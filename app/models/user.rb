@@ -1,6 +1,15 @@
 class User < ApplicationRecord
-  # Include default devise modules. Others available are:
-  # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
+
+  enum role: {
+    admin: 0,
+    gestor: 1,
+    tecnico: 2
+  }
+
+  validates :name, presence: true
+
+  has_many :assignments, dependent: :destroy
+  has_many :order_services, through: :assignments
 end
