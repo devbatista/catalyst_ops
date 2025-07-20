@@ -12,4 +12,7 @@ class User < ApplicationRecord
 
   has_many :assignments, dependent: :destroy
   has_many :order_services, through: :assignments
+
+  scope :tecnicos, -> { where(role: :tecnico) }
+  scope :gestores, -> { where(role: :gestor) }
 end
