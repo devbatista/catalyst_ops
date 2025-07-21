@@ -18,4 +18,12 @@ class OrderService < ApplicationRecord
   
   scope :by_status, ->(status) { where(status: status) }
   scope :by_client, ->(client_id) { where(client_id: client_id) }
+
+  def total_service_value
+    service_items.sum(&:total_price)
+  end
+  
+  def formatted_total_value
+    "R$ #{'%.2f' % total_service_value}"
+  end
 end
