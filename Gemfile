@@ -34,6 +34,9 @@ gem 'cancancan', '~> 3.5'
 gem 'simple_form', '~> 5.3'
 gem 'image_processing', '~> 1.2'
 
+# Validação de CPF/CNPJ
+gem 'cpf_cnpj', '~> 0.5.0'
+
 group :development, :test do
   gem "debug", platforms: %i[ mri windows ]
 
