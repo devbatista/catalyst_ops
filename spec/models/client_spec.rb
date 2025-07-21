@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Client, type: :model do
-  describe "validations" do
+  describe "validações" do
     subject { create(:client) }
 
     it { should validate_presence_of(:name) }
@@ -16,49 +16,49 @@ RSpec.describe Client, type: :model do
     it { should validate_presence_of(:phone) }
     it { should validate_length_of(:address).is_at_most(500) }
 
-    context "email format validation" do
-      it "accepts valid email" do
-        client = build(:client, email: "test@example.com")
+    context "validação de formato do e-mail" do
+      it "aceita e-mail válido" do
+        client = build(:client, email: "teste@exemplo.com")
         expect(client).to be_valid
       end
 
-      it "rejects invalid email" do
-        client = build(:client, email: "invalid_email")
+      it "rejeita e-mail inválido" do
+        client = build(:client, email: "email_invalido")
         expect(client).not_to be_valid
         expect(client.errors[:email]).to include("is invalid")
       end
     end
 
-    context "phone format validation" do
-      it "accepts valid phone" do
+    context "validação de formato do telefone" do
+      it "aceita telefone válido" do
         client = build(:client, phone: "11987654321")
         expect(client).to be_valid
       end
 
-      it "accepts formatted phone" do
+      it "aceita telefone formatado" do
         client = build(:client, phone: "(11) 98765-4321")
         expect(client).to be_valid
       end
     end
 
-    context "document validation" do
-      it "accepts valid CPF" do
+    context "validação de documento" do
+      it "aceita CPF válido" do
         client = build(:client, document: CPF.generate)
         expect(client).to be_valid
       end
 
-      it "accepts valid CNPJ" do
+      it "aceita CNPJ válido" do
         client = build(:client, document: CNPJ.generate)
         expect(client).to be_valid
       end
 
-      it "rejects invalid CPF" do
+      it "rejeita CPF inválido" do
         client = build(:client, document: "11111111111")
         expect(client).not_to be_valid
         expect(client.errors[:document]).to include("deve ser um CPF ou CNPJ válido")
       end
 
-      it "rejects invalid CNPJ" do
+      it "rejeita CNPJ inválido" do
         client = build(:client, document: "11111111111111")
         expect(client).not_to be_valid
         expect(client.errors[:document]).to include("deve ser um CPF ou CNPJ válido")
@@ -66,40 +66,40 @@ RSpec.describe Client, type: :model do
     end
   end
 
-  describe "associations" do
+  describe "associações" do
     it { should have_many(:order_services).dependent(:destroy) }
   end
 
-  describe "scopes" do
-    let!(:active_client) { create(:client) }
-    let!(:old_client) { create(:client) }
+  describe "escopos" do
+    let!(:cliente_ativo) { create(:client) }
+    let!(:cliente_antigo) { create(:client) }
 
     before do
-      create(:order_service, client: active_client, created_at: 1.month.ago)
-      create(:order_service, client: old_client, created_at: 8.months.ago)
+      create(:order_service, client: cliente_ativo, created_at: 1.month.ago)
+      create(:order_service, client: cliente_antigo, created_at: 8.months.ago)
     end
 
-    it "returns active clients" do
-      expect(Client.active_clients).to include(active_client)
-      expect(Client.active_clients).not_to include(old_client)
+    it "retorna clientes ativos" do
+      expect(Client.active_clients).to include(cliente_ativo)
+      expect(Client.active_clients).not_to include(cliente_antigo)
     end
 
-    it "filters by name" do
-      client_with_name = create(:client, name: "João Silva")
-      expect(Client.by_name("João")).to include(client_with_name)
-      expect(Client.by_name("Maria")).not_to include(client_with_name)
+    it "filtra por nome" do
+      cliente_com_nome = create(:client, name: "João Silva")
+      expect(Client.by_name("João")).to include(cliente_com_nome)
+      expect(Client.by_name("Maria")).not_to include(cliente_com_nome)
     end
 
-    it "orders by most recent" do
+    it "ordena pelo mais recente" do
       create(:client)
       sleep(1)
-      client2 = create(:client)
-      expect(Client.recent.first).to eq(client2)
+      cliente2 = create(:client)
+      expect(Client.recent.first).to eq(cliente2)
     end
   end
 
   describe "callbacks" do
-    it "normalizes attributes before validation" do
+    it "normaliza atributos antes da validação" do
       client = build(:client,
                      name: "  joão silva  ",
                      email: "  JOAO@EXAMPLE.COM  ",
@@ -113,13 +113,13 @@ RSpec.describe Client, type: :model do
     end
   end
 
-  describe "document methods" do
+  describe "métodos de documento" do
     let(:cpf_number) { CPF.generate }
     let(:cnpj_number) { CNPJ.generate }
     let(:cpf_client) { create(:client, document: cpf_number) }
     let(:cnpj_client) { create(:client, document: cnpj_number) }
 
-    it "identifies CPF correctly" do
+    it "identifica CPF corretamente" do
       expect(cpf_client.cpf?).to be true
       expect(cpf_client.cnpj?).to be false
       expect(cpf_client.document_type).to eq("CPF")
@@ -127,7 +127,7 @@ RSpec.describe Client, type: :model do
       expect(cpf_client.corporate_customer?).to be false
     end
 
-    it "identifies CNPJ correctly" do
+    it "identifica CNPJ corretamente" do
       expect(cnpj_client.cpf?).to be false
       expect(cnpj_client.cnpj?).to be true
       expect(cnpj_client.document_type).to eq("CNPJ")
@@ -135,31 +135,31 @@ RSpec.describe Client, type: :model do
       expect(cnpj_client.corporate_customer?).to be true
     end
 
-    it "formats document correctly" do
+    it "formata documento corretamente" do
       expect(cpf_client.formatted_document).to eq(CPF.new(cpf_number).formatted)
       expect(cnpj_client.formatted_document).to eq(CNPJ.new(cnpj_number).formatted)
     end
   end
 
-  describe "phone formatting" do
-    it "formats mobile phone correctly" do
+  describe "formatação de telefone" do
+    it "formata celular corretamente" do
       client = create(:client, phone: "11987654321")
       expect(client.formatted_phone).to eq("(11) 98765-4321")
     end
 
-    it "formats landline phone correctly" do
+    it "formata telefone fixo corretamente" do
       client = create(:client, phone: "1133334444")
       expect(client.formatted_phone).to eq("(11) 3333-4444")
     end
 
-    it "does not allow phone with less than 10 digits" do
+    it "não permite telefone com menos de 10 dígitos" do
       client = build(:client, phone: "123456789") # 9 dígitos
       expect(client).not_to be_valid
       expect(client.errors[:phone]).to include("is too short (minimum is 10 characters)")
     end
   end
 
-  describe "business methods" do
+  describe "métodos de negócio" do
     let(:client) { create(:client) }
 
     before do
@@ -169,28 +169,28 @@ RSpec.describe Client, type: :model do
       create(:order_service, client: client, status: :cancelada)
     end
 
-    it "returns active orders" do
+    it "retorna ordens ativas" do
       expect(client.active_orders.count).to eq(2)
     end
 
-    it "counts pending orders" do
+    it "conta ordens pendentes" do
       expect(client.pending_orders_count).to eq(1)
     end
 
-    it "counts completed orders" do
+    it "conta ordens concluídas" do
       expect(client.completed_orders_count).to eq(1)
     end
 
-    it "identifies if has active orders" do
+    it "identifica se possui ordens ativas" do
       expect(client.has_active_orders?).to be true
     end
 
-    it "determines if can be deleted" do
+    it "determina se pode ser deletado" do
       expect(client.can_be_deleted?).to be false
     end
   end
 
-  describe "financial calculations" do
+  describe "cálculos financeiros" do
     let(:client) { create(:client) }
 
     before do
@@ -200,26 +200,26 @@ RSpec.describe Client, type: :model do
       create(:service_item, order_service: order2, quantity: 1, unit_price: 100.0)
     end
 
-    it "calculates total orders value" do
+    it "calcula o valor total das ordens" do
       expect(client.total_orders_value).to eq(200.0)
     end
 
-    it "formats total value" do
+    it "formata o valor total" do
       expect(client.formatted_total_value).to eq("R$ 200.00")
     end
   end
 
   describe "factory" do
-    it "has a valid factory" do
+    it "possui uma factory válida" do
       expect(build(:client)).to be_valid
     end
 
-    it "has valid trait factories" do
+    it "possui traits de factory válidos" do
       expect(build(:client, :with_cnpj)).to be_valid
       expect(build(:client, :individual)).to be_valid
     end
 
-    it "creates unique documents" do
+    it "cria documentos únicos" do
       client1 = create(:client)
       client2 = create(:client)
       expect(client1.document).not_to eq(client2.document)
