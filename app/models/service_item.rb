@@ -7,4 +7,12 @@ class ServiceItem < ApplicationRecord
   def total_price
     quantity * unit_price
   end
+
+  def formatted_unit_price
+    "R$ #{'%.2f' % unit_price}"
+  end
+
+  def formatted_total_price
+    "R$ #{'%.2f' % total_price}"
+  end
 end
