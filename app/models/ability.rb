@@ -41,6 +41,9 @@ class Ability
     
     # Pode editar próprio perfil
     can [:read, :update], User, id: user.id
+
+    # Dashboard
+    can :read, :dashboard
   end
 
   def tecnico_abilities(user)
@@ -69,6 +72,8 @@ class Ability
     can :read, Client do |client|
       client.order_services.joins(:users).where(users: { id: user.id }).any?
     end
+
+    can :read, :dashboard
   end
 
   def guest_abilities
