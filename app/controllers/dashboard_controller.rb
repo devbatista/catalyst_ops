@@ -14,10 +14,5 @@ class DashboardController < ApplicationController
       @pending_orders = @my_orders.agendada.count
       @in_progress_orders = @my_orders.em_andamento.count
     end
-    
-    render json: {
-      role: current_user.role,
-      data: instance_variables.map { |var| [var, instance_variable_get(var)] }.to_h
-    }
   end
 end
