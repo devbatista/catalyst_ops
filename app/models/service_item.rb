@@ -3,7 +3,8 @@ class ServiceItem < ApplicationRecord
   
   validates :description, presence: true, length: { minimum: 5, maximum: 200 }
   validates :quantity, presence: true, numericality: { greater_than: 0, less_than_or_equal_to: 9999.99 }
-  validates :unit_price, presence: true, numericality: { greater_than: 0, less_than_or_equal_to: 999999.99 }
+  validates :unit_price, presence: true, numericality: { greater_than_or_equal_to: 0 }
+
   validate :cannot_edit_if_order_completed
   
   before_save :calculate_total
