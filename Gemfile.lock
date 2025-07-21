@@ -111,9 +111,17 @@ GEM
       railties (>= 4.1.0)
       responders
       warden (~> 1.2.3)
+    diff-lcs (1.6.2)
     drb (2.2.3)
     erb (5.0.2)
     erubi (1.13.1)
+    factory_bot (6.5.4)
+      activesupport (>= 6.1.0)
+    factory_bot_rails (6.5.0)
+      factory_bot (~> 6.5)
+      railties (>= 6.1.0)
+    faker (3.5.2)
+      i18n (>= 1.8.11, < 2)
     ffi (1.17.2-aarch64-linux-gnu)
     ffi (1.17.2-aarch64-linux-musl)
     ffi (1.17.2-arm-linux-gnu)
@@ -244,6 +252,23 @@ GEM
       actionpack (>= 5.2)
       railties (>= 5.2)
     rexml (3.4.1)
+    rspec-core (3.13.5)
+      rspec-support (~> 3.13.0)
+    rspec-expectations (3.13.5)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-mocks (3.13.5)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
+    rspec-rails (6.1.5)
+      actionpack (>= 6.1)
+      activesupport (>= 6.1)
+      railties (>= 6.1)
+      rspec-core (~> 3.13)
+      rspec-expectations (~> 3.13)
+      rspec-mocks (~> 3.13)
+      rspec-support (~> 3.13)
+    rspec-support (3.13.4)
     ruby-vips (2.2.4)
       ffi (~> 1.12)
       logger
@@ -255,6 +280,8 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
+    shoulda-matchers (5.3.0)
+      activesupport (>= 5.2.0)
     simple_form (5.3.1)
       actionpack (>= 5.2)
       activemodel (>= 5.2)
@@ -310,13 +337,17 @@ DEPENDENCIES
   capybara
   debug
   devise (~> 4.9)
+  factory_bot_rails (~> 6.4)
+  faker (~> 3.2)
   image_processing (~> 1.2)
   importmap-rails
   jbuilder
   pg (~> 1.1)
   puma (>= 5.0)
   rails (~> 7.1.5, >= 7.1.5.1)
+  rspec-rails (~> 6.1)
   selenium-webdriver
+  shoulda-matchers (~> 5.3)
   simple_form (~> 5.3)
   sprockets-rails
   stimulus-rails
