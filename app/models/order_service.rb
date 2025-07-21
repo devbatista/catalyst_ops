@@ -17,6 +17,8 @@ class OrderService < ApplicationRecord
   validates :description, presence: true, length: { minimum: 10, maximum: 1000 }
   validates :status, presence: true
   validates :scheduled_at, presence: true
+  validates :client_id, presence: true
+
   validate :scheduled_at_cannot_be_in_the_past, on: :create
   validate :started_at_logic
   validate :finished_at_logic
@@ -33,12 +35,12 @@ class OrderService < ApplicationRecord
   
   after_update :notify_client_on_completion, if: :saved_change_to_status?
   
-  def total_service_value
+  def total_value
     service_items.sum(&:total_price)
   end
   
   def formatted_total_value
-    "R$ #{'%.2f' % total_service_value}"
+    "R$ #{'%.2f' % total_value}"
   end
   
   def overdue?
