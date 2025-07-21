@@ -12,18 +12,19 @@
 
 ActiveRecord::Schema[7.1].define(version: 2025_07_20_234725) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "pgcrypto"
   enable_extension "plpgsql"
 
-  create_table "assignments", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.bigint "order_service_id", null: false
+  create_table "assignments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.uuid "order_service_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["order_service_id"], name: "index_assignments_on_order_service_id"
     t.index ["user_id"], name: "index_assignments_on_user_id"
   end
 
-  create_table "clients", force: :cascade do |t|
+  create_table "clients", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name"
     t.string "document"
     t.string "email"
@@ -33,10 +34,10 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_20_234725) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "order_services", force: :cascade do |t|
+  create_table "order_services", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "title"
     t.text "description"
-    t.bigint "client_id", null: false
+    t.uuid "client_id", null: false
     t.integer "status"
     t.datetime "scheduled_at"
     t.datetime "started_at"
@@ -47,17 +48,17 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_20_234725) do
     t.index ["client_id"], name: "index_order_services_on_client_id"
   end
 
-  create_table "service_items", force: :cascade do |t|
+  create_table "service_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.text "description"
     t.decimal "quantity"
     t.decimal "unit_price"
-    t.bigint "order_service_id", null: false
+    t.uuid "order_service_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["order_service_id"], name: "index_service_items_on_order_service_id"
   end
 
-  create_table "users", force: :cascade do |t|
+  create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"

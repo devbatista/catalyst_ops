@@ -1,9 +1,9 @@
 class CreateOrderServices < ActiveRecord::Migration[7.1]
   def change
-    create_table :order_services do |t|
+    create_table :order_services, id: :uuid do |t|
       t.string :title
       t.text :description
-      t.references :client, null: false, foreign_key: true
+      t.references :client, null: false, type: :uuid, foreign_key: true
       t.integer :status
       t.datetime :scheduled_at
       t.datetime :started_at
