@@ -1,15 +1,18 @@
 class Client < ApplicationRecord
   validates :name, presence: true, length: { minimum: 2, maximum: 100 }
-  validates :document, presence: true, uniqueness: true
-  validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }, uniqueness: true
-  validates :phone, presence: true, format: { with: /\A[\d\s\-\(\)]+\z/ }
+  validates :document, presence: true, uniqueness: { case_sensitive: false }
+  validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }, uniqueness: { case_sensitive: false}
+  validates :phone, presence: true, format: { with: /\A[\d\s\-\(\)]+\z/ }, length: { minimum: 10, maximum: 11 }
   validates :address, length: { maximum: 500 }
   
   validate :document_must_be_valid
   
   has_many :order_services, dependent: :destroy
   
-  scope :active_clients, -> { joins(:order_services).where(order_services: { created_at: 6.months.ago..Time.current }).distinct }
+  scope :active_clients, -> { joins(:order_services)
+                              .where(order_services: {
+                                created_at: 6.months.ago..Time.current 
+                              }).distinct }
   scope :by_name, ->(name) { where("name ILIKE ?", "%#{name}%") }
   scope :recent, -> { order(created_at: :desc) }
   
@@ -70,11 +73,11 @@ class Client < ApplicationRecord
   end
   
   def cpf?
-    document.present? && CPF.valid?(document)
+    !!(document.present? && CPF.valid?(document))
   end
   
   def cnpj?
-    document.present? && CNPJ.valid?(document)
+    !!(document.present? && CNPJ.valid?(document))
   end
   
   def document_type
