@@ -2,8 +2,7 @@ Rails.application.routes.draw do
   constraints subdomain: "admin" do
     namespace :admin do
       resources :companies
-      # Outras rotas de admin...
-      root to: "admin/dashboard#index", as: :admin_root
+      match '/', to: 'companies#index', via: [:get, :options], as: :root
     end
   end
 end

@@ -7,18 +7,25 @@ class SessionsController < ApplicationController
   def create
     user = User.find_by(email: params[:email].to_s.downcase.strip)
     if user&.valid_password?(params[:password])
-      sign_in(user)
-      # Redireciona para o subdomínio correto conforme o perfil
-      target_subdomain = user.admin? ? "admin" : "app"
-      redirect_to root_url(subdomain: target_subdomain), notice: "Login realizado com sucesso!"
+      sign_in(:user, user)
+      
+      if user.admin?
+        redirect_to admin_root_url(subdomain: 'admin'), 
+                    allow_other_host: true, 
+                    notice: 'Login realizado com sucesso!'
+      else
+        redirect_to app_root_url(subdomain: 'app'),
+                    allow_other_host: true,
+                    notice: 'Login realizado com sucesso!'
+      end
     else
-      flash.now[:alert] = "E-mail ou senha inválidos."
+      flash.now[:alert] = 'E-mail ou senha inválidos.'
       render :new, status: :unprocessable_entity
     end
   end
 
   def destroy
     sign_out(current_user)
-    redirect_to login_url(subdomain: "login"), notice: "Logout realizado com sucesso!"
+    redirect_to login_url(subdomain: 'login'), notice: 'Logout realizado com sucesso!'
   end
 end
