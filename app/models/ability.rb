@@ -24,6 +24,9 @@ class Ability
   end
 
   def gestor_abilities(user)
+    # NÃO pode gerenciar Company
+    cannot :manage, Company
+
     # Pode gerenciar clientes
     can :manage, Client
     
@@ -47,6 +50,9 @@ class Ability
   end
 
   def tecnico_abilities(user)
+    # NÃO pode gerenciar Company
+    cannot :manage, Company
+    
     # Pode visualizar apenas OSs atribuídas a ele
     can :read, OrderService do |order_service|
       order_service.users.include?(user)
