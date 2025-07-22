@@ -1,4 +1,4 @@
-class SessionsController < ApplicationController
+class SessionsController < Devise::SessionsController
   skip_before_action :authenticate_user!, only: [:new, :create]
   skip_authorization_check
 
@@ -10,11 +10,11 @@ class SessionsController < ApplicationController
       sign_in(:user, user)
 
       if user.admin?
-        redirect_to admin_root_url(subdomain: "admin"),
+        redirect_to admin_dashboard_url(subdomain: "admin"),
                     allow_other_host: true,
                     notice: "Login realizado com sucesso!"
       else
-        redirect_to app_root_url(subdomain: "app"),
+        redirect_to app_dashboard_url(subdomain: "app"),
                     allow_other_host: true,
                     notice: "Login realizado com sucesso!"
       end
@@ -26,6 +26,6 @@ class SessionsController < ApplicationController
 
   def destroy
     sign_out(current_user)
-    redirect_to login_url(subdomain: "login"), notice: "Logout realizado com sucesso!"
+    redirect_to login_root_url(subdomain: "login"), allow_other_host: true, notice: "Logout realizado com sucesso!"
   end
 end

@@ -1,0 +1,31 @@
+<!-- filepath: app/views/app/dashboard/index.html.erb -->
+<h1>Dashboard</h1>
+
+<%= button_to "Logout", logout_app_path, method: :delete, form: { data: { turbo: false } } %>
+
+<% if current_user.admin? || current_user.gestor? %>
+  <p>Total de clientes: <%= @clients_count %></p>
+  <p>Total de ordens de serviço: <%= @order_services_count %></p>
+  <p>Ordens agendadas: <%= @pending_orders %></p>
+  <p>Ordens em andamento: <%= @in_progress_orders %></p>
+
+  <h2>Ordens Recentes</h2>
+  <ul>
+    <% @recent_orders.each do |order| %>
+      <li>
+        <strong><%= order.client.name %></strong> - <%= order.created_at.strftime("%d/%m/%Y") %>
+      </li>
+    <% end %>
+  </ul>
+<% elsif current_user.tecnico? %>
+  <p>Minhas ordens agendadas: <%= @pending_orders %></p>
+  <p>Minhas ordens em andamento: <%= @in_progress_orders %></p>
+  <h2>Minhas Ordens</h2>
+  <ul>
+    <% @my_orders.each do |order| %>
+      <li>
+        <strong><%= order.client.name %></strong> - <%= order.created_at.strftime("%d/%m/%Y") %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>

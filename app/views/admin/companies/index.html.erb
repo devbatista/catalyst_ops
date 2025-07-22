@@ -1,0 +1,10 @@
+<!-- filepath: app/views/admin/companies/index.html.erb -->
+<h1>Empresas</h1>
+
+<%= button_to "Logout", logout_admin_path, method: :delete, form: { data: { turbo: false } } %>
+
+<ul>
+  <% @companies.each do |company| %>
+    <li><%= company.name %></li>
+  <% end %>
+</ul>
