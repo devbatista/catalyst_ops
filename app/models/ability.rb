@@ -2,6 +2,7 @@ class Ability
   include CanCan::Ability
 
   def initialize(user)
+    user = User.find_by(id: user["id"]) if user.is_a?(Hash) && user["id"]
     user ||= User.new
 
     case user.role
