@@ -78,5 +78,6 @@ Rails.application.configure do
 
   config.hosts << "app.catalystops.dev"
   config.hosts << "admin.catalystops.dev"
+  config.hosts << "login.catalystops.dev"
   config.hosts << /.*\.catalystops\.dev/
 end
