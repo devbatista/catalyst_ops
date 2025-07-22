@@ -1,5 +1,6 @@
 class OrderService < ApplicationRecord
   belongs_to :client
+  belongs_to :company
   
   has_many :assignments, dependent: :destroy
   has_many :users, through: :assignments

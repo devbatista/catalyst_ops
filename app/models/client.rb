@@ -6,6 +6,8 @@ class Client < ApplicationRecord
   validates :address, length: { maximum: 500 }
   
   validate :document_must_be_valid
+
+  belongs_to :company
   
   has_many :order_services, dependent: :destroy
   

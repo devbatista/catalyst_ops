@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_22_151218) do
+ActiveRecord::Schema[7.1].define(version: 2025_07_22_184321) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -32,6 +32,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_22_151218) do
     t.text "address"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "company_id", null: false
+    t.index ["company_id"], name: "index_clients_on_company_id"
   end
 
   create_table "companies", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -62,7 +64,9 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_22_151218) do
     t.boolean "signed_by_client"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "company_id", null: false
     t.index ["client_id"], name: "index_order_services_on_client_id"
+    t.index ["company_id"], name: "index_order_services_on_company_id"
   end
 
   create_table "service_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -93,8 +97,10 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_22_151218) do
 
   add_foreign_key "assignments", "order_services"
   add_foreign_key "assignments", "users"
+  add_foreign_key "clients", "companies"
   add_foreign_key "companies", "users", column: "responsible_id"
   add_foreign_key "order_services", "clients"
+  add_foreign_key "order_services", "companies"
   add_foreign_key "service_items", "order_services"
   add_foreign_key "users", "companies"
 end
