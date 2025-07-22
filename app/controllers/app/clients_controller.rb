@@ -1,4 +1,4 @@
-class ClientsController < ApplicationController
+class App::ClientsController < ApplicationController
   load_and_authorize_resource
   
   def index

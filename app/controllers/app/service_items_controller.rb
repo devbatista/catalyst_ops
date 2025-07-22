@@ -1,4 +1,4 @@
-class ServiceItemsController < ApplicationController
+class App::ServiceItemsController < ApplicationController
   before_action :set_order_service
   before_action :set_service_item, only: [:show, :edit, :update, :destroy]
   

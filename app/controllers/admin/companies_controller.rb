@@ -1,4 +1,4 @@
-class CompaniesController < ApplicationController
+class Admin::CompaniesController < ApplicationController
   load_and_authorize_resource
 
   def index

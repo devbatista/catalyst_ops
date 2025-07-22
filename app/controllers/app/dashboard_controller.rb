@@ -1,4 +1,4 @@
-class DashboardController < ApplicationController
+class App::DashboardController < ApplicationController
   def index
     authorize! :read, :dashboard
     
