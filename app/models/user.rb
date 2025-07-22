@@ -12,6 +12,8 @@ class User < ApplicationRecord
   validates :role, presence: true
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }
 
+  belongs_to :company, optional: true
+
   has_many :assignments, dependent: :destroy
   has_many :order_services, through: :assignments
 
