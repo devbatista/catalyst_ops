@@ -6,11 +6,14 @@ RSpec.describe Assignment, type: :model do
     it { should belong_to(:user) }
     it { should belong_to(:order_service) }
 
-    it {
-      should validate_uniqueness_of(:user_id)
-               .scoped_to(:order_service_id)
-               .with_message("já está atribuído a esta OS")
-    }
+    it "não permite o mesmo usuário na mesma OS" do
+      user = create(:user, role: "tecnico")
+      os = create(:order_service)
+      create(:assignment, user: user, order_service: os)
+      assignment = build(:assignment, user: user, order_service: os)
+      expect(assignment).not_to be_valid
+      expect(assignment.errors[:user_id]).to include("já está atribuído a esta OS")
+    end
 
     context "quando o usuário não é técnico" do
       it "não permite atribuição" do

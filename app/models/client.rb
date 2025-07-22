@@ -31,7 +31,7 @@ class Client < ApplicationRecord
   end
   
   def total_orders_value
-    order_services.sum { |os| os.total_service_value }
+    order_services.sum { |os| os.total_value }
   end
   
   def formatted_total_value
