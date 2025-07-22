@@ -10,6 +10,8 @@ Rails.application.routes.draw do
       put :update_status
     end
   end
+
+  resources :companies
   
   resources :users, only: [:index, :show, :edit, :update]
 
