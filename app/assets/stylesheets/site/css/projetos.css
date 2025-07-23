@@ -1,0 +1,322 @@
+/* Projetos Page Styles */
+.projetos-container {
+  min-height: 100vh;
+  background: linear-gradient(to bottom right, #111827, rgba(147, 51, 234, 0.2), #111827);
+}
+
+.projetos-content {
+  padding-top: 8rem;
+  padding-bottom: 5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.projetos-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Header */
+.projetos-header {
+  text-align: center;
+  margin-bottom: 5rem;
+}
+
+.projetos-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  background: linear-gradient(to right, var(--purple-400), var(--blue-400), var(--cyan-400));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .projetos-title {
+    font-size: 3.75rem;
+  }
+}
+
+.projetos-description {
+  font-size: 1.25rem;
+  color: #d1d5db;
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
+/* Filter Categories */
+.filter-categories {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 4rem;
+}
+
+.filter-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.filter-btn.active {
+  background: linear-gradient(to right, var(--purple-600), var(--blue-600));
+  color: white;
+}
+
+.filter-btn:not(.active) {
+  background: rgba(31, 41, 55, 0.5);
+  color: #d1d5db;
+  border: 1px solid #374151;
+}
+
+.filter-btn:not(.active):hover {
+  background: #374151;
+  color: white;
+  border-color: var(--purple-500);
+}
+
+/* Projects Grid */
+.projects-grid {
+  display: grid;
+  gap: 2rem;
+  margin-bottom: 5rem;
+}
+
+@media (min-width: 1024px) {
+  .projects-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.project-card {
+  background: rgba(31, 41, 55, 0.5);
+  backdrop-filter: blur(12px);
+  border: 1px solid #374151;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.project-card:hover {
+  border-color: var(--purple-500);
+  transform: scale(1.05);
+  box-shadow: 0 20px 25px -5px rgba(147, 51, 234, 0.1);
+}
+
+.project-image-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.project-image {
+  width: 100%;
+  height: 20rem;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.project-card:hover .project-image {
+  transform: scale(1.1);
+}
+
+.project-status {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.project-status.completed {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.project-status.development {
+  background: rgba(234, 179, 8, 0.2);
+  color: #facc15;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+.project-category {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: rgba(147, 51, 234, 0.2);
+  color: var(--purple-400);
+  border: 1px solid rgba(147, 51, 234, 0.3);
+}
+
+.project-content {
+  padding: 2.5rem;
+}
+
+.project-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 1.25rem;
+}
+
+.project-description {
+  color: #d1d5db;
+  margin-bottom: 2rem;
+  font-size: 1.125rem;
+  line-height: 1.75;
+}
+
+.project-technologies {
+  margin-bottom: 1.5rem;
+}
+
+.tech-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #9ca3af;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tech-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tech-tag {
+  padding: 0.25rem 0.75rem;
+  background: linear-gradient(to right, rgba(147, 51, 234, 0.2), rgba(59, 130, 246, 0.2));
+  border: 1px solid rgba(147, 51, 234, 0.3);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  color: white;
+}
+
+.project-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.project-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #d1d5db;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.project-link:hover {
+  color: white;
+}
+
+.project-link.demo {
+  color: var(--purple-400);
+}
+
+.project-link.demo:hover {
+  color: #c084fc;
+}
+
+/* Stats Section */
+.projects-stats {
+  display: grid;
+  gap: 2rem;
+  margin-bottom: 5rem;
+}
+
+@media (min-width: 768px) {
+  .projects-stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 2.25rem;
+  font-weight: 700;
+  background: linear-gradient(to right, var(--purple-400), var(--blue-400));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .stat-number {
+    font-size: 3rem;
+  }
+}
+
+.stat-label {
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+/* CTA Section */
+.projects-cta {
+  background: linear-gradient(to right, rgba(88, 28, 135, 0.3), rgba(30, 58, 138, 0.3));
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(147, 51, 234, 0.3);
+  border-radius: 1.5rem;
+  padding: 3rem;
+  text-align: center;
+}
+
+.projects-cta-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .projects-cta-title {
+    font-size: 2.25rem;
+  }
+}
+
+.projects-cta-description {
+  font-size: 1.25rem;
+  color: #d1d5db;
+  margin-bottom: 2rem;
+  max-width: 32rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.projects-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(to right, var(--purple-600), var(--blue-600));
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  transform: scale(1);
+}
+
+.projects-cta-btn:hover {
+  background: linear-gradient(to right, #7c3aed, #1d4ed8);
+  transform: scale(1.05);
+  box-shadow: 0 20px 25px -5px rgba(147, 51, 234, 0.25);
+}

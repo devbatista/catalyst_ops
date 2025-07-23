@@ -1,0 +1,241 @@
+/* DevBatista - Footer Styles */
+
+.footer {
+  background-color: var(--slate-900);
+  border-top: 1px solid var(--slate-800);
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 1rem;
+}
+
+.footer-grid {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .footer-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Footer Brand Section */
+.footer-brand {
+  grid-column: span 1;
+}
+
+@media (min-width: 768px) {
+  .footer-brand {
+    grid-column: span 2;
+  }
+}
+
+.footer-logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(to right, var(--blue-400), var(--cyan-400));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+  display: inline-block;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.footer-logo:hover {
+  background: linear-gradient(to right, #60a5fa, #22d3ee);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.footer-description {
+  color: var(--slate-300);
+  margin-bottom: 1.5rem;
+  max-width: 24rem;
+  line-height: 1.6;
+}
+
+/* Footer Social Links */
+.footer-social {
+  display: flex;
+  gap: 1rem;
+}
+
+.social-link {
+  background-color: var(--slate-800);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.social-link:hover {
+  background-color: var(--slate-700);
+  transform: translateY(-2px);
+}
+
+.social-link.github:hover {
+  background-color: var(--slate-700);
+}
+
+.social-link.linkedin:hover {
+  background-color: var(--blue-600);
+}
+
+.social-link.instagram:hover {
+  background-color: var(--pink-600);
+}
+
+.social-link.email:hover {
+  background-color: var(--blue-600);
+}
+
+.social-link svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--slate-400);
+  transition: color 0.3s ease;
+}
+
+.social-link:hover svg {
+  color: white;
+}
+
+/* Footer Sections */
+.footer-section h3 {
+  color: white;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links li {
+  margin-bottom: 0.5rem;
+}
+
+.footer-link {
+  color: var(--slate-300);
+  text-decoration: none;
+  transition: color 0.3s ease;
+  font-size: 0.875rem;
+}
+
+.footer-link:hover {
+  color: var(--blue-400);
+}
+
+.footer-services {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-services li {
+  margin-bottom: 0.5rem;
+}
+
+.footer-service {
+  color: var(--slate-300);
+  font-size: 0.875rem;
+}
+
+/* Footer Bottom */
+.footer-bottom {
+  border-top: 1px solid var(--slate-800);
+  margin-top: 3rem;
+  padding-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .footer-bottom {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+.footer-copyright {
+  color: var(--slate-300);
+  font-size: 0.875rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.footer-copyright svg {
+  width: 1rem;
+  height: 1rem;
+  color: var(--slate-400);
+}
+
+.footer-made-with {
+  color: var(--slate-300);
+  font-size: 0.875rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.heart-icon {
+  width: 1rem;
+  height: 1rem;
+  color: #ef4444;
+  animation: heartbeat 2s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0% {
+    transform: scale(1);
+  }
+  14% {
+    transform: scale(1.1);
+  }
+  28% {
+    transform: scale(1);
+  }
+  42% {
+    transform: scale(1.1);
+  }
+  70% {
+    transform: scale(1);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+  .footer-container {
+    padding: 2rem 1rem;
+  }
+  
+  .footer-grid {
+    gap: 2rem;
+  }
+  
+  .footer-social {
+    justify-content: center;
+  }
+  
+  .footer-bottom {
+    text-align: center;
+  }
+}
