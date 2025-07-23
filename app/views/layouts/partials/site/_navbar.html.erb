@@ -1,0 +1,37 @@
+<nav class="navigation">
+  <div class="nav-container">
+    <div class="nav-content">
+      <!-- Logo -->
+      <%= link_to "DevBatista", root_path, class: "nav-logo" %>
+
+      <!-- Desktop Navigation -->
+      <ul class="nav-links">
+        <li><%= link_to "Início", root_path, class: "nav-link" %></li>
+        <li><%= link_to "Sobre", about_path, class: "nav-link" %></li>
+        <li><%= link_to "Serviços", services_path, class: "nav-link" %></li>
+        <li><%= link_to "Projetos", projects_path, class: "nav-link" %></li>
+        <li><%= link_to "Contato", contact_path, class: "nav-link" %></li>
+      </ul>
+
+      <!-- Mobile Menu Button -->
+      <button class="mobile-menu-btn">
+        <svg class="icon" viewBox="0 0 24 24">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <div class="mobile-menu">
+      <ul class="mobile-nav-links">
+        <li><%= link_to "Início", root_path, class: "mobile-nav-link" %></li>
+        <li><%= link_to "Sobre", about_path, class: "mobile-nav-link" %></li>
+        <li><%= link_to "Serviços", services_path, class: "mobile-nav-link" %></li>
+        <li><%= link_to "Projetos", projects_path, class: "mobile-nav-link" %></li>
+        <li><%= link_to "Contato", contact_path, class: "mobile-nav-link" %></li>
+      </ul>
+    </div>
+  </div>
+</nav>
