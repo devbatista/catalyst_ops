@@ -19,8 +19,8 @@ class SessionsController < Devise::SessionsController
                     notice: "Login realizado com sucesso!"
       end
     else
-      flash.now[:alert] = "E-mail ou senha inválidos."
-      render :new, status: :unprocessable_entity
+      flash[:alert] = "E-mail ou senha inválidos."
+      redirect_to login_root_url(subdomain: "login"), allow_other_host: true
     end
   end
 
