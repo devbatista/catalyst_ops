@@ -8,66 +8,58 @@
   <!--navigation-->
   <ul class="metismenu" id="menu">
     <li>
-      <a href="/">
-        <div class="parent-icon"><i class='bx bx-home-alt'></i></div>
-        <div class="menu-title">Dashboard</div>
-      </a>
+      <%= link_to app_dashboard_path do %>
+      <div class="parent-icon"><i class='bx bx-home-alt'></i></div>
+      <div class="menu-title">Dashboard</div>
+      <% end %>
     </li>
     <li>
-      <a href="form-froala-editor.html">
-        <div class="parent-icon"><i class='bx bx-user'></i>
-        </div>
-        <div class="menu-title">Clientes</div>
-      </a>
+      <%= link_to app_clients_path do %>
+      <div class="parent-icon"><i class='bx bx-user'></i></div>
+      <div class="menu-title">Clientes</div>
+      <% end %>
     </li>
     <li>
-      <a href="form-froala-editor.html">
-        <div class="parent-icon"><i class='bx bx-edit'></i>
-        </div>
-        <div class="menu-title">Ordens de Serviço</div>
-      </a>
+      <%= link_to app_order_services_path do %>
+      <div class="parent-icon"><i class='bx bx-edit'></i></div>
+      <div class="menu-title">Ordens de Serviço</div>
+      <% end %>
     </li>
     <li>
-      <a href="form-froala-editor.html">
-        <div class="parent-icon"><i class='bx bx-run'></i>
-        </div>
-        <div class="menu-title">Técnicos</div>
-      </a>
+      <%= link_to app_technicians_path do %>
+      <div class="parent-icon"><i class='bx bx-run'></i></div>
+      <div class="menu-title">Técnicos</div>
+      <% end %>
     </li>
     <li>
-      <a href="form-froala-editor.html">
-        <div class="parent-icon"><i class='bx bx-vector'></i>
-        </div>
-        <div class="menu-title">Itens de Serviço</div>
-      </a>
+      <%= link_to app_service_items_path do %>
+      <div class="parent-icon"><i class='bx bx-vector'></i></div>
+      <div class="menu-title">Itens de Serviço</div>
+      <% end %>
     </li>
     <li>
-      <a href="form-froala-editor.html">
-        <div class="parent-icon"><i class='bx bx-archive'></i>
-        </div>
-        <div class="menu-title">Anexos</div>
-      </a>
+      <%= link_to app_attachments_path do %>
+      <div class="parent-icon"><i class='bx bx-archive'></i></div>
+      <div class="menu-title">Anexos</div>
+      <% end %>
     </li>
     <li>
-      <a href="form-froala-editor.html">
-        <div class="parent-icon"><i class='bx bx-file'></i>
-        </div>
-        <div class="menu-title">Relatórios</div>
-      </a>
+      <%= link_to app_reports_path do %>
+      <div class="parent-icon"><i class='bx bx-file'></i></div>
+      <div class="menu-title">Relatórios</div>
+      <% end %>
     </li>
     <li>
-      <a href="form-froala-editor.html">
-        <div class="parent-icon"><i class='bx bx-log-out'></i>
-        </div>
-        <div class="menu-title">Logout</div>
-      </a>
+      <%= link_to logout_app_path, method: :delete do %>
+      <div class="parent-icon"><i class='bx bx-log-out'></i></div>
+      <div class="menu-title">Logout</div>
+      <% end %>
     </li>
     <li>
-      <a href="https://themeforest.net/user/codervent" target="_blank">
-        <div class="parent-icon"><i class="bx bx-support"></i>
-        </div>
-        <div class="menu-title">Support</div>
-      </a>
+      <%= link_to url: "https://themeforest.net/user/codervent", target: "_blank" do %>
+      <div class="parent-icon"><i class="bx bx-support"></i></div>
+      <div class="menu-title">Support</div>
+      <% end %>
     </li>
   </ul>
   <!--end navigation-->
