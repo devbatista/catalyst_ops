@@ -5,6 +5,7 @@ class OrderService < ApplicationRecord
   has_many :assignments, dependent: :destroy
   has_many :users, through: :assignments
   has_many :service_items, dependent: :destroy
+  
   has_many_attached :attachments
   
   enum status: { 
