@@ -4,10 +4,11 @@ constraints subdomain: "app" do
   resources :clients, module: "app", as: :app_clients
   resources :order_services, module: "app", as: :app_order_services
   resources :service_items, module: "app", as: :app_service_items
-  get "technicians", to: "app/technicians#index", as: :app_technicians
   resources :attachments, only: [:index, :show, :destroy], module: "app", as: :app_attachments
   resources :reports, only: [:index, :show], module: "app", as: :app_reports
-
+  
+  get "technicians", to: "app/technicians#index", as: :app_technicians
+  
   devise_scope :user do
     delete "/logout", to: "sessions#destroy", as: :logout_app
   end

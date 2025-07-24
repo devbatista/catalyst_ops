@@ -50,11 +50,12 @@
       <% end %>
     </li>
     <li>
-      <%= link_to logout_app_path, method: :delete do %>
+      <%= link_to logout_app_path, data: { turbo_method: :delete } do %>
       <div class="parent-icon"><i class='bx bx-log-out'></i></div>
       <div class="menu-title">Logout</div>
       <% end %>
     </li>
+
     <li>
       <%= link_to url: "https://themeforest.net/user/codervent", target: "_blank" do %>
       <div class="parent-icon"><i class="bx bx-support"></i></div>
