@@ -23,12 +23,15 @@ services:
       DATABASE_URL: postgres://postgres:postgres@db:5432/catalyst_ops_development
       RAILS_ENV: development
     command: sh -c "bundle install && bin/rails server -b 0.0.0.0"
-  
+
   nginx:
-    image: nginx:1.25
+    image: nginx:latest
     ports:
+      - "443:443"
       - "80:80"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/ssl.crt:/etc/nginx/ssl/ssl.crt
+      - ./docker/nginx/ssl.key:/etc/nginx/ssl/ssl.key
     depends_on:
       - web
