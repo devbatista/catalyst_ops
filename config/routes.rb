@@ -11,4 +11,5 @@ Rails.application.routes.draw do
 
   # Rotas padrão (sem subdomínio)
   # root to: "home#index"
+  match '/', to: proc { [204, {}, []] }, via: :options
 end

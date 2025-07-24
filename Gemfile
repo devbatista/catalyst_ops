@@ -37,6 +37,8 @@ gem 'image_processing', '~> 1.2'
 # Validação de CPF/CNPJ
 gem 'cpf_cnpj', '~> 0.5.0'
 
+gem 'rack-cors', '~> 1.1'
+
 group :development, :test do
   gem "debug", platforms: %i[ mri windows ]
 
