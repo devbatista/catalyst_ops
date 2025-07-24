@@ -1,6 +1,4 @@
 class SessionsController < Devise::SessionsController
-  # before_action :redirect_if_authenticated, only: :new
-
   skip_before_action :authenticate_user!, only: [:new, :create]
   skip_authorization_check
 
@@ -31,10 +29,17 @@ class SessionsController < Devise::SessionsController
     redirect_to login_root_url(subdomain: "login"), allow_other_host: true, notice: "Logout realizado com sucesso!"
   end
 
-  def redirect_if_authenticated
-    if current_user
-      redirect_to admin_dashboard_url(subdomain: "admin") and return if current_user.admin?
-      redirect_to app_dashboard_url(subdomain: "app")
+  def require_no_authentication
+    return unless current_user
+
+    if current_user.admin?
+      unless request.subdomain == "admin"
+        redirect_to admin_dashboard_url(subdomain: "admin"), allow_other_host: true and return
+      end
+    else
+      unless request.subdomain == "app"
+        redirect_to app_dashboard_url(subdomain: "app"), allow_other_host: true and return
+      end
     end
   end
 end
