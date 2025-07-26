@@ -1,6 +1,66 @@
 <%= render 'layouts/partials/sidebar' %>
 <%= render 'layouts/partials/navbar' %>
 
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <h6 class="mb-0 text-uppercase">Clientes cadastrados</h6>
+        <hr />
+        <div class="card">
+          <div class="card-body">
+            <table class="table mb-0 table-hover">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nome</th>
+                  <th>Documento</th>
+                  <th>Email</th>
+                  <th>Telefone</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @clients.each do |client| %>
+                <tr>
+                  <td><%= client.id %></td>
+                  <td><%= client.name %></td>
+                  <td><%= client.formatted_document %></td>
+                  <td><%= client.email %></td>
+                  <td><%= client.formatted_phone %></td>
+                  <td>
+                    <%= link_to 'Ver', app_client_path(client), class: "btn btn-sm btn-primary" %>
+                    <%= link_to 'Editar', edit_app_client_path(client), class: "btn btn-sm btn-warning" %>
+                    <% if client.can_be_deleted? %>
+                    <%= link_to 'Excluir', app_client_path(client), method: :delete, data: { confirm: 'Tem certeza?' }, class: "btn btn-sm btn-danger" %>
+                    <% end %>
+                  </td>
+                </tr>
+                <% end %>
+              </tbody>
+            </table>
+            <nav aria-label="Page navigation">
+              <ul class="pagination justify-content-end mt-3">
+                <li class="page-item <%= 'disabled' unless @clients.prev_page %>">
+                  <%= link_to 'Previous', @clients.prev_page ? url_for(page: @clients.prev_page) : '#', class: "page-link" %>
+                </li>
+                <% 1.upto(@clients.total_pages) do |page| %>
+                <li class="page-item <%= 'active' if page == @clients.current_page %>">
+                  <%= link_to page, url_for(page: page), class: "page-link" %>
+                </li>
+                <% end %>
+                <li class="page-item <%= 'disabled' unless @clients.next_page %>">
+                  <%= link_to 'Next', @clients.next_page ? url_for(page: @clients.next_page) : '#', class: "page-link" %>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <%= render 'layouts/partials/footer' %>
 <%= render 'layouts/partials/search_modal' %>
 <%= render 'layouts/partials/scripts' %>
