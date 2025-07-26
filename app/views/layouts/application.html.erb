@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,31 +9,40 @@
   <%= csp_meta_tag %>
 
   <!--favicon-->
-	<link rel="icon" href="<%= asset_path('favicon-32x32.png') %>" type="image/png"/>
-	<!--plugins-->
-	<link href="<%= asset_path('plugins/vectormap/jquery-jvectormap-2.0.2.css') %>" rel="stylesheet"/>
-	<link href="<%= asset_path('plugins/simplebar/css/simplebar.css') %>" rel="stylesheet" />
-	<link href="<%= asset_path('plugins/perfect-scrollbar/css/perfect-scrollbar.css') %>" rel="stylesheet" />
-	<link href="<%= asset_path('plugins/metismenu/css/metisMenu.min.css') %>" rel="stylesheet"/>
-	<!-- loader-->
-	<link href="<%= asset_path('css/pace.min.css') %>" rel="stylesheet"/>
-	<script src="<%= asset_path('js/pace.min.js') %>"></script>
-	<!-- Bootstrap CSS -->
-	<link href="<%= asset_path('css/bootstrap.min.css') %>" rel="stylesheet">
-	<link href="<%= asset_path('css/bootstrap-extended.css') %>" rel="stylesheet">
-	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-	<link href="<%= asset_path('css/app.css') %>" rel="stylesheet">
-	<link href="<%= asset_path('css/icons.css') %>" rel="stylesheet">
-	<!-- Theme Style CSS -->
-	<link rel="stylesheet" href="<%= asset_path('css/dark-theme.css') %>"/>
-	<link rel="stylesheet" href="<%= asset_path('css/semi-dark.css') %>"/>
-	<link rel="stylesheet" href="<%= asset_path('css/header-colors.css') %>"/>
+  <link rel="icon" href="<%= asset_path('favicon-32x32.png') %>" type="image/png" />
+  <!--plugins-->
+  <link href="<%= asset_path('plugins/vectormap/jquery-jvectormap-2.0.2.css') %>" rel="stylesheet" />
+  <link href="<%= asset_path('plugins/simplebar/css/simplebar.css') %>" rel="stylesheet" />
+  <link href="<%= asset_path('plugins/perfect-scrollbar/css/perfect-scrollbar.css') %>" rel="stylesheet" />
+  <link href="<%= asset_path('plugins/metismenu/css/metisMenu.min.css') %>" rel="stylesheet" />
+  <!-- loader-->
+  <link href="<%= asset_path('css/pace.min.css') %>" rel="stylesheet" />
+  <script src="<%= asset_path('js/pace.min.js') %>"></script>
+  <!-- Bootstrap CSS -->
+  <link href="<%= asset_path('css/bootstrap.min.css') %>" rel="stylesheet">
+  <link href="<%= asset_path('css/bootstrap-extended.css') %>" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <link href="<%= asset_path('css/app.css') %>" rel="stylesheet">
+  <link href="<%= asset_path('css/icons.css') %>" rel="stylesheet">
+  <!-- Theme Style CSS -->
+  <link rel="stylesheet" href="<%= asset_path('css/dark-theme.css') %>" />
+  <link rel="stylesheet" href="<%= asset_path('css/semi-dark.css') %>" />
+  <link rel="stylesheet" href="<%= asset_path('css/header-colors.css') %>" />
 
-	<%= javascript_importmap_tags %>
+  <%= javascript_importmap_tags %>
 </head>
+
 <body>
-	<div class="wrapper">
-		<%= yield %>
-	</div>
+  <%= render 'layouts/partials/sidebar' %>
+  <%= render 'layouts/partials/navbar' %>
+
+  <div class="wrapper">
+    <%= yield %>
+  </div>
+
+  <%= render 'layouts/partials/footer' %>
+  <%= render 'layouts/partials/search_modal' %>
+  <%= render 'layouts/partials/scripts' %>
 </body>
+
 </html>
