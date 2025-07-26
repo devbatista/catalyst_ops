@@ -19,6 +19,16 @@ class Client < ApplicationRecord
   scope :recent, -> { order(created_at: :desc) }
   
   before_validation :normalize_attributes
+
+  def self.search(query = nil)
+    if query.present?
+      where(
+        "name ILIKE :q OR email ILIKE :q OR phone ILIKE :q OR document ILIKE :q", q: "%#{query}%"
+      )
+    else
+      all
+    end
+  end
   
   def active_orders
     order_services.where.not(status: [:concluida, :cancelada])
