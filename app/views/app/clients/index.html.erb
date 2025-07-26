@@ -31,13 +31,13 @@
                         <i class="bx bx-search"></i>
                       </span>
                     </div>
-                    <input type="text" name="q" value="<%= params[:q] %>" class="form-control input-search" placeholder="Search here..." aria-label="Search">
+                    <input type="text" name="q" value="<%= params[:q] %>" class="form-control input-search" placeholder="Buscar..." aria-label="Search">
                     <input type="hidden" name="per" value="<%= params[:per] %>">
                   </div>
                 </form>
               </div>
               <div class="col-md-6 d-flex justify-content-end">
-                <%= link_to raw('<i class="bx bx-plus"></i> Add new'), new_app_client_path,
+                <%= link_to raw('<i class="bx bx-plus"></i> Novo cliente'), new_app_client_path,
       class: "btn btn-outline-primary btn-add-new" %>
               </div>
             </div>
