@@ -2,10 +2,11 @@ class App::ClientsController < ApplicationController
   load_and_authorize_resource
 
   def index
+    per_page = params[:per].presence || 10
     @clients = @clients.includes(:order_services)
                        .order(:name)
                        .page(params[:page])
-                       .per(10)
+                       .per(per_page)
   end
 
   def show

@@ -1060,6 +1060,80 @@ a {
 }
 
 
+.showing-entries-group {
+  display: flex;
+  align-items: center;
+  min-width: 220px;
+}
+
+.showing-entries-label {
+  margin-right: 12px;
+  color: #6c757d; /* text-muted */
+}
+
+.showing-entries-form {
+  margin-right: 12px;
+  margin-bottom: 0;
+}
+
+.showing-entries-select {
+  width: 80px;
+  border-radius: 18px;
+  font-weight: 500;
+  padding-left: 18px;
+}
+
+.showing-entries-text {
+  margin-left: 12px;
+  margin-right: 32px;
+  color: #6c757d; /* text-muted */
+}
+
+.input-search-group {
+  background: #f7f7f7;
+  border-radius: 24px;
+  padding-left: 14px;
+  padding-right: 14px;
+  box-shadow: none;
+  height: 40px;
+}
+
+.input-search-group .input-group-text {
+  background: transparent;
+  border: 0;
+  color: #222;
+  font-size: 1.3rem;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.input-search {
+  background: transparent;
+  box-shadow: none;
+  font-size: 1.2rem;
+  color: #222;
+  height: 36px;
+  border: 0;
+}
+
+.input-search::placeholder {
+  color: #b0b0b0;
+  opacity: 1;
+}
+
+.btn-add-new {
+  border-radius: 18px;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 0.45rem 1.4rem;
+  border-width: 2px;
+  letter-spacing: 0.5px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+
 
 .fm-menu .list-group a {
 
