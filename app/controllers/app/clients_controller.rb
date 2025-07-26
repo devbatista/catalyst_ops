@@ -3,10 +3,7 @@ class App::ClientsController < ApplicationController
 
   def index
     per_page = params[:per].presence || 10
-    @clients = @clients.includes(:order_services)
-                       .order(:name)
-                       .page(params[:page])
-                       .per(per_page)
+    @clients = @clients.page(params[:page]).per(per_page)
   end
 
   def show
