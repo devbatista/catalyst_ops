@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_26_134305) do
+ActiveRecord::Schema[7.1].define(version: 2025_07_27_152307) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -43,6 +43,22 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_26_134305) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "addresses", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "client_id", null: false
+    t.string "street"
+    t.string "number"
+    t.string "complement"
+    t.string "neighborhood"
+    t.string "zip_code"
+    t.string "city"
+    t.string "state"
+    t.string "country"
+    t.string "address_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["client_id"], name: "index_addresses_on_client_id"
+  end
+
   create_table "assignments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
     t.uuid "order_service_id", null: false
@@ -57,7 +73,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_26_134305) do
     t.string "document"
     t.string "email"
     t.string "phone"
-    t.text "address"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.uuid "company_id", null: false
@@ -129,6 +144,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_26_134305) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "addresses", "clients"
   add_foreign_key "assignments", "order_services"
   add_foreign_key "assignments", "users"
   add_foreign_key "clients", "companies"
