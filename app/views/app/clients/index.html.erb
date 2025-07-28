@@ -61,9 +61,6 @@
                   <td>
                     <%= link_to 'Ver', app_client_path(client), class: "btn btn-sm btn-primary" %>
                     <%= link_to 'Editar', edit_app_client_path(client), class: "btn btn-sm btn-warning" %>
-                    <% if client.can_be_deleted? %>
-                    <%= link_to 'Excluir', app_client_path(client), method: :delete, data: { confirm: 'Tem certeza?' }, class: "btn btn-sm btn-danger" %>
-                    <% end %>
                   </td>
                 </tr>
                 <% end %>
