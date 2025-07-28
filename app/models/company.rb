@@ -1,5 +1,6 @@
 class Company < ApplicationRecord
   has_many :users, dependent: :destroy
+  has_many :clients, dependent: :destroy
 
   belongs_to :responsible, class_name: "User", optional: true
 
