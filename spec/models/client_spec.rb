@@ -74,8 +74,8 @@ RSpec.describe Client, type: :model do
     let!(:cliente_antigo) { create(:client) }
 
     before do
-      create(:order_service, client: cliente_ativo, company: cliente_ativo.company, created_at: 1.month.ago)
-      create(:order_service, client: cliente_antigo, company: cliente_ativo.company, created_at: 8.months.ago)
+      create(:order_service, client: cliente_ativo, created_at: 1.month.ago)
+      create(:order_service, client: cliente_antigo, created_at: 8.months.ago)
     end
 
     it "retorna clientes ativos" do
@@ -162,10 +162,10 @@ RSpec.describe Client, type: :model do
     let(:client) { create(:client) }
 
     before do
-      create(:order_service, client: client, company: client.company, status: :agendada)
-      create(:order_service, client: client, company: client.company, status: :em_andamento)
-      create(:order_service, client: client, company: client.company, status: :concluida)
-      create(:order_service, client: client, company: client.company, status: :cancelada)
+      create(:order_service, client: client, status: :agendada)
+      create(:order_service, client: client, status: :em_andamento)
+      create(:order_service, client: client, status: :concluida)
+      create(:order_service, client: client, status: :cancelada)
     end
 
     it "retorna ordens ativas" do
@@ -193,8 +193,8 @@ RSpec.describe Client, type: :model do
     let(:client) { create(:client) }
 
     before do
-      order1 = create(:order_service, client: client, company: client.company)
-      order2 = create(:order_service, client: client, company: client.company)
+      order1 = create(:order_service, client: client)
+      order2 = create(:order_service, client: client)
       create(:service_item, order_service: order1, quantity: 2, unit_price: 50.0)
       create(:service_item, order_service: order2, quantity: 1, unit_price: 100.0)
     end
