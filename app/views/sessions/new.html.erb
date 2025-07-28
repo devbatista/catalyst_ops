@@ -1,10 +1,47 @@
-<body class="">
-  <!--wrapper-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CatalystOps</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+  <!--favicon-->
+  <link rel="icon" href="<%= asset_path('favicon-32x32.png') %>" type="image/png" />
+  <!--plugins-->
+  <link href="<%= asset_path('plugins/vectormap/jquery-jvectormap-2.0.2.css') %>" rel="stylesheet" />
+  <link href="<%= asset_path('plugins/simplebar/css/simplebar.css') %>" rel="stylesheet" />
+  <link href="<%= asset_path('plugins/perfect-scrollbar/css/perfect-scrollbar.css') %>" rel="stylesheet" />
+  <link href="<%= asset_path('plugins/metismenu/css/metisMenu.min.css') %>" rel="stylesheet" />
+  <!-- loader-->
+  <link href="<%= asset_path('css/pace.min.css') %>" rel="stylesheet" />
+  <script src="<%= asset_path('js/pace.min.js') %>"></script>
+  <!-- Bootstrap CSS -->
+  <link href="<%= asset_path('css/bootstrap.min.css') %>" rel="stylesheet">
+  <link href="<%= asset_path('css/bootstrap-extended.css') %>" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <link href="<%= asset_path('css/app.css') %>" rel="stylesheet">
+  <link href="<%= asset_path('css/icons.css') %>" rel="stylesheet">
+  <!-- Theme Style CSS -->
+  <link rel="stylesheet" href="<%= asset_path('css/dark-theme.css') %>" />
+  <link rel="stylesheet" href="<%= asset_path('css/semi-dark.css') %>" />
+  <link rel="stylesheet" href="<%= asset_path('css/header-colors.css') %>" />
+
+  <%= javascript_importmap_tags %>
+</head>
+
+<body>
   <div class="wrapper">
-    <div class="section-authentication-cover">
-      <div class="">
-        <div class="row g-0">
-          <div class="col-12 
+
+    <body class="">
+      <!--wrapper-->
+      <div class="wrapper">
+        <div class="section-authentication-cover">
+          <div class="">
+            <div class="row g-0">
+              <div class="col-12 
                       col-xl-7
                       col-xxl-8
                       auth-cover-left
@@ -12,90 +49,98 @@
                       justify-content-center
                       d-none
                       d-xl-flex">
-            <div class="card shadow-none bg-transparent shadow-none rounded-0 mb-0">
-              <div class="card-body">
-                <%= image_tag "login-images/login-cover.svg", 
+                <div class="card shadow-none bg-transparent shadow-none rounded-0 mb-0">
+                  <div class="card-body">
+                    <%= image_tag "login-images/login-cover.svg", 
                     class: "img-fluid auth-img-cover-login",
                     width: 650, alt: "" %>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-12 col-xl-5 col-xxl-4 auth-cover-right align-items-center justify-content-center">
-            <div class="card rounded-0 m-3 shadow-none bg-transparent mb-0">
-              <div class="card-body p-sm-5">
-                <div class="">
-                  <div class="mb-3 text-center">
-                    <%= image_tag "logo-icon.png", width: 150, alt: "" %>
                   </div>
-                  <div class="form-body">
-                    <%= form_with url: login_path, 
+                </div>
+              </div>
+
+              <div class="col-12 col-xl-5 col-xxl-4 auth-cover-right align-items-center justify-content-center">
+                <div class="card rounded-0 m-3 shadow-none bg-transparent mb-0">
+                  <div class="card-body p-sm-5">
+                    <div class="">
+                      <div class="mb-3 text-center">
+                        <%= image_tag "logo-icon.png", width: 150, alt: "" %>
+                      </div>
+                      <div class="form-body">
+                        <%= form_with url: login_path, 
                                   method: :post, 
                                   class: "row g-3", 
                                   local: true, 
                                   data: { 
                                     turbo: false 
                                   } do |f| %>
-                    <div class="col-12">
-                      <%= f.label :email, "Email", class: "form-label" %>
-                      <%= f.email_field :email, 
+                        <div class="col-12">
+                          <%= f.label :email, "Email", class: "form-label" %>
+                          <%= f.email_field :email, 
                                         class: "form-control", 
                                         id: "inputEmailAddress", 
                                         placeholder: "joao@exemplo.com", 
                                         autofocus: true %>
-                    </div>
-                    <div class="col-12">
-                      <%= f.label :password, "Senha", class: "form-label" %>
-                      <div class="input-group" id="show_hide_password">
-                        <%= f.password_field :password, 
+                        </div>
+                        <div class="col-12">
+                          <%= f.label :password, "Senha", class: "form-label" %>
+                          <div class="input-group" id="show_hide_password">
+                            <%= f.password_field :password, 
                                               class: "form-control border-end-0", 
                                               id: "inputChoosePassword", 
                                               placeholder: "Coloque sua senha" %>
-                        <a href="javascript:;" class="input-group-text bg-transparent"><i class="bx bx-hide"></i></a>
+                            <a href="javascript:;" class="input-group-text bg-transparent"><i class="bx bx-hide"></i></a>
+                          </div>
+                        </div>
+                        <div class="col-md-12">
+                          <%= link_to "Esqueceu sua senha?", new_user_password_path %>
+                        </div>
+                        <div class="col-12">
+                          <div class="d-grid">
+                            <%= f.submit "Entrar", class: "btn btn-primary" %>
+                          </div>
+                        </div>
+                        <% end %>
                       </div>
                     </div>
-                    <div class="col-md-12">
-                      <%= link_to "Esqueceu sua senha?", new_user_password_path %>
-                    </div>
-                    <div class="col-12">
-                      <div class="d-grid">
-                        <%= f.submit "Entrar", class: "btn btn-primary" %>
-                      </div>
-                    </div>
-                    <% end %>
                   </div>
                 </div>
               </div>
+
             </div>
+            <!--end row-->
           </div>
-
         </div>
-        <!--end row-->
       </div>
-    </div>
-  </div>
-  <!--end wrapper-->
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      var toggle = document.querySelector("#show_hide_password a");
-      var input = document.querySelector("#show_hide_password input");
-      var icon = document.querySelector("#show_hide_password i");
+      <!--end wrapper-->
+      <script>
+        document.addEventListener("DOMContentLoaded", function() {
+          var toggle = document.querySelector("#show_hide_password a");
+          var input = document.querySelector("#show_hide_password input");
+          var icon = document.querySelector("#show_hide_password i");
 
-      if (toggle && input && icon) {
-        toggle.addEventListener("click", function(event) {
-          event.preventDefault();
-          if (input.type === "text") {
-            input.type = "password";
-            icon.classList.add("bx-hide");
-            icon.classList.remove("bx-show");
-          } else if (input.type === "password") {
-            input.type = "text";
-            icon.classList.remove("bx-hide");
-            icon.classList.add("bx-show");
+          if (toggle && input && icon) {
+            toggle.addEventListener("click", function(event) {
+              event.preventDefault();
+              if (input.type === "text") {
+                input.type = "password";
+                icon.classList.add("bx-hide");
+                icon.classList.remove("bx-show");
+              } else if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("bx-hide");
+                icon.classList.add("bx-show");
+              }
+            });
           }
         });
-      }
-    });
-  </script>
-  <!--app JS-->
+      </script>
+      <!--app JS-->
+    </body>
+  </div>
+
+  <%= render 'layouts/partials/footer' %>
+  <%= render 'layouts/partials/search_modal' %>
+  <%= render 'layouts/partials/scripts' %>
 </body>
+
+</html>

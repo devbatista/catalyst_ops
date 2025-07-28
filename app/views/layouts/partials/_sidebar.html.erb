@@ -44,7 +44,7 @@
       <% end %>
     </li>
     <li>
-      <%= link_to logout_app_url, method: :delete, data: { turbo: false } do %>
+      <%= link_to logout_app_url, data: { turbo_method: :delete } do %>
       <div class="parent-icon"><i class='bx bx-log-out'></i></div>
       <div class="menu-title">Logout</div>
       <% end %>

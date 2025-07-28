@@ -1,4 +1,6 @@
 class SessionsController < Devise::SessionsController
+  layout false
+
   skip_before_action :custom_authenticate_user!, only: [:new, :create]
   skip_authorization_check
 

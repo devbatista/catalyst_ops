@@ -7,14 +7,25 @@ CLIENTS = []
 
 COMPANIES.each do |company|
   rand(3..10).times do
-    CLIENTS << Client.create!(
+    client = Client.create!(
       name: Faker::Name.name,
       document: [CPF.generate, CNPJ.generate].sample,
       email: Faker::Internet.unique.email,
       phone: Faker::PhoneNumber.cell_phone.gsub(/\D/, '')[0, 11],
-      address: Faker::Address.full_address,
       company: company
     )
+    client.addresses.create!(
+      street: Faker::Address.street_name,
+      number: rand(1..999).to_s,
+      complement: Faker::Address.secondary_address,
+      neighborhood: Faker::Address.community,
+      zip_code: Faker::Address.zip_code,
+      city: Faker::Address.city,
+      state: Faker::Address.state_abbr,
+      country: "Brasil",
+      address_type: "principal"
+    )
+    CLIENTS << client
   end
 end
 
