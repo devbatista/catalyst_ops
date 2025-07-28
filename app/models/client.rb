@@ -115,8 +115,9 @@ class Client < ApplicationRecord
   def normalize_attributes
     self.name = name.strip.titleize if name.present?
     self.email = email.strip.downcase if email.present?
-    self.document = document.gsub(/\D/, "") if document.present?
-    self.phone = phone.gsub(/\D/, "") if phone.present?
+    self.document = document.gsub(/\D/, '') if document.present?
+    self.phone = phone.gsub(/\D/, '') if phone.present?
+    self.address = address.strip if address.present?
   end
 
   def document_must_be_valid
