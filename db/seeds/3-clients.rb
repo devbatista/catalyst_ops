@@ -19,7 +19,7 @@ COMPANIES.each do |company|
       number: rand(1..999).to_s,
       complement: Faker::Address.secondary_address,
       neighborhood: Faker::Address.community,
-      zip_code: Faker::Address.zip_code,
+      zip_code: "#{rand(10000..99999)}-#{rand(100..999)}",
       city: Faker::Address.city,
       state: Faker::Address.state_abbr,
       country: "Brasil",
