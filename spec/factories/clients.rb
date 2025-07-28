@@ -4,7 +4,7 @@ FactoryBot.define do
     document { CPF.generate }
     email { Faker::Internet.email }
     phone { '11987654321' }
-    address { Faker::Address.full_address }
+    company
     
     trait :with_cnpj do
       document { CNPJ.generate }
