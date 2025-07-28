@@ -12,7 +12,9 @@ class App::ClientsController < ApplicationController
                              .order(created_at: :desc)
   end
 
-  def new; end
+  def new
+    @client = Client.new.tap { |c| c.addresses.build }
+  end
 
   def create
     if @client.save
@@ -41,6 +43,13 @@ class App::ClientsController < ApplicationController
   private
 
   def client_params
-    params.require(:client).permit(:name, :document, :email, :phone, :address)
+    params.require(:client).permit(
+      :name, :document, :email, :phone,
+      addresses_attributes: [
+        :id, :street, :number, :complement,
+        :neighborhood, :zip_code, :city,
+        :state, :country, :address_type, :_destroy
+      ]
+    )
   end
 end

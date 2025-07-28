@@ -25,6 +25,6 @@ class Address < ApplicationRecord
       state,
       zip_code,
       country,
-    ].compact.reject(&:blank?).join(", ")s
+    ].compact.reject(&:blank?).join(", ")
   end
 end
