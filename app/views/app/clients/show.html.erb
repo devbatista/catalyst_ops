@@ -1,0 +1,82 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="mb-3">
+          <h4 class="mb-0 text-uppercase">Informações do cliente</h6>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <strong>Nome:</strong>
+                <p><%= @client.name %></p>
+              </div>
+              <div class="col-md-3">
+                <strong>Documento:</strong>
+                <p><%= @client.formatted_document %></p>
+              </div>
+              <div class="col-md-3">
+                <strong>Telefone:</strong>
+                <p><%= @client.formatted_phone %></p>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <strong>Email:</strong>
+                <p><%= @client.email %></p>
+              </div>
+              <div class="col-md-6">
+                <strong>Empresa:</strong>
+                <p><%= @client.company&.name %></p>
+              </div>
+            </div>
+            <% if @client.addresses.any? %>
+            <hr>
+            <h5>Endereço</h5>
+            <% @client.addresses.each do |address| %>
+            <div class="row mb-2">
+              <div class="col-md-4">
+                <strong>CEP:</strong>
+                <p><%= address.zip_code %></p>
+              </div>
+              <div class="col-md-4">
+                <strong>Rua:</strong>
+                <p><%= address.street %>, <%= address.number %></p>
+              </div>
+              <div class="col-md-4">
+                <strong>Bairro:</strong>
+                <p><%= address.neighborhood %></p>
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-3">
+                <strong>Cidade:</strong>
+                <p><%= address.city %></p>
+              </div>
+              <div class="col-md-2">
+                <strong>Estado:</strong>
+                <p><%= address.state %></p>
+              </div>
+              <div class="col-md-3">
+                <strong>Complemento:</strong>
+                <p><%= address.complement %></p>
+              </div>
+              <div class="col-md-4">
+                <strong>Tipo:</strong>
+                <p><%= address.address_type %></p>
+              </div>
+            </div>
+            <hr>
+            <% end %>
+            <% end %>
+            <div class="mt-3">
+              <%= link_to "Voltar", app_clients_path, class: "btn btn-secondary" %>
+              <%= link_to "Editar", edit_app_client_path(@client), class: "btn btn-primary" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
