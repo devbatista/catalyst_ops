@@ -4,6 +4,22 @@
     <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
       <h4 class="mb-0 text-uppercase">Novo cliente</h6>
     </div>
+
+    <% if @client.errors.any? %>
+    <div class="alert alert-danger">
+      <ul>
+        <% @client.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+        <% end %>
+        <% @client.addresses.each do |address| %>
+        <% address.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+        <% end %>
+        <% end %>
+      </ul>
+    </div>
+    <% end %>
+    
     <!--end breadcrumb-->
     <div class="row">
       <div class="col-xl-12 mx-auto">

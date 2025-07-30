@@ -3,7 +3,7 @@ class Address < ApplicationRecord
 
   before_validation :format_zip_code
 
-  validates :street, :number, :neighborhood, :zip_code, :city, :state, :country, presence: true
+  validates :street, :number, :neighborhood, :zip_code, :city, :state, presence: true
   validates :street, length: { minimum: 2, maximum: 100 }
   validates :number, length: { maximum: 10 }
   validates :complement, length: { maximum: 50 }, allow_blank: true
@@ -11,7 +11,7 @@ class Address < ApplicationRecord
   validates :zip_code, format: { with: /\A\d{5}-\d{3}\z/, message: "deve estar no formato 00000-000" }
   validates :city, length: { minimum: 2, maximum: 50 }
   validates :state, length: { is: 2 }, format: { with: /\A[A-Z]{2}\z/, message: "deve ser a sigla do estado (ex: SP)" }
-  validates :country, length: { minimum: 2, maximum: 50 }
+  validates :country, length: { minimum: 2, maximum: 50 }, allow_blank: true
   validates :address_type, inclusion: {
                              in: %w[principal entrega cobranca outros],
                              message: "%{value} não é um tipo válido",

@@ -1,6 +1,8 @@
 class App::ClientsController < ApplicationController
   load_and_authorize_resource
 
+  before_action :set_company, only: [:create, :update]
+
   def index
     per_page = params[:per].presence || 10
     @clients = @clients.search(params[:q]).page(params[:page]).per(per_page)
@@ -18,7 +20,7 @@ class App::ClientsController < ApplicationController
 
   def create
     if @client.save
-      redirect_to @client, notice: "Cliente criado com sucesso."
+      redirect_to app_clients_url, notice: "Cliente criado com sucesso."
     else
       render :new, status: :unprocessable_entity
     end
@@ -29,7 +31,7 @@ class App::ClientsController < ApplicationController
 
   def update
     if @client.update(client_params)
-      redirect_to @client, notice: "Cliente atualizado com sucesso."
+      redirect_to app_clients_url, notice: "Cliente atualizado com sucesso."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -51,5 +53,9 @@ class App::ClientsController < ApplicationController
         :state, :country, :address_type, :_destroy
       ]
     )
+  end
+
+  def set_company
+    @client.company = current_user.company if @client
   end
 end
