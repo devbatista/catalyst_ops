@@ -1,5 +1,14 @@
 <div class="page-wrapper">
   <div class="page-content">
+  
+    <% flash.each do |type, message| %>
+    <% bootstrap_class = { notice: "alert-success", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
+    <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert">
+      <%= message %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <% end %>
+
     <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4">
       <div class="col">
         <div class="card radius-10 border-start border-0 border-4 border-info">
