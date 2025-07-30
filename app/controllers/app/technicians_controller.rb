@@ -1,17 +1,23 @@
 class App::TechniciansController < ApplicationController
   before_action :set_technician, only: [:show, :edit, :update]
-  load_and_authorize_resource class: 'User', instance_name: 'technician'
+  load_and_authorize_resource class: "User", instance_name: "technician"
 
   def index
-    @technicians =
-      case current_user.role
-      when 'admin'
-        User.where(role: :técnico).order(:name)
-      when 'gestor'
-        User.where(role: :técnico, company_id: current_user.company_id).order(:name)
+    @technicians = case current_user.role
+      when "admin"
+        User.where(role: :tecnico).order(:name)
+      when "gestor"
+        User.where(role: :tecnico, company_id: current_user.company_id).order(:name)
       else
         User.none
       end
+
+    if params[:q].present?
+      query = "%#{params[:q]}%"
+      @technicians = @technicians.where("name ILIKE ? OR email ILIKE ?", query, query)
+    end
+
+    @technicians = @technicians.page(params[:page]).per(params[:per] || 10)
   end
 
   def show
@@ -23,7 +29,7 @@ class App::TechniciansController < ApplicationController
 
   def update
     if @technician.update(user_params)
-      redirect_to app_technician_path(@technician), notice: 'Técnico atualizado com sucesso.'
+      redirect_to app_technician_path(@technician), notice: "Técnico atualizado com sucesso."
     else
       render :edit, status: :unprocessable_entity
     end

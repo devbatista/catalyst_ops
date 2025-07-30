@@ -1,0 +1,97 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="mb-3">
+          <h4 class="mb-0 text-uppercase">Técnicos</h4>
+        </div>
+        <% flash.each do |type, message| %>
+        <% bootstrap_class = { notice: "alert-success", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
+        <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert">
+          <%= message %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <% end %>
+        <div class="card">
+          <div class="card-body">
+            <div class="row align-items-center mb-4">
+              <div class="col-md-6 d-flex">
+                <div class="showing-entries-group flex-shrink-0">
+                  <span class="showing-entries-label">Mostrar</span>
+                  <form method="get" class="showing-entries-form">
+                    <select name="per" class="form-select form-select-sm showing-entries-select" onchange="this.form.submit()">
+                      <% [10, 20, 30].each do |n| %>
+                      <option value="<%= n %>" <%= params[:per].to_i == n ? 'selected' : '' %>><%= n %></option>
+                      <% end %>
+                    </select>
+                    <input type="hidden" name="q" value="<%= params[:q] %>">
+                  </form>
+                  <span class="showing-entries-text">registros</span>
+                </div>
+                <!-- Bloco Search -->
+                <form method="get" class="flex-grow-1" style="min-width: 0;">
+                  <div class="input-group input-search-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">
+                        <i class="bx bx-search"></i>
+                      </span>
+                    </div>
+                    <input type="text" name="q" value="<%= params[:q] %>" class="form-control input-search" placeholder="Buscar..." aria-label="Search">
+                    <input type="hidden" name="per" value="<%= params[:per] %>">
+                  </div>
+                </form>
+              </div>
+              <div class="col-md-6 d-flex justify-content-end">
+                <%= link_to raw('<i class="bx bx-plus"></i> Novo técnico'), new_app_technician_path,
+      class: "btn btn-outline-primary btn-add-new" %>
+              </div>
+            </div>
+            <table class="table mb-0 table-hover">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nome</th>
+                  <th>Email</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @technicians.each do |technician| %>
+                <tr>
+                  <td><%= technician.id %></td>
+                  <td><%= technician.name %></td>
+                  <td><%= technician.email %></td>
+                  <td>
+                    <%= link_to 'Ver', app_technician_path(technician), class: "btn btn-sm btn-primary" %>
+                    <%= link_to 'Editar', edit_app_technician_path(technician), class: "btn btn-sm btn-warning" %>
+                  </td>
+                </tr>
+                <% end %>
+              </tbody>
+            </table>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <div class="text-muted">
+                Mostrando <%= @technicians.size %> de <%= @technicians.total_count %> registros
+              </div>
+              <nav aria-label="Page navigation">
+                <ul class="pagination mb-0">
+                  <li class="page-item <%= 'disabled' unless @technicians.prev_page %>">
+                    <%= link_to 'Previous', @technicians.prev_page ? url_for(params.permit(:q, :per).merge(page: @technicians.prev_page)) : '#', class: "page-link" %>
+                  </li>
+                  <% 1.upto(@technicians.total_pages) do |page| %>
+                  <li class="page-item <%= 'active' if page == @technicians.current_page %>">
+                    <%= link_to page, url_for(params.permit(:q, :per).merge(page: page)), class: "page-link" %>
+                  </li>
+                  <% end %>
+                  <li class="page-item <%= 'disabled' unless @technicians.next_page %>">
+                    <%= link_to 'Next', @technicians.next_page ? url_for(params.permit(:q, :per).merge(page: @technicians.next_page)) : '#', class: "page-link" %>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
