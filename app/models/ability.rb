@@ -29,7 +29,7 @@ class Ability
     cannot :manage, Company
 
     # Pode gerenciar clientes
-    can :manage, Client
+    can :manage, Client, company_id: user.company_id
     
     # Pode gerenciar ordens de serviço
     can :manage, OrderService
