@@ -38,7 +38,7 @@ class App::TechniciansController < ApplicationController
   private
 
   def set_technician
-    @technician = User.find_by(id: params[:id], role: :técnico)
+    @technician = User.find_by(id: params[:id], role: :tecnico)
     redirect_to app_technicians_path, alert: "Técnico não encontrado." unless @technician
   end
 

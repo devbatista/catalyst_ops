@@ -5,7 +5,12 @@ class ApplicationController < ActionController::Base
   check_authorization unless: :devise_controller?
 
   rescue_from CanCan::AccessDenied do |exception|
-    redirect_to app_root_path, alert: exception.message
+    flash[:alert] = exception.message
+    if current_user&.admin?
+      redirect_to admin_dashboard_url(subdomain: "admin")
+    else
+      redirect_to app_dashboard_url(subdomain: "app")
+    end
   end
 
   protected

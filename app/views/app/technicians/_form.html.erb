@@ -1,0 +1,35 @@
+<%= form_with(model: @technician, url: app_technicians_path, local: true) do |f| %>
+<div class="row g-3">
+  <div class="col-md-12">
+    <%= f.label :name, "Nome", class: "form-label" %>
+    <%= f.text_field :name, class: "form-control" %>
+  </div>
+  <div class="col-md-12">
+    <%= f.label :email, "Email", class: "form-label" %>
+    <%= f.email_field :email, class: "form-control" %>
+  </div>
+  <div class="col-md-12">
+    <%= f.label :phone, "Telefone", class: "form-label" %>
+    <%= f.text_field :phone, class: "form-control" %>
+  </div>
+
+  <div class="col-md-12">
+    <div class="d-flex align-items-center justify-content-between gap-3 mt-2">
+      <div>
+        <%= f.submit "Enviar", class: "btn btn-primary px-4" %>
+        <%= link_to "Voltar", app_technicians_path, class: "btn btn-light px-4" %>
+      </div>
+      <% if @technician.persisted? %>
+      <%= link_to "Excluir", app_technicians_path(@technician),
+        data: { 
+          turbo_method: :delete,
+          turbo_confirm: "Tem certeza que deseja excluir este cliente?"
+        },
+        class: "btn btn-danger" %>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<%= javascript_include_tag "viacep", "data-turbo-track": "reload" %>
+<% end %>

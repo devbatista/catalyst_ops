@@ -1,0 +1,24 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+      <h4 class="mb-0 text-uppercase">Editar técnico</h6>
+    </div>
+
+    <% flash.each do |type, message| %>
+    <% bootstrap_class = { notice: "alert-success", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
+    <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert">
+      <%= message %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <% end %>
+
+    <!--end breadcrumb-->
+    <div class="row">
+      <div class="col-xl-12 mx-auto">
+        <%= render 'form' %>
+      </div>
+    </div>
+    <!--end row-->
+  </div>
+</div>
