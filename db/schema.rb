@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_07_30_150101) do
+ActiveRecord::Schema[7.1].define(version: 2025_07_30_164837) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -142,6 +142,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_30_150101) do
     t.integer "role"
     t.uuid "company_id"
     t.string "phone"
+    t.boolean "active", default: true, null: false
+    t.index ["active"], name: "index_users_on_active"
     t.index ["company_id"], name: "index_users_on_company_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["name", "email"], name: "index_users_on_name_and_email"
@@ -152,7 +154,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_30_150101) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "addresses", "clients"
+  add_foreign_key "addresses", "clients", on_delete: :cascade
   add_foreign_key "assignments", "order_services"
   add_foreign_key "assignments", "users"
   add_foreign_key "clients", "companies"
