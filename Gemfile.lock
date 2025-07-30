@@ -209,6 +209,8 @@ GEM
     nokogiri (1.18.8-x86_64-linux-musl)
       racc (~> 1.4)
     orm_adapter (0.5.0)
+    paranoia (2.6.4)
+      activerecord (>= 5.1, < 7.2)
     pg (1.5.9)
     pp (0.6.2)
       prettyprint
@@ -368,6 +370,7 @@ DEPENDENCIES
   importmap-rails
   jbuilder
   kaminari (~> 1.2)
+  paranoia (~> 2.6)
   pg (~> 1.1)
   pry-byebug
   puma (>= 5.0)

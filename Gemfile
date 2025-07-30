@@ -41,6 +41,8 @@ gem 'rack-cors', '~> 1.1'
 
 gem 'kaminari', '~> 1.2'
 
+gem 'paranoia', '~> 2.6'
+
 group :development, :test do
   gem "debug", platforms: %i[ mri windows ]
 
