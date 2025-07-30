@@ -12,4 +12,8 @@ Rails.application.routes.draw do
   # Rotas padrão (sem subdomínio)
   # root to: "home#index"
   match '/', to: proc { [204, {}, []] }, via: :options
+
+  if Rails.env.development?
+    mount LetterOpenerWeb::Engine, at: "/letter_opener"
+  end
 end

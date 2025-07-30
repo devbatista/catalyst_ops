@@ -51,6 +51,8 @@ group :development, :test do
   gem 'faker', '~> 3.2'
 
   gem 'pry-byebug'
+
+  gem 'letter_opener_web', '~> 2.0'
 end
 
 group :development do
