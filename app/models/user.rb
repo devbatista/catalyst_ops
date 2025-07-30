@@ -11,6 +11,7 @@ class User < ApplicationRecord
   validates :name, presence: true, length: { minimum: 2, maximum: 100 }
   validates :role, presence: true
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }
+  validates :active, inclusion: { in: [true, false] }
 
   belongs_to :company, optional: true
 
@@ -19,6 +20,8 @@ class User < ApplicationRecord
 
   scope :tecnicos, -> { where(role: :tecnico) }
   scope :gestores, -> { where(role: :gestor) }
+  scope :active, -> { where(active: true) }
+  scope :inactive, -> { where(active: false) }
 
   before_validation :normalize_name
   
@@ -50,6 +53,22 @@ class User < ApplicationRecord
 
   def can_create_orders?
     admin? || gestor?
+  end
+
+  def active?
+    active
+  end
+
+  def inactive?
+    !active
+  end
+
+  def activate!
+    update(active: true)
+  end
+
+  def inactivate!
+    update(active: false)
   end
 
   private
