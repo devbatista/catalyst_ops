@@ -39,7 +39,7 @@ class App::ClientsController < ApplicationController
 
   def destroy
     @client.destroy
-    redirect_to clients_path, notice: "Cliente removido com sucesso."
+    redirect_to app_clients_path, notice: "Cliente removido com sucesso."
   end
 
   private

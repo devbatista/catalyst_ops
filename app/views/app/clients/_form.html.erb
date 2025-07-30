@@ -49,9 +49,19 @@
   <% end %>
 
   <div class="col-md-12">
-    <div class="d-md-flex d-grid align-items-center gap-3 mt-2">
-      <%= f.submit "Enviar", class: "btn btn-primary px-4" %>
-      <%= link_to "Voltar", app_clients_path, class: "btn btn-light px-4" %>
+    <div class="d-flex align-items-center justify-content-between gap-3 mt-2">
+      <div>
+        <%= f.submit "Enviar", class: "btn btn-primary px-4" %>
+        <%= link_to "Voltar", app_clients_path, class: "btn btn-light px-4" %>
+      </div>
+      <% if @client.persisted? %>
+      <%= link_to "Excluir", app_client_path(@client),
+        data: { 
+          turbo_method: :delete,
+          turbo_confirm: "Tem certeza que deseja excluir este cliente?"
+        },
+        class: "btn btn-danger" %>
+      <% end %>
     </div>
   </div>
 </div>
