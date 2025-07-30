@@ -1,8 +1,21 @@
 class Client < ApplicationRecord
+  acts_as_paranoid
+
   validates :name, presence: true, length: { minimum: 2, maximum: 100 }
-  validates :document, presence: true, uniqueness: { case_sensitive: false }
-  validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }, uniqueness: { case_sensitive: false }
   validates :phone, presence: true, format: { with: /\A[\d\s\-\(\)]+\z/ }, length: { minimum: 10, maximum: 11 }
+  validates :document, presence: true, 
+                       uniqueness: { 
+                        case_sensitive: false,
+                        scope: [:company_id],
+                        conditions: -> { where(deleted_at: nil) }
+                      }
+  validates :email, presence: true,
+                    format: { with: URI::MailTo::EMAIL_REGEXP },
+                    uniqueness: { 
+                      case_sensitive: false,
+                      scope: [:company_id],
+                      conditions: -> { where(deleted_at: nil) }
+                    }
 
   validate :document_must_be_valid
 
