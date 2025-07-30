@@ -123,6 +123,11 @@ class Client < ApplicationRecord
     cnpj?
   end
 
+  def restore(*args)
+    super
+    addresses.only_deleted.each(&:restore)
+  end
+
   private
 
   def normalize_attributes

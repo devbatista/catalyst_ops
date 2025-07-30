@@ -1,4 +1,6 @@
 class Address < ApplicationRecord
+  acts_as_paranoid
+
   belongs_to :client
 
   before_validation :format_zip_code
