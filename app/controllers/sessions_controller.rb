@@ -26,6 +26,8 @@ class SessionsController < Devise::SessionsController
     end
   end
 
+  def new_password;end
+
   def destroy
     sign_out(current_user)
     redirect_to login_root_url(subdomain: "login"), allow_other_host: true, notice: "Logout realizado com sucesso!"
