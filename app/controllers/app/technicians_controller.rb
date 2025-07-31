@@ -1,6 +1,6 @@
 class App::TechniciansController < ApplicationController
   before_action :set_technician, only: [:show, :edit, :update]
-  load_and_authorize_resource class: "User", instance_name: "technician"
+  load_and_authorize_resource class: "User", instance_name: "technician", param_method: :user_params
 
   def index
     @technicians = case current_user.role
@@ -27,6 +27,18 @@ class App::TechniciansController < ApplicationController
   def edit
   end
 
+  def create
+    Rails.logger.info(@technician.inspect)
+    @technician.role = :tecnico
+    @technician.company_id = current_user.company_id if current_user.gestor?
+
+    if @technician.save
+      redirect_to app_technician_path(@technician), notice: "Técnico criado com sucesso."
+    else
+      render :new, :unprocessable_entity
+    end
+  end
+
   def update
     if @technician.update(user_params)
       redirect_to app_technician_path(@technician), notice: "Técnico atualizado com sucesso."
@@ -43,8 +55,6 @@ class App::TechniciansController < ApplicationController
   end
 
   def user_params
-    permitted = [:name, :email]
-    permitted << :role if can?(:manage, User)
-    params.require(:user).permit(permitted)
+    params.require(:user).permit(:name, :email, :phone)
   end
 end

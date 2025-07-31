@@ -5,7 +5,7 @@ class User < ApplicationRecord
   enum role: {
     admin: 0,
     gestor: 1,
-    tecnico: 2
+    tecnico: 2,
   }
 
   validates :name, presence: true, length: { minimum: 2, maximum: 100 }
@@ -24,8 +24,9 @@ class User < ApplicationRecord
   scope :inactive, -> { where(active: false) }
 
   before_validation :normalize_name
-  
-  after_create :send_welcome_email, if: :persisted?
+  before_validation :set_default_password_for_tecnico, on: :create
+
+  after_create :send_welcome_email
 
   def can_be_assigned_to_orders?
     tecnico?
@@ -77,7 +78,14 @@ class User < ApplicationRecord
     self.name = name.strip.titleize if name.present?
   end
 
+  def set_default_password_for_tecnico
+    if tecnico? && password.blank?
+      self.password = self.password_confirmation = "alterar123"
+    end
+  end
+
   def send_welcome_email
-    UserMailer.welcome_email(self).deliver_later
+    token = set_reset_password_token
+    UserMailer.welcome_email(self, token).deliver_later
   end
 end
