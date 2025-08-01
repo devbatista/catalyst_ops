@@ -10,7 +10,8 @@ USERS << User.create!(
   email: "admin@catalystops.dev",
   password: "senha123",
   role: :admin,
-  phone: Faker::PhoneNumber.cell_phone_in_e164
+  phone: Faker::PhoneNumber.cell_phone_in_e164,
+  active: true
 )
 
 # Gestores e Técnicos
@@ -23,6 +24,7 @@ COMPANIES.each do |company|
       role: :gestor,
       company: company,
       phone: Faker::PhoneNumber.cell_phone_in_e164
+      active: true
     )
   end
   rand(1..5).times do
@@ -32,7 +34,8 @@ COMPANIES.each do |company|
       password: "senha123",
       role: :tecnico,
       company: company,
-      phone: Faker::PhoneNumber.cell_phone_in_e164
+      phone: Faker::PhoneNumber.cell_phone_in_e164,
+      active: [true, false].sample
     )
   end
 end
