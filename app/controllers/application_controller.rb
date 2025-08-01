@@ -16,7 +16,7 @@ class ApplicationController < ActionController::Base
   protected
 
   def custom_authenticate_user!
-    unless current_user
+    unless current_user && current_user.active?
       reset_session
       redirect_to login_root_url(subdomain: "login"), allow_other_host: true
     end
