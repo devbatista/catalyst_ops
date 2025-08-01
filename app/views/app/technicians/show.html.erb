@@ -1,0 +1,67 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="mb-3">
+          <h4 class="mb-0 text-uppercase">Informações do técnico</h4>
+        </div>
+
+        <% flash.each do |type, message| %>
+        <% bootstrap_class = { notice: "alert-success", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
+        <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert">
+          <%= message %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <% end %>
+        
+        <div class="card">
+          <div class="card-body">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <strong>Nome:</strong>
+                <p><%= @technician.name %></p>
+              </div>
+              <div class="col-md-3">
+                <strong>Email:</strong>
+                <p><%= @technician.email %></p>
+              </div>
+              <div class="col-md-3">
+                <strong>Telefone:</strong>
+                <p><%= @technician.phone %></p>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <strong>Empresa:</strong>
+                <p><%= @technician.company&.name %></p>
+              </div>
+              <div class="col-md-6">
+                <strong>Status:</strong>
+                <p>
+                  <%= @technician.active? ? "Ativo" : "Inativo" %>
+                </p>
+              </div>
+            </div>
+            <hr>
+            <h5>Ordens de Serviço</h5>
+            <% if @technician.assignments.any? %>
+            <% @technician.assignments.each do |assignment| %>
+            <div class="mb-2">
+              <strong>OS:</strong>
+              <%= link_to "Ver OS", "#" %>
+              <span class="ms-2"><strong>Status:</strong> <%= assignment.order_service.status %></span>
+            </div>
+            <% end %>
+            <% else %>
+            <p>Nenhuma ordem de serviço atribuída.</p>
+            <% end %>
+            <div class="mt-3">
+              <%= link_to "Voltar", app_technicians_path, class: "btn btn-secondary" %>
+              <%= link_to "Editar", edit_app_technician_path(@technician), class: "btn btn-primary" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
