@@ -1,14 +1,14 @@
 class SessionsController < Devise::SessionsController
   layout false
 
-  skip_before_action :custom_authenticate_user!, only: [:new, :create]
+  skip_before_action :custom_authenticate_user!, only: [:new, :create, :new_password, :update_password]
   skip_authorization_check
 
   def new; end
 
   def create
     user = User.find_by(email: params[:email].to_s.downcase.strip)
-    if user&.valid_password?(params[:password])
+    if user&.active? && user&.valid_password?(params[:password])
       sign_in(:user, user)
 
       if user.admin?
@@ -26,7 +26,25 @@ class SessionsController < Devise::SessionsController
     end
   end
 
-  def new_password;end
+  def new_password; end
+
+  def update_password
+    user = User.reset_password_by_token(
+      reset_password_token: params[:reset_password_token],
+      password: params[:password],
+      password_confirmation: params[:password_confirmation],
+    )
+
+    if user.errors.empty?
+      user.activate!
+      flash[:notice] = "Senha alterada com sucesso! Faça o login."
+      redirect_to login_root_url(subdomain: "login"), allow_other_host: true
+    else
+      flash.now[:alert] = user.errors.full_messages.to_sentence
+      @token = params[:reset_password_token]
+      render :new_password, status: :unprocessable_entity
+    end
+  end
 
   def destroy
     sign_out(current_user)

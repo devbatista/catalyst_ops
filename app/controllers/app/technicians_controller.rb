@@ -28,7 +28,6 @@ class App::TechniciansController < ApplicationController
   end
 
   def create
-    Rails.logger.info(@technician.inspect)
     @technician.role = :tecnico
     @technician.company_id = current_user.company_id if current_user.gestor?
 

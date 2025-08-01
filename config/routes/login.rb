@@ -5,5 +5,6 @@ constraints subdomain: "login" do
     delete "/logout", to: "sessions#destroy", as: :logout
     
     get "/new_password", to: "sessions#new_password", as: :new_password
+    put "/new_password", to: "sessions#update_password", as: :update_password
   end
 end
