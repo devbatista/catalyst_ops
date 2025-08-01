@@ -3,11 +3,15 @@ class App::OrderServicesController < ApplicationController
 
   def index
     @order_services = case current_user.role
-    when "admin", "gestor"
+    when "admin"
       @order_services.includes(:client, :users)
+    when "gestor"
+      @order_services.joins(:client)
+                     .where(clients: { company_id: current_user.company_id })
+                     .includes(:client, :users)
     when "tecnico"
       current_user.order_services.includes(:client)
-    end.order(created_at: :desc)
+    end.order(created_at: :desc).page(params[:page]).per(params[:per] || 10)
   end
 
   def show
