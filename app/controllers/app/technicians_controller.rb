@@ -1,5 +1,5 @@
 class App::TechniciansController < ApplicationController
-  before_action :set_technician, only: [:show, :edit, :update]
+  before_action :set_technician, only: [:show, :edit, :update, :destroy]
   load_and_authorize_resource class: "User", instance_name: "technician", param_method: :user_params
 
   def index
@@ -44,6 +44,11 @@ class App::TechniciansController < ApplicationController
     else
       render :edit, status: :unprocessable_entity
     end
+  end
+
+  def destroy
+    @technician.destroy
+    redirect_to app_technicians_path, notice: "Técnico removido com sucesso."
   end
 
   private

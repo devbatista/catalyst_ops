@@ -1,4 +1,6 @@
-<%= form_with(model: @technician, url: app_technicians_path, local: true) do |f| %>
+<%= form_with(model: @technician, 
+              url: @technician.persisted? ? app_technician_path(@technician) : app_technicians_path,
+              local: true) do |f| %>
 <div class="row g-3">
   <div class="col-md-12">
     <%= f.label :name, "Nome", class: "form-label" %>
@@ -20,7 +22,7 @@
         <%= link_to "Voltar", app_technicians_path, class: "btn btn-light px-4" %>
       </div>
       <% if @technician.persisted? %>
-      <%= link_to "Excluir", app_technicians_path(@technician),
+      <%= link_to "Excluir", app_technician_path(@technician),
         data: { 
           turbo_method: :delete,
           turbo_confirm: "Tem certeza que deseja excluir este cliente?"
