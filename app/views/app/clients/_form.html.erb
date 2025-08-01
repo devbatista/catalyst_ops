@@ -1,4 +1,6 @@
-<%= form_with(model: @client, url: app_clients_path, local: true) do |f| %>
+<%= form_with(model: @client, 
+              url: @client.persisted? ? app_client_path(@client) : app_clients_path,
+              local: true) do |f| %>
 <div class="row g-3">
   <div class="col-md-12">
     <%= f.label :name, "Nome", class: "form-label" %>
