@@ -1,0 +1,86 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+      <h4 class="mb-0 text-uppercase">Detalhes da Ordem de Serviço</h4>
+    </div>
+
+    <% flash.each do |type, message| %>
+    <% bootstrap_class = { notice: "alert-success", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
+    <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert">
+      <%= message %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <% end %>
+
+    <div class="card">
+      <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <strong>ID:</strong>
+            <p><%= @order_service.id %></p>
+          </div>
+          <div class="col-md-4">
+            <strong>Cliente:</strong>
+            <p><%= @order_service.client&.name %></p>
+          </div>
+          <div class="col-md-4">
+            <strong>Status:</strong>
+            <p><%= @order_service.status %></p>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <strong>Agendada para:</strong>
+            <p><%= l(@order_service.scheduled_at, format: :short) if @order_service.scheduled_at %></p>
+          </div>
+          <div class="col-md-4">
+            <strong>Técnicos:</strong>
+            <p>
+              <%= @order_service.assignments.map { |a| a.user.name }.join(", ") %>
+            </p>
+          </div>
+          <div class="col-md-4">
+            <strong>Criada em:</strong>
+            <p><%= l(@order_service.created_at, format: :short) %></p>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-12">
+            <strong>Descrição:</strong>
+            <p><%= @order_service.description %></p>
+          </div>
+        </div>
+        <hr>
+        <h5>Itens do Serviço</h5>
+        <% if @service_items.any? %>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Descrição</th>
+              <th>Quantidade</th>
+              <th>Valor Unitário</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @service_items.each do |item| %>
+            <tr>
+              <td><%= item.description %></td>
+              <td><%= item.quantity %></td>
+              <td><%= number_to_currency(item.unit_price) %></td>
+              <td><%= number_to_currency(item.quantity * item.unit_price) %></td>
+            </tr>
+            <% end %>
+          </tbody>
+        </table>
+        <% else %>
+        <p>Nenhum item cadastrado para esta ordem de serviço.</p>
+        <% end %>
+        <div class="mt-3">
+          <%= link_to "Voltar", app_order_services_path, class: "btn btn-secondary" %>
+          <%= link_to "Editar", edit_app_order_service_path(@order_service), class: "btn btn-primary" %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

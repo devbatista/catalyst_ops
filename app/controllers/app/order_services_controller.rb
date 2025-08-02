@@ -19,7 +19,8 @@ class App::OrderServicesController < ApplicationController
   end
 
   def new
-    @clients = Client.order(:name)
+    @clients = current_user.clients.order(:name)
+    @technicians = current_user.company.technicians
   end
 
   def create

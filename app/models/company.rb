@@ -1,6 +1,7 @@
 class Company < ApplicationRecord
   has_many :users, dependent: :destroy
   has_many :clients, dependent: :destroy
+  has_many :technicians, -> { where(role: :tecnico, active: true) }, class_name: "User"
 
   belongs_to :responsible, class_name: "User", optional: true
 
