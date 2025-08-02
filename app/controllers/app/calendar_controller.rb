@@ -4,7 +4,9 @@ class App::CalendarController < ApplicationController
   def index; end
 
   def events
-    order_services = current_user.company.order_services.includes(:users)
+    order_services = current_user.gestor? ? 
+      current_user.company.order_services.includes(:users) :
+      current_user.order_services.includes(:users)
 
     events = order_services.map do |os|
       {
