@@ -20,7 +20,7 @@ class App::OrderServicesController < ApplicationController
 
   def new
     @clients = current_user.clients.order(:name)
-    @technicians = current_user.company.technicians
+    @technicians = current_user.company.users
   end
 
   def create
@@ -28,14 +28,14 @@ class App::OrderServicesController < ApplicationController
       redirect_to app_order_services_url, notice: "Ordem de serviço criada com sucesso."
     else
       @clients = current_user.clients.order(:name)
-      @technicians = current_user.company.technicians
+      @technicians = current_user.company.users
       render :new, status: :unprocessable_entity
     end
   end
 
   def edit
     @clients = current_user.clients.order(:name)
-    @technicians = current_user.company.technicians
+    @technicians = current_user.company.users
     @order_service.service_items ||= []
   end
 
