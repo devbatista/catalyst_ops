@@ -1,0 +1,53 @@
+<div class="card radius-10">
+  <div class="card-header">
+    <div class="d-flex align-items-center">
+      <div>
+        <h6 class="mb-0">Ordens recentes</h6>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Cliente</th>
+            <th>Status</th>
+            <th>Valor Total</th>
+            <th>Data agendada</th>
+            <th>Técnicos</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @recent_orders.each do |order| %>
+          <tr>
+            <td><%= link_to "#"+order.id[0,8], app_order_service_path(order), class: "text-decoration-none" %></td>
+            <td><%= order.title %></td>
+            <td><%= order.client&.name %></td>
+            <td>
+              <span class="badge bg-<%= order.status_color %> bg-gradient">
+                <%= order.status.humanize %>
+              </span>
+            </td>
+            <td>
+              <%= number_to_currency(
+                order.service_items.sum { |item| (item.quantity || 0) * (item.unit_price || 0) },
+                unit: "R$ ",
+                separator: ",",
+                delimiter: ".") %>
+            </td>
+            <td><%= l(order.scheduled_at, format: :short) %></td>
+            <td>
+              <% order.users.each do |user| %>
+              <span class="badge bg-secondary"><%= user.name %></span>
+              <% end %>
+            </td>
+          </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

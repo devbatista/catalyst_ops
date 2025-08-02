@@ -174,67 +174,9 @@
     </div>
     <!--end row-->
 
-    <div class="card radius-10">
-      <div class="card-header">
-        <div class="d-flex align-items-center">
-          <div>
-            <h6 class="mb-0">Ordens recentes</h6>
-          </div>
-          <div class="dropdown ms-auto">
-            <a class="dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown"><i class='bx bx-dots-horizontal-rounded font-22 text-option'></i></a>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="javascript:;">Action</a></li>
-              <li><a class="dropdown-item" href="javascript:;">Another action</a></li>
-              <li>
-                <hr class="dropdown-divider">
-              </li>
-              <li><a class="dropdown-item" href="javascript:;">Something else here</a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="table-responsive">
-          <table class="table align-middle mb-0">
-            <thead class="table-light">
-              <tr>
-                <th>ID</th>
-                <th>Título</th>
-                <th>Cliente</th>
-                <th>Status</th>
-                <th>Valor Total</th>
-                <th>Data agendada</th>
-                <th>Técnicos</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% @recent_orders.each do |order| %>
-              <tr>
-                <td>#<%= order.id %></td>
-                <td><%= order.title %></td>
-                <td><%= order.client&.name %></td>
-                <td>
-                  <span class="badge bg-<%= order.status_color %> bg-gradient">
-                    <%= order.status.humanize %>
-                  </span>
-                </td>
-                <td>
-                  <%= number_to_currency(order.service_items.sum { |item| (item.quantity || 0) * (item.unit_price || 0) }, unit: "R$ ", separator: ",", delimiter: ".") %>
-                </td>
-                <td><%= l(order.scheduled_at, format: :short) %></td>
-                <td>
-                  <% order.users.each do |user| %>
-                  <span class="badge bg-secondary"><%= user.name %></span>
-                  <% end %>
-                </td>
-              </tr>
-              <% end %>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
+    <!-- begin order services -->
+    <%= render 'order_services' %>
+    <!-- end order services -->
 
     <div class="row">
       <div class="col-12 col-lg-7 col-xl-8 d-flex">
