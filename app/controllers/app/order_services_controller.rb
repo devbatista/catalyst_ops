@@ -33,7 +33,9 @@ class App::OrderServicesController < ApplicationController
   end
 
   def edit
-    @clients = Client.order(:name)
+    @clients = current_user.clients.order(:name)
+    @technicians = current_user.company.technicians
+    @order_service.service_items ||= []
   end
 
   def update

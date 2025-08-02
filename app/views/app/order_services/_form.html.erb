@@ -1,5 +1,5 @@
 <%= form_with(model: @order_service, 
-              url: app_order_services_path,
+              url: @order_service.persisted? ? app_order_services_path(@order_service) : app_order_services_path,
               local: true) do |f| %>
 <div class="row g-3">
   <div class="row mb-3 mt-3">
@@ -46,7 +46,6 @@
       <% end %>
     </div>
   </div>
-
   <div class="row mb-3">
     <div class="col-md-12">
       <%= f.label :user_ids, "Técnicos atribuídos", class: "form-label" %>
@@ -68,6 +67,35 @@
                                 } %>
     </div>
   </div>
+
+  <div class="row mb-3">
+    <div class="col-md-12">
+      <h5>Itens de Serviço</h5>
+      <div id="service-items-list">
+        <% @order_service.service_items.each_with_index do |item, idx| %>
+        <div class="input-group mb-2">
+          <%= f.fields_for :service_items, item do |item_fields| %>
+          <%= item_fields.text_field :description, class: "form-control", placeholder: "Nome do item" %>
+          <%= item_fields.text_field :quantity, class: "form-control", placeholder: "Quantidade" %>
+          <%= item_fields.text_field :unit_price, class: "form-control", placeholder: "Valor unitário" %>
+          <button type="button" class="btn btn-danger remove-item">Remover</button>
+          <% end %>
+        </div>
+        <% end %>
+      </div>
+      <button type="button" class="btn btn-outline-primary" id="add-service-item">Adicionar item</button>
+    </div>
+  </div>
+
+  <div id="service-item-template" style="display:none;">
+    <div class="input-group mb-2 service-item-row">
+      <input type="text" name="order_service[service_items_attributes][NEW_INDEX][description]" class="form-control" placeholder="Nome do item" />
+      <input type="text" name="order_service[service_items_attributes][NEW_INDEX][quantity]" class="form-control" placeholder="Quantidade" />
+      <input type="text" name="order_service[service_items_attributes][NEW_INDEX][unit_price]" class="form-control" placeholder="Valor unitário" />
+      <button type="button" class="btn btn-danger remove-item">Remover</button>
+    </div>
+  </div>
+
   <div class="row">
     <div class="col-md-12 mt-3">
       <%= f.submit "Salvar", class: "btn btn-primary px-4" %>
@@ -80,13 +108,25 @@
   document.addEventListener("DOMContentLoaded", function() {
     if (window.jQuery) {
       $('#multiple-select-field').select2({
-        theme: 'bootstrap-4',
+        theme: 'bootstrap-5',
         placeholder: $('#multiple-select-field').data('placeholder'),
         width: '100%'
       });
-    } else {
-      console.error("jQuery não está disponível!");
     }
+    
+    let itemIndex = <%= @order_service.service_items.size %> ;
+    document.getElementById('add-service-item').addEventListener('click', function() {
+      let template = document.getElementById('service-item-template').innerHTML;
+      let newRow = template.replace(/NEW_INDEX/g, itemIndex);
+      document.getElementById('service-items-list').insertAdjacentHTML('beforeend', newRow);
+      itemIndex++;
+    });
+
+    document.getElementById('service-items-list').addEventListener('click', function(e) {
+      if (e.target.classList.contains('remove-item')) {
+        e.target.closest('.service-item-row').remove();
+      }
+    });
   });
 </script>
 <% end %>
