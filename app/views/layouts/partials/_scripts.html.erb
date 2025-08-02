@@ -1,16 +1,16 @@
 <!-- Bootstrap JS -->
-<script src="assets/js/bootstrap.bundle.min.js"></script>
-<!--plugins-->
-<script src="assets/js/jquery.min.js"></script>
-<script src="assets/plugins/simplebar/js/simplebar.min.js"></script>
-<script src="assets/plugins/metismenu/js/metisMenu.min.js"></script>
-<script src="assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>
-<script src="assets/plugins/vectormap/jquery-jvectormap-2.0.2.min.js"></script>
-  <script src="assets/plugins/vectormap/jquery-jvectormap-world-mill-en.js"></script>
-<script src="assets/plugins/chartjs/js/chart.js"></script>
-<script src="assets/js/index.js"></script>
-<!--app JS-->
-<script src="assets/js/app.js"></script>
+<%= javascript_include_tag "js/bootstrap.bundle.min.js" %>
+<!-- plugins -->
+<%= javascript_include_tag "js/jquery.min.js" %>
+<%= javascript_include_tag "plugins/simplebar/js/simplebar.min.js" %>
+<%= javascript_include_tag "plugins/metismenu/js/metisMenu.min.js" %>
+<%= javascript_include_tag "plugins/perfect-scrollbar/js/perfect-scrollbar.js" %>
+<%= javascript_include_tag "plugins/vectormap/jquery-jvectormap-2.0.2.min.js" %>
+<%= javascript_include_tag "plugins/vectormap/jquery-jvectormap-world-mill-en.js" %>
+<%= javascript_include_tag "plugins/chartjs/js/chart.js" %>
+<%= javascript_include_tag "js/index.js" %>
+<!-- app JS -->
+<%= javascript_include_tag "js/app.js" %>
 <script>
   new PerfectScrollbar(".app-container")
 </script>
