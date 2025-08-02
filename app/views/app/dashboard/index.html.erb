@@ -203,7 +203,7 @@
                 <th>Cliente</th>
                 <th>Status</th>
                 <th>Valor Total</th>
-                <th>Data</th>
+                <th>Data agendada</th>
                 <th>Técnicos</th>
               </tr>
             </thead>
@@ -221,7 +221,7 @@
                 <td>
                   <%= number_to_currency(order.service_items.sum { |item| (item.quantity || 0) * (item.unit_price || 0) }, unit: "R$ ", separator: ",", delimiter: ".") %>
                 </td>
-                <td><%= l(order.created_at, format: :short) %></td>
+                <td><%= l(order.scheduled_at, format: :short) %></td>
                 <td>
                   <% order.users.each do |user| %>
                   <span class="badge bg-secondary"><%= user.name %></span>
