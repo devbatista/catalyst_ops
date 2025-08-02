@@ -7,49 +7,49 @@
   </div>
   <!--navigation-->
   <ul class="metismenu" id="menu" style="position: relative; z-index: 10;">
-    <li>
+    <li class="list-group-item <%= active_menu_class(app_dashboard_path) %>">
       <%= link_to app_dashboard_path do %>
       <div class="parent-icon"><i class='bx bx-home-alt'></i></div>
       <div class="menu-title">Dashboard</div>
       <% end %>
     </li>
-    <li>
+    <li class="list-group-item <%= active_menu_class(app_clients_path) %>">
       <%= link_to app_clients_path do %>
       <div class="parent-icon"><i class='bx bx-user'></i></div>
       <div class="menu-title">Clientes</div>
       <% end %>
     </li>
-    <li>
+    <li class="list-group-item <%= active_menu_class(app_order_services_path) %>">
       <%= link_to app_order_services_path do %>
       <div class="parent-icon"><i class='bx bx-edit'></i></div>
       <div class="menu-title">Ordens de Serviço</div>
       <% end %>
     </li>
-    <li>
+    <li class="list-group-item <%= active_menu_class(app_technicians_path) %>">
       <%= link_to app_technicians_path do %>
       <div class="parent-icon"><i class='bx bx-run'></i></div>
       <div class="menu-title">Técnicos</div>
       <% end %>
     </li>
-    <li>
+    <li class="list-group-item <%= active_menu_class(app_attachments_path) %>">
       <%= link_to app_attachments_path do %>
       <div class="parent-icon"><i class='bx bx-archive'></i></div>
       <div class="menu-title">Anexos</div>
       <% end %>
     </li>
-    <li>
+    <li class="list-group-item <%= active_menu_class(app_reports_path) %>">
       <%= link_to app_reports_path do %>
       <div class="parent-icon"><i class='bx bx-file'></i></div>
       <div class="menu-title">Relatórios</div>
       <% end %>
     </li>
-    <li>
+    <li class="list-group-item <%= active_menu_class(app_calendar_index_path) %>">
       <%= link_to app_calendar_index_path do %>
       <div class="parent-icon"><i class='bx bx-calendar'></i></div>
       <div class="menu-title">Calendário</div>
       <% end %>
     </li>
-    <li>
+    <li class="list-group-item <%= active_menu_class(logout_app_url) %>">
       <%= link_to logout_app_url, data: { turbo_method: :delete } do %>
       <div class="parent-icon"><i class='bx bx-log-out'></i></div>
       <div class="menu-title">Logout</div>

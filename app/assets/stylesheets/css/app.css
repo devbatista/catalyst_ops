@@ -2567,6 +2567,10 @@ form select.error:focus {
 
 }
 
+.list-group-item.active .menu-title,
+.list-group-item.active .parent-icon {
+  color: #fff !important;
+}
 
 
 .chart-online {
