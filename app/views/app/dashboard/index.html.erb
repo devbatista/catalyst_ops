@@ -16,7 +16,7 @@
             <div class="d-flex align-items-center">
               <div>
                 <p class="mb-0 text-secondary">Total de Ordens</p>
-                <h4 class="my-1 text-info"><%= @order_services_count %></h4>
+                <h4 class="my-1 text-info"><%= @order_services.count %></h4>
                 <p class="mb-0 font-13">+2.5% from last week</p>
               </div>
               <div class="widgets-icons-2 rounded-circle bg-gradient-blues text-white ms-auto">
@@ -32,7 +32,14 @@
             <div class="d-flex align-items-center">
               <div>
                 <p class="mb-0 text-secondary">Valor geral dos itens</p>
-                <h4 class="my-1 text-danger">$84,245</h4>
+                <h4 class="my-1 text-danger">
+                  <%= number_to_currency(
+                    @order_services.joins(:service_items).sum('service_items.unit_price'),
+                    unit: "R$ ",
+                    separator: ",",
+                    delimiter: "."
+                  ) %>
+                </h4>
                 <p class="mb-0 font-13">+5.4% from last week</p>
               </div>
               <div class="widgets-icons-2 rounded-circle bg-gradient-burning text-white ms-auto"><i class='bx bxs-wallet'></i>
