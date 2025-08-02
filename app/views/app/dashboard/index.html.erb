@@ -15,11 +15,12 @@
           <div class="card-body">
             <div class="d-flex align-items-center">
               <div>
-                <p class="mb-0 text-secondary">Total Orders</p>
-                <h4 class="my-1 text-info">4805</h4>
+                <p class="mb-0 text-secondary">Total de Ordens</p>
+                <h4 class="my-1 text-info"><%= @order_services_count %></h4>
                 <p class="mb-0 font-13">+2.5% from last week</p>
               </div>
-              <div class="widgets-icons-2 rounded-circle bg-gradient-blues text-white ms-auto"><i class='bx bxs-cart'></i>
+              <div class="widgets-icons-2 rounded-circle bg-gradient-blues text-white ms-auto">
+                <i class='bx bxs-edit'></i>
               </div>
             </div>
           </div>
@@ -30,7 +31,7 @@
           <div class="card-body">
             <div class="d-flex align-items-center">
               <div>
-                <p class="mb-0 text-secondary">Total Revenue</p>
+                <p class="mb-0 text-secondary">Valor geral dos itens</p>
                 <h4 class="my-1 text-danger">$84,245</h4>
                 <p class="mb-0 font-13">+5.4% from last week</p>
               </div>
@@ -45,8 +46,8 @@
           <div class="card-body">
             <div class="d-flex align-items-center">
               <div>
-                <p class="mb-0 text-secondary">Bounce Rate</p>
-                <h4 class="my-1 text-success">34.6%</h4>
+                <p class="mb-0 text-secondary">Técnicos</p>
+                <h4 class="my-1 text-success"><%= @technicians_count %></h4>
                 <p class="mb-0 font-13">-4.5% from last week</p>
               </div>
               <div class="widgets-icons-2 rounded-circle bg-gradient-ohhappiness text-white ms-auto"><i class='bx bxs-bar-chart-alt-2'></i>
@@ -60,8 +61,8 @@
           <div class="card-body">
             <div class="d-flex align-items-center">
               <div>
-                <p class="mb-0 text-secondary">Total Customers</p>
-                <h4 class="my-1 text-warning">8.4K</h4>
+                <p class="mb-0 text-secondary">Total de clientes ativos</p>
+                <h4 class="my-1 text-warning"><%= @clients_count %></h4>
                 <p class="mb-0 font-13">+8.4% from last week</p>
               </div>
               <div class="widgets-icons-2 rounded-circle bg-gradient-orange text-white ms-auto"><i class='bx bxs-group'></i>
@@ -177,7 +178,7 @@
       <div class="card-header">
         <div class="d-flex align-items-center">
           <div>
-            <h6 class="mb-0">Recent Orders</h6>
+            <h6 class="mb-0">Ordens recentes</h6>
           </div>
           <div class="dropdown ms-auto">
             <a class="dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown"><i class='bx bx-dots-horizontal-rounded font-22 text-option'></i>

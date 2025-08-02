@@ -3,9 +3,16 @@ class App::DashboardController < ApplicationController
     authorize! :read, :dashboard
     
     case current_user.role
-    when 'admin', 'gestor'
+    when 'admin'
       @clients_count = Client.count
       @order_services_count = OrderService.count
+      @pending_orders = OrderService.agendada.count
+      @in_progress_orders = OrderService.em_andamento.count
+      @recent_orders = OrderService.includes(:client).order(created_at: :desc).limit(5)
+    when 'gestor'
+      @clients_count = current_user.clients.count
+      @order_services_count = current_user.company.order_services.count
+      @technicians_count = User.where(role: :tecnico, company_id: current_user.company_id).count
       @pending_orders = OrderService.agendada.count
       @in_progress_orders = OrderService.em_andamento.count
       @recent_orders = OrderService.includes(:client).order(created_at: :desc).limit(5)
