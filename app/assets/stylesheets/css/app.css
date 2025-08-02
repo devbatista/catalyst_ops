@@ -303,6 +303,10 @@ a {
 
 }
 
+.js-wait {
+	display: none;
+}
+
 
 
 .sidebar-wrapper .metismenu li:first-child {
