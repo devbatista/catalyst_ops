@@ -5,6 +5,8 @@ class OrderService < ApplicationRecord
   has_many :assignments, dependent: :destroy
   has_many :users, through: :assignments
   has_many :service_items, dependent: :destroy
+
+  accepts_nested_attributes_for :service_items, allow_destroy: true
   
   has_many_attached :attachments
   
@@ -16,7 +18,7 @@ class OrderService < ApplicationRecord
   }
   
   validates :title, presence: true, length: { minimum: 5, maximum: 100 }
-  validates :description, presence: true, length: { minimum: 10, maximum: 1000 }
+  validates :description, presence: true, length: { minimum: 5, maximum: 1000 }
   validates :status, presence: true
   validates :scheduled_at, presence: true
   validates :client_id, presence: true
@@ -32,6 +34,8 @@ class OrderService < ApplicationRecord
   scope :overdue, -> { agendada.where('scheduled_at < ?', Time.current) }
   scope :recent, -> { order(created_at: :desc) }
   scope :by_technician, ->(user_id) { joins(:users).where(users: { id: user_id }) }
+  
+  before_validation :set_company_from_client, on: :create
   
   before_save :set_timestamps_on_status_change
   
@@ -150,6 +154,10 @@ class OrderService < ApplicationRecord
         self.finished_at = Time.current if finished_at.blank?
       end
     end
+  end
+
+  def set_company_from_client
+    self.company_id ||= client.company_id if client.present?
   end
   
   def notify_client_on_completion

@@ -25,9 +25,10 @@ class App::OrderServicesController < ApplicationController
 
   def create
     if @order_service.save
-      redirect_to @order_service, notice: "Ordem de serviço criada com sucesso."
+      redirect_to app_order_services_url, notice: "Ordem de serviço criada com sucesso."
     else
-      @clients = Client.order(:name)
+      @clients = current_user.clients.order(:name)
+      @technicians = current_user.company.technicians
       render :new, status: :unprocessable_entity
     end
   end
@@ -85,6 +86,10 @@ class App::OrderServicesController < ApplicationController
       :scheduled_at,
       :signed_by_client,
       attachments: [],
+      user_ids: [],
+      service_items_attributes: [
+        :id, :description, :quantity, :unit_price, :_destroy,
+      ],
     )
   end
 end
