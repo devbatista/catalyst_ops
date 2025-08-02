@@ -8,7 +8,9 @@ constraints subdomain: "app" do
   resources :attachments, only: [:index, :show, :destroy], module: "app", as: :app_attachments
   resources :reports, only: [:index, :show], module: "app", as: :app_reports
   resources :technicians, module: "app", as: :app_technicians
-  resources :calendar, module: "app", as: :app_calendar
+  resources :calendar, only: [:index], module: "app", as: :app_calendar
+
+  get "calendar/events", to: "app/calendar#events"
 
   devise_scope :user do
     delete "/logout", to: "sessions#destroy", as: :logout_app
