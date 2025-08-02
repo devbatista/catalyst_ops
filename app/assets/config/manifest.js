@@ -8,3 +8,5 @@
 //= link controllers/hello_controller.js
 //= link controllers/index.js
 //= link viacep.js
+//= link fullcalendar/main.min.css
+//= link fullcalendar/main.min.js
