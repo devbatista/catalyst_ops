@@ -2,6 +2,7 @@
 <%= javascript_include_tag "js/bootstrap.bundle.min.js" %>
 <!-- plugins -->
 <%= javascript_include_tag "js/jquery.min.js" %>
+<%= javascript_include_tag "https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js" %>
 <%= javascript_include_tag "plugins/simplebar/js/simplebar.min.js" %>
 <%= javascript_include_tag "plugins/metismenu/js/metisMenu.min.js" %>
 <%= javascript_include_tag "plugins/perfect-scrollbar/js/perfect-scrollbar.js" %>
@@ -13,4 +14,14 @@
 <%= javascript_include_tag "js/app.js" %>
 <script>
   new PerfectScrollbar(".app-container")
+
+  document.addEventListener("DOMContentLoaded", function() {
+    if (window.jQuery && $('#multiple-select-field').length > 0) {
+      $('#multiple-select-field').select2({
+        theme: 'bootstrap-5',
+        placeholder: $('#multiple-select-field').data('placeholder'),
+        width: '100%'
+      });
+    }
+  });
 </script>
