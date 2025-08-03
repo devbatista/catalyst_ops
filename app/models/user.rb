@@ -72,6 +72,10 @@ class User < ApplicationRecord
   def inactivate!
     update(active: false)
   end
+  
+  def can_be_tecnico?
+    tecnico? || can_be_technician?
+  end
 
   private
 

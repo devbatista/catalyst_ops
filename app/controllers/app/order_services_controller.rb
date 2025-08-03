@@ -1,4 +1,6 @@
 class App::OrderServicesController < ApplicationController
+  before_action :set_other_resources, only: [:new, :edit]
+  
   load_and_authorize_resource
 
   def index
@@ -18,10 +20,7 @@ class App::OrderServicesController < ApplicationController
     @service_items = @order_service.service_items.order(:id)
   end
 
-  def new
-    @clients = current_user.clients.order(:name)
-    @technicians = current_user.company.users
-  end
+  def new;end
 
   def create
     if @order_service.save
@@ -33,11 +32,7 @@ class App::OrderServicesController < ApplicationController
     end
   end
 
-  def edit
-    @clients = current_user.clients.order(:name)
-    @technicians = current_user.company.users
-    @order_service.service_items ||= []
-  end
+  def edit;end
 
   def update
     if @order_service.update(order_service_params)
@@ -91,5 +86,11 @@ class App::OrderServicesController < ApplicationController
         :id, :description, :quantity, :unit_price, :_destroy,
       ],
     )
+  end
+
+  def set_other_resources
+    @clients = current_user.clients.order(:name)
+    @technicians = current_user.company.users.where("role = ? OR can_be_technician = ?", User.roles[:tecnico], true)
+    @order_service&.service_items ||= []
   end
 end

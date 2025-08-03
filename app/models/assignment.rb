@@ -24,7 +24,7 @@ class Assignment < ApplicationRecord
   def user_must_be_tecnico
     return unless user.present?
 
-    unless user.tecnico?
+    unless user.can_be_tecnico?
       errors.add(:user, "deve ser um técnico")
     end
   end
