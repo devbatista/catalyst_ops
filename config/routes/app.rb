@@ -9,6 +9,7 @@ constraints subdomain: "app" do
   resources :reports, only: [:index, :show], module: "app", as: :app_reports
   resources :technicians, module: "app", as: :app_technicians
   resources :calendar, only: [:index], module: "app", as: :app_calendar
+  resources :configurations, module: "app", as: :app_configurations
 
   get "calendar/events", to: "app/calendar#events"
 

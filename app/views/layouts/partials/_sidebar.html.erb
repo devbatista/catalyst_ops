@@ -36,14 +36,6 @@
       <% end %>
     </li>
     <% end %>
-
-    <li class="list-group-item <%= active_menu_class(app_attachments_path) %>">
-      <%= link_to app_attachments_path do %>
-      <div class="parent-icon"><i class='bx bx-archive'></i></div>
-      <div class="menu-title">Anexos</div>
-      <% end %>
-    </li>
-
     <li class="list-group-item <%= active_menu_class(app_reports_path) %>">
       <%= link_to app_reports_path do %>
       <div class="parent-icon"><i class='bx bx-file'></i></div>
@@ -61,6 +53,12 @@
       <%= link_to logout_app_url, data: { turbo_method: :delete } do %>
       <div class="parent-icon"><i class='bx bx-log-out'></i></div>
       <div class="menu-title">Logout</div>
+      <% end %>
+    </li>
+    <li class="list-group-item <%= active_menu_class(app_configurations_path) %>">
+      <%= link_to app_configurations_path do %>
+      <div class="parent-icon"><i class='bx bx-wrench'></i></div>
+      <div class="menu-title">Configuração</div>
       <% end %>
     </li>
     <li>
