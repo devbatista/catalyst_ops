@@ -23,7 +23,7 @@ COMPANIES.each do |company|
       password: "senha123",
       role: :gestor,
       company: company,
-      phone: Faker::PhoneNumber.cell_phone_in_e164
+      phone: Faker::PhoneNumber.cell_phone_in_e164,
       active: true
     )
   end

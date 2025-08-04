@@ -28,6 +28,7 @@
     <div class="row mb-3">
       <div class="col-md-6">
         <%= f.label :attachments, "Anexos", class: "form-label" %>
+        <% if @order_service.persisted? %>
         <%= f.file_field :attachments, multiple: true, class: "form-control" %>
         <% if @order_service.attachments.attached? %>
         <div class="mt-2">
@@ -40,6 +41,9 @@
             <% end %>
           </ul>
         </div>
+        <% end %>
+        <% else %>
+        <p class="form-text text-muted">Salve a ordem de serviço antes de anexar arquivos.</p>
         <% end %>
       </div>
     </div>

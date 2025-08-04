@@ -153,8 +153,11 @@ class OrderService < ApplicationRecord
   end
 
   def cannot_assign_if_completed
-    if concluida? && assignments.any? && assignments.last.created_at > updated_at
-      errors.add(:base, "Não é possível atribuir técnicos a uma OS concluída")
+    if concluida? && assignments.any?
+      last_created_at = assignments.last.created_at
+      if last_created_at.present? && updated_at.present? && last_created_at > updated_at
+        errors.add(:base, "Não é possível atribuir técnicos a uma OS concluída")
+      end
     end
   end
 

@@ -1,5 +1,5 @@
 class App::OrderServicesController < ApplicationController
-  before_action :set_other_resources, only: [:new, :edit]
+  before_action :set_other_resources, only: [:new, :edit, :update]
 
   load_and_authorize_resource
 
