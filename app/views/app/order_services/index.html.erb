@@ -49,7 +49,7 @@
                 <tr>
                   <td><%= os.id %></td>
                   <td><%= os.client&.name %></td>
-                  <td><%= os.status %></td>
+                  <td><%= os.status.humanize %></td>
                   <td><%= l(os.scheduled_at, format: :short) if os.scheduled_at %></td>
                   <td><%= os.assignments.map { |a| a.user.name }.join(", ") %></td>
                   <td>
