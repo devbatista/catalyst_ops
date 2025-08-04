@@ -33,12 +33,7 @@
               <div>
                 <p class="mb-0 text-secondary">Valor geral dos itens</p>
                 <h4 class="my-1 text-danger">
-                  <%= number_to_currency(
-                    @order_services.joins(:service_items).sum('service_items.unit_price'),
-                    unit: "R$ ",
-                    separator: ",",
-                    delimiter: "."
-                  ) %>
+                  <%= currency_br(@order_services.joins(:service_items).sum('service_items.unit_price')) %>
                 </h4>
                 <p class="mb-0 font-13">+5.4% from last week</p>
               </div>

@@ -75,8 +75,8 @@
             <tr>
               <td><%= item.description %></td>
               <td><%= item.quantity %></td>
-              <td><%= number_to_currency(item.unit_price) %></td>
-              <td><%= number_to_currency(item.quantity * item.unit_price) %></td>
+              <td><%= currency_br(item.unit_price) %></td>
+              <td><%= currency_br(item.quantity * item.unit_price) %></td>
             </tr>
             <% end %>
           </tbody>

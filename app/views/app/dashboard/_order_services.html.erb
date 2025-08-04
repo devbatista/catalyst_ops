@@ -32,11 +32,7 @@
               </span>
             </td>
             <td>
-              <%= number_to_currency(
-                order.service_items.sum { |item| (item.quantity || 0) * (item.unit_price || 0) },
-                unit: "R$ ",
-                separator: ",",
-                delimiter: ".") %>
+              <%= currency_br(order.service_items.sum { |item| (item.quantity || 0) * (item.unit_price || 0) }) %>
             </td>
             <td><%= l(order.scheduled_at, format: :short) %></td>
             <td>
