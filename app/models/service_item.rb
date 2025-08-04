@@ -2,7 +2,13 @@ class ServiceItem < ApplicationRecord
   belongs_to :order_service
   
   validates :description, presence: true, length: { minimum: 5, maximum: 200 }
-  validates :quantity, presence: true, numericality: { greater_than: 0, less_than_or_equal_to: 9999.99 }
+  validates :quantity,
+            presence: true,
+            numericality: {
+              only_integer: true,
+              greater_than: 0,
+              less_than_or_equal_to: 9999
+            }
   validates :unit_price, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
   validate :cannot_edit_if_order_completed
@@ -26,7 +32,7 @@ class ServiceItem < ApplicationRecord
   end
   
   def formatted_quantity
-    quantity % 1 == 0 ? quantity.to_i.to_s : quantity.to_s
+    quantity.to_i.to_s
   end
   
   def can_be_edited?
