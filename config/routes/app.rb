@@ -5,6 +5,7 @@ constraints subdomain: "app" do
   resources :order_services, module: "app", as: :app_order_services do
     resources :service_items, module: "order_services", as: :app_service_items
     patch :update_status, on: :member
+    get :generate_pdf, on: :member
   end
   resources :attachments, only: [:index, :show, :destroy], module: "app", as: :app_attachments
   resources :reports, only: [:index, :show], module: "app", as: :app_reports

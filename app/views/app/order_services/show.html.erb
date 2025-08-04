@@ -1,7 +1,8 @@
 <div class="page-wrapper">
   <div class="page-content">
-    <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+    <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3 justify-content-between">
       <h4 class="mb-0 text-uppercase">Detalhes da Ordem de Serviço</h4>
+      <%= link_to "Gerar PDF", generate_pdf_app_order_service_path(@order_service), class: "btn btn-outline-secondary", target: "_blank" %>
     </div>
 
     <% flash.each do |type, message| %>

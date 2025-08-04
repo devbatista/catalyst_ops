@@ -1,6 +1,6 @@
 class App::OrderServicesController < ApplicationController
   before_action :set_other_resources, only: [:new, :edit]
-  
+
   load_and_authorize_resource
 
   def index
@@ -20,7 +20,7 @@ class App::OrderServicesController < ApplicationController
     @service_items = @order_service.service_items.order(:id)
   end
 
-  def new;end
+  def new; end
 
   def create
     if @order_service.save
@@ -33,7 +33,7 @@ class App::OrderServicesController < ApplicationController
     end
   end
 
-  def edit;end
+  def edit; end
 
   def update
     if @order_service.update(order_service_params)
@@ -70,6 +70,14 @@ class App::OrderServicesController < ApplicationController
     else
       redirect_to app_order_service_url(@order_service), alert: @order_service.errors.full_messages
     end
+  end
+
+  def generate_pdf
+    pdf_data = Cmd::Pdf::Create.new(@order_service).generate_pdf_data
+    send_data pdf_data,
+              filename: "ordem_servico_#{@order_service.id}.pdf",
+              type: "application/pdf",
+              disposition: "attachment"
   end
 
   private

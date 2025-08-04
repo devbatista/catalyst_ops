@@ -43,6 +43,10 @@ gem 'kaminari', '~> 1.2'
 
 gem 'paranoia', '~> 2.6'
 
+# Geração de PDF
+gem 'prawn', '~> 2.4'
+gem 'prawn-table', '~> 0.2'
+
 group :development, :test do
   gem "debug", platforms: %i[ mri windows ]
 
