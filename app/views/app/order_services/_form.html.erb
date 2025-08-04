@@ -47,6 +47,14 @@
         <% end %>
       </div>
     </div>
+    <% if @order_service.persisted? %>
+    <div class="row mb-3">
+      <div class="col-md-12">
+        <%= f.label :observations, "Observações", class: "form-label" %>
+        <%= f.text_area :observations, class: "form-control", rows: 3 %>
+      </div>
+    </div>
+    <% end %>
     <div class="row mb-3">
       <div class="col-md-12">
         <%= f.label :user_ids, "Técnicos atribuídos", class: "form-label" %>

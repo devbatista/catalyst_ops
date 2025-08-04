@@ -80,6 +80,7 @@ class App::OrderServicesController < ApplicationController
       :status,
       :scheduled_at,
       :signed_by_client,
+      :observations,
       attachments: [],
       user_ids: [],
       service_items_attributes: [
