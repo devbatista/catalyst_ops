@@ -28,6 +28,7 @@ class App::OrderServicesController < ApplicationController
     else
       @clients = current_user.clients.order(:name)
       @technicians = current_user.company.users
+      flash.now[:alert] = @order_service.errors.full_messages
       render :new, status: :unprocessable_entity
     end
   end
@@ -36,26 +37,27 @@ class App::OrderServicesController < ApplicationController
 
   def update
     if @order_service.update(order_service_params)
-      redirect_to @order_service, notice: "Ordem de serviço atualizada com sucesso."
+      redirect_to app_order_services_url, notice: "Ordem de serviço atualizada com sucesso."
     else
       @clients = Client.order(:name)
+      flash.now[:alert] = @order_service.errors.full_messages
       render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
     @order_service.destroy
-    redirect_to order_services_path, notice: "Ordem de serviço removida com sucesso."
+    redirect_to app_order_services_url, notice: "Ordem de serviço removida com sucesso."
   end
 
   def assign_technician
     user = User.find(params[:user_id])
 
     if @order_service.users.include?(user)
-      redirect_to @order_service, alert: "Técnico já atribuído a esta OS."
+      redirect_to app_order_service_url(@order_service), alert: "Técnico já atribuído a esta OS."
     else
       @order_service.assignments.create!(user: user)
-      redirect_to @order_service, notice: "Técnico #{user.name} atribuído com sucesso."
+      redirect_to app_order_service_url(@order_service), notice: "Técnico #{user.name} atribuído com sucesso."
     end
   end
 
@@ -64,9 +66,9 @@ class App::OrderServicesController < ApplicationController
       @order_service.update(started_at: Time.current) if params[:status] == "em_andamento"
       @order_service.update(finished_at: Time.current) if params[:status] == "concluida"
 
-      redirect_to @order_service, notice: "Status atualizado com sucesso."
+      redirect_to app_order_service_url(@order_service), notice: "Status atualizado com sucesso."
     else
-      redirect_to @order_service, alert: "Erro ao atualizar status."
+      redirect_to app_order_service_url(@order_service), alert: @order_service.errors.full_messages
     end
   end
 

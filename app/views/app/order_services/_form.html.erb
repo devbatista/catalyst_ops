@@ -1,6 +1,6 @@
 <div class="js-wait">
   <%= form_with(model: @order_service, 
-                url: @order_service.persisted? ? app_order_services_path(@order_service) : app_order_services_path,
+                url: @order_service.persisted? ? app_order_service_path(@order_service) : app_order_services_path,
                 local: true) do |f| %>
   <div class="row g-3">
     <div class="row mb-3 mt-3">
@@ -11,10 +11,6 @@
       <div class="col-md-3">
         <%= f.label :scheduled_at, "Data agendada", class: "form-label" %>
         <%= f.text_field :scheduled_at, class: "form-control", type: "datetime-local", value: (@order_service.scheduled_at&.strftime("%Y-%m-%dT%H:%M") if @order_service.scheduled_at) %>
-      </div>
-      <div class="col-md-3">
-        <%= f.label :status, "Status", class: "form-label" %>
-        <%= f.select :status, OrderService.statuses.keys.map { |s| [s.humanize, s] }, {}, class: "form-select" %>
       </div>
     </div>
     <div class="row mb-3">

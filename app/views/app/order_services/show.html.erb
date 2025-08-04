@@ -25,7 +25,7 @@
           </div>
           <div class="col-md-4">
             <strong>Status:</strong>
-            <p><%= @order_service.status %></p>
+            <p><%= @order_service.status.humanize %></p>
           </div>
         </div>
         <div class="row mb-3">
@@ -42,6 +42,12 @@
           <div class="col-md-4">
             <strong>Criada em:</strong>
             <p><%= l(@order_service.created_at, format: :short) %></p>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-12">
+            <strong>Titulo:</strong>
+            <p><%= @order_service.title %></p>
           </div>
         </div>
         <div class="row mb-3">
@@ -84,9 +90,21 @@
         <% else %>
         <p>Nenhum item cadastrado para esta ordem de serviço.</p>
         <% end %>
-        <div class="mt-3">
-          <%= link_to "Voltar", app_order_services_path, class: "btn btn-secondary" %>
-          <%= link_to "Editar", edit_app_order_service_path(@order_service), class: "btn btn-primary" %>
+        <div class="mt-3 d-flex justify-content-between align-items-center">
+          <div>
+            <%= link_to "Voltar", app_order_services_path, class: "btn btn-secondary" %>
+            <%= link_to "Editar", edit_app_order_service_path(@order_service), class: "btn btn-primary" %>
+          </div>
+          <div>
+            <% @order_service.next_possible_statuses.each do |next_status| %>
+            <%= button_to next_status.humanize,
+                  update_status_app_order_service_path(@order_service, status: next_status),
+                  class: "btn btn-#{OrderService.new(status: next_status).status_color} btn-sm ms-2",
+                  form_class: "d-inline-block",
+                  method: :patch,
+                  data: { turbo_confirm: "Alterar status para #{next_status.humanize}?" } %>
+            <% end %>
+          </div>
         </div>
       </div>
     </div>
