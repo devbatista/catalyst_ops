@@ -23,6 +23,7 @@ class OrderService < ApplicationRecord
   validates :status, presence: true
   validates :scheduled_at, presence: true
   validates :client_id, presence: true
+  validates :code, presence: true, uniqueness: { scope: :company_id }
 
   validate :scheduled_at_cannot_be_in_the_past, on: :create
   validate :must_have_technician_to_start
@@ -38,6 +39,7 @@ class OrderService < ApplicationRecord
   scope :by_technician, ->(user_id) { joins(:users).where(users: { id: user_id }) }
 
   before_validation :set_company_from_client, on: :create
+  before_validation :set_sequencial_code, on: :create
 
   before_save :set_timestamps_on_status_change
 
@@ -169,6 +171,13 @@ class OrderService < ApplicationRecord
 
   def set_company_from_client
     self.company_id ||= client.company_id if client.present?
+  end
+
+  def set_sequencial_code
+    return if code.present? || company_id.blank?
+
+    last_code = OrderService.where(company_id: company_id).maximum(:code) || 0
+    self.code = last_code + 1
   end
 
   def notify_client_on_completion
