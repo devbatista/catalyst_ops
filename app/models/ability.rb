@@ -46,6 +46,9 @@ class Ability
     # Pode editar próprio perfil
     can [:read, :update], User, id: user.id
 
+    # Pode gerenciar relatórios
+    can :manage, Report, company_id: user.company_id
+
     # Dashboard
     can :read, :dashboard
   end
@@ -79,6 +82,9 @@ class Ability
     can :read, Client do |client|
       client.order_services.joins(:users).where(users: { id: user.id }).any?
     end
+
+    # NÃO pode gerenciar relatórios
+    cannot :manage, Report
 
     can :read, :dashboard
   end
