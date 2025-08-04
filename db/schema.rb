@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_08_04_003050) do
+ActiveRecord::Schema[7.1].define(version: 2025_08_04_124805) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -121,6 +121,25 @@ ActiveRecord::Schema[7.1].define(version: 2025_08_04_003050) do
     t.index ["company_id"], name: "index_order_services_on_company_id"
   end
 
+  create_table "reports", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "title", null: false
+    t.string "report_type", null: false
+    t.uuid "user_id", null: false
+    t.uuid "company_id", null: false
+    t.datetime "generated_at"
+    t.string "status", default: "pending"
+    t.text "filters"
+    t.string "file"
+    t.text "error_message"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id", "generated_at"], name: "index_reports_on_company_id_and_generated_at"
+    t.index ["company_id", "report_type"], name: "index_reports_on_company_id_and_report_type"
+    t.index ["company_id", "status"], name: "index_reports_on_company_id_and_status"
+    t.index ["company_id"], name: "index_reports_on_company_id"
+    t.index ["user_id"], name: "index_reports_on_user_id"
+  end
+
   create_table "service_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.text "description"
     t.integer "quantity"
@@ -163,6 +182,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_08_04_003050) do
   add_foreign_key "companies", "users", column: "responsible_id"
   add_foreign_key "order_services", "clients"
   add_foreign_key "order_services", "companies"
+  add_foreign_key "reports", "companies"
+  add_foreign_key "reports", "users"
   add_foreign_key "service_items", "order_services"
   add_foreign_key "users", "companies"
 end

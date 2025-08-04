@@ -8,6 +8,7 @@ constraints subdomain: "app" do
   resources :attachments, only: [:index, :show, :destroy], module: "app", as: :app_attachments
   resources :reports, only: [:index, :show], module: "app", as: :app_reports
   resources :technicians, module: "app", as: :app_technicians
+  resources :reports, module: "app", as: :app_reports
   resources :calendar, only: [:index], module: "app", as: :app_calendar
   resources :configurations, module: "app", as: :app_configurations
 
