@@ -14,7 +14,8 @@ class OrderService < ApplicationRecord
     agendada: 0, 
     em_andamento: 1, 
     concluida: 2, 
-    cancelada: 3 
+    cancelada: 3,
+    finalizada: 4
   }
   
   validates :title, presence: true, length: { minimum: 5, maximum: 100 }
@@ -82,7 +83,8 @@ class OrderService < ApplicationRecord
   def progress_percentage
     return 0 if agendada?
     return 50 if em_andamento?
-    return 100 if concluida?
+    return 90 if concluida?
+    return 100 if finalizada?
     0
   end
   
@@ -91,6 +93,7 @@ class OrderService < ApplicationRecord
     when 'agendada' then 'warning'
     when 'em_andamento' then 'info'
     when 'concluida' then 'success'
+    when 'finalizada' then 'primary'
     when 'cancelada' then 'danger'
     end
   end
@@ -99,7 +102,8 @@ class OrderService < ApplicationRecord
     case status
     when 'agendada' then ['em_andamento', 'cancelada']
     when 'em_andamento' then ['concluida', 'cancelada']
-    when 'concluida' then []
+    when 'concluida' then ['finalizada']
+    when 'finalizada' then []
     when 'cancelada' then []
     else []
     end
