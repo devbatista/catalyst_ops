@@ -20,27 +20,31 @@
             <strong>ID:</strong>
             <p><%= @order_service.id %></p>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-3">
+            <strong>Código:</strong>
+            <p><%= @order_service.code %></p>
+          </div>
+          <div class="col-md-5">
             <strong>Cliente:</strong>
             <p><%= @order_service.client&.name %></p>
           </div>
-          <div class="col-md-4">
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-3">
             <strong>Status:</strong>
             <p><%= @order_service.status.humanize %></p>
           </div>
-        </div>
-        <div class="row mb-3">
-          <div class="col-md-4">
+          <div class="col-md-3">
             <strong>Agendada para:</strong>
             <p><%= l(@order_service.scheduled_at, format: :short) if @order_service.scheduled_at %></p>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-3">
             <strong>Técnicos:</strong>
             <p>
               <%= @order_service.assignments.map { |a| a.user.name }.join(", ") %>
             </p>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-3">
             <strong>Criada em:</strong>
             <p><%= l(@order_service.created_at, format: :short) %></p>
           </div>
