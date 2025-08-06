@@ -37,6 +37,7 @@
               <thead>
                 <tr>
                   <th>#</th>
+                  <th>Código</th>
                   <th>Cliente</th>
                   <th>Status</th>
                   <th>Agendada</th>
@@ -48,6 +49,7 @@
                 <% @order_services.each do |os| %>
                 <tr>
                   <td><%= os.id %></td>
+                  <td><%= os.code %></td>
                   <td><%= os.client&.name %></td>
                   <td><%= os.status.humanize %></td>
                   <td><%= l(os.scheduled_at, format: :short) if os.scheduled_at %></td>
