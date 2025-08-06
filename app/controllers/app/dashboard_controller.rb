@@ -12,10 +12,12 @@ class App::DashboardController < ApplicationController
     when "gestor"
       @clients_count = current_user.clients.count
       @order_services = current_user.company.order_services
+      @order_services_by_status = @order_services.group(:status).count
       @technicians_count = User.where(role: :tecnico, company_id: current_user.company_id).count
       @recent_orders = @order_services.order(created_at: :desc).limit(6)
     when "tecnico"
       @order_services = current_user.order_services
+      @order_services_by_status = @order_services.group(:status).count
       @recent_orders = @order_services.order(created_at: :desc).limit(6)
       @my_orders = current_user.order_services.includes(:client)
       @pending_orders = @my_orders.agendada.count
