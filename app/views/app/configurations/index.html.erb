@@ -1,0 +1,54 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row" style="min-height: 80vh;">
+      <div class="col-12">
+        <div class="mb-3">
+          <h4 class="mb-0 text-uppercase">Configurações</h4>
+        </div>
+        <% flash.each do |type, message| %>
+        <% bootstrap_class = { notice: "alert-success", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
+        <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert">
+          <%= message %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <% end %>
+        <div class="row flex-nowrap" style="min-height: 70vh;">
+          <!-- Menu lateral -->
+          <nav class="col-md-2 border-end p-0" style="min-height: 70vh;">
+            <div class="py-4 px-3">
+              <ul class="list-unstyled">
+                <li>
+                  <a class="text-decoration-none d-block py-2 ps-2 link-dark active" id="tab-perfil" data-bs-toggle="tab" href="#perfil" role="tab">Perfil</a>
+                </li>
+                <li>
+                  <a class="text-decoration-none d-block py-2 ps-2 link-dark" id="tab-gestores" data-bs-toggle="tab" href="#gestores" role="tab">Gestores</a>
+                </li>
+                <li>
+                  <a class="text-decoration-none d-block py-2 ps-2 link-dark" id="tab-sistema" data-bs-toggle="tab" href="#sistema" role="tab">Configurações do Sistema</a>
+                </li>
+              </ul>
+            </div>
+          </nav>
+          <!-- Conteúdo -->
+          <div class="col-md-9">
+            <div class="tab-content py-4 px-2">
+              <div class="tab-pane fade show active" id="perfil" role="tabpanel">
+                <%= render 'profile_form', user: current_user %>
+              </div>
+              <div class="tab-pane fade" id="gestores" role="tabpanel">
+                <% if current_user.admin? || current_user.gestor? %>
+                  <%= render 'managers' %>
+                <% else %>
+                  <p>Você não tem permissão para gerenciar gestores.</p>
+                <% end %>
+              </div>
+              <div class="tab-pane fade" id="sistema" role="tabpanel">
+                <%= render 'system_settings' %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
