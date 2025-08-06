@@ -1,5 +1,6 @@
 class App::OrderServicesController < ApplicationController
   before_action :set_other_resources, only: [:new, :edit, :update]
+  before_action :set_attachment_on_update, only: [:update]
 
   load_and_authorize_resource
 
@@ -37,7 +38,7 @@ class App::OrderServicesController < ApplicationController
 
   def update
     if @order_service.update(order_service_params)
-      redirect_to app_order_services_url, notice: "Ordem de serviço atualizada com sucesso."
+      redirect_to app_order_service_url(@order_service), notice: "Ordem de serviço atualizada com sucesso."
     else
       @clients = Client.order(:name)
       flash.now[:alert] = @order_service.errors.full_messages
@@ -103,5 +104,12 @@ class App::OrderServicesController < ApplicationController
     @clients = current_user.clients.order(:name)
     @technicians = current_user.company.users.where("role = ? OR can_be_technician = ?", User.roles[:tecnico], true)
     @order_service&.service_items ||= []
+  end
+
+  def set_attachment_on_update
+    if params[:order_service][:attachments].is_a?(Array)
+      params[:order_service][:attachments].reject!(&:blank?)
+      params[:order_service].delete(:attachments) if params[:order_service][:attachments].empty?
+    end
   end
 end

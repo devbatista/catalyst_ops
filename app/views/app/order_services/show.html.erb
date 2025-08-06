@@ -65,6 +65,23 @@
             </div>
           </div>
         </div>
+        <div class="row mb-3">
+          <div class="col-md-12">
+            <strong>Anexos:</strong>
+            <% if @order_service.attachments.attached? %>
+            <ul>
+              <% @order_service.attachments.each do |attachment| %>
+              <li>
+                <%= link_to attachment.filename, url_for(attachment), target: "_blank" %>
+                (<%= number_to_human_size(attachment.byte_size) %>)
+              </li>
+              <% end %>
+            </ul>
+            <% else %>
+            <span>Nenhum anexo.</span>
+            <% end %>
+          </div>
+        </div>
         <hr>
         <h5>Itens do Serviço</h5>
         <% if @service_items.any? %>
