@@ -3,6 +3,9 @@ module Cmd
     class Create
       def initialize(order_service)
         @order_service = order_service
+        @company = @order_service.company
+        @client = @order_service.client
+        @address = @client.addresses.first
       end
 
       def generate_pdf_data
@@ -21,7 +24,7 @@ module Cmd
         pdf.move_down(7)
         pdf.font_size(26) do
           pdf.fill_color("FFFFFF")
-          pdf.text("Ordem de Serviço 001", align: :center, style: :bold)
+          pdf.text("Ordem de Serviço #{@order_service.code}", align: :center, style: :bold)
         end
         pdf.fill_color("000000")
         pdf.move_down(5)
@@ -30,10 +33,10 @@ module Cmd
         header_data = [
           [
             { content: "Insira sua logo aqui", align: :center, valign: :center },
-            { content: "eGestor - Sistema de Gestão Empresarial
-                        0800 603 3336
-                        egestor@egestor.com.br
-                        Rua do Acampamento nº 380 Salas 1, 2 e 3 - Centro", align: :center, valign: :center },
+            { content: "#{@company.name}
+                        #{@company.formatted_document} || #{@company.formatted_phone}
+                        #{@company.email}
+                        #{@company.address}", align: :center, valign: :center },
           ],
         ]
         pdf.table(
@@ -52,27 +55,27 @@ module Cmd
         client_data = [
           [
             { content: "Cliente:", align: :left, borders: [] },
-            { content: "", borders: [] },
-            { content: "CPF:", align: :left, borders: [] },
-            { content: "", borders: [] },
+            { content: @client.name, borders: [] },
+            { content: "Documento:", align: :left, borders: [] },
+            { content: @client.formatted_document, borders: [] },
           ],
           [
             { content: "Endereço:", align: :left, borders: [] },
-            { content: "", borders: [] },
+            { content: @address.street, borders: [] },
             { content: "Nº:", align: :left, borders: [] },
-            { content: "", borders: [] },
+            { content: @address.number, borders: [] },
           ],
           [
             { content: "Bairro:", align: :left, borders: [] },
-            { content: "", borders: [] },
+            { content: @address.neighborhood, borders: [] },
             { content: "CEP:", align: :left, borders: [] },
-            { content: "", borders: [] },
+            { content: @address.zip_code, borders: [] },
           ],
           [
             { content: "Telefone:", align: :left, borders: [] },
-            { content: "", borders: [] },
+            { content: @client.formatted_phone, borders: [] },
             { content: "Email:", align: :left, borders: [] },
-            { content: "", borders: [] },
+            { content: @client.email, borders: [] },
           ],
         ]
         pdf.table(
@@ -96,7 +99,7 @@ module Cmd
 
         # Área em branco para descrição (tabela para garantir altura)
         pdf.table(
-          [[""]],
+          [[@order_service.description]],
           cell_style: {
             height: 80,
             borders: [],
@@ -115,13 +118,23 @@ module Cmd
 
         # Tabela de produtos (linhas em branco)
         data_items = [
-          ["Qntd.", "Produtos", "Valor"],
-          ["", "", ""],
-          ["", "", ""],
-          ["", "", ""],
-          ["", "", ""],
-          ["", "", ""],
+          ["Qtd", "Item", "Valor"],
         ]
+
+        # Adiciona cada item da ordem de serviço
+        @order_service.service_items.each do |item|
+          data_items << [
+            item.quantity,
+            item.description,
+            "R$ #{"%.2f" % item.unit_price}",
+          ]
+        end
+
+        # Se quiser garantir pelo menos 5 linhas (completar com linhas em branco)
+        while data_items.size < 6
+          data_items << ["", "", ""]
+        end
+
         pdf.table(data_items, header: true, width: pdf.bounds.width, cell_style: { size: 11, height: 28 })
 
         pdf.move_down(10)
@@ -133,7 +146,19 @@ module Cmd
         pdf.fill_color("FFFFFF")
         pdf.text("Observações:", align: :center, style: :bold)
         pdf.fill_color("000000")
-        pdf.move_down(80)
+        pdf.move_down(3)
+
+        # Área para observações (tabela para garantir altura e alinhamento)
+        pdf.table(
+          [[@order_service.observations.presence || " "]],
+          cell_style: {
+            height: 80,
+            borders: [],
+          },
+          width: pdf.bounds.width,
+        )
+
+        pdf.move_down(10)
 
         pdf.stroke_horizontal_line(pdf.bounds.left, pdf.bounds.right, at: pdf.cursor)
 
@@ -142,7 +167,7 @@ module Cmd
           [
             { content: "Desconto:", borders: [] },
             { content: "", borders: [] },
-            { content: "Total: R$ 0,00", align: :right, borders: [] },
+            { content: "Total: #{@order_service.formatted_total_value}", align: :right, borders: [] },
           ],
         ]
         pdf.table(rodape_data, cell_style: { borders: [] }, width: pdf.bounds.width)
@@ -153,7 +178,7 @@ module Cmd
         pdf.fill_rectangle([0, pdf.cursor], pdf.bounds.width, 20)
         pdf.move_down(3)
         pdf.fill_color("FFFFFF")
-        pdf.text("Este serviço prestado possui garantia de 15 dias após a entrega.", align: :center)
+        pdf.text("Este serviço prestado possui garantia de X dias após a entrega.", align: :center)
         pdf.fill_color("000000")
         pdf.move_down(20)
 

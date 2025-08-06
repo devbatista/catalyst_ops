@@ -19,6 +19,34 @@ class Company < ApplicationRecord
 
   validate :document_must_be_cpf_or_cnpj
 
+  def formatted_document
+    return document unless document.present?
+
+    cpf_cnpj = normalize_document
+
+    if cpf_cnpj.size == 11
+      CPF.new(cpf_cnpj).formatted
+    elsif cpf_cnpj.size
+      CNPJ.new(cpf_cnpj).formatted
+    else
+      cpf_cnpj
+    end
+  end
+
+  def formatted_phone
+    return phone unless phone.present?
+
+    clean_phone = phone.gsub(/\D/, "")
+
+    if clean_phone.length == 11
+      clean_phone.gsub(/(\d{2})(\d{5})(\d{4})/, '(\1) \2-\3')
+    elsif clean_phone.length == 10
+      clean_phone.gsub(/(\d{2})(\d{4})(\d{4})/, '(\1) \2-\3')
+    else
+      phone
+    end
+  end
+
   private
 
   def normalize_document
