@@ -30,18 +30,7 @@
         <%= f.label :attachments, "Anexos", class: "form-label" %>
         <% if @order_service.persisted? %>
         <%= f.file_field :attachments, multiple: true, class: "form-control" %>
-        <% if @order_service.attachments.attached? %>
-        <div class="mt-2">
-          <strong>Anexos atuais:</strong>
-          <ul>
-            <% @order_service.attachments.each do |attachment| %>
-            <li>
-              <%= link_to attachment.filename, url_for(attachment), target: "_blank" %>
-            </li>
-            <% end %>
-          </ul>
-        </div>
-        <% end %>
+        <%= render partial: "app/order_services/attachments", locals: { order_service: @order_service } %>
         <% else %>
         <p class="form-text text-muted">Salve a ordem de serviço antes de anexar arquivos.</p>
         <% end %>
