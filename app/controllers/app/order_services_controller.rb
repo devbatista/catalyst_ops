@@ -38,6 +38,7 @@ class App::OrderServicesController < ApplicationController
 
   def update
     if @order_service.update(order_service_params)
+      add_attachs if @attachments.present?
       redirect_to app_order_service_url(@order_service), notice: "Ordem de serviço atualizada com sucesso."
     else
       @clients = Client.order(:name)
@@ -109,7 +110,13 @@ class App::OrderServicesController < ApplicationController
   def set_attachment_on_update
     if params[:order_service][:attachments].is_a?(Array)
       params[:order_service][:attachments].reject!(&:blank?)
-      params[:order_service].delete(:attachments) if params[:order_service][:attachments].empty?
+      @attachments = params[:order_service].delete(:attachments)
+    end
+  end
+
+  def add_attachs
+    @attachments.each do |file|
+      @order_service.attachments.attach(file)
     end
   end
 end
