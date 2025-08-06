@@ -1,4 +1,6 @@
 class OrderService < ApplicationRecord
+  include AttachmentValidations
+  
   belongs_to :client
   belongs_to :company
 
