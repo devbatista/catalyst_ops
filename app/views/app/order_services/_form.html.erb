@@ -76,6 +76,7 @@
             <%= item_fields.text_field :description, class: "form-control", placeholder: "Nome do item" %>
             <%= item_fields.text_field :quantity, class: "form-control", placeholder: "Quantidade" %>
             <%= item_fields.text_field :unit_price, class: "form-control", placeholder: "Valor unitário" %>
+            <%= item_fields.hidden_field :_destroy, class: "service-item-destroy-flag" %>
             <button type="button" class="btn btn-danger remove-item">Remover</button>
             <% end %>
           </div>
@@ -97,7 +98,9 @@
     <div class="row">
       <div class="col-md-12 mt-3">
         <%= f.submit "Salvar", class: "btn btn-primary px-4" %>
-        <%= link_to "Voltar", app_order_services_path, class: "btn btn-light px-4" %>
+        <%= link_to "Voltar", 
+            @order_service.persisted? ? app_order_service_path(@order_service) : app_order_services_path,
+            class: "btn btn-light px-4" %>
       </div>
     </div>
   </div>
@@ -121,8 +124,15 @@
       });
 
       document.getElementById('service-items-list').addEventListener('click', function(e) {
-        if (e.target.classList.contains('remove-item')) {
-          e.target.closest('.service-item-row').remove();
+        if (e.target.classList.contains('remove-item') || e.target.closest('.remove-item')) {
+          const row = e.target.closest('.input-group, .service-item-row');
+          const destroyFlag = row.querySelector('.service-item-destroy-flag');
+          if (destroyFlag) {
+            destroyFlag.value = '1';
+            row.style.display = 'none';
+          } else {
+            row.remove();
+          }
         }
       });
 
