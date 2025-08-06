@@ -157,28 +157,6 @@ module Cmd
         pdf.fill_color("000000")
         pdf.move_down(20)
 
-        # # Assinaturas (tabela para linhas)
-        # assinatura_data = [
-        #   [
-        #     { content: "", borders: [], height: 70 },
-        #     { content: "", borders: [], height: 70 },
-        #   ],
-        #   [
-        #     { content: "Cliente", borders: [:top], border_width: 1, border_color: "000000", padding_left: 30 },
-        #     { content: "Responsável", borders: [:top], border_width: 1, border_color: "000000", padding_right: 30 },
-        #   ],
-        # ]
-        # pdf.table(
-        #   assinatura_data,
-        #   cell_style: {
-        #     width: pdf.bounds.width / 2,
-        #     align: :center,
-        #     valign: :bottom,
-        #     size: 14,
-        #   },
-        #   position: :center,
-        # )
-
         padding = 24
         pdf.bounding_box([pdf.bounds.left + padding, 80], width: pdf.bounds.width - 2 * padding, height: 80) do
           y = pdf.cursor - 30
