@@ -47,6 +47,9 @@ gem 'paranoia', '~> 2.6'
 gem 'prawn', '~> 2.4'
 gem 'prawn-table', '~> 0.2'
 
+# Validação do active_storage
+gem 'active_storage_validations', '~> 1.1'
+
 group :development, :test do
   gem "debug", platforms: %i[ mri windows ]
 
