@@ -27,6 +27,17 @@
                   </form>
                   <span class="showing-entries-text">registros</span>
                 </div>
+                <form method="get" class="flex-grow-1" style="min-width: 0;">
+                  <div class="input-group input-search-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">
+                        <i class="bx bx-search"></i>
+                      </span>
+                    </div>
+                    <input type="number" name="code" value="<%= params[:code] %>" class="form-control input-search" placeholder="Código..." aria-label="Search">
+                    <input type="hidden" name="per" value="<%= params[:per] %>">
+                  </div>
+                </form>
               </div>
               <div class="col-md-6 d-flex justify-content-end">
                 <%= link_to raw('<i class="bx bx-plus"></i> Nova OS'),

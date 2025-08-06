@@ -15,6 +15,10 @@ class App::OrderServicesController < ApplicationController
     when "tecnico"
       current_user.order_services.includes(:client)
     end.order(created_at: :desc).page(params[:page]).per(params[:per] || 10)
+
+    if params[:code].present?
+      @order_services = @order_services.where(code: params[:code])
+    end
   end
 
   def show
