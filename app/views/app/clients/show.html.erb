@@ -68,6 +68,21 @@
               </div>
             </div>
             <hr>
+            <% if @client.order_services.any? %>
+            <h5>Ordens de Serviço</h5>
+            <ul>
+              <% @client.order_services.order(created_at: :desc).each do |os| %>
+              <li>
+                <strong><%= os.title %></strong>
+                (<%= os.status %>)
+                - <%= link_to "Ver", app_order_service_path(os), class: "btn btn-sm btn-outline-primary" %>
+                - <%= link_to "Editar", edit_app_order_service_path(os), class: "btn btn-sm btn-outline-secondary" %>
+              </li>
+              <% end %>
+            </ul>
+            <% else %>
+            <p>Nenhuma ordem de serviço para este cliente.</p>
+            <% end %>
             <% end %>
             <% end %>
             <div class="mt-3">
