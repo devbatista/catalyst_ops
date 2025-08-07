@@ -7,7 +7,7 @@ USERS = []
 # Admin
 USERS << User.create!(
   name: "Admin",
-  email: "admin@catalystops.dev",
+  email: "admin@catalystops.local",
   password: "senha123",
   role: :admin,
   phone: Faker::PhoneNumber.cell_phone_in_e164,
