@@ -42,8 +42,11 @@ class App::OrderServicesController < ApplicationController
 
   def update
     if @order_service.update(order_service_params)
-      add_attachs if @attachments.present?
-      redirect_to app_order_service_url(@order_service), notice: "Ordem de serviço atualizada com sucesso."
+      if @attachments.present?
+        add_attachs
+      else
+        redirect_to app_order_service_url(@order_service), notice: "Ordem de serviço atualizada com sucesso."
+      end
     else
       @clients = Client.order(:name)
       flash.now[:alert] = @order_service.errors.full_messages
@@ -135,8 +138,25 @@ class App::OrderServicesController < ApplicationController
   end
 
   def add_attachs
+    invalid_attachments = []
+
     @attachments.each do |file|
       @order_service.attachments.attach(file)
+      @order_service.valid?
+
+      if @order_service.errors[:attachments].any?
+        last_attachment = @order_service.attachments.last
+        last_attachment.purge if last_attachment.present?
+        invalid_attachments << file.original_filename
+      end
+    end
+
+    if invalid_attachments.any?
+      @clients = Client.order(:name)
+      flash.now[:alert] = @order_service.errors.full_messages
+      render :edit, status: :unprocessable_entity
+    else
+      redirect_to app_order_service_url(@order_service), notice: "Ordem de serviço atualizada com sucesso."
     end
   end
 end
