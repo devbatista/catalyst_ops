@@ -6,6 +6,8 @@
 //= link application.js
 //= link controllers/application.js
 //= link controllers/hello_controller.js
+//= link controllers/scrollbar_controller.js
+//= link controllers/stimulus.js
 //= link controllers/index.js
 //= link viacep.js
 //= link fullcalendar/main.min.css
