@@ -37,3 +37,5 @@
 /project.md
 
 /bin/rails_bkp
+
+*.diff
