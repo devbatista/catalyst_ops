@@ -12,3 +12,4 @@
 //= link viacep.js
 //= link fullcalendar/main.min.css
 //= link fullcalendar/main.min.js
+//= link jquery-jvectormap-2.0.2.min.js
