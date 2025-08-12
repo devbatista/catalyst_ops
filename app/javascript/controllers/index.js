@@ -1,5 +1,14 @@
-import { application } from "./application"
+import { Application } from "@hotwired/stimulus"
 import { eagerLoadControllersFrom } from "@hotwired/stimulus-loading"
 
-// Carrega automaticamente todos os *_controller.js em app/javascript/controllers
+// 1. Crie a instância da aplicação Stimulus aqui mesmo
+const application = Application.start()
+
+// 2. Configure a aplicação
+application.debug = false
+window.Stimulus = application
+
+// 3. Carregue os controladores
 eagerLoadControllersFrom("controllers", application)
+
+export { application }
