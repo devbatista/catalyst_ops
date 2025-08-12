@@ -13,7 +13,12 @@
 <!-- app JS -->
 <%= javascript_include_tag "js/app.js" %>
 <script>
-  new PerfectScrollbar(".app-container")
+  document.addEventListener("DOMContentLoaded", function() {
+    const appContainer = document.querySelector(".app-container");
+    if (appContainer) {
+      new PerfectScrollbar(appContainer);
+    }
+  });
 
   document.addEventListener("DOMContentLoaded", function() {
     if (window.jQuery && $('#multiple-select-field').length > 0) {
