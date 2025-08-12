@@ -1,9 +1,26 @@
 $(function () {
 	"use strict";
-	new PerfectScrollbar(".app-container"),
-		$(".mobile-search-icon").on("click", function () {
-			$(".search-bar").addClass("full-search-bar")
-		}),
+
+	// Inicializações do PerfectScrollbar com verificação de existência
+	const appContainer = document.querySelector(".app-container");
+	if (appContainer) {
+		new PerfectScrollbar(appContainer);
+	}
+
+	const headerMessageList = document.querySelector(".header-message-list");
+	if (headerMessageList) {
+		new PerfectScrollbar(headerMessageList);
+	}
+
+	const headerNotificationsList = document.querySelector(".header-notifications-list");
+	if (headerNotificationsList) {
+		new PerfectScrollbar(headerNotificationsList);
+	}
+
+	// O restante do seu código original continua aqui
+	$(".mobile-search-icon").on("click", function () {
+		$(".search-bar").addClass("full-search-bar")
+	}),
 
 		$(".search-close").on("click", function () {
 			$(".search-bar").removeClass("full-search-bar")
@@ -25,6 +42,7 @@ $(function () {
 
 		}),
 
+
 		$(".toggle-icon").click(function () {
 			$(".wrapper").hasClass("toggled") ? ($(".wrapper").removeClass("toggled"), $(".sidebar-wrapper").unbind("hover")) : ($(".wrapper").addClass("toggled"), $(".sidebar-wrapper").hover(function () {
 				$(".wrapper").addClass("sidebar-hovered")
@@ -41,6 +59,7 @@ $(function () {
 				}, 600), !1
 			})
 		}),
+
 
 		$(function () {
 			for (var e = window.location, o = $(".metismenu li a").filter(function () {
@@ -101,7 +120,7 @@ $(function () {
 			$("html").addClass("color-header headercolor8"), $("html").removeClass("headercolor1 headercolor2 headercolor4 headercolor5 headercolor6 headercolor7 headercolor3")
 		})
 
-	// sidebar colors 
+	// sidebar colors
 	$('#sidebarcolor1').click(theme1);
 	$('#sidebarcolor2').click(theme2);
 	$('#sidebarcolor3').click(theme3);
@@ -142,6 +161,4 @@ $(function () {
 	function theme8() {
 		$('html').attr('class', 'color-sidebar sidebarcolor8');
 	}
-
-
 });

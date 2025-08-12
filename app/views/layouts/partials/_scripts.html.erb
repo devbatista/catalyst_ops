@@ -12,16 +12,3 @@
 <%= javascript_include_tag "js/index.js" %>
 <!-- app JS -->
 <%= javascript_include_tag "js/app.js" %>
-<script>
-  new PerfectScrollbar(".app-container")
-
-  document.addEventListener("DOMContentLoaded", function() {
-    if (window.jQuery && $('#multiple-select-field').length > 0) {
-      $('#multiple-select-field').select2({
-        theme: 'bootstrap-5',
-        placeholder: $('#multiple-select-field').data('placeholder'),
-        width: '100%'
-      });
-    }
-  });
-</script>
