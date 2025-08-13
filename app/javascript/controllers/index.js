@@ -10,5 +10,3 @@ window.Stimulus = application
 
 // 3. Carregue os controladores
 eagerLoadControllersFrom("controllers", application)
-
-export { application }
