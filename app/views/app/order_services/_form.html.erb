@@ -123,42 +123,5 @@
       </div>
     </div>
   </div>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      if (window.jQuery) {
-        $('#multiple-select-field').select2({
-          theme: 'bootstrap-5',
-          placeholder: $('#multiple-select-field').data('placeholder'),
-          width: '100%'
-        });
-      }
-
-      let itemIndex = <%= @order_service.service_items.size %> ;
-      document.getElementById('add-service-item').addEventListener('click', function() {
-        let template = document.getElementById('service-item-template').innerHTML;
-        let newRow = template.replace(/NEW_INDEX/g, itemIndex);
-        document.getElementById('service-items-list').insertAdjacentHTML('beforeend', newRow);
-        itemIndex++;
-      });
-
-      document.getElementById('service-items-list').addEventListener('click', function(e) {
-        if (e.target.classList.contains('remove-item') || e.target.closest('.remove-item')) {
-          const row = e.target.closest('.input-group, .service-item-row');
-          const destroyFlag = row.querySelector('.service-item-destroy-flag');
-          if (destroyFlag) {
-            destroyFlag.value = '1';
-            row.style.display = 'none';
-          } else {
-            row.remove();
-          }
-        }
-      });
-
-      document.querySelectorAll('.js-wait').forEach(function(el) {
-        el.classList.remove('js-wait');
-      });
-    });
-  </script>
   <% end %>
 </div>

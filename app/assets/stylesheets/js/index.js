@@ -1,9 +1,60 @@
+// Declara as variáveis no objeto global 'window' para que persistam e
+// não causem erro de "already been declared" se o script for carregado novamente.
+window.chart1Instance = window.chart1Instance || null;
+window.chart2Instance = window.chart2Instance || null;
+window.chart3Instance = window.chart3Instance || null;
+window.chart4Instance = window.chart4Instance || null;
+window.chart5Instance = window.chart5Instance || null;
+
+// Função para inicializar o jVectorMap de forma segura
+function initializeVectorMap() {
+  const mapEl = jQuery('#geographic-map-2');
+  if (mapEl.length === 0) {
+    return; // Não há mapa nesta página, então não faz nada.
+  }
+
+  // Verifica se o plugin está pronto. Se não, espera 100ms e tenta de novo.
+  if (!jQuery.fn.vectorMap) {
+    setTimeout(initializeVectorMap, 100);
+    return;
+  }
+
+  mapEl.empty(); // Limpa o conteúdo do mapa antes de recriar
+  mapEl.vectorMap({
+    map: 'world_mill_en',
+    backgroundColor: 'transparent',
+    borderColor: '#818181',
+    borderOpacity: 0.25,
+    borderWidth: 1,
+    zoomOnScroll: false,
+    color: '#009efb',
+    regionStyle: { initial: { fill: '#008cff' } },
+    markerStyle: { initial: { r: 9, 'fill': '#fff', 'fill-opacity': 1, 'stroke': '#000', 'stroke-width': 5, 'stroke-opacity': 0.4 } },
+    enableZoom: true,
+    hoverColor: '#009efb',
+    markers: [{ latLng: [21.00, 78.00], name: 'Lorem Ipsum Dollar' }],
+    hoverOpacity: null,
+    normalizeFunction: 'linear',
+    scaleColors: ['#b6d6ff', '#005ace'],
+    selectedColor: '#c9dfaf',
+    selectedRegions: [],
+    showTooltip: true,
+  });
+}
+
+
 document.addEventListener("turbo:load", function() {
   "use strict";
+
+  // --- GRÁFICOS ---
+  // (O código dos gráficos permanece o mesmo, destruindo e recriando as instâncias)
 
   // chart 1
   const chart1El = document.getElementById("chart1");
   if (chart1El) {
+    if (window.chart1Instance) {
+      window.chart1Instance.destroy();
+    }
     const ctx = chart1El.getContext('2d');
     const gradientStroke1 = ctx.createLinearGradient(0, 0, 0, 300);
     gradientStroke1.addColorStop(0, '#6078ea');
@@ -11,7 +62,8 @@ document.addEventListener("turbo:load", function() {
     const gradientStroke2 = ctx.createLinearGradient(0, 0, 0, 300);
     gradientStroke2.addColorStop(0, '#ff8359');
     gradientStroke2.addColorStop(1, '#ffdf40');
-    new Chart(ctx, {
+    
+    window.chart1Instance = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
@@ -47,9 +99,12 @@ document.addEventListener("turbo:load", function() {
     });
   }
 
-  // chart 2 (Dinâmico, como solicitado)
+  // chart 2 (Dinâmico)
   const chart2El = document.getElementById("chart2");
   if (chart2El) {
+    if (window.chart2Instance) {
+      window.chart2Instance.destroy();
+    }
     const ctx = chart2El.getContext('2d');
     const statusLabels = [];
     const statusCounts = [];
@@ -63,7 +118,7 @@ document.addEventListener("turbo:load", function() {
       statusColors.push(color);
     });
 
-    new Chart(ctx, {
+    window.chart2Instance = new Chart(ctx, {
       type: 'doughnut',
       data: {
         labels: statusLabels,
@@ -82,38 +137,21 @@ document.addEventListener("turbo:load", function() {
     });
   }
 
-  // world map
-  if (jQuery('#geographic-map-2').length) {
-    jQuery('#geographic-map-2').vectorMap({
-      map: 'world_mill_en',
-      backgroundColor: 'transparent',
-      borderColor: '#818181',
-      borderOpacity: 0.25,
-      borderWidth: 1,
-      zoomOnScroll: false,
-      color: '#009efb',
-      regionStyle: { initial: { fill: '#008cff' } },
-      markerStyle: { initial: { r: 9, 'fill': '#fff', 'fill-opacity': 1, 'stroke': '#000', 'stroke-width': 5, 'stroke-opacity': 0.4 } },
-      enableZoom: true,
-      hoverColor: '#009efb',
-      markers: [{ latLng: [21.00, 78.00], name: 'Lorem Ipsum Dollar' }],
-      hoverOpacity: null,
-      normalizeFunction: 'linear',
-      scaleColors: ['#b6d6ff', '#005ace'],
-      selectedColor: '#c9dfaf',
-      selectedRegions: [],
-      showTooltip: true,
-    });
-  }
+  // --- MAPA ---
+  // Chama a função segura para inicializar o mapa.
+  initializeVectorMap();
 
   // chart 3
   const chart3El = document.getElementById('chart3');
   if (chart3El) {
+    if (window.chart3Instance) {
+      window.chart3Instance.destroy();
+    }
     const ctx = chart3El.getContext('2d');
     const gradientStroke1 = ctx.createLinearGradient(0, 0, 0, 300);
     gradientStroke1.addColorStop(0, '#00b09b');
     gradientStroke1.addColorStop(1, '#96c93d');
-    new Chart(ctx, {
+    window.chart3Instance = new Chart(ctx, {
       type: 'line',
       data: {
         labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
@@ -138,6 +176,9 @@ document.addEventListener("turbo:load", function() {
   // chart 4
   const chart4El = document.getElementById("chart4");
   if (chart4El) {
+    if (window.chart4Instance) {
+      window.chart4Instance.destroy();
+    }
     const ctx = chart4El.getContext('2d');
     const gradientStroke1 = ctx.createLinearGradient(0, 0, 0, 300);
     gradientStroke1.addColorStop(0, '#ee0979');
@@ -148,7 +189,7 @@ document.addEventListener("turbo:load", function() {
     const gradientStroke3 = ctx.createLinearGradient(0, 0, 0, 300);
     gradientStroke3.addColorStop(0, '#7f00ff');
     gradientStroke3.addColorStop(1, '#e100ff');
-    new Chart(ctx, {
+    window.chart4Instance = new Chart(ctx, {
       type: 'pie',
       data: {
         labels: ["Completed", "Pending", "Process"],
@@ -170,6 +211,9 @@ document.addEventListener("turbo:load", function() {
   // chart 5
   const chart5El = document.getElementById("chart5");
   if (chart5El) {
+    if (window.chart5Instance) {
+      window.chart5Instance.destroy();
+    }
     const ctx = chart5El.getContext('2d');
     const gradientStroke1 = ctx.createLinearGradient(0, 0, 0, 300);
     gradientStroke1.addColorStop(0, '#f54ea2');
@@ -177,7 +221,7 @@ document.addEventListener("turbo:load", function() {
     const gradientStroke2 = ctx.createLinearGradient(0, 0, 0, 300);
     gradientStroke2.addColorStop(0, '#42e695');
     gradientStroke2.addColorStop(1, '#3bb2b8');
-    new Chart(ctx, {
+    window.chart5Instance = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: [1, 2, 3, 4, 5],
