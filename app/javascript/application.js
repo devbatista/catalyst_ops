@@ -39,6 +39,35 @@ document.addEventListener('click', function(e) {
   }
 });
 
+// Função para definir o item de menu ativo com base na URL atual
+function setActiveMenuItem() {
+  const currentUrl = window.location.href;
+  const menuLinks = $("#menu li a");
+  const menuLists = $("#menu li")
+
+  // Remove a classe 'active' e 'mm-active' de todos os itens primeiro
+  menuLists.removeClass('mm-active').removeClass('active');
+
+  // Encontra o link que corresponde exatamente à URL atual
+  const activeLink = menuLinks.filter(function() {
+    return this.href === currentUrl;
+  });
+
+  if (activeLink.length > 0) {
+    const parentLi = activeLink.closest('li');
+    parentLi.addClass('active');
+
+    // Abre os submenus pais, se houver
+    let parentUl = parentLi.parent('ul.metismenu-container');
+    while (parentUl.length > 0 && !parentUl.is('#menu')) {
+      parentUl.addClass('mm-show');
+      const grandParentLi = parentUl.parent('li');
+      grandParentLi.addClass('mm-active');
+      parentUl = grandParentLi.parent('ul.metismenu-container');
+    }
+  }
+}
+
 
 // --- 2. FUNÇÕES DE INICIALIZAÇÃO (Chamadas a cada navegação) ---
 
@@ -60,6 +89,8 @@ function initializePlugins() {
         width: '100%'
       });
     }
+
+    setActiveMenuItem();
   });
 
   // Inicializa as barras de rolagem
