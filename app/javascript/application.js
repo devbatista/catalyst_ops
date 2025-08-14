@@ -44,8 +44,6 @@ document.addEventListener('click', function(e) {
 
 function initializePlugins() {
   $(document).ready(function() {
-    console.log("jQuery ready, inicializando plugins de UI.");
-
     // Inicializa o MetisMenu (menu lateral)
     const menuEl = $('#menu');
     if (menuEl.length > 0 && $.fn.metisMenu) {
@@ -78,7 +76,6 @@ function initializePlugins() {
 // --- 3. EVENTOS DO TURBO ---
 
 document.addEventListener("turbo:load", () => {
-  console.log("turbo:load - Inicializando plugins da página.");
   initializePlugins();
 });
 
