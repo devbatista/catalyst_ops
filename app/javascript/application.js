@@ -10,8 +10,6 @@ import "metisMenu"
 import PerfectScrollbar from "perfect-scrollbar"
 
 // --- 1. CONFIGURAÇÃO ÚNICA DE EVENTOS (Executa apenas uma vez) ---
-// Estes listeners são adicionados ao corpo do documento e funcionam para
-// elementos que são adicionados dinamicamente à página.
 document.addEventListener('click', function(e) {
   // Botão de adicionar item de serviço
   if (e.target.matches('#add-service-item')) {
@@ -39,23 +37,35 @@ document.addEventListener('click', function(e) {
   }
 });
 
+
+// --- NOVA VERSÃO ---
 // Função para definir o item de menu ativo com base na URL atual
+// Agora funciona para sub-páginas como /clients/new
 function setActiveMenuItem() {
   const currentUrl = window.location.href;
   const menuLinks = $("#menu li a");
-  const menuLists = $("#menu li")
+  let bestMatch = null;
 
-  // Remove a classe 'active' e 'mm-active' de todos os itens primeiro
-  menuLists.removeClass('mm-active').removeClass('active');
-
-  // Encontra o link que corresponde exatamente à URL atual
-  const activeLink = menuLinks.filter(function() {
-    return this.href === currentUrl;
+  // Encontra o link com o prefixo mais longo que corresponde à URL atual
+  menuLinks.each(function() {
+    const linkHref = this.href;
+    if (currentUrl.startsWith(linkHref)) {
+      if (!bestMatch || linkHref.length > bestMatch.href.length) {
+        bestMatch = this;
+      }
+    }
   });
 
-  if (activeLink.length > 0) {
+  // Remove a classe 'active' e 'mm-active' de todos os itens primeiro
+  $("#menu li").removeClass('mm-active active');
+  menuLinks.removeClass('active');
+
+  if (bestMatch) {
+    const activeLink = $(bestMatch);
+    activeLink.addClass('active');
+    
     const parentLi = activeLink.closest('li');
-    parentLi.addClass('active');
+    parentLi.addClass('mm-active').addClass('active');
 
     // Abre os submenus pais, se houver
     let parentUl = parentLi.parent('ul.metismenu-container');
@@ -72,15 +82,23 @@ function setActiveMenuItem() {
 // --- 2. FUNÇÕES DE INICIALIZAÇÃO (Chamadas a cada navegação) ---
 
 function initializePlugins() {
+  // Inicializa as barras de rolagem
+  $('.app-container, .header-message-list, .header-notifications-list').each(function() {
+    const ps = PerfectScrollbar.getInstance(this);
+    if (ps) ps.destroy();
+    new PerfectScrollbar(this);
+  });
+
+  // Usa o document.ready para garantir que o DOM está pronto para os plugins jQuery
   $(document).ready(function() {
-    // Inicializa o MetisMenu (menu lateral)
+    // 1. Inicializa o MetisMenu (menu lateral)
     const menuEl = $('#menu');
     if (menuEl.length > 0 && $.fn.metisMenu) {
       if (menuEl.data('metisMenu')) menuEl.metisMenu('dispose');
       menuEl.metisMenu();
     }
 
-    // Inicializa o Select2 para os técnicos
+    // 2. Inicializa o Select2 para os técnicos
     const selectField = $('#multiple-select-field');
     if (selectField.length > 0 && $.fn.select2) {
       selectField.select2({
@@ -90,17 +108,12 @@ function initializePlugins() {
       });
     }
 
+    // 3. Define o item de menu ativo
     setActiveMenuItem();
-  });
 
-  // Inicializa as barras de rolagem
-  $('.app-container, .header-message-list, .header-notifications-list').each(function() {
-    const ps = PerfectScrollbar.getInstance(this);
-    if (ps) ps.destroy();
-    new PerfectScrollbar(this);
+    // 4. Exibe o conteúdo após a inicialização dos plugins
+    $('.js-wait').show();
   });
-  
-  $('.js-wait').show();
 }
 
 
@@ -111,8 +124,8 @@ document.addEventListener("turbo:load", () => {
 });
 
 document.addEventListener("turbo:before-cache", () => {
-  // Destrói a instância do Select2 para evitar problemas ao voltar na página
-  const selectField = $('#order_service_user_ids');
+  // CORREÇÃO: Use o ID correto para destruir a instância do Select2
+  const selectField = $('#multiple-select-field');
   if (selectField.length > 0 && selectField.data('select2')) {
     selectField.select2('destroy');
   }
