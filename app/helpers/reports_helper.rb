@@ -22,6 +22,6 @@ module ReportsHelper
       ]
     }
 
-    categories.reject { |_categories, reports| reports.empty? }
+    categories.reject { |_category, reports| reports.empty? }
   end
 end
