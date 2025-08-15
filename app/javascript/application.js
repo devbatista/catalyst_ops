@@ -78,10 +78,9 @@ function setActiveMenuItem() {
   }
 }
 
-
 // --- 2. FUNÇÕES DE INICIALIZAÇÃO (Chamadas a cada navegação) ---
 
-function initializePlugins() {
+function initializePage() {
   // Inicializa as barras de rolagem
   $('.app-container, .header-message-list, .header-notifications-list').each(function() {
     const ps = PerfectScrollbar.getInstance(this);
@@ -108,10 +107,12 @@ function initializePlugins() {
       });
     }
 
-    // 3. Define o item de menu ativo
+    // 3. Renderiza o calendário
+
+    // 4. Define o item de menu ativo
     setActiveMenuItem();
 
-    // 4. Exibe o conteúdo após a inicialização dos plugins
+    // 5. Exibe o conteúdo após a inicialização dos plugins
     $('.js-wait').show();
   });
 }
@@ -120,7 +121,7 @@ function initializePlugins() {
 // --- 3. EVENTOS DO TURBO ---
 
 document.addEventListener("turbo:load", () => {
-  initializePlugins();
+  initializePage();
 });
 
 document.addEventListener("turbo:before-cache", () => {
