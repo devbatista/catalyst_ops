@@ -1,0 +1,48 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="mb-3">
+          <h4 class="mb-0 text-uppercase">Relatórios</h4>
+        </div>
+        <% flash.each do |type, message| %>
+        <% bootstrap_class = { notice: "alert-success", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
+        <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert">
+          <%= message %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <% end %>
+        <div class="card">
+          <div class="card-body">
+            <!-- Menu de Abas -->
+            <ul class="nav nav-tabs" id="reportTabs" role="tablist">
+              <% available_report_categories.keys.each_with_index do |category, index| %>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link <%= 'active' if index.zero? %>" id="<%= category.parameterize %>-tab" data-bs-toggle="tab" data-bs-target="#<%= category.parameterize %>-pane" type="button" role="tab" aria-controls="<%= category.parameterize %>-pane" aria-selected="<%= index.zero? %>"><%= category %></button>
+                </li>
+              <% end %>
+            </ul>
+
+            <!-- Conteúdo das Abas -->
+            <div class="tab-content" id="reportTabsContent">
+              <% available_report_categories.each_with_index do |(category, reports), index| %>
+                <div class="tab-pane fade <%= 'show active' if index.zero? %>" id="<%= category.parameterize %>-pane" role="tabpanel" aria-labelledby="<%= category.parameterize %>-tab" tabindex="0">
+                  <div class="list-group mt-3">
+                    <% reports.each do |report| %>
+                      <a href="<%= report[:path] %>" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                          <h5 class="mb-1"><%= report[:name] %></h5>
+                        </div>
+                        <p class="mb-1"><%= report[:description] %></p>
+                      </a>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
