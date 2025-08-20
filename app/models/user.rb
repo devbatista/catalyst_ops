@@ -18,6 +18,7 @@ class User < ApplicationRecord
   has_many :assignments, dependent: :destroy
   has_many :order_services, through: :assignments
   has_many :clients, foreign_key: :company_id, primary_key: :company_id, class_name: "Client"
+  has_many :reports, dependent: :destroy
 
   scope :tecnicos, -> { where(role: :tecnico) }
   scope :gestores, -> { where(role: :gestor) }

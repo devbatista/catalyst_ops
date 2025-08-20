@@ -15,6 +15,24 @@ class Report < ApplicationRecord
     service_orders: "service_orders",
   }, _prefix: true
 
+  DEFINITIONS = {
+    clients: {
+      name: "Relatório de Clientes",
+      decription: "Gere uma lista completa de clientes cadastrados.",
+      category: "Cadastros"
+    },
+    technicians: {
+      name: "Relatório de Técnicos",
+      description: "Gere uma lista completa de técnicos cadastrados",
+      category: "Cadastros"
+    },
+    service_orders: {
+      name: "Ordens de Serviço por Período",
+      description: "Visualize e filtre ordens de serviço em tempo real.",
+      category: "Operacional"
+    }
+  }.with_indifferent_access.freeze
+
   validates :title, presence: true, length: { minimum: 5, maximum: 100 }
   validates :report_type, presence: true
   validates :status, presence: true, inclusion: { in: statuses.keys }
@@ -31,5 +49,9 @@ class Report < ApplicationRecord
       "finished" => "Finalizado",
       "failed" => "Falhou",
     }[status] || status
+  end
+
+  def report_type_human
+    DEFINITIONS.dig(report_type, :name) || report_type.to_s.humanize
   end
 end
