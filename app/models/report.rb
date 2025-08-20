@@ -6,24 +6,52 @@ class Report < ApplicationRecord
     pending: "pending",
     processing: "processing",
     finished: "finished",
-    failed: "failed"
+    failed: "failed",
   }, _prefix: true
 
+  enum report_type: {
+    clients: "clients",
+    technicians: "technicians",
+    service_orders: "service_orders",
+  }, _prefix: true
+
+  DEFINITIONS = {
+    clients: {
+      name: "Relatório de Clientes",
+      decription: "Gere uma lista completa de clientes cadastrados.",
+      category: "Cadastros"
+    },
+    technicians: {
+      name: "Relatório de Técnicos",
+      description: "Gere uma lista completa de técnicos cadastrados",
+      category: "Cadastros"
+    },
+    service_orders: {
+      name: "Ordens de Serviço por Período",
+      description: "Visualize e filtre ordens de serviço em tempo real.",
+      category: "Operacional"
+    }
+  }.with_indifferent_access.freeze
+
   validates :title, presence: true, length: { minimum: 5, maximum: 100 }
-  validates :report_type, presence: true, length: { maximum: 50 }
+  validates :report_type, presence: true
   validates :status, presence: true, inclusion: { in: statuses.keys }
   validates :generated_at, presence: true, if: -> { finished? }
   validates :file, presence: true, if: -> { finished? }
   validates :error_message, length: { maximum: 1000 }, allow_blank: true
 
   serialize :filters, JSON
-  
+
   def status_human
     {
       "pending" => "Pendente",
       "processing" => "Processando",
       "finished" => "Finalizado",
-      "failed" => "Falhou"
+      "failed" => "Falhou",
     }[status] || status
+  end
+
+  def report_type_human
+    DEFINITIONS.dig(report_type, :name) || report_type.to_s.humanize
   end
 end
