@@ -18,7 +18,7 @@
               <div>
                 <p class="mb-0 text-secondary">Total de Ordens</p>
                 <h4 class="my-1 text-info"><%= @order_services.count %></h4>
-                <p class="mb-0 font-13">+2.5% from last week</p>
+                <%= weekly_change_indicator(@orders_current_week, @orders_last_week) %>
               </div>
               <div class="widgets-icons-2 rounded-circle bg-gradient-blues text-white ms-auto">
                 <i class='bx bxs-edit'></i>
@@ -36,7 +36,7 @@
                 <h4 class="my-1 text-danger">
                   <%= currency_br(@order_services.joins(:service_items).sum('service_items.unit_price')) %>
                 </h4>
-                <p class="mb-0 font-13">+5.4% from last week</p>
+                <%= weekly_change_indicator(@revenue_current_week, @revenue_last_week) %>
               </div>
               <div class="widgets-icons-2 rounded-circle bg-gradient-burning text-white ms-auto"><i class='bx bxs-wallet'></i>
               </div>
@@ -51,7 +51,7 @@
               <div>
                 <p class="mb-0 text-secondary">Técnicos</p>
                 <h4 class="my-1 text-success"><%= @technicians_count %></h4>
-                <p class="mb-0 font-13">-4.5% from last week</p>
+                <%= weekly_change_indicator(@new_technicians_current_week, @new_clients_last_week) %>
               </div>
               <div class="widgets-icons-2 rounded-circle bg-gradient-ohhappiness text-white ms-auto"><i class='bx bxs-bar-chart-alt-2'></i>
               </div>
@@ -66,7 +66,7 @@
               <div>
                 <p class="mb-0 text-secondary">Total de clientes ativos</p>
                 <h4 class="my-1 text-warning"><%= @clients_count %></h4>
-                <p class="mb-0 font-13">+8.4% from last week</p>
+                <%= weekly_change_indicator(@new_clients_current_week, @new_clients_last_week) %>
               </div>
               <div class="widgets-icons-2 rounded-circle bg-gradient-orange text-white ms-auto"><i class='bx bxs-group'></i>
               </div>
@@ -104,6 +104,47 @@
             </li>
             <% end %>
           </ul>
+        </div>
+      </div>
+
+      <!-- NOVO: Card de OS Pendentes de Finalização -->
+      <div class="col-12 col-lg-8 d-flex">
+        <div class="card radius-10 w-100">
+          <div class="card-header">
+            <h6 class="mb-0">Pendentes de Finalização</h6>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-striped table-hover align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>Cliente</th>
+                    <th>Data Agendada</th>
+                    <th>Técnico(s)</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% if @pending_approval_orders.any? %>
+                  <% @pending_approval_orders.each do |order| %>
+                  <tr>
+                    <td><%= order.client.name %></td>
+                    <td><%= l(order.created_at, format: :short) %></td>
+                    <td><%= order.users.map(&:name).join(', ') %></td>
+                    <td>
+                      <%= link_to 'Ver Detalhes', app_order_service_path(order), class: 'btn btn-sm btn-outline-primary' %>
+                    </td>
+                  </tr>
+                  <% end %>
+                  <% else %>
+                  <tr>
+                    <td colspan="4" class="text-center">Nenhuma ordem de serviço concluída.</td>
+                  </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>
