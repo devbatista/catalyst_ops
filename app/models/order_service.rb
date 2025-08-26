@@ -18,7 +18,7 @@ class OrderService < ApplicationRecord
     concluida: 2,
     cancelada: 3,
     finalizada: 4,
-  }
+  }, _default: :agendada
 
   validates :title, presence: true, length: { minimum: 5, maximum: 100 }
   validates :description, presence: true, length: { minimum: 5, maximum: 1000 }
