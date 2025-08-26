@@ -3,6 +3,7 @@ constraints subdomain: "app" do
 
   resources :clients, module: "app", as: :app_clients
   resources :order_services, module: "app", as: :app_order_services do
+    get :unassigned, on: :collection
     resources :service_items, module: "order_services", as: :app_service_items
     member do
       patch :update_status

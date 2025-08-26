@@ -34,6 +34,9 @@ class Ability
     # Pode gerenciar ordens de serviço
     can :manage, OrderService
 
+    # Permissão para atribuir técnico a OS
+    can :unassigned, OrderService
+
     # Pode gerenciar atribuições
     can :manage, Assignment
 

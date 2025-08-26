@@ -118,6 +118,7 @@
               <table class="table table-striped table-hover align-middle mb-0">
                 <thead>
                   <tr>
+                    <th>Código</th>
                     <th>Cliente</th>
                     <th>Data Agendada</th>
                     <th>Técnico(s)</th>
@@ -128,6 +129,7 @@
                   <% if @pending_approval_orders.any? %>
                   <% @pending_approval_orders.each do |order| %>
                   <tr>
+                    <td><%= order.code %></td>
                     <td><%= order.client.name %></td>
                     <td><%= l(order.created_at, format: :short) %></td>
                     <td><%= order.users.map(&:name).join(', ') %></td>
@@ -138,7 +140,7 @@
                   <% end %>
                   <% else %>
                   <tr>
-                    <td colspan="4" class="text-center">Nenhuma ordem de serviço concluída.</td>
+                    <td colspan="5" class="text-center">Nenhuma ordem de serviço concluída.</td>
                   </tr>
                   <% end %>
                 </tbody>

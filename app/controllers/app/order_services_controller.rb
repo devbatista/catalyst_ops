@@ -25,6 +25,17 @@ class App::OrderServicesController < ApplicationController
     @service_items = @order_service.service_items.order(:id)
   end
 
+  def unassigned
+    authorize! :read, OrderService
+
+    @order_services = current_user.company.order_services
+                                          .includes(:client)
+                                          .unassigned
+                                          .order(created_at: :desc)
+                                          .page(params[:page])
+                                          .per(params[:per] || 10)
+  end
+
   def new; end
 
   def create
