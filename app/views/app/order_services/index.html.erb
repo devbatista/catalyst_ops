@@ -2,9 +2,11 @@
   <div class="page-content">
     <div class="row">
       <div class="col-12">
-        <div class="mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
           <h4 class="mb-0 text-uppercase">Ordens de Serviço</h4>
+          <%= link_to "OS não atribuídas", unassigned_app_order_services_path, class: "btn btn-dark" %>
         </div>
+
         <% flash.each do |type, message| %>
         <% bootstrap_class = { notice: "alert-success", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
         <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert">
