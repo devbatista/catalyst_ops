@@ -3,15 +3,15 @@ class Assignment < ApplicationRecord
   belongs_to :order_service
 
   validates :user_id, uniqueness: { scope: :order_service_id, message: "já está atribuído a esta OS" }
+
+  validate :order_service_is_schedulable
   validate :user_must_be_tecnico
-  validate :order_service_must_allow_assignment
   validate :user_availability
 
   scope :active, -> { joins(:order_service).where.not(order_services: { status: [:concluida, :cancelada] }) }
   scope :by_technician, ->(user_id) { where(user_id: user_id) }
   scope :by_status, ->(status) { joins(:order_service).where(order_services: { status: status }) }
 
-  after_create :set_order_service_to_agendada
   after_create :notify_technician
 
   after_destroy :revert_order_service_if_last_assignment
@@ -22,6 +22,14 @@ class Assignment < ApplicationRecord
   end
 
   private
+
+  def order_service_is_schedulable
+    return if order_service.blank?
+
+    if order_service.concluida? || order_service.finalizada? || order_service.cancelada?
+      errors.add(:base, "Não é possível atribuir técnicos a uma OS com status #{order_service.status.humanize}")
+    end
+  end
 
   def user_must_be_tecnico
     return unless user.present?
@@ -41,7 +49,7 @@ class Assignment < ApplicationRecord
   end
 
   def user_availability
-    return unless user.present? && order_service.present?
+    return if user.blank? || order_service.blank? || order_service.scheduled_at.blank?
 
     # Verificar se o técnico já tem outra OS no mesmo horário
     if conflicting_assignments.exists?

@@ -9,6 +9,7 @@ class OrderService < ApplicationRecord
   has_many :service_items, dependent: :destroy
 
   accepts_nested_attributes_for :service_items, allow_destroy: true
+  accepts_nested_attributes_for :assignments, allow_destroy: true
 
   has_many_attached :attachments
 
@@ -32,7 +33,7 @@ class OrderService < ApplicationRecord
   validate :must_have_technician_to_start
   validate :started_at_logic
   validate :finished_at_logic
-  validate :cannot_assign_if_completed
+  validate :scheduled_at_is_required_if_technicians_are_present
 
   scope :by_status, ->(status) { where(status: status) }
   scope :by_client, ->(client_id) { where(client_id: client_id) }
@@ -45,10 +46,10 @@ class OrderService < ApplicationRecord
   before_validation :set_company_from_client, on: :create
   before_validation :set_sequencial_code, on: :create
 
+  after_validation :promote_assignment_errors
+
   before_save :set_timestamps_on_status_change
-
-  before_update :set_scheduled_at_if_agendada
-
+  
   after_update :notify_client_on_completion, if: :saved_change_to_status?
 
   def total_value
@@ -196,9 +197,23 @@ class OrderService < ApplicationRecord
     # ClientMailer.order_completed(self).deliver_later if concluida?
   end
 
-  def set_scheduled_at_if_agendada
-    if status_changed?(to: "agendada") && scheduled_at.blank?
-      self.scheduled_at = Time.current
+  def promote_assignment_errors
+    assignments.each do |assignment|
+      next if assignment.valid?
+
+      assignment.errors.each do |error|
+        if error.attribute == :base && error.message.include?("data de agendamento")
+          errors.add(:scheduled_at, "é obrigatório ao atribuir um técnico.")
+        else
+          errors.add(:base, "Houve um problema ao atribuir um técnico: #{error.full_message}")
+        end
+      end
+    end
+  end
+
+  def scheduled_at_is_required_if_technicians_are_present
+    if users.any? && scheduled_at.blank?
+      errors.add(:scheduled_at, "é obrigatório quando um ou mais técnicos são atribuídos")
     end
   end
 end
