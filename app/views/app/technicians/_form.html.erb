@@ -23,9 +23,9 @@
       </div>
       <% if @technician.persisted? %>
       <%= link_to "Excluir", app_technician_path(@technician),
+        method: :delete,
         data: { 
-          turbo_method: :delete,
-          turbo_confirm: "Tem certeza que deseja excluir este cliente?"
+          confirm: "Tem certeza que deseja excluir este técnico?"
         },
         class: "btn btn-danger" %>
       <% end %>
