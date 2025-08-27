@@ -118,13 +118,13 @@
             <%= link_to "Editar", edit_app_order_service_path(@order_service), class: "btn btn-primary" %>
           </div>
           <div>
-            <% @order_service.next_possible_statuses.each do |next_status| %>
-            <%= button_to next_status.humanize,
-                  update_status_app_order_service_path(@order_service, status: next_status),
-                  class: "btn btn-#{OrderService.new(status: next_status).status_color} btn-sm ms-2",
-                  form_class: "d-inline-block",
-                  method: :patch,
-                  data: { turbo_confirm: "Alterar status para #{next_status.humanize}?" } %>
+            <% @order_service.available_actions.each do |action| %>
+            <%= button_to action[:label],
+                    update_status_app_order_service_path(@order_service, status: action[:target_status]),
+                    class: "btn btn-#{OrderService.new(status: action[:target_status]).status_color} btn-sm ms-2",
+                    form_class: "d-inline-block",
+                    method: :patch,
+                    data: { confirm: "Tem certeza que deseja '#{action[:label]}' esta OS?" } %>
             <% end %>
           </div>
         </div>

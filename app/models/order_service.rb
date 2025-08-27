@@ -22,6 +22,14 @@ class OrderService < ApplicationRecord
     finalizada: 5,
   }, _default: :pendente
 
+  STATUS_ACTIONS = {
+    agendada: "Agendar",
+    em_andamento: "Iniciar",
+    concluida: "Concluir",
+    finalizada: "Finalizar",
+    cancelada: "Cancelar"
+  }.freeze
+
   validates :title, presence: true, length: { minimum: 5, maximum: 100 }
   validates :description, presence: true, length: { minimum: 5, maximum: 1000 }
   validates :status, presence: true
@@ -120,6 +128,16 @@ class OrderService < ApplicationRecord
     when "cancelada" then []
     else []
     end
+  end
+
+  def available_actions
+    next_possible_statuses.map do |status_string|
+      status_symbol = status_string.to_sym
+      {
+        label: STATUS_ACTIONS[status_symbol],
+        target_status: status_symbol
+      }
+    end.compact
   end
 
   private
