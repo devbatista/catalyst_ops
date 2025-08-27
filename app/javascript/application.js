@@ -2,9 +2,7 @@ import * as Rails from "@rails/ujs"
 // import "@hotwired/turbo-rails" // 1. REMOVIDO
 import "./controllers"
 
-import jquery from "jquery"
-window.jQuery = jquery
-window.$ = jquery
+import "jquery"
 
 import "select2"
 import "metisMenu"
