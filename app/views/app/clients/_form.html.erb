@@ -58,9 +58,9 @@
       </div>
       <% if @client.persisted? %>
       <%= link_to "Excluir", app_client_path(@client),
+        method: :delete,
         data: { 
-          turbo_method: :delete,
-          turbo_confirm: "Tem certeza que deseja excluir este cliente?"
+          confirm: "Tem certeza que deseja excluir este cliente?"
         },
         class: "btn btn-danger" %>
       <% end %>
@@ -68,5 +68,5 @@
   </div>
 </div>
 
-<%= javascript_include_tag "viacep", "data-turbo-track": "reload" %>
+<%= javascript_include_tag "viacep" %>
 <% end %>

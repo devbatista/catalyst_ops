@@ -1,3 +1,4 @@
+import * as Rails from "@rails/ujs"
 // import "@hotwired/turbo-rails" // 1. REMOVIDO
 import "./controllers"
 
