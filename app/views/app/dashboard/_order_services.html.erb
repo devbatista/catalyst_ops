@@ -34,7 +34,13 @@
             <td>
               <%= currency_br(order.service_items.sum { |item| (item.quantity || 0) * (item.unit_price || 0) }) %>
             </td>
-            <td><%= l(order.scheduled_at, format: :short) %></td>
+            <td>
+              <% if order.scheduled_at.present? %>
+              <%= l(order.scheduled_at, format: :short) %>
+              <% else %>
+              <span class="text-muted">—</span>
+              <% end %>
+            </td>
             <td>
               <% order.users.each do |user| %>
               <span class="badge bg-secondary"><%= user.name %></span>

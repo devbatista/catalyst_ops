@@ -13,17 +13,18 @@ class OrderService < ApplicationRecord
   has_many_attached :attachments
 
   enum status: {
-    agendada: 0,
-    em_andamento: 1,
-    concluida: 2,
-    cancelada: 3,
-    finalizada: 4,
-  }, _default: :agendada
+    pendente: 0,
+    agendada: 1,
+    em_andamento: 2,
+    concluida: 3,
+    cancelada: 4,
+    finalizada: 5,
+  }, _default: :pendente
 
   validates :title, presence: true, length: { minimum: 5, maximum: 100 }
   validates :description, presence: true, length: { minimum: 5, maximum: 1000 }
   validates :status, presence: true
-  validates :scheduled_at, presence: true
+  validates :scheduled_at, presence: true, if: -> { !pendente? }
   validates :client_id, presence: true
   validates :code, presence: true, uniqueness: { scope: :company_id }
 
@@ -45,6 +46,8 @@ class OrderService < ApplicationRecord
   before_validation :set_sequencial_code, on: :create
 
   before_save :set_timestamps_on_status_change
+
+  before_update :set_scheduled_at_if_agendada
 
   after_update :notify_client_on_completion, if: :saved_change_to_status?
 
@@ -87,7 +90,8 @@ class OrderService < ApplicationRecord
   end
 
   def progress_percentage
-    return 0 if agendada?
+    return 0 if pendente?
+    return 25 if agendada?
     return 50 if em_andamento?
     return 90 if concluida?
     return 100 if finalizada?
@@ -96,6 +100,7 @@ class OrderService < ApplicationRecord
 
   def status_color
     case status
+    when "pendente" then "secondary"
     when "agendada" then "warning"
     when "em_andamento" then "info"
     when "concluida" then "success"
@@ -106,6 +111,7 @@ class OrderService < ApplicationRecord
 
   def next_possible_statuses
     case status
+    when "pendente" then ["agendada", "cancelada"]
     when "agendada" then ["em_andamento", "cancelada"]
     when "em_andamento" then ["concluida", "cancelada"]
     when "concluida" then ["finalizada"]
@@ -120,7 +126,7 @@ class OrderService < ApplicationRecord
   def scheduled_at_cannot_be_in_the_past
     return unless scheduled_at.present?
 
-    if scheduled_at < Time.current
+    if !pendente? && scheduled_at < Time.current
       errors.add(:scheduled_at, "não pode ser no passado")
     end
   end
@@ -188,5 +194,11 @@ class OrderService < ApplicationRecord
 
   def notify_client_on_completion
     # ClientMailer.order_completed(self).deliver_later if concluida?
+  end
+
+  def set_scheduled_at_if_agendada
+    if status_changed?(to: "agendada") && scheduled_at.blank?
+      self.scheduled_at = Time.current
+    end
   end
 end

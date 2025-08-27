@@ -1,30 +1,39 @@
-ASSIGNMENTS = []
+puts 'Atribuindo técnicos às OSs e atualizando status para "agendada"'
 
-puts 'Atribuindo técnicos às OSs'
+# Pega 75% das OS criadas no arquivo anterior para tentar agendar.
+orders_to_schedule = ORDER_SERVICES.sample((ORDER_SERVICES.size * 0.75).to_i)
 
-ORDER_SERVICES.each do |os|
-  # Seleciona técnicos da mesma empresa do cliente
-  tecnicos = USERS.select { |u| u.role == "tecnico" && u.company_id == os.company_id }
-  next if tecnicos.empty?
+orders_to_schedule.each do |os|
+  # Seleciona técnicos da mesma empresa da OS.
+  all_technicians = USERS.select { |u| u.role == "tecnico" && u.company_id == os.company_id }
+  next if all_technicians.empty?
 
-  # Filtra técnicos que já têm OS agendada para o mesmo dia
-  disponiveis = tecnicos.select do |tecnico|
-    os_do_tecnico = Assignment.joins(:order_service)
-      .where(user_id: tecnico.id)
-      .where(order_services: { scheduled_at: os.scheduled_at.beginning_of_day..os.scheduled_at.end_of_day })
-    os_do_tecnico.empty?
+  # CRÍTICO: Define uma data de agendamento para esta OS.
+  scheduled_time = Faker::Time.forward(days: 10, period: :morning)
+
+  # Agora que temos uma data, podemos filtrar os técnicos disponíveis.
+  available_technicians = all_technicians.select do |tecnico|
+    # Verifica se o técnico já tem alguma OS nesse dia.
+    is_busy = Assignment.joins(:order_service)
+                        .where(user_id: tecnico.id)
+                        .where(order_services: { scheduled_at: scheduled_time.all_day })
+                        .exists?
+    !is_busy # Retorna true se o técnico NÃO estiver ocupado.
   end
 
-  next if disponiveis.empty?
+  next if available_technicians.empty?
 
-  # Atribui 1 a 3 técnicos disponíveis por OS
-  disponiveis.sample(rand(1..[3, disponiveis.size].min)).each do |tecnico|
-    ASSIGNMENTS << Assignment.create!(
-      user: tecnico,
-      order_service: os
-    )
-  end
+  # Pega um técnico aleatório dos que estão disponíveis.
+  chosen_technician = available_technicians.sample
+
+  # Atualiza a OS com status, data e técnico, TUDO DE UMA VEZ.
+  # Isso garante que a validação de disponibilidade no modelo Assignment funcione.
+  os.update!(
+    status: :agendada,
+    scheduled_at: scheduled_time,
+    users: [chosen_technician]
+  )
 end
 
-puts 'Técnicos atribuídos!'
+puts 'Técnicos atribuídos e status atualizados!'
 puts '###################################'

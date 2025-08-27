@@ -11,8 +11,10 @@ class Assignment < ApplicationRecord
   scope :by_technician, ->(user_id) { where(user_id: user_id) }
   scope :by_status, ->(status) { joins(:order_service).where(order_services: { status: status }) }
 
+  after_create :set_order_service_to_agendada
   after_create :notify_technician
 
+  after_destroy :revert_order_service_if_last_assignment
   after_destroy :notify_technician_removal
 
   def can_be_removed?
@@ -63,5 +65,15 @@ class Assignment < ApplicationRecord
 
   def notify_technician_removal
     # TechnicianMailer.assignment_removed(self).deliver_later
+  end
+
+  def set_order_service_to_agendada
+    order_service.agendada! if order_service.pendente?
+  end
+
+  def revert_order_service_if_last_assignment
+    if order_service.users.none? && order_service.agendada?
+      order_service.pendente!
+    end
   end
 end
