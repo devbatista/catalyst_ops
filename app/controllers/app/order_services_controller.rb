@@ -137,7 +137,7 @@ class App::OrderServicesController < ApplicationController
 
   def set_other_resources
     @clients = current_user.clients.order(:name)
-    @technicians = current_user.company.users.where("role = ? OR can_be_technician = ?", User.roles[:tecnico], true)
+    @technicians = current_user.company.users.active.where("role = ? OR can_be_technician = ?", User.roles[:tecnico], true)
     @order_service&.service_items ||= []
   end
 
