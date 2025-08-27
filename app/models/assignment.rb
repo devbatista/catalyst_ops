@@ -4,7 +4,7 @@ class Assignment < ApplicationRecord
 
   validates :user_id, uniqueness: { scope: :order_service_id, message: "já está atribuído a esta OS" }
 
-  validate :order_service_is_schedulable
+  validate :order_service_is_schedulable, on: :create
   validate :user_must_be_tecnico
   validate :user_availability
 

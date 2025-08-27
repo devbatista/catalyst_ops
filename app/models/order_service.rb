@@ -1,6 +1,6 @@
 class OrderService < ApplicationRecord
   include AttachmentValidations
-  
+
   belongs_to :client
   belongs_to :company
 
@@ -27,7 +27,7 @@ class OrderService < ApplicationRecord
     em_andamento: "Iniciar",
     concluida: "Concluir",
     finalizada: "Finalizar",
-    cancelada: "Cancelar"
+    cancelada: "Cancelar",
   }.freeze
 
   validates :title, presence: true, length: { minimum: 5, maximum: 100 }
@@ -57,7 +57,7 @@ class OrderService < ApplicationRecord
   after_validation :promote_assignment_errors
 
   before_save :set_timestamps_on_status_change
-  
+
   after_update :notify_client_on_completion, if: :saved_change_to_status?
 
   def total_value
@@ -135,7 +135,7 @@ class OrderService < ApplicationRecord
       status_symbol = status_string.to_sym
       {
         label: STATUS_ACTIONS[status_symbol],
-        target_status: status_symbol
+        target_status: status_symbol,
       }
     end.compact
   end
@@ -159,13 +159,7 @@ class OrderService < ApplicationRecord
   def started_at_logic
     return unless started_at.present?
 
-    if em_andamento? && started_at.blank?
-      errors.add(:started_at, "deve ser preenchido quando em andamento")
-    end
-
-    if started_at.present? && scheduled_at.present? && started_at < scheduled_at
-      errors.add(:started_at, "não pode ser anterior ao agendamento")
-    end
+    errors.add(:started_at, "deve ser preenchido quando em andamento") if em_andamento? && started_at.blank?
   end
 
   def finished_at_logic
