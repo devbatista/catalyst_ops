@@ -1,5 +1,4 @@
 import * as Rails from "@rails/ujs"
-// import "@hotwired/turbo-rails" // 1. REMOVIDO
 import "./controllers"
 
 import "jquery"
@@ -8,9 +7,7 @@ import "select2"
 import "metisMenu"
 import PerfectScrollbar from "perfect-scrollbar"
 
-// --- 1. CONFIGURAÇÃO ÚNICA DE EVENTOS (Permanece igual) ---
 document.addEventListener('click', function (e) {
-  // Botão de adicionar item de serviço
   if (e.target.matches('#add-service-item')) {
     e.preventDefault();
     const serviceItemsContainer = document.getElementById('service-items-list');
@@ -36,10 +33,6 @@ document.addEventListener('click', function (e) {
   }
 });
 
-
-// --- NOVA VERSÃO ---
-// Função para definir o item de menu ativo com base na URL atual
-// (Permanece igual)
 function setActiveMenuItem() {
   const currentUrl = window.location.href;
   const menuLinks = $("#menu li a");
@@ -74,8 +67,6 @@ function setActiveMenuItem() {
   }
 }
 
-// --- 2. FUNÇÕES DE INICIALIZAÇÃO (Permanece igual) ---
-
 function initializePage() {
   $('.app-container, .header-message-list, .header-notifications-list').each(function () {
     const ps = PerfectScrollbar.getInstance(this);
@@ -83,15 +74,12 @@ function initializePage() {
     new PerfectScrollbar(this);
   });
 
-  // O $(document).ready() aqui dentro já garante que o código só roda quando o DOM está pronto.
-  // 1. Inicializa o MetisMenu (menu lateral)
   const menuEl = $('#menu');
   if (menuEl.length > 0 && $.fn.metisMenu) {
     if (menuEl.data('metisMenu')) menuEl.metisMenu('dispose');
     menuEl.metisMenu();
   }
 
-  // 2. Inicializa o Select2 para os técnicos
   const selectField = $('#multiple-select-field');
   if (selectField.length > 0 && $.fn.select2) {
     selectField.select2({
@@ -101,7 +89,6 @@ function initializePage() {
     });
   }
 
-  // 3. Renderiza o gráfico da index
   const chartCanvas = document.getElementById('chart2');
   if (chartCanvas) {
     const statusListItems = document.querySelectorAll('#os-status-list li');
@@ -109,7 +96,6 @@ function initializePage() {
     const data = [];
     const backgroundColors = [];
 
-    // Mapeamento de cores do Bootstrap para códigos hexadecimais
     const colorMap = {
       'primary': '#0d6efd',
       'secondary': '#6c757d',
@@ -122,7 +108,6 @@ function initializePage() {
     statusListItems.forEach(item => {
       labels.push(item.dataset.status);
       data.push(parseInt(item.dataset.count, 10));
-      // Usa a cor do Bootstrap ou uma cor padrão
       const colorKey = item.dataset.colorKey.replace('bg-', '');
       backgroundColors.push(colorMap[colorKey] || '#6c757d');
     });
@@ -151,15 +136,11 @@ function initializePage() {
     });
   }
 
-  // 4. Define o item de menu ativo
   setActiveMenuItem();
 
-  // 5. Exibe o conteúdo após a inicialização dos plugins
   $('.js-wait').show();
 }
 
-
-// --- 3. INICIALIZAÇÃO DA PÁGINA (Substitui os eventos do Turbo) ---
 $(document).ready(function () {
   initializePage();
 });
