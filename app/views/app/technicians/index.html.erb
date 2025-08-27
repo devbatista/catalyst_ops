@@ -43,7 +43,7 @@
               </div>
               <div class="col-md-6 d-flex justify-content-end">
                 <%= link_to raw('<i class="bx bx-plus"></i> Novo técnico'), new_app_technician_path,
-      class: "btn btn-outline-primary btn-add-new" %>
+                    class: "btn btn-outline-primary btn-add-new" %>
               </div>
             </div>
             <table class="table mb-0 table-hover">
@@ -74,19 +74,7 @@
                 Mostrando <%= @technicians.size %> de <%= @technicians.total_count %> registros
               </div>
               <nav aria-label="Page navigation">
-                <ul class="pagination mb-0">
-                  <li class="page-item <%= 'disabled' unless @technicians.prev_page %>">
-                    <%= link_to 'Previous', @technicians.prev_page ? url_for(params.permit(:q, :per).merge(page: @technicians.prev_page)) : '#', class: "page-link" %>
-                  </li>
-                  <% 1.upto(@technicians.total_pages) do |page| %>
-                  <li class="page-item <%= 'active' if page == @technicians.current_page %>">
-                    <%= link_to page, url_for(params.permit(:q, :per).merge(page: page)), class: "page-link" %>
-                  </li>
-                  <% end %>
-                  <li class="page-item <%= 'disabled' unless @technicians.next_page %>">
-                    <%= link_to 'Next', @technicians.next_page ? url_for(params.permit(:q, :per).merge(page: @technicians.next_page)) : '#', class: "page-link" %>
-                  </li>
-                </ul>
+                <%= custom_paginate(@technicians) %>
               </nav>
             </div>
           </div>
