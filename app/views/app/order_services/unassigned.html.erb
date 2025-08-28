@@ -53,7 +53,7 @@
                     <td><%= order_service.status.humanize %></td>
                     <td><%= l(order_service.created_at, format: :short) %></td>
                     <td>
-                      <%= link_to "Ver Detalhes", edit_app_order_service_path(order_service), class: "btn btn-sm btn-primary" %>
+                      <%= link_to "Atribuir", schedule_app_order_service_path(order_service), class: "btn btn-sm btn-primary" %>
                     </td>
                   </tr>
                   <% end %>
