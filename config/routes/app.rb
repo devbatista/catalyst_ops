@@ -9,6 +9,8 @@ constraints subdomain: "app" do
       patch :update_status
       get :generate_pdf
       delete :purge_attachment
+      get :schedule
+      patch :perform_schedule
     end
   end
   resources :attachments, only: [:index, :show, :destroy], module: "app", as: :app_attachments

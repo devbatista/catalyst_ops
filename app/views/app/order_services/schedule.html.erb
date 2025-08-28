@@ -1,0 +1,70 @@
+<div class="js-wait">
+  <div class="page-wrapper">
+    <div class="page-content">
+      <!--breadcrumb-->
+      <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+        <h4 class="mb-0 text-uppercase">Atribuir e agendar OS #<%= @order_service.code %></h6>
+      </div>
+
+      <% if @order_service.errors.any? %>
+      <div class="alert alert-danger">
+        <ul>
+          <% @order_service.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+      <% end %>
+
+      <!--end breadcrumb-->
+      <div class="row">
+        <div class="col-xl-12 mx-auto">
+          <div class="card">
+            <div class="card-body">
+              <%= form_with(model: @order_service,
+                          url: perform_schedule_app_order_service_path(@order_service),
+                          method: :patch,
+                          local: true) do |f| %>
+              <%# --- Campo de Seleção de Técnicos --- %>
+              <div class="row mb-3">
+                <%= f.label :user_ids, "Técnicos", class: "col-sm-3 col-form-label" %>
+                <div class="col-sm-9">
+                  <%= f.collection_select :user_ids,
+                                          @technicians,
+                                          :id,
+                                          :name,
+                                          {
+                                            prompt: "Selecione os técnicos",
+                                            selected: @order_service.user_ids
+                                          },
+                                          {
+                                            multiple: true,
+                                            class: "form-select",
+                                            id: "multiple-select-field",
+                                            data: { placeholder: "Escolha os técnicos" }
+                                          } %>
+                </div>
+              </div>
+              <%# --- Campo de Data e Hora --- %>
+              <div class="row mb-3">
+                <label for="scheduled_at" class="col-sm-3 col-form-label">Data e Hora do Agendamento</label>
+                <div class="col-sm-9">
+                  <%= f.datetime_local_field :scheduled_at, class: "form-control", required: true %>
+                </div>
+              </div>
+
+              <%# --- Botões Alinhados à Esquerda --- %>
+              <div class="mt-4">
+                <%= f.submit "Confirmar Agendamento", class: "btn btn-primary" %>
+                <%= link_to "Cancelar", app_order_service_path(@order_service), class: "btn btn-secondary ms-2" %>
+              </div>
+
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--end row-->
+    </div>
+  </div>
+</div>

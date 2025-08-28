@@ -1,5 +1,5 @@
 class App::OrderServicesController < ApplicationController
-  before_action :set_other_resources, only: [:new, :edit, :update]
+  before_action :set_other_resources, only: [:new, :edit, :update, :schedule]
   before_action :set_attachment_on_update, only: [:update]
 
   load_and_authorize_resource
@@ -70,25 +70,27 @@ class App::OrderServicesController < ApplicationController
     redirect_to app_order_services_url, notice: "Ordem de serviço removida com sucesso."
   end
 
-  def assign_technician
-    user = User.find(params[:user_id])
+  def schedule;end
 
-    if @order_service.users.include?(user)
-      redirect_to app_order_service_url(@order_service), alert: "Técnico já atribuído a esta OS."
+  def perform_schedule
+    if @order_service.update(schedule_params)
+      redirect_to app_order_service_path(@order_service), notice: 'Ordem de Serviço agendada com sucesso.'
     else
-      @order_service.assignments.create!(user: user)
-      redirect_to app_order_service_url(@order_service), notice: "Técnico #{user.name} atribuído com sucesso."
+      set_other_resources
+      flash.now[:alert] = @order_service.errors.full_messages.join(', ')
+      render :schedule, status: :unprocessable_entity
     end
   end
 
   def update_status
-    if @order_service.update(status: params[:status])
-      @order_service.update(started_at: Time.current) if params[:status] == "em_andamento"
-      @order_service.update(finished_at: Time.current) if params[:status] == "concluida"
-
-      redirect_to app_order_service_url(@order_service), notice: "Status atualizado com sucesso."
+    if params[:status] == 'agendada'
+      redirect_to schedule_app_order_service_path(@order_service)
     else
-      redirect_to app_order_service_url(@order_service), alert: @order_service.errors.full_messages
+      if @order_service.update(status: params[:status])
+        redirect_to app_order_service_url(@order_service), notice: "Status atualizado com sucesso."
+      else
+        redirect_to app_order_service_url(@order_service), alert: @order_service.errors.full_messages.join(', ')
+      end
     end
   end
 
@@ -133,6 +135,12 @@ class App::OrderServicesController < ApplicationController
         :id, :description, :quantity, :unit_price, :_destroy,
       ],
     )
+  end
+
+  def schedule_params
+    params.require(:order_service)
+          .permit(:scheduled_at, user_ids: [])
+          .merge(status: :agendada)
   end
 
   def set_other_resources
