@@ -57,6 +57,8 @@ class OrderService < ApplicationRecord
   after_validation :promote_assignment_errors
 
   before_save :set_timestamps_on_status_change
+  
+  after_create :notify_client_on_create
 
   after_update :notify_client_on_completion, if: :saved_change_to_status?
 
@@ -207,6 +209,10 @@ class OrderService < ApplicationRecord
 
   def notify_client_on_completion
     # ClientMailer.order_completed(self).deliver_later if concluida?
+  end
+
+  def notify_client_on_create
+    OrderServiceMailer.notify_create(self).deliver_later
   end
 
   def promote_assignment_errors
