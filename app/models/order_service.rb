@@ -60,7 +60,8 @@ class OrderService < ApplicationRecord
   
   after_create :notify_client_on_create
 
-  after_update :notify_client_on_completion, if: :saved_change_to_status?
+  after_update :notify_client_on_completion, if: -> { saved_change_to_status?(to: "concluida") }
+  after_update :notify_client_on_scheduled, if: -> { saved_change_to_status?(to: "agendada") }
 
   def total_value
     service_items.sum(&:total_price)
@@ -213,6 +214,10 @@ class OrderService < ApplicationRecord
 
   def notify_client_on_create
     OrderServiceMailer.notify_create(self).deliver_later
+  end
+
+  def notify_client_on_scheduled
+    OrderServiceMailer.notify_scheduled(self).deliver_later
   end
 
   def promote_assignment_errors
