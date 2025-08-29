@@ -128,6 +128,10 @@ class Client < ApplicationRecord
     addresses.only_deleted.each(&:restore)
   end
 
+  def address
+    addresses.first.full_address
+  end
+
   private
 
   def normalize_attributes

@@ -57,7 +57,7 @@ class OrderService < ApplicationRecord
   after_validation :promote_assignment_errors
 
   before_save :set_timestamps_on_status_change
-  
+
   after_create :notify_create
 
   after_update :notify_complete, if: -> { saved_change_to_status?(to: "concluida") }
@@ -227,7 +227,18 @@ class OrderService < ApplicationRecord
   end
 
   def notify_scheduled
-    OrderServiceMailer.notify_scheduled(self).deliver_later
+    notify_client_on_scheduled
+    notify_technical_on_scheduled
+  end
+
+  def notify_client_on_scheduled
+    OrderServiceMailer.notify_client_on_scheduled(self).deliver_later
+  end
+
+  def notify_technical_on_scheduled
+    users.each do |user|
+      OrderServiceMailer.notify_technical_on_scheduled(self, user).deliver_later
+    end
   end
 
   def notify_finished
