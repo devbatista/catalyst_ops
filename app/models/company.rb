@@ -47,6 +47,10 @@ class Company < ApplicationRecord
     end
   end
 
+  def gestores
+    users.gestores
+  end
+
   private
 
   def normalize_document

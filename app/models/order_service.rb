@@ -58,10 +58,10 @@ class OrderService < ApplicationRecord
 
   before_save :set_timestamps_on_status_change
   
-  after_create :notify_client_on_create
+  after_create :notify_create
 
-  after_update :notify_client_on_completion, if: -> { saved_change_to_status?(to: "concluida") }
-  after_update :notify_client_on_scheduled, if: -> { saved_change_to_status?(to: "agendada") }
+  after_update :notify_complete, if: -> { saved_change_to_status?(to: "concluida") }
+  after_update :notify_scheduled, if: -> { saved_change_to_status?(to: "agendada") }
 
   def total_value
     service_items.sum(&:total_price)
@@ -208,15 +208,24 @@ class OrderService < ApplicationRecord
     self.code = last_code + 1
   end
 
-  def notify_client_on_completion
-    # ClientMailer.order_completed(self).deliver_later if concluida?
+  def notify_complete
+    notify_client_on_completion
+    notify_manager_on_completion
   end
 
-  def notify_client_on_create
+  def notify_client_on_completion
+    OrderServiceMailer.notify_client_on_complete(self).deliver_later
+  end
+
+  def notify_manager_on_completion
+    OrderServiceMailer.notify_manager_on_complete(self).deliver_later
+  end
+
+  def notify_create
     OrderServiceMailer.notify_create(self).deliver_later
   end
 
-  def notify_client_on_scheduled
+  def notify_scheduled
     OrderServiceMailer.notify_scheduled(self).deliver_later
   end
 
