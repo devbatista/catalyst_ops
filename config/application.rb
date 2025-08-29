@@ -29,5 +29,10 @@ module CatalystOps
     # config.eager_load_paths << Rails.root.join("extras")
 
     config.autoload_paths << Rails.root.join('app/commands')
+
+    config.time_zone = 'America/Sao_Paulo'
+    config.active_record.default_timezone = :local
+
+    config.i18n.default_locale = :'pt-BR'
   end
 end
