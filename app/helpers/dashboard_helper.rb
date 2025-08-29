@@ -4,7 +4,7 @@ module DashboardHelper
   end
 
   def weekly_change_indicator(current_value, previous_value)
-    return content_tag(:p, "—", class: "mb-0 font-13") if previous_value.zero?
+    return content_tag(:p, "—", class: "mb-0 font-13") if previous_value&.zero?
     
     percentage = ((current_value - previous_value) / previous_value.to_f) * 100
     
