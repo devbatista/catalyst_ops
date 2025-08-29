@@ -23,4 +23,10 @@ class OrderServiceMailer < ApplicationMailer
     @client = @order_service.client
     mail(to: @client.email, subject: "Sua ordem de serviço foi concluída com sucesso!")
   end
+
+  def notify_finished(order_service)
+    @order_service = order_service
+    @client = @order_service.client
+    mail(to: @client.email, subject: "Sua ordem de serviço foi finalizada!")
+  end
 end
