@@ -23,6 +23,8 @@ services:
       DATABASE_URL: postgres://postgres:postgres@db:5432/catalyst_ops_development
       RAILS_ENV: development
     command: sh -c "bundle install && bin/rails server -b 0.0.0.0"
+    stdin_open: true
+    tty: true
 
   nginx:
     image: nginx:latest

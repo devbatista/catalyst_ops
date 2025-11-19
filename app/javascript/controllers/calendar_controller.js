@@ -18,7 +18,7 @@ export default class extends Controller {
       navLinks: true,
       selectable: true,
       nowIndicator: true,
-      dayMaxEvents: true, // A opção que queremos que funcione
+      dayMaxEvents: true,
       editable: true,
       businessHours: true,
       events: {
