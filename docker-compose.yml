@@ -37,3 +37,22 @@ services:
       - ./docker/nginx/ssl.key:/etc/nginx/ssl/ssl.key
     depends_on:
       - web
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  sidekiq:
+    build: .
+    command: bundle exec sidekiq -C config/sidekiq.yml
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/catalyst_ops_development
+      RAILS_ENV: development
+      REDIS_URL: redis://redis:6379/0
+    volumes:
+      - .:/rails
+      - ./storage:/rails/storage
+    depends_on:
+      - db
+      - redis

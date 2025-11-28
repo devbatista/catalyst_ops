@@ -72,3 +72,6 @@ group :test do
 
   gem 'shoulda-matchers', '~> 5.3'
 end
+
+gem "sidekiq", "~> 7.2"
+gem "sidekiq-cron", "~> 1.12"
