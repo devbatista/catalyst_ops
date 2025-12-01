@@ -4,9 +4,14 @@ class MarkOverdueOrderServicesJob <
 
   def perform
     order_services = OrderService.to_overdue
-    order_services.find_each(batch_size: 500) do |order_service|
-      order_service.atrasada!
+
+    if order_services.any?
+      order_services.find_each(batch_size: 50) do |order_service|
+        order_service.atrasada!
+      end
+      Rails.logger.info "[MarkOverdueOrderServicesJob] #{order_services.size} OrderServices marcadas como atrasadas."
+    else
+      Rails.logger.info "[MarkOverdueOrderServicesJob] Nenhuma OrderService para marcar como atrasada."
     end
-    Rails.logger.info "[MarkOverdueOrderServicesJob] Executando o MarkOverdueOrderServicesJob com sucesso!"
   end
 end
