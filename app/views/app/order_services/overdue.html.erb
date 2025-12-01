@@ -3,22 +3,15 @@
     <div class="row">
       <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-3">
-          <h4 class="mb-0 text-uppercase">Ordens de Serviço</h4>
+          <h4 class="mb-0 text-uppercase">OS Atrasadas</h4>
           <div class="d-flex gap-2">
-            <%= link_to "OS atrasadas", overdue_app_order_services_path, class: "btn btn-danger" %>
-            <%= link_to "OS não atribuídas", unassigned_app_order_services_path, class: "btn btn-dark" %>
+            <%= link_to "Voltar para todas as OS", app_order_services_path, class: "btn btn-outline-secondary" %>
           </div>
         </div>
 
-        <% flash.each do |type, message| %>
-        <% bootstrap_class = { notice: "alert-success", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
-        <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert">
-          <%= message %>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        <% end %>
         <div class="card">
           <div class="card-body">
+            <!-- filtros iguais aos da index (opcional) -->
             <div class="row align-items-center mb-4">
               <div class="col-md-6 d-flex">
                 <div class="showing-entries-group flex-shrink-0">
@@ -26,7 +19,7 @@
                   <form method="get" class="showing-entries-form">
                     <select name="per" class="form-select form-select-sm showing-entries-select" onchange="this.form.submit()">
                       <% [10, 20, 30].each do |n| %>
-                      <option value="<%= n %>" <%= params[:per].to_i == n ? 'selected' : '' %>><%= n %></option>
+                        <option value="<%= n %>" <%= params[:per].to_i == n ? 'selected' : '' %>><%= n %></option>
                       <% end %>
                     </select>
                   </form>
@@ -44,16 +37,11 @@
                   </div>
                 </form>
               </div>
-              <div class="col-md-6 d-flex justify-content-end">
-                <%= link_to raw('<i class="bx bx-plus"></i> Nova OS'),
-                    new_app_order_service_path,
-                    class: "btn btn-outline-primary btn-add-new" %>
-              </div>
             </div>
+
             <table class="table mb-0 table-hover">
               <thead>
                 <tr>
-                  <th>#</th>
                   <th>Código</th>
                   <th>Cliente</th>
                   <th>Status</th>
@@ -64,31 +52,32 @@
               </thead>
               <tbody>
                 <% @order_services.each do |os| %>
-                <tr>
-                  <td><%= os.id %></td>
-                  <td><%= os.code %></td>
-                  <td><%= os.client&.name %></td>
-                  <td><%= os.status.humanize %></td>
-                  <td><%= l(os.scheduled_at, format: :short) if os.scheduled_at %></td>
-                  <td><%= os.assignments.map { |a| a.user.name }.join(", ") %></td>
-                  <td>
-                    <%= link_to 'Ver', app_order_service_path(os), class: "btn btn-sm btn-primary" %>
-                    <%= link_to 'Editar', edit_app_order_service_path(os), class: "btn btn-sm btn-warning" %>
-                  </td>
-                </tr>
+                  <tr>
+                    <td><%= os.code %></td>
+                    <td><%= os.client&.name %></td>
+                    <td><%= os.status.humanize %></td>
+                    <td><%= l(os.scheduled_at, format: :short) if os.scheduled_at %></td>
+                    <td><%= os.assignments.map { |a| a.user.name }.join(", ") %></td>
+                    <td>
+                      <%= link_to 'Ver', app_order_service_path(os), class: "btn btn-sm btn-primary" %>
+                      <%= link_to 'Reagendar', schedule_app_order_service_path(os), class: "btn btn-sm btn-outline-secondary" %>
+                    </td>
+                  </tr>
                 <% end %>
               </tbody>
             </table>
+
             <div class="d-flex justify-content-between align-items-center mt-3">
               <div class="text-muted">
-                Mostrando <%= @order_services.size %> de <%= @order_services.total_count %> registros
+                Mostrando <%= @order_services.size %> de <%= @order_services.try(:total_count) || @order_services.size %> registros
               </div>
               <nav aria-label="Page navigation">
-                <%= custom_paginate(@order_services) %>
+                <%= custom_paginate(@order_services) if defined?(custom_paginate) %>
               </nav>
             </div>
           </div>
         </div>
+
       </div>
     </div>
   </div>

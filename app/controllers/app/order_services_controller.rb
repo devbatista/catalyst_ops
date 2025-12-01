@@ -35,6 +35,17 @@ class App::OrderServicesController < ApplicationController
                                           .page(params[:page])
                                           .per(params[:per] || 10)
   end
+  
+  def overdue
+    authorize! :read, OrderService
+
+    @order_services = current_user.company.order_services
+                                          .includes(:client)
+                                          .overdue
+                                          .order(created_at: :desc)
+                                          .page(params[:page])
+                                          .per(params[:per] || 10)
+  end
 
   def new; end
 
