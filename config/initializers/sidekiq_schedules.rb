@@ -1,23 +1,14 @@
 Sidekiq.configure_server do |config|
   config.on(:startup) do
-    schedules = [
-      {
-        name: "TestJob",
-        cron: "* * * * *",           # a cada minuto
-        class: "ActiveJob::QueueAdapters::SidekiqAdapter::JobWrapper",
-        queue: "default",
-        description: "Testa a execução do Sidekiq Cron a cada minuto",
-        args: [
-          { 
-            job_class: "TestJob",
-            job_id: SecureRandom.uuid,
-            queue_name: "default",
-            arguments: []
-          }
-        ]
+    schedules_hash = {
+      "MarkOverdueOrderServicesJob" => {
+        "cron"        => "* * * * *",
+        "class"       => "MarkOverdueOrderServicesJob",
+        "queue"       => "default",
+        "description" => "Marca OS como atrasadas se a data de agendamento já passou"
       }
-    ]
+    }
 
-    Sidekiq::Cron::Job.load_from_array(schedules)
+    Sidekiq::Cron::Job.load_from_hash!(schedules_hash)
   end
 end

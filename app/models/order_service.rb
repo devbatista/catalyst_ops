@@ -20,6 +20,7 @@ class OrderService < ApplicationRecord
     concluida: 3,
     cancelada: 4,
     finalizada: 5,
+    atrasada: 6,
   }, _default: :pendente
 
   STATUS_ACTIONS = {
@@ -28,6 +29,7 @@ class OrderService < ApplicationRecord
     concluida: "Concluir",
     finalizada: "Finalizar",
     cancelada: "Cancelar",
+    atrasada: "Reagendar", 
   }.freeze
 
   validates :title, presence: true, length: { minimum: 5, maximum: 100 }
@@ -46,7 +48,8 @@ class OrderService < ApplicationRecord
   scope :by_status, ->(status) { where(status: status) }
   scope :by_client, ->(client_id) { where(client_id: client_id) }
   scope :scheduled_for_today, -> { where(scheduled_at: Date.current.beginning_of_day..Date.current.end_of_day) }
-  scope :overdue, -> { agendada.where("scheduled_at < ?", Time.current) }
+  scope :to_overdue, -> { agendada.where("scheduled_at < ?", Time.current) }
+  scope :overdue, -> { by_status(:atrasada) }
   scope :recent, -> { order(created_at: :desc) }
   scope :by_technician, ->(user_id) { joins(:users).where(users: { id: user_id }) }
   scope :unassigned, -> { left_joins(:assignments).where(assignments: { id: nil }) }
@@ -63,6 +66,7 @@ class OrderService < ApplicationRecord
   after_update :notify_complete, if: -> { saved_change_to_status?(to: "concluida") }
   after_update :notify_scheduled, if: -> { saved_change_to_status?(to: "agendada") }
   after_update :notify_finished, if: -> { saved_change_to_status?(to: "finalizada") }
+  after_update :notify_overdue, if: -> { saved_change_to_status?(to: "atrasada") }
 
   def total_value
     service_items.sum(&:total_price)
@@ -73,7 +77,7 @@ class OrderService < ApplicationRecord
   end
 
   def overdue?
-    agendada? && scheduled_at < Time.current
+    atrasada?
   end
 
   def can_be_started?
@@ -115,6 +119,7 @@ class OrderService < ApplicationRecord
     case status
     when "pendente" then "secondary"
     when "agendada" then "warning"
+    when "atrasada" then "dark"
     when "em_andamento" then "info"
     when "concluida" then "success"
     when "finalizada" then "primary"
@@ -126,6 +131,7 @@ class OrderService < ApplicationRecord
     case status
     when "pendente" then ["agendada", "cancelada"]
     when "agendada" then ["em_andamento", "cancelada"]
+    when "atrasada" then ["agendada", "em_andamento", "cancelada"]
     when "em_andamento" then ["concluida", "cancelada"]
     when "concluida" then ["finalizada"]
     when "finalizada" then []
@@ -243,6 +249,10 @@ class OrderService < ApplicationRecord
 
   def notify_finished
     OrderServiceMailer.notify_finished(self).deliver_later
+  end
+
+  def notify_overdue
+    OrderServiceMailer.notify_overdue(self).deliver_later
   end
 
   def promote_assignment_errors

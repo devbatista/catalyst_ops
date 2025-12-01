@@ -102,7 +102,9 @@ function initializePage() {
       'success': '#198754',
       'danger': '#dc3545',
       'warning': '#ffc107',
-      'info': '#0dcaf0'
+      'info': '#0dcaf0',
+      'dark': '#343a40',
+      'light': '#f8f9fa'
     };
 
     statusListItems.forEach(item => {
