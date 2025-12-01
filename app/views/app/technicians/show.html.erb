@@ -48,7 +48,7 @@
             <% @technician.assignments.each do |assignment| %>
             <div class="mb-2">
               <strong>OS:</strong>
-              <%= link_to "Ver OS", "#" %>
+              <%= link_to "Ver OS", app_order_service_path(assignment.order_service) %>
               <span class="ms-2"><strong>Status:</strong> <%= assignment.order_service.status %></span>
             </div>
             <% end %>
