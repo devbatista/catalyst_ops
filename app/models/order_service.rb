@@ -129,9 +129,9 @@ class OrderService < ApplicationRecord
 
   def next_possible_statuses
     case status
-    when "pendente" then ["agendada", "cancelada"]
+    when "pendente" then ["cancelada"]
     when "agendada" then ["em_andamento", "cancelada"]
-    when "atrasada" then ["agendada", "em_andamento", "cancelada"]
+    when "atrasada" then ["em_andamento", "cancelada"]
     when "em_andamento" then ["concluida", "cancelada"]
     when "concluida" then ["finalizada"]
     when "finalizada" then []
