@@ -42,7 +42,7 @@ module MercadoPago
     end
 
     def fetch_plans
-      response = request(method: :get, path: "/preapproval_plan/search", params: { limit: 100 })
+      response = request(method: :get, path: "/preapproval_plan/search", params: { limit: 100, status: 'active' })
       JSON.parse(response.body)["results"]
     end
   end
