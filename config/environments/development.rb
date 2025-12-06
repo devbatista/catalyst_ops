@@ -81,5 +81,8 @@ Rails.application.configure do
   config.hosts << "app.catalystops.local"
   config.hosts << "admin.catalystops.local"
   config.hosts << "login.catalystops.local"
+  config.hosts << "register.catalystops.local"
   config.hosts << /.*\.catalystops\.local/
+
+  config.action_dispatch.tld_length = 1
 end

@@ -1,0 +1,12 @@
+<div class="min-vh-100 d-flex align-items-center bg-light">
+  <div class="container text-center">
+    <h4>Cadastro iniciado</h4>
+    <% if params[:qr].present? %>
+      <p>Escaneie o QR Code para pagar via PIX</p>
+      <!-- esboço: renderiza imagem base64 ou payload de QR -->
+      <div id="qr-code">QR code aqui</div>
+    <% else %>
+      <p>Você será redirecionado ao pagamento, se necessário.</p>
+    <% end %>
+  </div>
+</div>
