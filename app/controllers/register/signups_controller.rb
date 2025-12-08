@@ -52,7 +52,10 @@ class Register::SignupsController < ApplicationController
   private
 
   def company_params
-    params.require(:signup).require(:company).permit(:name, :document, :email, :phone)
+    params.require(:signup).require(:company).permit(
+      :name, :document, :email, :phone,
+      :address, :state_registration, :municipal_registration, :website
+    )
   end
 
   def user_params

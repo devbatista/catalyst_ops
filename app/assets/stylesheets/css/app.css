@@ -4251,6 +4251,35 @@ input::placeholder {
 
 }
 
+payment-methods { align-items: stretch; }
+.pm-card {
+  display: inline-block;
+  cursor: pointer;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 14px 18px;
+  min-width: 140px;
+  background: #fff;
+  transition: all .2s ease;
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+	margin-bottom: 20px;
+}
+.pm-card:hover { border-color: #cbd5e1; box-shadow: 0 6px 16px rgba(0,0,0,.06); }
+.pm-input { display: none; }
+.pm-content { display: flex; align-items: center; gap: 10px; }
+.pm-icon {
+  font-size: 28px;
+  color: #475569;
+}
+.pm-label { font-weight: 500; color: #334155; }
+
+/* Estado selecionado */
+.pm-input:checked + .pm-content .pm-icon { color: #0d6efd; }
+.pm-input:checked ~ .pm-content, .pm-input:checked + .pm-content { }
+.pm-input:checked ~ .pm-content .pm-label, .pm-input:checked + .pm-content .pm-label { color: #0d6efd; }
+.pm-input:checked ~ .pm-content, .pm-input:checked + .pm-content { }
+.pm-card:has(.pm-input:checked) { border-color: #0d6efd; box-shadow: 0 0 0 3px rgba(13,110,253,.15); }
+
 
 
 .topbar .navbar .navbar-nav .nav-link {

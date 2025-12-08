@@ -1,55 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CatalystOps</title>
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
-
-  <!--favicon-->
   <link rel="icon" href="<%= asset_path('favicon-32x32.png') %>" type="image/png" />
-  <!--plugins-->
-  <link href="<%= asset_path('plugins/vectormap/jquery-jvectormap-2.0.2.css') %>" rel="stylesheet" />
   <link href="<%= asset_path('plugins/simplebar/css/simplebar.css') %>" rel="stylesheet" />
   <link href="<%= asset_path('plugins/perfect-scrollbar/css/perfect-scrollbar.css') %>" rel="stylesheet" />
   <link href="<%= asset_path('plugins/metismenu/css/metisMenu.min.css') %>" rel="stylesheet" />
-  <!-- loader-->
   <link href="<%= asset_path('css/pace.min.css') %>" rel="stylesheet" />
   <script src="<%= asset_path('js/pace.min.js') %>"></script>
-  <!-- Bootstrap CSS -->
   <link href="<%= asset_path('css/bootstrap.min.css') %>" rel="stylesheet">
   <link href="<%= asset_path('css/bootstrap-extended.css') %>" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   <link href="<%= asset_path('css/app.css') %>" rel="stylesheet">
   <link href="<%= asset_path('css/icons.css') %>" rel="stylesheet">
-  <!-- Theme Style CSS -->
   <link rel="stylesheet" href="<%= asset_path('css/dark-theme.css') %>" />
   <link rel="stylesheet" href="<%= asset_path('css/semi-dark.css') %>" />
   <link rel="stylesheet" href="<%= asset_path('css/header-colors.css') %>" />
-
+  <link rel="stylesheet" href="<%= asset_path('plugins/bs-stepper/css/bs-stepper.css') %>" />
   <%= javascript_importmap_tags %>
 </head>
-
 <body>
   <div class="wrapper">
     <div class="section-authentication-cover">
       <div class="">
         <div class="row g-0">
-          <!-- Lado esquerdo (ilustração) -->
-          <div class="col-12 col-xl-7 col-xxl-8 auth-cover-left align-items-center justify-content-center d-none d-xl-flex">
-            <div class="card shadow-none bg-transparent shadow-none rounded-0 mb-0">
+          <div class="col-12 col-xl-5 col-xxl-5 auth-cover-left align-items-center justify-content-center d-none d-xl-flex">
+            <div class="card shadow-none bg-transparent rounded-0 mb-0">
               <div class="card-body">
-                <%= image_tag "login-images/login-cover.svg",
-                              class: "img-fluid auth-img-cover-login",
-                              width: 650, alt: "" %>
+                <%= image_tag "login-images/login-cover.svg", class: "img-fluid auth-img-cover-login", width: 650, alt: "" %>
               </div>
             </div>
           </div>
 
-          <!-- Lado direito (form) -->
-          <div class="col-12 col-xl-5 col-xxl-4 auth-cover-right align-items-center justify-content-center">
+          <div class="col-12 col-xl-7 col-xxl-7 auth-cover-right align-items-center justify-content-center">
             <div class="card rounded-0 m-3 shadow-none bg-transparent mb-0">
               <div class="card-body p-sm-5">
                 <div class="">
@@ -65,122 +52,178 @@
                     </div>
                   <% end %>
 
-                  <div class="form-body">
-                    <%= form_with url: signups_path,
-                                  scope: :signup,
-                                  method: :post,
-                                  class: "row g-3",
-                                  local: true,
-                                  data: { turbo: false } do |f| %>
-
-                      <div class="col-12">
-                        <h5 class="mb-2">Cadastro CatalystOps</h5>
-                      </div>
-
-                      <div class="col-12">
-                        <h6 class="mt-2">Dados da Empresa</h6>
-                      </div>
-                      <%= f.fields_for :company do |c| %>
-                        <div class="col-12">
-                          <%= c.label :name, "Razão Social", class: "form-label" %>
-                          <%= c.text_field :name, class: "form-control", required: true, placeholder: "Minha Empresa LTDA" %>
-                        </div>
-                        <div class="col-12 col-md-6">
-                          <%= c.label :document, "CNPJ/CPF", class: "form-label" %>
-                          <%= c.text_field :document, class: "form-control", required: true, placeholder: "00.000.000/0001-00" %>
-                        </div>
-                        <div class="col-12 col-md-6">
-                          <%= c.label :phone, "Telefone", class: "form-label" %>
-                          <%= c.text_field :phone, class: "form-control", required: true, placeholder: "(11) 90000-0000" %>
-                        </div>
-                        <div class="col-12">
-                          <%= c.label :email, "Email", class: "form-label" %>
-                          <%= c.email_field :email, class: "form-control", required: true, placeholder: "contato@empresa.com" %>
-                        </div>
-                        <div class="col-12">
-                          <%= c.label :address, "Endereço", class: "form-label" %>
-                          <%= c.text_area :address, class: "form-control", rows: 3, placeholder: "Rua, número, bairro, cidade - UF" %>
-                        </div>
-                        <div class="col-12 col-md-6">
-                          <%= c.label :state_registration, "Inscrição Estadual", class: "form-label" %>
-                          <%= c.text_field :state_registration, class: "form-control" %>
-                        </div>
-                        <div class="col-12 col-md-6">
-                          <%= c.label :municipal_registration, "Inscrição Municipal", class: "form-label" %>
-                          <%= c.text_field :municipal_registration, class: "form-control" %>
-                        </div>
-                        <div class="col-12">
-                          <%= c.label :website, "Website", class: "form-label" %>
-                          <%= c.url_field :website, class: "form-control", placeholder: "https://www.empresa.com" %>
-                        </div>
-                      <% end %>
-
-                      <div class="col-12">
-                        <h6 class="mt-2">Usuário Administrador</h6>
-                      </div>
-                      <%= f.fields_for :user do |u| %>
-                        <div class="col-12">
-                          <%= u.label :name, "Nome", class: "form-label" %>
-                          <%= u.text_field :name, class: "form-control", required: true, placeholder: "João Silva" %>
-                        </div>
-                        <div class="col-12">
-                          <%= u.label :email, "Email", class: "form-label" %>
-                          <%= u.email_field :email, class: "form-control", required: true, placeholder: "joao@exemplo.com" %>
-                        </div>
-                        <div class="col-12">
-                          <%= u.label :password, "Senha", class: "form-label" %>
-                          <div class="input-group" id="show_hide_password">
-                            <%= u.password_field :password,
-                                                 class: "form-control border-end-0",
-                                                 placeholder: "Coloque sua senha",
-                                                 required: true %>
-                            <a href="javascript:;" class="input-group-text bg-transparent"><i class="bx bx-hide"></i></a>
-                          </div>
-                        </div>
-                        <div class="col-12">
-                          <%= u.label :password_confirmation, "Confirmar Senha", class: "form-label" %>
-                          <div class="input-group" id="show_hide_password_conf">
-                            <%= u.password_field :password_confirmation,
-                                                 class: "form-control border-end-0",
-                                                 placeholder: "Repita sua senha",
-                                                 required: true %>
-                            <a href="javascript:;" class="input-group-text bg-transparent"><i class="bx bx-hide"></i></a>
-                          </div>
-                        </div>
-                      <% end %>
-
-                      <div class="col-12">
-                        <h6 class="mt-2">Formas de Pagamento</h6>
-                        <div class="mb-1">
-                          <% ["pix", "credit_card", "boleto"].each do |pm| %>
-                            <div class="form-check form-check-inline">
-                              <%= f.check_box :payment_methods, { multiple: true, class: "form-check-input", id: "pm_#{pm}" }, pm, nil %>
-                              <%= label_tag "pm_#{pm}", pm.humanize, class: "form-check-label" %>
+                  
+                  <div id="stepper1" class="bs-stepper">
+                    <div class="card">
+                      <div class="card-header">
+                        <div class="d-lg-flex flex-lg-row align-items-lg-center justify-content-lg-between" role="tablist">
+                          <div class="step" data-target="#step-company">
+                            <div class="step-trigger" role="tab" id="stepper1trigger1" aria-controls="step-company">
+                              <div class="bs-stepper-circle">1</div>
+                              <div class="">
+                                <h5 class="mb-0 steper-title">Dados da Empresa</h5>
+                                <p class="mb-0 steper-sub-title">Informações básicas</p>
+                              </div>
                             </div>
+                          </div>
+                          <div class="bs-stepper-line"></div>
+                          <div class="step" data-target="#step-admin">
+                            <div class="step-trigger" role="tab" id="stepper1trigger2" aria-controls="step-admin">
+                              <div class="bs-stepper-circle">2</div>
+                              <div class="">
+                                <h5 class="mb-0 steper-title">Usuário Admin</h5>
+                                <p class="mb-0 steper-sub-title">Credenciais do gestor</p>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="bs-stepper-line"></div>
+                          <div class="step" data-target="#step-payment">
+                            <div class="step-trigger" role="tab" id="stepper1trigger3" aria-controls="step-payment">
+                              <div class="bs-stepper-circle">3</div>
+                              <div class="">
+                                <h5 class="mb-0 steper-title">Pagamento</h5>
+                                <p class="mb-0 steper-sub-title">Escolha a forma</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="card-body">
+                        <div class="bs-stepper-content">
+                          <%= form_with url: signups_path, scope: :signup, method: :post, class: "row g-3", local: true, data: { turbo: false } do |f| %>
+
+                            <div id="step-company" role="tabpanel" class="bs-stepper-pane" aria-labelledby="stepper1trigger1">
+                              <h5 class="mb-2">Cadastro CatalystOps</h5>
+                              <h6 class="mb-3">Dados da Empresa</h6>
+                              <%= f.fields_for :company do |c| %>
+                                <div class="row g-3">
+                                  <div class="col-12">
+                                    <%= c.label :name, "Razão Social", class: "form-label" %>
+                                    <%= c.text_field :name, class: "form-control", required: true, placeholder: "Minha Empresa LTDA" %>
+                                  </div>
+
+                                  <div class="col-12 col-md-6">
+                                    <%= c.label :document, "CNPJ/CPF", class: "form-label" %>
+                                    <%= c.text_field :document, class: "form-control", required: true, placeholder: "00.000.000/0001-00 ou 000.000.000-00" %>
+                                  </div>
+
+                                  <div class="col-12 col-md-6">
+                                    <%= c.label :phone, "Telefone", class: "form-label" %>
+                                    <%= c.text_field :phone, class: "form-control", required: true, placeholder: "Apenas números. Ex: 11999999999" %>
+                                  </div>
+
+                                  <div class="col-12">
+                                    <%= c.label :email, "Email", class: "form-label" %>
+                                    <%= c.email_field :email, class: "form-control", required: true, placeholder: "contato@empresa.com" %>
+                                  </div>
+
+                                  <div class="col-12">
+                                    <%= c.label :address, "Endereço", class: "form-label" %>
+                                    <%= c.text_area :address, class: "form-control", rows: 3, placeholder: "Rua, número, bairro, cidade - UF" %>
+                                  </div>
+
+                                  <div class="col-12 col-md-6">
+                                    <%= c.label :state_registration, "Inscrição Estadual", class: "form-label" %>
+                                    <%= c.text_field :state_registration, class: "form-control", placeholder: "Opcional" %>
+                                  </div>
+
+                                  <div class="col-12 col-md-6">
+                                    <%= c.label :municipal_registration, "Inscrição Municipal", class: "form-label" %>
+                                    <%= c.text_field :municipal_registration, class: "form-control", placeholder: "Opcional" %>
+                                  </div>
+
+                                  <div class="col-12">
+                                    <%= c.label :website, "Website", class: "form-label" %>
+                                    <%= c.url_field :website, class: "form-control", placeholder: "https://www.empresa.com" %>
+                                  </div>
+
+                                  <div class="col-12 d-flex justify-content-end">
+                                    <button type="button" class="btn btn-primary px-4" onclick="stepper1.next()">Próximo<i class='bx bx-right-arrow-alt ms-2'></i></button>
+                                  </div>
+                                </div>
+                              <% end %>
+                            </div>
+
+                            <div id="step-admin" role="tabpanel" class="bs-stepper-pane" aria-labelledby="stepper1trigger2">
+                              <h6 class="mb-3">Usuário Administrador</h6>
+                              <%= f.fields_for :user do |u| %>
+                                <div class="row g-3">
+                                  <div class="col-12">
+                                    <%= u.label :name, "Nome", class: "form-label" %>
+                                    <%= u.text_field :name, class: "form-control", required: true %>
+                                  </div>
+                                  <div class="col-12">
+                                    <%= u.label :email, "Email", class: "form-label" %>
+                                    <%= u.email_field :email, class: "form-control", required: true %>
+                                  </div>
+                                  <div class="col-12">
+                                    <%= u.label :password, "Senha", class: "form-label" %>
+                                    <div class="input-group" id="show_hide_password">
+                                      <%= u.password_field :password, class: "form-control border-end-0", required: true %>
+                                      <a href="javascript:;" class="input-group-text bg-transparent"><i class="bx bx-hide"></i></a>
+                                    </div>
+                                  </div>
+                                  <div class="col-12">
+                                    <%= u.label :password_confirmation, "Confirmar Senha", class: "form-label" %>
+                                    <div class="input-group" id="show_hide_password_conf">
+                                      <%= u.password_field :password_confirmation, class: "form-control border-end-0", required: true %>
+                                      <a href="javascript:;" class="input-group-text bg-transparent"><i class="bx bx-hide"></i></a>
+                                    </div>
+                                  </div>
+                                  <div class="col-12 d-flex">
+                                    <button type="button" class="btn btn-outline-secondary px-4 me-auto" onclick="stepper1.previous()"><i class='bx bx-left-arrow-alt me-2'></i>Voltar</button>
+                                    <button type="button" class="btn btn-primary px-4" onclick="stepper1.next()">Próximo<i class='bx bx-right-arrow-alt ms-2'></i></button>
+                                  </div>
+                                </div>
+                              <% end %>
+                            </div>
+
+                            <div id="step-payment" role="tabpanel" class="bs-stepper-pane" aria-labelledby="stepper1trigger3">
+                              <h6 class="mb-3">Formas de Pagamento (selecione um ou mais)</h6>
+
+                              <div class="payment-methods d-flex gap-3 flex-wrap">
+                                <% payment_methods.each do |pm| %>
+                                  <label class="pm-card" for="pm_<%= pm %>">
+                                    <%= f.check_box :payment_methods, { multiple: true, class: "pm-input", id: "pm_#{pm}" }, pm, nil %>
+                                    <div class="pm-content">
+                                      <i class="bx <%= payment_method_icon(pm) %> pm-icon"></i>
+                                      <span class="pm-label"><%= payment_method_label(pm) %></span>
+                                    </div>
+                                  </label>
+                                <% end %>
+                              </div>
+
+                              <div class="d-flex">
+                                <button type="button" class="btn btn-outline-secondary px-4 me-auto" onclick="stepper1.previous()"><i class='bx bx-left-arrow-alt me-2'></i>Voltar</button>
+                                <%= f.submit "Continuar", class: "btn btn-primary px-4" %>
+                              </div>
+                            </div>
+
                           <% end %>
                         </div>
                       </div>
-
-                      <div class="col-12">
-                        <div class="d-grid">
-                          <%= f.submit "Continuar", class: "btn btn-primary" %>
-                        </div>
-                      </div>
-                    <% end %>
+                    </div>
                   </div>
+
                 </div>
               </div>
             </div>
           </div>
           <!-- fim lado direito -->
         </div>
-        <!--end row-->
       </div>
     </div>
   </div>
 
+  <script src="<%= asset_path('plugins/bs-stepper/js/bs-stepper.min.js') %>"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
+      window.stepper1 = new window.Stepper(document.querySelector('#stepper1'), {
+        linear: false,
+        animation: true
+      });
+
       function bindToggle(containerSelector) {
         var container = document.querySelector(containerSelector);
         if (!container) return;
@@ -210,6 +253,7 @@
   <%= render 'layouts/partials/footer' %>
   <%= render 'layouts/partials/search_modal' %>
   <%= render 'layouts/partials/scripts' %>
+  <!-- BS Stepper assets (se ainda não estiverem no pack) -->
+  <script src="<%= asset_path('plugins/bs-stepper/js/bs-stepper.min.js') %>"></script>
 </body>
-
 </html>
