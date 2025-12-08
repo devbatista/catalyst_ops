@@ -1,93 +1,215 @@
-<div class="min-vh-100 d-flex align-items-center bg-light">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-md-7">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h5 class="mb-3">Cadastro CatalystOps</h5>
+<!DOCTYPE html>
+<html lang="en">
 
-            <%= form_with url: signups_path, scope: :signup, method: :post, local: true do |f| %>
-              <h6 class="mt-3">Dados da Empresa</h6>
-              <div class="row">
-                <div class="col-md-12">
-                  <%= f.fields_for :company do |c| %>
-                    <div class="mb-2">
-                      <%= c.label :name, "Razão Social" %>
-                      <%= c.text_field :name, class: "form-control", required: true %>
-                    </div>
-                    <div class="mb-2">
-                      <%= c.label :document, "CNPJ/CPF" %>
-                      <%= c.text_field :document, class: "form-control", required: true %>
-                    </div>
-                    <div class="mb-2">
-                      <%= c.label :email %>
-                      <%= c.email_field :email, class: "form-control", required: true %>
-                    </div>
-                    <div class="mb-2">
-                      <%= c.label :phone, "Telefone" %>
-                      <%= c.text_field :phone, class: "form-control", required: true %>
-                    </div>
-                    <div class="mb-2">
-                      <%= c.label :address, "Endereço" %>
-                      <%= c.text_area :address, class: "form-control", rows: 3 %>
-                    </div>
-                    <div class="mb-2">
-                      <%= c.label :state_registration, "Inscrição Estadual" %>
-                      <%= c.text_field :state_registration, class: "form-control" %>
-                    </div>
-                    <div class="mb-2">
-                      <%= c.label :municipal_registration, "Inscrição Municipal" %>
-                      <%= c.text_field :municipal_registration, class: "form-control" %>
-                    </div>
-                    <div class="mb-2">
-                      <%= c.label :website, "Website" %>
-                      <%= c.url_field :website, class: "form-control" %>
-                    </div>
-                  <% end %>
-                </div>
-              </div>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CatalystOps</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
 
-              <h6 class="mt-3">Usuário Administrador</h6>
-              <div class="row">
-                <div class="col-md-6">
-                  <%= f.fields_for :user do |u| %>
-                    <div class="mb-2">
-                      <%= u.label :name, "Nome" %>
-                      <%= u.text_field :name, class: "form-control", required: true %>
-                    </div>
-                    <div class="mb-2">
-                      <%= u.label :email %>
-                      <%= u.email_field :email, class: "form-control", required: true %>
-                    </div>
-                    <div class="mb-2">
-                      <%= u.label :password, "Senha" %>
-                      <%= u.password_field :password, class: "form-control", required: true %>
-                    </div>
-                    <div class="mb-2">
-                      <%= u.label :password_confirmation, "Confirmar Senha" %>
-                      <%= u.password_field :password_confirmation, class: "form-control", required: true %>
-                    </div>
-                  <% end %>
-                </div>
-              </div>
+  <!--favicon-->
+  <link rel="icon" href="<%= asset_path('favicon-32x32.png') %>" type="image/png" />
+  <!--plugins-->
+  <link href="<%= asset_path('plugins/vectormap/jquery-jvectormap-2.0.2.css') %>" rel="stylesheet" />
+  <link href="<%= asset_path('plugins/simplebar/css/simplebar.css') %>" rel="stylesheet" />
+  <link href="<%= asset_path('plugins/perfect-scrollbar/css/perfect-scrollbar.css') %>" rel="stylesheet" />
+  <link href="<%= asset_path('plugins/metismenu/css/metisMenu.min.css') %>" rel="stylesheet" />
+  <!-- loader-->
+  <link href="<%= asset_path('css/pace.min.css') %>" rel="stylesheet" />
+  <script src="<%= asset_path('js/pace.min.js') %>"></script>
+  <!-- Bootstrap CSS -->
+  <link href="<%= asset_path('css/bootstrap.min.css') %>" rel="stylesheet">
+  <link href="<%= asset_path('css/bootstrap-extended.css') %>" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <link href="<%= asset_path('css/app.css') %>" rel="stylesheet">
+  <link href="<%= asset_path('css/icons.css') %>" rel="stylesheet">
+  <!-- Theme Style CSS -->
+  <link rel="stylesheet" href="<%= asset_path('css/dark-theme.css') %>" />
+  <link rel="stylesheet" href="<%= asset_path('css/semi-dark.css') %>" />
+  <link rel="stylesheet" href="<%= asset_path('css/header-colors.css') %>" />
 
-              <h6 class="mt-3">Formas de Pagamento</h6>
-              <div class="mb-3">
-                <% ["pix", "credit_card", "boleto"].each do |pm| %>
-                  <div class="form-check form-check-inline">
-                    <%= f.check_box :payment_methods, { multiple: true, class: "form-check-input", id: "pm_#{pm}" }, pm, nil %>
-                    <%= label_tag "pm_#{pm}", pm.humanize, class: "form-check-label" %>
-                  </div>
-                <% end %>
-              </div>
+  <%= javascript_importmap_tags %>
+</head>
 
-              <div class="mt-3 d-flex justify-content-end">
-                <%= f.submit "Continuar", class: "btn btn-primary" %>
+<body>
+  <div class="wrapper">
+    <div class="section-authentication-cover">
+      <div class="">
+        <div class="row g-0">
+          <!-- Lado esquerdo (ilustração) -->
+          <div class="col-12 col-xl-7 col-xxl-8 auth-cover-left align-items-center justify-content-center d-none d-xl-flex">
+            <div class="card shadow-none bg-transparent shadow-none rounded-0 mb-0">
+              <div class="card-body">
+                <%= image_tag "login-images/login-cover.svg",
+                              class: "img-fluid auth-img-cover-login",
+                              width: 650, alt: "" %>
               </div>
-            <% end %>
+            </div>
           </div>
+
+          <!-- Lado direito (form) -->
+          <div class="col-12 col-xl-5 col-xxl-4 auth-cover-right align-items-center justify-content-center">
+            <div class="card rounded-0 m-3 shadow-none bg-transparent mb-0">
+              <div class="card-body p-sm-5">
+                <div class="">
+                  <div class="mb-3 text-center">
+                    <%= image_tag "logo-icon.png", width: 150, alt: "" %>
+                  </div>
+
+                  <% flash.each do |type, message| %>
+                    <% bootstrap_class = { notice: "alert-success", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
+                    <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert">
+                      <%= message %>
+                      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                  <% end %>
+
+                  <div class="form-body">
+                    <%= form_with url: signups_path,
+                                  scope: :signup,
+                                  method: :post,
+                                  class: "row g-3",
+                                  local: true,
+                                  data: { turbo: false } do |f| %>
+
+                      <div class="col-12">
+                        <h5 class="mb-2">Cadastro CatalystOps</h5>
+                      </div>
+
+                      <div class="col-12">
+                        <h6 class="mt-2">Dados da Empresa</h6>
+                      </div>
+                      <%= f.fields_for :company do |c| %>
+                        <div class="col-12">
+                          <%= c.label :name, "Razão Social", class: "form-label" %>
+                          <%= c.text_field :name, class: "form-control", required: true, placeholder: "Minha Empresa LTDA" %>
+                        </div>
+                        <div class="col-12 col-md-6">
+                          <%= c.label :document, "CNPJ/CPF", class: "form-label" %>
+                          <%= c.text_field :document, class: "form-control", required: true, placeholder: "00.000.000/0001-00" %>
+                        </div>
+                        <div class="col-12 col-md-6">
+                          <%= c.label :phone, "Telefone", class: "form-label" %>
+                          <%= c.text_field :phone, class: "form-control", required: true, placeholder: "(11) 90000-0000" %>
+                        </div>
+                        <div class="col-12">
+                          <%= c.label :email, "Email", class: "form-label" %>
+                          <%= c.email_field :email, class: "form-control", required: true, placeholder: "contato@empresa.com" %>
+                        </div>
+                        <div class="col-12">
+                          <%= c.label :address, "Endereço", class: "form-label" %>
+                          <%= c.text_area :address, class: "form-control", rows: 3, placeholder: "Rua, número, bairro, cidade - UF" %>
+                        </div>
+                        <div class="col-12 col-md-6">
+                          <%= c.label :state_registration, "Inscrição Estadual", class: "form-label" %>
+                          <%= c.text_field :state_registration, class: "form-control" %>
+                        </div>
+                        <div class="col-12 col-md-6">
+                          <%= c.label :municipal_registration, "Inscrição Municipal", class: "form-label" %>
+                          <%= c.text_field :municipal_registration, class: "form-control" %>
+                        </div>
+                        <div class="col-12">
+                          <%= c.label :website, "Website", class: "form-label" %>
+                          <%= c.url_field :website, class: "form-control", placeholder: "https://www.empresa.com" %>
+                        </div>
+                      <% end %>
+
+                      <div class="col-12">
+                        <h6 class="mt-2">Usuário Administrador</h6>
+                      </div>
+                      <%= f.fields_for :user do |u| %>
+                        <div class="col-12">
+                          <%= u.label :name, "Nome", class: "form-label" %>
+                          <%= u.text_field :name, class: "form-control", required: true, placeholder: "João Silva" %>
+                        </div>
+                        <div class="col-12">
+                          <%= u.label :email, "Email", class: "form-label" %>
+                          <%= u.email_field :email, class: "form-control", required: true, placeholder: "joao@exemplo.com" %>
+                        </div>
+                        <div class="col-12">
+                          <%= u.label :password, "Senha", class: "form-label" %>
+                          <div class="input-group" id="show_hide_password">
+                            <%= u.password_field :password,
+                                                 class: "form-control border-end-0",
+                                                 placeholder: "Coloque sua senha",
+                                                 required: true %>
+                            <a href="javascript:;" class="input-group-text bg-transparent"><i class="bx bx-hide"></i></a>
+                          </div>
+                        </div>
+                        <div class="col-12">
+                          <%= u.label :password_confirmation, "Confirmar Senha", class: "form-label" %>
+                          <div class="input-group" id="show_hide_password_conf">
+                            <%= u.password_field :password_confirmation,
+                                                 class: "form-control border-end-0",
+                                                 placeholder: "Repita sua senha",
+                                                 required: true %>
+                            <a href="javascript:;" class="input-group-text bg-transparent"><i class="bx bx-hide"></i></a>
+                          </div>
+                        </div>
+                      <% end %>
+
+                      <div class="col-12">
+                        <h6 class="mt-2">Formas de Pagamento</h6>
+                        <div class="mb-1">
+                          <% ["pix", "credit_card", "boleto"].each do |pm| %>
+                            <div class="form-check form-check-inline">
+                              <%= f.check_box :payment_methods, { multiple: true, class: "form-check-input", id: "pm_#{pm}" }, pm, nil %>
+                              <%= label_tag "pm_#{pm}", pm.humanize, class: "form-check-label" %>
+                            </div>
+                          <% end %>
+                        </div>
+                      </div>
+
+                      <div class="col-12">
+                        <div class="d-grid">
+                          <%= f.submit "Continuar", class: "btn btn-primary" %>
+                        </div>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- fim lado direito -->
         </div>
+        <!--end row-->
       </div>
     </div>
   </div>
-</div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      function bindToggle(containerSelector) {
+        var container = document.querySelector(containerSelector);
+        if (!container) return;
+        var toggle = container.querySelector("a");
+        var input = container.querySelector("input");
+        var icon = container.querySelector("i");
+        if (toggle && input && icon) {
+          toggle.addEventListener("click", function(event) {
+            event.preventDefault();
+            if (input.type === "text") {
+              input.type = "password";
+              icon.classList.add("bx-hide");
+              icon.classList.remove("bx-show");
+            } else {
+              input.type = "text";
+              icon.classList.remove("bx-hide");
+              icon.classList.add("bx-show");
+            }
+          });
+        }
+      }
+      bindToggle("#show_hide_password");
+      bindToggle("#show_hide_password_conf");
+    });
+  </script>
+
+  <%= render 'layouts/partials/footer' %>
+  <%= render 'layouts/partials/search_modal' %>
+  <%= render 'layouts/partials/scripts' %>
+</body>
+
+</html>
