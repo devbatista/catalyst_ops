@@ -162,4 +162,48 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
   }
+
+  // Formatador de telefone (Brasil)
+  const onlyDigitsPhone = (v) => (v || "").replace(/\D/g, "");
+
+  function formatPhone(value) {
+    const v = onlyDigitsPhone(value).slice(0, 11); // 10 ou 11 dígitos
+    const ddd = v.slice(0, 2);
+
+    if (v.length <= 2) return `(${v}`;
+    if (v.length <= 6) return `(${ddd}) ${v.slice(2)}`;
+    if (v.length <= 10) return `(${ddd}) ${v.slice(2, 6)}-${v.slice(6)}`;
+    return `(${ddd}) ${v.slice(2, 7)}-${v.slice(7)}`;
+  }
+
+  // Campo telefone
+  const phoneInput = document.querySelector('[name="signup[company][phone]"]');
+  if (phoneInput) {
+    phoneInput.addEventListener("input", function () {
+      const prev = phoneInput.value;
+      phoneInput.value = formatPhone(prev);
+      phoneInput.setSelectionRange(phoneInput.value.length, phoneInput.value.length);
+    });
+
+    // validação simples: 10 ou 11 dígitos
+    phoneInput.addEventListener("blur", function () {
+      const digits = onlyDigitsPhone(phoneInput.value);
+      const valid = digits.length === 10 || digits.length === 11;
+      const errorId = "company_phone_error";
+      let el = document.getElementById(errorId);
+      if (!valid) {
+        if (!el) {
+          el = document.createElement("div");
+          el.id = errorId;
+          el.className = "invalid-feedback d-block";
+          phoneInput.parentElement.appendChild(el);
+        }
+        el.textContent = "Telefone deve conter DDD + número (10 ou 11 dígitos).";
+        phoneInput.classList.add("is-invalid");
+      } else {
+        if (el) el.textContent = "";
+        phoneInput.classList.remove("is-invalid");
+      }
+    });
+  }
 });
