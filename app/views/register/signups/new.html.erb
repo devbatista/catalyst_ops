@@ -51,8 +51,7 @@
                       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                   <% end %>
-
-                  
+     
                   <div id="stepper1" class="bs-stepper">
                     <div class="card">
                       <div class="card-header">
@@ -94,7 +93,6 @@
                           <%= form_with url: signups_path, scope: :signup, method: :post, class: "row g-3", local: true, data: { turbo: false } do |f| %>
 
                             <div id="step-company" role="tabpanel" class="bs-stepper-pane" aria-labelledby="stepper1trigger1">
-                              <h5 class="mb-2">Cadastro CatalystOps</h5>
                               <h6 class="mb-3">Dados da Empresa</h6>
                               <%= f.fields_for :company do |c| %>
                                 <div class="row g-3">
@@ -134,7 +132,7 @@
                                   </div>
 
                                   <div class="col-12">
-                                    <%= c.label :website, "Website", class: "form-label" %>
+                                    <%= c.label :website, "Website (ou instagram, se preferir)", class: "form-label" %>
                                     <%= c.url_field :website, class: "form-control", placeholder: "https://www.empresa.com" %>
                                   </div>
 
@@ -217,41 +215,9 @@
   </div>
 
   <script src="<%= asset_path('plugins/bs-stepper/js/bs-stepper.min.js') %>"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      window.stepper1 = new window.Stepper(document.querySelector('#stepper1'), {
-        linear: false,
-        animation: true
-      });
-
-      function bindToggle(containerSelector) {
-        var container = document.querySelector(containerSelector);
-        if (!container) return;
-        var toggle = container.querySelector("a");
-        var input = container.querySelector("input");
-        var icon = container.querySelector("i");
-        if (toggle && input && icon) {
-          toggle.addEventListener("click", function(event) {
-            event.preventDefault();
-            if (input.type === "text") {
-              input.type = "password";
-              icon.classList.add("bx-hide");
-              icon.classList.remove("bx-show");
-            } else {
-              input.type = "text";
-              icon.classList.remove("bx-hide");
-              icon.classList.add("bx-show");
-            }
-          });
-        }
-      }
-      bindToggle("#show_hide_password");
-      bindToggle("#show_hide_password_conf");
-    });
-  </script>
+  <script src="<%= asset_path('plugins/bs-stepper/js/bs-stepper.min.js') %>"></script>
 
   <%= render 'layouts/partials/footer' %>
-  <%= render 'layouts/partials/search_modal' %>
   <%= render 'layouts/partials/scripts' %>
   <!-- BS Stepper assets (se ainda não estiverem no pack) -->
   <script src="<%= asset_path('plugins/bs-stepper/js/bs-stepper.min.js') %>"></script>

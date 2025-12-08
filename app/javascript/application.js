@@ -7,6 +7,8 @@ import "select2"
 import "metisMenu"
 import PerfectScrollbar from "perfect-scrollbar"
 
+import "./register/signups"
+
 document.addEventListener('click', function (e) {
   if (e.target.matches('#add-service-item')) {
     e.preventDefault();
