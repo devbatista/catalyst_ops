@@ -4280,6 +4280,14 @@ payment-methods { align-items: stretch; }
 .pm-input:checked ~ .pm-content, .pm-input:checked + .pm-content { }
 .pm-card:has(.pm-input:checked) { border-color: #0d6efd; box-shadow: 0 0 0 3px rgba(13,110,253,.15); }
 
+.pm-card .pm-label {
+  font-size: 0.95rem;
+}
+
+.pm-card small.text-muted {
+  font-size: 0.80rem;
+  line-height: 1.2;
+}
 
 
 .topbar .navbar .navbar-nav .nav-link {

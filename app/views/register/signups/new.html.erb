@@ -76,12 +76,12 @@
                             </div>
                           </div>
                           <div class="bs-stepper-line"></div>
-                          <div class="step" data-target="#step-payment">
-                            <div class="step-trigger" role="tab" id="stepper1trigger3" aria-controls="step-payment">
+                          <div class="step" data-target="#step-plan">
+                            <div class="step-trigger" role="tab" id="stepper1trigger3" aria-controls="step-plan">
                               <div class="bs-stepper-circle">3</div>
                               <div class="">
-                                <h5 class="mb-0 steper-title">Pagamento</h5>
-                                <p class="mb-0 steper-sub-title">Escolha a forma</p>
+                                <h5 class="mb-0 steper-title">Plano</h5>
+                                <p class="mb-0 steper-sub-title">Escolha o plano</p>
                               </div>
                             </div>
                           </div>
@@ -177,9 +177,32 @@
                               <% end %>
                             </div>
 
-                            <div id="step-payment" role="tabpanel" class="bs-stepper-pane" aria-labelledby="stepper1trigger3">
-                              <h6 class="mb-3">Formas de Pagamento (selecione um ou mais)</h6>
-
+                            <div id="step-plan" role="tabpanel" class="bs-stepper-pane" aria-labelledby="stepper1trigger3">
+                              <h6 class="mb-3">Planos</h6>
+                            
+                              <div class="row g-3 mb-3">
+                                <% @plans.each do |plan| %>
+                                  <div class="col-12 col-md-6 col-xl-4">
+                                    <label class="pm-card w-100" for="plan_<%= plan.id %>">
+                                      <%= f.radio_button :plan_id, plan.id, id: "plan_#{plan.id}", class: "pm-input" %>
+                                      <div class="pm-content justify-content-between">
+                                        <div class="d-flex align-items-center gap-2">
+                                          <span class="pm-icon-wrap"><i class="bx bx-package pm-icon" aria-hidden="true"></i></span>
+                                          <div>
+                                            <div class="pm-label"><%= plan.name %></div>
+                                            <small class="text-muted"><%= plan.reason %></small>
+                                          </div>
+                                        </div>
+                                        <div class="text-end">
+                                          <div class="fw-bold">R$ <%= number_with_precision(plan.transaction_amount, precision: 2, separator: ',', delimiter: '.' ) %></div>
+                                        </div>
+                                      </div>
+                                    </label>
+                                  </div>
+                                <% end %>
+                              </div>
+                            
+                              <h6 class="mb-2">Formas de Pagamento</h6>
                               <div class="payment-methods d-flex gap-3 flex-wrap">
                                 <% payment_methods.each do |pm| %>
                                   <label class="pm-card" for="pm_<%= pm %>">
@@ -191,9 +214,11 @@
                                   </label>
                                 <% end %>
                               </div>
-
-                              <div class="d-flex">
-                                <button type="button" class="btn btn-outline-secondary px-4 me-auto" onclick="stepper1.previous()"><i class='bx bx-left-arrow-alt me-2'></i>Voltar</button>
+                            
+                              <div class="d-flex mt-3">
+                                <button type="button" class="btn btn-outline-secondary px-4 me-auto" onclick="stepper1.previous()">
+                                  <i class='bx bx-left-arrow-alt me-2'></i>Voltar
+                                </button>
                                 <%= f.submit "Continuar", class: "btn btn-primary px-4" %>
                               </div>
                             </div>

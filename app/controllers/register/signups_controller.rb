@@ -1,11 +1,12 @@
 class Register::SignupsController < ApplicationController
-  layout false # se quiser página limpa
+  layout false
   skip_authorization_check
 
   def new
     @company = Company.new
     @user = User.new
     @payment_methods = %w[pix credit_card boleto]
+    @plans = Plan.where(status: :active).order(:transaction_amount)
   end
 
   def create
@@ -19,7 +20,7 @@ class Register::SignupsController < ApplicationController
         @user.save!
       end
 
-      chosen = Array(params[:signup][:payment_methods]) # ["pix","credit_card","boleto"]
+      chosen = Array(params[:signup][:payment_methods])
 
       if chosen.include?("credit_card")
         # esboço: redireciona ao init_point (assinatura/plano)
