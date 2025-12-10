@@ -206,7 +206,7 @@
                               <div class="payment-methods d-flex gap-3 flex-wrap">
                                 <% payment_methods.each do |pm| %>
                                   <label class="pm-card" for="pm_<%= pm %>">
-                                    <%= f.check_box :payment_methods, { multiple: true, class: "pm-input", id: "pm_#{pm}" }, pm, nil %>
+                                    <%= f.radio_button :payment_method, pm, id: "pm_#{pm}", class: "pm-input" %>
                                     <div class="pm-content">
                                       <i class="bx <%= payment_method_icon(pm) %> pm-icon"></i>
                                       <span class="pm-label"><%= payment_method_label(pm) %></span>

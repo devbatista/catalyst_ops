@@ -2,6 +2,8 @@ class Register::SignupsController < ApplicationController
   layout false
   skip_authorization_check
 
+  before_action :sanitize_phone, only: :create
+
   def new
     @company = Company.new
     @user = User.new
@@ -61,5 +63,13 @@ class Register::SignupsController < ApplicationController
 
   def user_params
     params.require(:signup).require(:user).permit(:name, :email, :password, :password_confirmation)
+  end
+
+  def sanitize_phone
+    if params.dig(:signup, :company, :phone).present?
+      phone = params[:signup][:company][:phone]
+      sanitized = phone.gsub(/\D/, "")
+      params[:signup][:company][:phone] = sanitized
+    end
   end
 end
