@@ -1,7 +1,12 @@
 document.addEventListener("DOMContentLoaded", function () {
   // Init BS Stepper
   const el = document.querySelector("#stepper1");
-  if (el && window.Stepper) {
+  if (el) {
+    el.classList.remove("d-none");
+  }
+
+  const hasHeader = el && el.querySelector(".bs-stepper-header, .card-header");
+  if (hasHeader && window.Stepper) {
     window.stepper1 = new window.Stepper(el, { linear: false, animation: true });
   }
 

@@ -52,7 +52,7 @@
                     </div>
                   <% end %>
      
-                  <div id="stepper1" class="bs-stepper">
+                  <div id="stepper1" class="bs-stepper d-none">
                     <div class="card">
                       <div class="card-header">
                         <div class="d-lg-flex flex-lg-row align-items-lg-center justify-content-lg-between" role="tablist">
@@ -149,23 +149,23 @@
                                 <div class="row g-3">
                                   <div class="col-12">
                                     <%= u.label :name, "Nome", class: "form-label" %>
-                                    <%= u.text_field :name, class: "form-control", required: true %>
+                                    <%= u.text_field :name, class: "form-control", required: true, placeholder: "Seu nome completo" %>
                                   </div>
                                   <div class="col-12">
                                     <%= u.label :email, "Email", class: "form-label" %>
-                                    <%= u.email_field :email, class: "form-control", required: true %>
+                                    <%= u.email_field :email, class: "form-control", required: true, placeholder: "seuemail@exemplo.com" %>
                                   </div>
                                   <div class="col-12">
                                     <%= u.label :password, "Senha", class: "form-label" %>
                                     <div class="input-group" id="show_hide_password">
-                                      <%= u.password_field :password, class: "form-control border-end-0", required: true %>
+                                      <%= u.password_field :password, class: "form-control border-end-0", required: true, placeholder: "Mínimo de 8 caracteres" %>
                                       <a href="javascript:;" class="input-group-text bg-transparent"><i class="bx bx-hide"></i></a>
                                     </div>
                                   </div>
                                   <div class="col-12">
                                     <%= u.label :password_confirmation, "Confirmar Senha", class: "form-label" %>
                                     <div class="input-group" id="show_hide_password_conf">
-                                      <%= u.password_field :password_confirmation, class: "form-control border-end-0", required: true %>
+                                      <%= u.password_field :password_confirmation, class: "form-control border-end-0", required: true, placeholder: "Repita a senha" %>
                                       <a href="javascript:;" class="input-group-text bg-transparent"><i class="bx bx-hide"></i></a>
                                     </div>
                                   </div>
@@ -239,7 +239,6 @@
     </div>
   </div>
 
-  <script src="<%= asset_path('plugins/bs-stepper/js/bs-stepper.min.js') %>"></script>
   <script src="<%= asset_path('plugins/bs-stepper/js/bs-stepper.min.js') %>"></script>
 
   <%= render 'layouts/partials/footer' %>
