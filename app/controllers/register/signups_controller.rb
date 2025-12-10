@@ -13,39 +13,21 @@ class Register::SignupsController < ApplicationController
 
   def create
     @payment_methods = %w[pix credit_card boleto]
-    @company = Company.new(company_params)
+    @company = Company.new(company_params.merge(
+      plan_id: signup_params[:plan_id],
+      payment_method: signup_params[:payment_method]
+    ))
     @user = User.new(user_params.merge(company: @company, role: :gestor))
 
-    if @company.valid? && @user.valid?
-      ActiveRecord::Base.transaction do
-        @company.save!
-        @user.save!
-      end
+    result = save_register(@company, @user)
 
-      chosen = Array(params[:signup][:payment_methods])
-
-      if chosen.include?("credit_card")
-        # esboço: redireciona ao init_point (assinatura/plano)
-        init_point = MercadoPago::Subscriptions.start!(
-          company: @company,
-          payer_email: @user.email,
-          amount: 99.90,
-          reason: "CatalystOps - Plano Mensal",
-          back_url: register_success_url(subdomain: "register")
-        )
-        redirect_to init_point, allow_other_host: true
-      elsif chosen.include?("pix")
-        # esboço: gera QRCode via API de pagamentos (preferencialmente Payment intent PIX)
-        qr = MercadoPago::Pix.generate_qr(amount: 99.90, description: "CatalystOps - PIX", external_reference: "signup_#{@company.id}")
-        @qr_data = qr # exibir na view success
-        redirect_to register_success_path(subdomain: "register", qr: true)
-      else
-        # boleto ou fallback
-        redirect_to register_success_path(subdomain: "register")
-      end
-    else
-      render :new, status: :unprocessable_entity
+    unless result.success?
+      flash.now[:alert] = result.errors
+      return render :new, status: :unprocessable_entity
     end
+
+    payment_method = signup_params[:payment_method].to_s
+    handle_payment_flow(@company, @user, payment_method)
   end
 
   def success
@@ -71,5 +53,36 @@ class Register::SignupsController < ApplicationController
       sanitized = phone.gsub(/\D/, "")
       params[:signup][:company][:phone] = sanitized
     end
+  end
+
+  def save_register(company, user)
+    ActiveRecord::Base.transaction do 
+      company_res = Cmd::Companies::Create.new(company).call
+      user_res = Cmd::Users::Create.new(user).call
+
+      if company_res.success? && user_res.success?
+        return Result.new(true, nil)
+      else
+        errors = [company_res.errors] + [user_res.errors].compact.flatten
+        raise ActiveRecord::Rollback, errors.join(", ")
+      end
+    end
+    Result.new(true, nil)
+  rescue ActiveRecord::RecordInvalid => e
+    Result.new(false, e.message.presence || (Array(company.errors.full_messages) + Array(user.errors.full_messages)))
+  end
+
+  def handle_payment_flow(company, user, payment_method)
+    case payment_method
+    when "boleto"
+      # boleto
+    when "pix"
+      # pix
+    when "credit_card"
+      # credit_card
+    else
+      redirect_to register_signup_success_path(company_id: company.id, user_id: user.id)
+    end
+    
   end
 end
