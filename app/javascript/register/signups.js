@@ -211,4 +211,66 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   }
+
+  const zipInput = document.querySelector('[name="signup[company][zip_code]"]');
+  if (zipInput) {
+    const onlyDigits = (v) => (v || "").replace(/\D/g, "");
+    const formatCEP = (v) => {
+      const d = onlyDigits(v).slice(0, 8);
+      if (d.length <= 5) return d;
+      return `${d.slice(0, 5)}-${d.slice(5)}`;
+    };
+    const isValidCEP = (v) => onlyDigits(v).length === 8;
+
+    const errorId = "company_zip_error";
+    const ensureErrorEl = () => {
+      let el = document.getElementById(errorId);
+      if (!el) {
+        el = document.createElement("div");
+        el.id = errorId;
+        el.className = "invalid-feedback d-block";
+        zipInput.parentElement.appendChild(el);
+      }
+      return el;
+    };
+    const showError = (msg) => {
+      const el = ensureErrorEl();
+      el.textContent = msg;
+      zipInput.classList.add("is-invalid");
+    };
+    const clearError = () => {
+      const el = document.getElementById(errorId);
+      if (el) el.textContent = "";
+      zipInput.classList.remove("is-invalid");
+    };
+
+    // máscara enquanto digita
+    zipInput.addEventListener("input", () => {
+      const prev = zipInput.value;
+      zipInput.value = formatCEP(prev);
+      zipInput.setSelectionRange(zipInput.value.length, zipInput.value.length);
+    });
+
+    // valida ao sair
+    zipInput.addEventListener("blur", () => {
+      if (!isValidCEP(zipInput.value)) {
+        showError("CEP inválido. Use o formato 00000-000.");
+      } else {
+        clearError();
+      }
+    });
+
+    // bloquear avanço do step se CEP inválido
+    document.querySelectorAll('[onclick="stepper1.next()"]').forEach((btn) => {
+      btn.addEventListener("click", function (e) {
+        const pane = btn.closest("#step-company");
+        if (!pane) return;
+        if (!isValidCEP(zipInput.value)) {
+          e.preventDefault();
+          showError("CEP inválido. Use o formato 00000-000.");
+          zipInput.focus();
+        }
+      });
+    });
+  }
 });

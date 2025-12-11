@@ -123,12 +123,12 @@
 
                                   <div class="col-6 col-md-3">
                                     <%= c.label :state, "UF", class: "form-label" %>
-                                    <%= c.text_field :state, class: "form-control text-uppercase", required: true, maxlength: 2, placeholder: "SP" %>
+                                    <%= c.text_field :state, class: "form-control text-uppercase", required: true, maxlength: 2, placeholder: "SP", readonly: true %>
                                   </div>
 
                                   <div class="col-12 col-md-8">
                                     <%= c.label :street, "Logradouro", class: "form-label" %>
-                                    <%= c.text_field :street, class: "form-control", required: true, placeholder: "Rua Exemplo" %>
+                                    <%= c.text_field :street, class: "form-control", required: true, placeholder: "Rua Exemplo", readonly: true %>
                                   </div>
 
                                   <div class="col-12 col-md-4">
@@ -143,12 +143,12 @@
 
                                   <div class="col-12 col-md-6">
                                     <%= c.label :neighborhood, "Bairro", class: "form-label" %>
-                                    <%= c.text_field :neighborhood, class: "form-control", required: true, placeholder: "Centro" %>
+                                    <%= c.text_field :neighborhood, class: "form-control", required: true, placeholder: "Centro", readonly: true %>
                                   </div>
 
                                   <div class="col-12 col-sm-6">
                                     <%= c.label :city, "Cidade", class: "form-label" %>
-                                    <%= c.text_field :city, class: "form-control", required: true, placeholder: "São Paulo" %>
+                                    <%= c.text_field :city, class: "form-control", required: true, placeholder: "São Paulo", readonly: true %>
                                   </div>
 
                                   <div class="col-12 col-sm-6">
@@ -274,6 +274,7 @@
   </div>
 
   <script src="<%= asset_path('plugins/bs-stepper/js/bs-stepper.min.js') %>"></script>
+  <%= javascript_include_tag "viacep", defer: true %>
 
   <%= render 'layouts/partials/footer' %>
   <%= render 'layouts/partials/scripts' %>
