@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CatalystOps</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+  <style>
+    .page-hidden { visibility: hidden; }
+  </style>
+
+  <link rel="icon" href="<%= asset_path('favicon-32x32.png') %>" type="image/png" />
+  <link href="<%= asset_path('css/bootstrap.min.css') %>" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <link href="<%= asset_path('css/app.css') %>" rel="stylesheet">
+  <link href="<%= asset_path('css/icons.css') %>" rel="stylesheet">
+</head>
+<body class="page-hidden">
+  <div class="success-page min-vh-100 d-flex align-items-center justify-content-center">
+    <div class="success-card card border-0 shadow-sm text-center">
+      <div class="card-body p-5 p-md-6">
+        <div class="success-badge mx-auto mb-4">
+          <i class="bx bx-check"></i>
+        </div>
+
+        <h1 class="success-title mb-3">Cadastro concluído</h1>
+
+        <p class="success-text mb-1">
+          Foi enviado um email para sua conta com as informações de pagamento.
+        </p>
+
+        <br>
+
+        <p class="success-subtext mb-0">Por favor, verifique sua caixa de entrada.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.addEventListener('load', function () {
+      document.body.classList.remove('page-hidden');
+    });
+  </script>
+</body>
+</html>

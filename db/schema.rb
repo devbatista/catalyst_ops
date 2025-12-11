@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_12_05_195049) do
+ActiveRecord::Schema[7.1].define(version: 2025_12_10_141645) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -188,8 +188,12 @@ ActiveRecord::Schema[7.1].define(version: 2025_12_05_195049) do
     t.string "website"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "plan_id"
+    t.string "payment_method", default: "boleto", null: false
     t.index ["document"], name: "index_companies_on_document", unique: true
     t.index ["email"], name: "index_companies_on_email", unique: true
+    t.index ["payment_method"], name: "index_companies_on_payment_method"
+    t.index ["plan_id"], name: "index_companies_on_plan_id"
     t.index ["responsible_id"], name: "index_companies_on_responsible_id"
   end
 
@@ -710,6 +714,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_12_05_195049) do
   add_foreign_key "chat_hub_sessions", "user", column: "ownerId", name: "FK_e9ecf8ede7d989fcd18790fe36a", on_delete: :cascade
   add_foreign_key "chat_hub_sessions", "workflow_entity", column: "workflowId", name: "FK_9f9293d9f552496c40e0d1a8f80", on_delete: :nullify
   add_foreign_key "clients", "companies"
+  add_foreign_key "companies", "plans"
   add_foreign_key "companies", "users", column: "responsible_id"
   add_foreign_key "data_table", "project", column: "projectId", name: "FK_c2a794257dee48af7c9abf681de", on_delete: :cascade
   add_foreign_key "data_table_column", "data_table", column: "dataTableId", name: "FK_930b6e8faaf88294cef23484160", on_delete: :cascade

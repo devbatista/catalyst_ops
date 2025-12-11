@@ -5,10 +5,14 @@ class Company < ApplicationRecord
   has_many :technicians, -> { where(role: :tecnico, active: true) }, class_name: "User"
 
   belongs_to :responsible, class_name: "User", optional: true
+  belongs_to :plan, optional: true
 
+  PAYMENT_METHODS = %w[pix credit_card boleto].freeze
+  
   before_validation :normalize_document
   before_validation { self.email = email.to_s.downcase.strip if email.present? }
-
+  
+  validates :payment_method, inclusion: { in: PAYMENT_METHODS }
   validates :name, presence: true, length: { minimum: 3 }
   validates :document, presence: true, uniqueness: true
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }

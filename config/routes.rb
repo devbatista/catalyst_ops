@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   draw :admin
   draw :app
   draw :login
+  draw :register
 
   # Rotas padrão (sem subdomínio)
   # root to: "home#index"
