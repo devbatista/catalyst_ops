@@ -4289,6 +4289,51 @@ payment-methods { align-items: stretch; }
   line-height: 1.2;
 }
 
+.success-page {
+	background: #f7f7ff;
+	padding: 24px;
+}
+
+.success-card {
+	max-width: 560px;
+	width: 100%;
+	border-radius: 24px;
+	background: #ffffff;
+	box-shadow: 0 12px 40px rgba(2, 6, 23, 0.06);
+}
+
+.success-badge {
+	width: 96px;
+	height: 96px;
+	border-radius: 50%;
+	background: #2274c5ff;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 10px 20px rgba(24, 109, 206, 0.35);
+}
+.success-badge i {
+	color: #ffffff;
+	font-size: 56px;
+	line-height: 1;
+}
+
+.success-title {
+	font-weight: 800;
+	font-size: 2.4rem;
+	color: #0f172a;
+	letter-spacing: .2px;
+}
+
+.success-text {
+	font-size: 1.125rem;
+	color: #334155;
+}
+.success-subtext {
+	color: #64748b;
+	font-size: 1rem;
+}
+
 
 .topbar .navbar .navbar-nav .nav-link {
 
