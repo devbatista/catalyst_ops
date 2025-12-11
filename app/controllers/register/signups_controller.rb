@@ -26,8 +26,8 @@ class Register::SignupsController < ApplicationController
       return render :new, status: :unprocessable_entity
     end
 
-    payment_method = signup_params[:payment_method].to_s
-    handle_payment_flow(@company, @user, payment_method)
+    # payment_method = signup_params[:payment_method].to_s
+    # handle_payment_flow(@company, payment_method)
   end
 
   def success
@@ -72,16 +72,16 @@ class Register::SignupsController < ApplicationController
     Result.new(false, e.message.presence || (Array(company.errors.full_messages) + Array(user.errors.full_messages)))
   end
 
-  def handle_payment_flow(company, user, payment_method)
+  def handle_payment_flow(company, payment_method)
     case payment_method
     when "boleto"
-      # boleto
+      ::Payments::BoletoPaymentJob.perform_async(company.id)
     when "pix"
-      # pix
+      ::Payments::PixPaymentJob.perform_async(company.id)
     when "credit_card"
-      # credit_card
+      ::Payments::CreditCardPayment.perform_async(company.id)
     else
-      redirect_to register_signup_success_path(company_id: company.id, user_id: user.id)
+      redirect_to register_signup_success_path(company_id: company.id)
     end
     
   end
