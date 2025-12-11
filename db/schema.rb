@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_12_11_200839) do
+ActiveRecord::Schema[7.1].define(version: 2025_12_11_210418) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -190,13 +190,13 @@ ActiveRecord::Schema[7.1].define(version: 2025_12_11_200839) do
     t.uuid "plan_id"
     t.string "payment_method", default: "boleto", null: false
     t.string "zip_code"
-    t.string "street_name"
-    t.string "street_number"
+    t.string "street"
+    t.string "number"
     t.string "complement"
     t.string "neighborhood"
     t.string "city"
-    t.string "federal_unit"
-    t.index ["city", "federal_unit"], name: "index_companies_on_city_and_federal_unit"
+    t.string "state"
+    t.index ["city", "state"], name: "index_companies_on_city_and_state"
     t.index ["document"], name: "index_companies_on_document", unique: true
     t.index ["email"], name: "index_companies_on_email", unique: true
     t.index ["payment_method"], name: "index_companies_on_payment_method"

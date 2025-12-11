@@ -21,11 +21,11 @@ class Company < ApplicationRecord
   validates :state_registration, length: { maximum: 30 }, allow_blank: true
   validates :municipal_registration, length: { maximum: 30 }, allow_blank: true
   validates :website, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]), allow_blank: true }
-  validates :street_number,  presence: true, length: { maximum: 20 }
+  validates :number,  presence: true, length: { maximum: 20 }
   validates :complement, length: { maximum: 60 }, allow_blank: true
   validates :neighborhood, presence: true, length: { maximum: 80 }
   validates :city,     presence: true, length: { maximum: 80 }
-  validates :federal_unit,    presence: true, length: { is: 2 }, format: { with: /\A[A-Z]{2}\z/, message: "use UF em maiúsculas, ex: SP" }
+  validates :state,    presence: true, length: { is: 2 }, format: { with: /\A[A-Z]{2}\z/, message: "use UF em maiúsculas, ex: SP" }
   validates :zip_code, presence: true, format: { with: /\A\d{8}\z/, message: "deve conter 8 números" }
 
   validate :document_must_be_cpf_or_cnpj
@@ -64,7 +64,7 @@ class Company < ApplicationRecord
   end
 
   def full_address
-    [street_name, street_number, complement.presence, neighborhood, "#{city}/#{federal_unit}", formatted_zip_code].compact.join(', ')
+    [street, number, complement.presence, neighborhood, "#{city}/#{state}", formatted_zip_code].compact.join(', ')
   end
 
   def gestores

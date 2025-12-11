@@ -47,7 +47,7 @@ class Register::SignupsController < ApplicationController
   def company_params
     params.require(:signup).require(:company).permit(
       :name, :document, :email, :phone,
-      :zip_code, :street_name, :street_number, :complement, :neighborhood, :city, :federal_unit,
+      :zip_code, :street, :number, :complement, :neighborhood, :city, :state,
       :state_registration, :municipal_registration, :website
     )
   end
@@ -66,7 +66,6 @@ class Register::SignupsController < ApplicationController
 
   def save_register(company, user)
     ActiveRecord::Base.transaction do
-      binding.pry
       company_res = Cmd::Companies::Create.new(company).call
       unless company_res.success?
         raise ActiveRecord::Rollback, Array(company_res.errors).join(", ")

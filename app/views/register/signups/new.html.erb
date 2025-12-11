@@ -118,22 +118,22 @@
 
                                   <div class="col-6 col-md-3">
                                     <%= c.label :zip_code, "CEP", class: "form-label" %>
-                                    <%= c.text_field :zip_code, class: "form-control", required: true, placeholder: "00000-000" %>
+                                    <%= c.text_field :zip_code, class: "form-control", required: true, placeholder: "00000-000", inputmode: "numeric", maxlength: 9 %>
                                   </div>
 
                                   <div class="col-6 col-md-3">
-                                    <%= c.label :federal_unit, "UF", class: "form-label" %>
-                                    <%= c.text_field :federal_unit, class: "form-control text-uppercase", required: true, maxlength: 2, placeholder: "SP" %>
+                                    <%= c.label :state, "UF", class: "form-label" %>
+                                    <%= c.text_field :state, class: "form-control text-uppercase", required: true, maxlength: 2, placeholder: "SP" %>
                                   </div>
 
                                   <div class="col-12 col-md-8">
-                                    <%= c.label :street_name, "Logradouro", class: "form-label" %>
-                                    <%= c.text_field :street_name, class: "form-control", required: true, placeholder: "Rua Exemplo" %>
+                                    <%= c.label :street, "Logradouro", class: "form-label" %>
+                                    <%= c.text_field :street, class: "form-control", required: true, placeholder: "Rua Exemplo" %>
                                   </div>
 
                                   <div class="col-12 col-md-4">
-                                    <%= c.label :street_number, "Número", class: "form-label" %>
-                                    <%= c.text_field :street_number, class: "form-control", required: true, placeholder: "123" %>
+                                    <%= c.label :number, "Número", class: "form-label" %>
+                                    <%= c.text_field :number, class: "form-control", required: true, placeholder: "123" %>
                                   </div>
 
                                   <div class="col-12 col-md-6">
