@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_12_10_141645) do
+ActiveRecord::Schema[7.1].define(version: 2025_12_11_210418) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -182,7 +182,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_12_10_141645) do
     t.string "email", null: false
     t.string "phone", null: false
     t.uuid "responsible_id"
-    t.text "address"
     t.string "state_registration"
     t.string "municipal_registration"
     t.string "website"
@@ -190,11 +189,20 @@ ActiveRecord::Schema[7.1].define(version: 2025_12_10_141645) do
     t.datetime "updated_at", null: false
     t.uuid "plan_id"
     t.string "payment_method", default: "boleto", null: false
+    t.string "zip_code"
+    t.string "street"
+    t.string "number"
+    t.string "complement"
+    t.string "neighborhood"
+    t.string "city"
+    t.string "state"
+    t.index ["city", "state"], name: "index_companies_on_city_and_state"
     t.index ["document"], name: "index_companies_on_document", unique: true
     t.index ["email"], name: "index_companies_on_email", unique: true
     t.index ["payment_method"], name: "index_companies_on_payment_method"
     t.index ["plan_id"], name: "index_companies_on_plan_id"
     t.index ["responsible_id"], name: "index_companies_on_responsible_id"
+    t.index ["zip_code"], name: "index_companies_on_zip_code"
   end
 
   create_table "credentials_entity", id: { type: :string, limit: 36 }, force: :cascade do |t|

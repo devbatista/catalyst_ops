@@ -101,39 +101,69 @@
                                     <%= c.text_field :name, class: "form-control", required: true, placeholder: "Minha Empresa LTDA" %>
                                   </div>
 
-                                  <div class="col-12 col-md-6">
+                                  <div class="col-12 col-sm-6">
                                     <%= c.label :document, "CNPJ/CPF", class: "form-label" %>
                                     <%= c.text_field :document, class: "form-control", required: true, placeholder: "00.000.000/0001-00 ou 000.000.000-00" %>
                                   </div>
 
-                                  <div class="col-12 col-md-6">
+                                  <div class="col-12 col-sm-6">
                                     <%= c.label :phone, "Telefone", class: "form-label" %>
                                     <%= c.text_field :phone, class: "form-control", required: true, placeholder: "Apenas números. Ex: 11999999999" %>
                                   </div>
 
-                                  <div class="col-12">
+                                  <div class="col-12 col-sm-6">
                                     <%= c.label :email, "Email", class: "form-label" %>
                                     <%= c.email_field :email, class: "form-control", required: true, placeholder: "contato@empresa.com" %>
                                   </div>
 
-                                  <div class="col-12">
-                                    <%= c.label :address, "Endereço", class: "form-label" %>
-                                    <%= c.text_area :address, class: "form-control", rows: 3, placeholder: "Rua, número, bairro, cidade - UF" %>
+                                  <div class="col-6 col-md-3">
+                                    <%= c.label :zip_code, "CEP", class: "form-label" %>
+                                    <%= c.text_field :zip_code, class: "form-control", required: true, placeholder: "00000-000", inputmode: "numeric", maxlength: 9 %>
+                                  </div>
+
+                                  <div class="col-6 col-md-3">
+                                    <%= c.label :state, "UF", class: "form-label" %>
+                                    <%= c.text_field :state, class: "form-control text-uppercase", required: true, maxlength: 2, placeholder: "SP", readonly: true %>
+                                  </div>
+
+                                  <div class="col-12 col-md-8">
+                                    <%= c.label :street, "Logradouro", class: "form-label" %>
+                                    <%= c.text_field :street, class: "form-control", required: true, placeholder: "Rua Exemplo", readonly: true %>
+                                  </div>
+
+                                  <div class="col-12 col-md-4">
+                                    <%= c.label :number, "Número", class: "form-label" %>
+                                    <%= c.text_field :number, class: "form-control", required: true, placeholder: "123" %>
                                   </div>
 
                                   <div class="col-12 col-md-6">
+                                    <%= c.label :complement, "Complemento", class: "form-label" %>
+                                    <%= c.text_field :complement, class: "form-control", placeholder: "Apto, Bloco, Sala (opcional)" %>
+                                  </div>
+
+                                  <div class="col-12 col-md-6">
+                                    <%= c.label :neighborhood, "Bairro", class: "form-label" %>
+                                    <%= c.text_field :neighborhood, class: "form-control", required: true, placeholder: "Centro", readonly: true %>
+                                  </div>
+
+                                  <div class="col-12 col-sm-6">
+                                    <%= c.label :city, "Cidade", class: "form-label" %>
+                                    <%= c.text_field :city, class: "form-control", required: true, placeholder: "São Paulo", readonly: true %>
+                                  </div>
+
+                                  <div class="col-12 col-sm-6">
+                                    <%= c.label :website, "Website (ou instagram, se preferir)", class: "form-label" %>
+                                    <%= c.url_field :website, class: "form-control", placeholder: "https://www.empresa.com" %>
+                                  </div>
+
+                                  <div class="col-12 col-sm-6">
                                     <%= c.label :state_registration, "Inscrição Estadual", class: "form-label" %>
                                     <%= c.text_field :state_registration, class: "form-control", placeholder: "Opcional" %>
                                   </div>
 
-                                  <div class="col-12 col-md-6">
+                                  <div class="col-12 col-sm-6">
                                     <%= c.label :municipal_registration, "Inscrição Municipal", class: "form-label" %>
                                     <%= c.text_field :municipal_registration, class: "form-control", placeholder: "Opcional" %>
-                                  </div>
-
-                                  <div class="col-12">
-                                    <%= c.label :website, "Website (ou instagram, se preferir)", class: "form-label" %>
-                                    <%= c.url_field :website, class: "form-control", placeholder: "https://www.empresa.com" %>
                                   </div>
 
                                   <div class="col-12 d-flex justify-content-end">
@@ -151,10 +181,12 @@
                                     <%= u.label :name, "Nome", class: "form-label" %>
                                     <%= u.text_field :name, class: "form-control", required: true, placeholder: "Seu nome completo" %>
                                   </div>
+
                                   <div class="col-12">
                                     <%= u.label :email, "Email", class: "form-label" %>
                                     <%= u.email_field :email, class: "form-control", required: true, placeholder: "seuemail@exemplo.com" %>
                                   </div>
+
                                   <div class="col-12">
                                     <%= u.label :password, "Senha", class: "form-label" %>
                                     <div class="input-group" id="show_hide_password">
@@ -162,6 +194,7 @@
                                       <a href="javascript:;" class="input-group-text bg-transparent"><i class="bx bx-hide"></i></a>
                                     </div>
                                   </div>
+
                                   <div class="col-12">
                                     <%= u.label :password_confirmation, "Confirmar Senha", class: "form-label" %>
                                     <div class="input-group" id="show_hide_password_conf">
@@ -169,6 +202,7 @@
                                       <a href="javascript:;" class="input-group-text bg-transparent"><i class="bx bx-hide"></i></a>
                                     </div>
                                   </div>
+
                                   <div class="col-12 d-flex">
                                     <button type="button" class="btn btn-outline-secondary px-4 me-auto" onclick="stepper1.previous()"><i class='bx bx-left-arrow-alt me-2'></i>Voltar</button>
                                     <button type="button" class="btn btn-primary px-4" onclick="stepper1.next()">Próximo<i class='bx bx-right-arrow-alt ms-2'></i></button>
@@ -240,6 +274,7 @@
   </div>
 
   <script src="<%= asset_path('plugins/bs-stepper/js/bs-stepper.min.js') %>"></script>
+  <%= javascript_include_tag "viacep", defer: true %>
 
   <%= render 'layouts/partials/footer' %>
   <%= render 'layouts/partials/scripts' %>

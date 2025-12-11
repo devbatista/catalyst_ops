@@ -28,10 +28,10 @@ class Register::SignupsController < ApplicationController
       return render :new, status: :unprocessable_entity
     end
 
-    redirect_to success_path(company_id: @company.id)
-
     payment_method = params[:payment_method].to_s
     handle_payment_flow(@company, payment_method)
+    
+    redirect_to success_path(company_id: @company.id)
   end
 
   def success
@@ -47,7 +47,8 @@ class Register::SignupsController < ApplicationController
   def company_params
     params.require(:signup).require(:company).permit(
       :name, :document, :email, :phone,
-      :address, :state_registration, :municipal_registration, :website
+      :zip_code, :street, :number, :complement, :neighborhood, :city, :state,
+      :state_registration, :municipal_registration, :website
     )
   end
 
@@ -94,9 +95,6 @@ class Register::SignupsController < ApplicationController
       ::Payments::PixPaymentJob.perform_async(company.id)
     when "credit_card"
       ::Payments::CreditCardPayment.perform_async(company.id)
-    else
-      redirect_to register_signups_success_path(company_id: company.id)
     end
-    
   end
 end

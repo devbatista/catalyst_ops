@@ -11,6 +11,7 @@ class Company < ApplicationRecord
   
   before_validation :normalize_document
   before_validation { self.email = email.to_s.downcase.strip if email.present? }
+  before_validation :normalize_zip_code
   
   validates :payment_method, inclusion: { in: PAYMENT_METHODS }
   validates :name, presence: true, length: { minimum: 3 }
@@ -20,6 +21,12 @@ class Company < ApplicationRecord
   validates :state_registration, length: { maximum: 30 }, allow_blank: true
   validates :municipal_registration, length: { maximum: 30 }, allow_blank: true
   validates :website, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]), allow_blank: true }
+  validates :number,  presence: true, length: { maximum: 20 }
+  validates :complement, length: { maximum: 60 }, allow_blank: true
+  validates :neighborhood, presence: true, length: { maximum: 80 }
+  validates :city,     presence: true, length: { maximum: 80 }
+  validates :state,    presence: true, length: { is: 2 }, format: { with: /\A[A-Z]{2}\z/, message: "use UF em maiúsculas, ex: SP" }
+  validates :zip_code, presence: true, format: { with: /\A\d{8}\z/, message: "deve conter 8 números" }
 
   validate :document_must_be_cpf_or_cnpj
 
@@ -51,6 +58,15 @@ class Company < ApplicationRecord
     end
   end
 
+  def formatted_zip_code
+    return zip_code unless zip_code.present?
+    zip_code.gsub(/(\d{5})(\d{3})/, '\1-\2')
+  end
+
+  def full_address
+    [street, number, complement.presence, neighborhood, "#{city}/#{state}", formatted_zip_code].compact.join(', ')
+  end
+
   def gestores
     users.gestores
   end
@@ -59,6 +75,10 @@ class Company < ApplicationRecord
 
   def normalize_document
     self.document = document.to_s.gsub(/\D/, "") if document.present?
+  end
+
+  def normalize_zip_code
+    self.zip_code = zip_code.to_s.gsub(/\D/, "") if zip_code.present?
   end
 
   def document_must_be_cpf_or_cnpj
