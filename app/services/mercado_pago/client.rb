@@ -30,7 +30,8 @@ module MercadoPago
       request = request_class.new(uri.request_uri)
       request["Authorization"] = "Bearer #{@access_token}"
       request["Content-Type"] = "application/json"
-      request.body = body.to_json if body
+      request["X-Idempotency-Key"] = SecureRandom.uuid if method == :post
+      request.body = body.is_a?(Hash) ? body.to_json : body
 
       response = http.request(request)
 
@@ -38,7 +39,7 @@ module MercadoPago
         raise "API request failed with code #{response.code}: #{response.body}"
       end
 
-      response
+      JSON.parse(response.body)
     end
 
     def fetch_plans

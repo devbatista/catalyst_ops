@@ -30,8 +30,8 @@ class Register::SignupsController < ApplicationController
 
     redirect_to success_path(company_id: @company.id)
 
-    # payment_method = params[:payment_method].to_s
-    # handle_payment_flow(@company, payment_method)
+    payment_method = params[:payment_method].to_s
+    handle_payment_flow(@company, payment_method)
   end
 
   def success
