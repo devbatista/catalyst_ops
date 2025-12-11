@@ -2,6 +2,8 @@ class Register::SignupsController < ApplicationController
   layout false
   skip_authorization_check
 
+  Result = Struct.new(:success?, :errors)
+
   before_action :sanitize_phone, only: :create
 
   def new
@@ -14,10 +16,10 @@ class Register::SignupsController < ApplicationController
   def create
     @payment_methods = %w[pix credit_card boleto]
     @company = Company.new(company_params.merge(
-      plan_id: signup_params[:plan_id],
-      payment_method: signup_params[:payment_method]
+      plan_id: params.dig(:signup, :plan_id),
+      payment_method: params.dig(:signup, :payment_method)
     ))
-    @user = User.new(user_params.merge(company: @company, role: :gestor))
+    @user = User.new(user_params.merge(role: :gestor))
 
     result = save_register(@company, @user)
 
@@ -26,12 +28,18 @@ class Register::SignupsController < ApplicationController
       return render :new, status: :unprocessable_entity
     end
 
-    # payment_method = signup_params[:payment_method].to_s
+    redirect_to success_path(company_id: @company.id)
+
+    # payment_method = params[:payment_method].to_s
     # handle_payment_flow(@company, payment_method)
   end
 
   def success
-    # exibe confirmação e QRCode se qr=true
+    company = Company.find_by(id: params[:company_id])
+
+    unless company
+      redirect_to root_path, alert: "Erro no cadastro ou empresa já cadastrada, verifique com nosso suporte."
+    end
   end
 
   private
@@ -56,20 +64,26 @@ class Register::SignupsController < ApplicationController
   end
 
   def save_register(company, user)
-    ActiveRecord::Base.transaction do 
+    ActiveRecord::Base.transaction do
       company_res = Cmd::Companies::Create.new(company).call
-      user_res = Cmd::Users::Create.new(user).call
-
-      if company_res.success? && user_res.success?
-        return Result.new(true, nil)
-      else
-        errors = [company_res.errors] + [user_res.errors].compact.flatten
-        raise ActiveRecord::Rollback, errors.join(", ")
+      unless company_res.success?
+        raise ActiveRecord::Rollback, Array(company_res.errors).join(", ")
       end
+
+      user.company = company
+      user_res = Cmd::Users::Create.new(user).call
+      unless user_res.success?
+        raise ActiveRecord::Rollback, Array(user_res.errors).join(", ")
+      end
+
+      company.update_attribute(:responsible_id, user.id)
+
+      return Result.new(true, nil)
     end
     Result.new(true, nil)
-  rescue ActiveRecord::RecordInvalid => e
-    Result.new(false, e.message.presence || (Array(company.errors.full_messages) + Array(user.errors.full_messages)))
+  rescue => e
+    Result.new(false,
+               e.message.presence || (Array(company.errors.full_messages) + Array(user.errors.full_messages)))
   end
 
   def handle_payment_flow(company, payment_method)
@@ -81,7 +95,7 @@ class Register::SignupsController < ApplicationController
     when "credit_card"
       ::Payments::CreditCardPayment.perform_async(company.id)
     else
-      redirect_to register_signup_success_path(company_id: company.id)
+      redirect_to register_signups_success_path(company_id: company.id)
     end
     
   end
