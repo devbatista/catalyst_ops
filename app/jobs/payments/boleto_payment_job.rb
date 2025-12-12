@@ -3,7 +3,7 @@ class Payments::BoletoPaymentJob < ApplicationJob
 
   def perform(company_id)
     Cmd::MercadoPago::CreateBoletoPayment.new(
-      company: company,
+      company: company
     ).call
   end
 end

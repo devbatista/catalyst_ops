@@ -1,5 +1,5 @@
 class Payments::BoletoMailer < ApplicationMailer
-  default from: "no-reply@catalystops.com"
+  default from: "no-reply@catalystops.com.br"
 
   def ticket_email
     @company  = params[:company]

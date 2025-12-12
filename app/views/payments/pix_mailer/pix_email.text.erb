@@ -1,0 +1,23 @@
+Olá, <%= (@company.responsible&.name.presence || @company.name) %>,
+
+Bem-vindo(a)! Falta pouco para você utilizar o CatalystOps.
+Para concluir, pague via PIX escaneando o QR Code ou usando o código “copia e cola”.
+
+<% if @expires_on.present? %>
+Vencimento: <%= (I18n.l(Date.parse(@expires_on.to_s), format: :long, locale: :'pt-BR') rescue @expires_on) %>
+<% end %>
+
+<% if @pix_code.present? %>
+Código PIX (copia e cola):
+<%= @pix_code %>
+Dica: copie o código acima e cole na opção “PIX copia e cola” do seu banco.
+<% end %>
+
+<% if @pix_ticket_url.present? %>
+Acessar a página do pagamento no Mercado Pago:
+<%= @pix_ticket_url %>
+<% end %>
+
+Após a confirmação do pagamento, sua conta será ativada e enviaremos as instruções de acesso ao painel.
+
+Dúvidas? Responda este e-mail ou fale com nosso suporte.

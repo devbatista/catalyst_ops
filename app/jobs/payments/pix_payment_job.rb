@@ -1,7 +1,9 @@
-class Payments::CreditCardPaymentJob < ApplicationJob
+class Payments::PixPaymentJob < ApplicationJob
   queue_as :default
 
-  def perform(company_id, user_id)
-     
+  def perform(company_id)
+    Cmd::MercadoPago::CreatePixPayment.new(
+      company: company
+    ).call
   end
 end
