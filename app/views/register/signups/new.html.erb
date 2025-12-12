@@ -203,6 +203,13 @@
                                     </div>
                                   </div>
 
+                                  <div class="col-12">
+                                    <div class="form-check form-switch">
+                                      <%= u.check_box :can_be_technician, class: "form-check-input", id: "flexSwitchCanBeTechnician" %>
+                                      <%= u.label :can_be_technician, "Também será técnico?", class: "form-check-label", for: "flexSwitchCanBeTechnician" %>
+                                    </div>
+                                  </div>
+
                                   <div class="col-12 d-flex">
                                     <button type="button" class="btn btn-outline-secondary px-4 me-auto" onclick="stepper1.previous()"><i class='bx bx-left-arrow-alt me-2'></i>Voltar</button>
                                     <button type="button" class="btn btn-primary px-4" onclick="stepper1.next()">Próximo<i class='bx bx-right-arrow-alt ms-2'></i></button>

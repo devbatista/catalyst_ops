@@ -27,9 +27,6 @@ class Register::SignupsController < ApplicationController
       flash.now[:alert] = result.errors
       return render :new, status: :unprocessable_entity
     end
-
-    payment_method = params[:payment_method].to_s
-    handle_payment_flow(@company, payment_method)
     
     redirect_to success_path(company_id: @company.id)
   end
@@ -53,7 +50,8 @@ class Register::SignupsController < ApplicationController
   end
 
   def user_params
-    params.require(:signup).require(:user).permit(:name, :email, :password, :password_confirmation)
+    params.require(:signup).require(:user).permit(:name, :email, :password, 
+                                                  :password_confirmation, :can_be_technician)
   end
 
   def sanitize_phone

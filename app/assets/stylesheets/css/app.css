@@ -4334,6 +4334,22 @@ payment-methods { align-items: stretch; }
 	font-size: 1rem;
 }
 
+#flexSwitchCanBeTechnician.form-check-input {
+  width: 3.2rem;
+  height: 1.8rem;
+  cursor: pointer;
+}
+
+#flexSwitchCanBeTechnician.form-check-input:checked {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.form-check.form-switch .form-check-label[for="flexSwitchCanBeTechnician"] {
+  margin-left: 12px;
+	margin-top: 8px;
+}
+
 
 .topbar .navbar .navbar-nav .nav-link {
 
