@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_12_11_210418) do
+ActiveRecord::Schema[7.1].define(version: 2025_12_12_011632) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -196,6 +196,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_12_11_210418) do
     t.string "neighborhood"
     t.string "city"
     t.string "state"
+    t.boolean "active", default: false, null: false
+    t.index ["active"], name: "index_companies_on_active"
     t.index ["city", "state"], name: "index_companies_on_city_and_state"
     t.index ["document"], name: "index_companies_on_document", unique: true
     t.index ["email"], name: "index_companies_on_email", unique: true

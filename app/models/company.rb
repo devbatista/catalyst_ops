@@ -30,6 +30,8 @@ class Company < ApplicationRecord
 
   validate :document_must_be_cpf_or_cnpj
 
+  scope :active, -> { where(active: true) }
+
   def formatted_document
     return document unless document.present?
 
@@ -69,6 +71,18 @@ class Company < ApplicationRecord
 
   def gestores
     users.gestores
+  end
+
+  def activate!
+    update!(active: true)
+  end
+
+  def deactivate!
+    update!(active: false)
+  end
+
+  def access_enabled?
+    active? && plan.present?
   end
 
   private
