@@ -78,6 +78,10 @@ class User < ApplicationRecord
     tecnico? || can_be_technician?
   end
 
+  def access_enabled?
+    company.active? && active?
+  end
+
   private
 
   def normalize_name
