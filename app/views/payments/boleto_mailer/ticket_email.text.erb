@@ -1,0 +1,19 @@
+Olá, <%= (@company.responsible&.name.presence || @company.name) %>,
+
+Bem-vindo(a)! Falta pouco para você utilizar o CatalystOps.
+Assim que o pagamento do boleto for confirmado, sua conta será ativada e você receberá instruções para acessar o painel.
+
+<% if @status.present? %>
+Status do pagamento: <%= @status %>.
+<% end %>
+<% if @expires_on.present? %>
+Vencimento: <%= @expires_on %>
+<% end %>
+<% if @url.present? %>
+Link do boleto: <%= @url %>
+<% end %>
+<% if @barcode.present? %>
+Linha digitável: <%= @barcode %>
+<% end %>
+
+Dúvidas? Responda este e-mail ou fale com nosso suporte.

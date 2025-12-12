@@ -1,0 +1,48 @@
+<% content_for :title, "Seu boleto CatalystOps" %>
+
+<h2 style="margin-top:0;">Seu boleto está pronto</h2>
+
+<p style="font-size:16px; line-height:1.6;">
+  Olá, <strong><%= (@company.responsible&.name.presence || @company.name) %></strong>.
+</p>
+
+<p style="font-size:16px; line-height:1.6; margin:0 0 12px;">
+  Bem-vindo(a)! <strong>Falta pouco para você utilizar o CatalystOps.</strong>
+</p>
+<p style="font-size:14px; line-height:1.6; margin:0 0 16px; color:#555;">
+  Assim que o pagamento do boleto for confirmado, sua conta será ativada e você receberá instruções para acessar o painel.
+</p>
+
+<% if @status.present? %>
+  <p style="font-size:14px; color:#666; margin:0 0 8px;">
+    Status do pagamento: <strong><%= @status.to_s.capitalize %></strong>.
+  </p>
+<% end %>
+
+<% if @expires_on.present? %>
+  <p style="font-size:14px; color:#666; margin:0 0 16px;">
+    Vencimento: <%= I18n.l(Time.zone.parse(@expires_on.to_s).to_date, format: :long, locale: :'pt-BR') rescue @expires_on %>
+  </p>
+<% end %>
+
+<% if @url.present? %>
+  <div style="margin:24px 0;">
+    <a href="<%= @url %>" target="_blank" rel="noopener"
+       style="background:#0d6efd; color:#fff; text-decoration:none; padding:14px 32px; border-radius:4px; font-size:16px; font-weight:bold; display:inline-block;">
+      Baixar boleto
+    </a>
+  </div>
+<% end %>
+
+<% if @barcode.present? %>
+  <p style="font-size:14px; line-height:1.6; margin:0 0 8px;">
+    Linha digitável:
+  </p>
+  <p style="font-family:monospace; font-size:14px; background:#f7f7f7; padding:10px 12px; border-radius:4px; margin:0 0 16px;">
+    <%= @barcode %>
+  </p>
+<% end %>
+
+<p style="font-size:14px; color:#888;">
+  Em caso de dúvidas, responda este e-mail ou fale com nosso suporte.
+</p>
