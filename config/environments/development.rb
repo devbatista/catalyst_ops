@@ -43,7 +43,9 @@ Rails.application.configure do
 
   config.action_mailer.delivery_method = :letter_opener_web
   config.action_mailer.perform_deliveries = true
-  config.action_mailer.default_url_options = { host: "login.catalystops.local", protocol: 'https' }
+  config.action_mailer.default_url_options = { host: "catalystops.local", protocol: 'https' }
+  config.action_mailer.asset_host = "https://catalystops.local"
+  config.action_mailer.preview_path = Rails.root.join("app/mailers/previews")
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
@@ -78,6 +80,7 @@ Rails.application.configure do
   # Raise error when a before_action's only/except options reference missing actions
   config.action_controller.raise_on_missing_callback_actions = true
 
+  config.hosts << "catalystops.local"
   config.hosts << "app.catalystops.local"
   config.hosts << "admin.catalystops.local"
   config.hosts << "login.catalystops.local"
