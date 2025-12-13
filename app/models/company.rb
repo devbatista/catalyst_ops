@@ -3,6 +3,8 @@ class Company < ApplicationRecord
   has_many :clients, dependent: :destroy
   has_many :order_services
   has_many :technicians, -> { where(role: :tecnico, active: true) }, class_name: "User"
+  has_many :subscriptions, dependent: :destroy
+  has_one :current_subscription, -> { current }, class_name: "Subscription"
 
   belongs_to :responsible, class_name: "User", optional: true
   belongs_to :plan, optional: true
@@ -82,7 +84,7 @@ class Company < ApplicationRecord
   end
 
   def access_enabled?
-    active? && plan.present?
+    active? && adimplente?
   end
 
   private
@@ -99,5 +101,9 @@ class Company < ApplicationRecord
     unless CPF.valid?(document) || CNPJ.valid?(document)
       errors.add(:document, "deve ser um CPF ou CNPJ válido")
     end
+  end
+
+  def adimplente?
+    !!current_subscription
   end
 end
