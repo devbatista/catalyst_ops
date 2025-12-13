@@ -82,8 +82,6 @@ class Register::SignupsController < ApplicationController
       user_res = Cmd::Users::Create.new(user).call
       raise ActiveRecord::Rollback, Array(user_res.errors).join(", ") unless user_res.success?
 
-      binding.pry
-
       company.update_attribute(:responsible_id, user.id)
       company.subscriptions.create!(subscription_params)
 
