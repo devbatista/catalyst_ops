@@ -27,6 +27,8 @@ class Register::SignupsController < ApplicationController
       flash.now[:alert] = result.errors
       return render :new, status: :unprocessable_entity
     end
+
+    # handle_payment_flow(@company, @company.payment_method)
     
     redirect_to success_path(company_id: @company.id)
   end
@@ -54,6 +56,15 @@ class Register::SignupsController < ApplicationController
                                                   :password_confirmation, :can_be_technician)
   end
 
+  def subscription_params
+    plan = Plan.find_by(id: params.dig(:signup, :plan_id))
+    {
+      preapproval_plan_id: plan&.external_id,
+      reason: plan&.reason,
+      transaction_amount: plan&.transaction_amount,
+    }
+  end
+
   def sanitize_phone
     if params.dig(:signup, :company, :phone).present?
       phone = params[:signup][:company][:phone]
@@ -65,17 +76,16 @@ class Register::SignupsController < ApplicationController
   def save_register(company, user)
     ActiveRecord::Base.transaction do
       company_res = Cmd::Companies::Create.new(company).call
-      unless company_res.success?
-        raise ActiveRecord::Rollback, Array(company_res.errors).join(", ")
-      end
+      raise ActiveRecord::Rollback, Array(company_res.errors).join(", ") unless company_res.success?
 
       user.company = company
       user_res = Cmd::Users::Create.new(user).call
-      unless user_res.success?
-        raise ActiveRecord::Rollback, Array(user_res.errors).join(", ")
-      end
+      raise ActiveRecord::Rollback, Array(user_res.errors).join(", ") unless user_res.success?
+
+      binding.pry
 
       company.update_attribute(:responsible_id, user.id)
+      company.subscriptions.create!(subscription_params)
 
       return Result.new(true, nil)
     end

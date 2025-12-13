@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_12_12_011632) do
+ActiveRecord::Schema[7.1].define(version: 2025_12_13_114644) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -534,6 +534,28 @@ ActiveRecord::Schema[7.1].define(version: 2025_12_12_011632) do
     t.timestamptz "updatedAt", precision: 3, default: -> { "CURRENT_TIMESTAMP(3)" }, null: false
   end
 
+  create_table "subscriptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.string "preapproval_plan_id", null: false
+    t.string "reason"
+    t.string "external_reference"
+    t.datetime "start_date"
+    t.datetime "end_date"
+    t.datetime "canceled_date"
+    t.decimal "transaction_amount", precision: 12, scale: 2
+    t.string "status", default: "pending", null: false
+    t.string "gateway", default: "mercado_pago"
+    t.string "external_subscription_id"
+    t.jsonb "raw_payload"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id", "status"], name: "index_subscriptions_on_company_id_and_status"
+    t.index ["company_id"], name: "index_subscriptions_on_company_id"
+    t.index ["external_reference"], name: "index_subscriptions_on_external_reference"
+    t.index ["external_subscription_id"], name: "index_subscriptions_on_external_subscription_id"
+    t.index ["preapproval_plan_id"], name: "index_subscriptions_on_preapproval_plan_id"
+  end
+
   create_table "tag_entity", id: { type: :string, limit: 36 }, force: :cascade do |t|
     t.string "name", limit: 24, null: false
     t.timestamptz "createdAt", precision: 3, default: -> { "CURRENT_TIMESTAMP(3)" }, null: false
@@ -766,6 +788,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_12_12_011632) do
   add_foreign_key "shared_credentials", "project", column: "projectId", name: "FK_812c2852270da1247756e77f5a4", on_delete: :cascade
   add_foreign_key "shared_workflow", "project", column: "projectId", name: "FK_a45ea5f27bcfdc21af9b4188560", on_delete: :cascade
   add_foreign_key "shared_workflow", "workflow_entity", column: "workflowId", name: "FK_daa206a04983d47d0a9c34649ce", on_delete: :cascade
+  add_foreign_key "subscriptions", "companies"
   add_foreign_key "test_case_execution", "execution_entity", column: "executionId", name: "FK_e48965fac35d0f5b9e7f51d8c44", on_delete: :nullify
   add_foreign_key "test_case_execution", "test_run", column: "testRunId", name: "FK_8e4b4774db42f1e6dda3452b2af", on_delete: :cascade
   add_foreign_key "test_run", "workflow_entity", column: "workflowId", name: "FK_d6870d3b6e4c185d33926f423c8", on_delete: :cascade
