@@ -16,7 +16,7 @@ class Subscription < ApplicationRecord
   scope :recent, -> { order(created_at: :desc) }
   scope :current, -> { where(status: :active).where('end_date > ?', Time.current) }
 
-  after_commit :sync_company_access, if: -> { previous_change.key?('status') }
+  after_commit :sync_company_access, on: :update, if: -> { previous_change.key?('status') }
   
   def allows_access?
     active?

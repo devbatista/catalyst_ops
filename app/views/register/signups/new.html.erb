@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="mp-public-key" content="<%= ENV['MP_PUBLIC_KEY_TEST'] %>">
   <title>CatalystOps</title>
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
@@ -90,7 +91,13 @@
 
                       <div class="card-body">
                         <div class="bs-stepper-content">
-                          <%= form_with url: signups_path, scope: :signup, method: :post, class: "row g-3", local: true, data: { turbo: false } do |f| %>
+                          <%= form_with url: signups_path,
+                                        scope: :signup,
+                                        method: :post,
+                                        class: "row g-3",
+                                        local: true,
+                                        data: { turbo: false },
+                                        html: { id: "signup-form" } do |f| %>
 
                             <div id="step-company" role="tabpanel" class="bs-stepper-pane" aria-labelledby="stepper1trigger1">
                               <h6 class="mb-3">Dados da Empresa</h6>
@@ -255,6 +262,40 @@
                                   </label>
                                 <% end %>
                               </div>
+
+                              <div id="credit-card-form" class="card border mt-3 d-none">
+                                <div class="card-body">
+                                  <h6 class="mb-3">Dados do Cartão</h6>
+                                  <div class="row g-3">
+                                    <div class="col-12 col-md-6">
+                                      <label class="form-label">Nome impresso no cartão</label>
+                                      <input type="text" name="signup[card][cardholder_name]" class="form-control" placeholder="Fulano de Tal">
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                      <label class="form-label">CPF do titular</label>
+                                      <input type="text" name="signup[card][cardholder_document]" class="form-control" placeholder="000.000.000-00">
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                      <label class="form-label">Número do cartão</label>
+                                      <input type="text" name="signup[card][card_number]" class="form-control" inputmode="numeric" placeholder="4111 1111 1111 1111">
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                      <label class="form-label">Validade (MM/AA)</label>
+                                      <input type="text" name="signup[card][card_expiration]" class="form-control" placeholder="12/28">
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                      <label class="form-label">CVV</label>
+                                      <input type="password" name="signup[card][card_cvv]" class="form-control" inputmode="numeric" placeholder="123">
+                                    </div>
+
+                                    <div class="col-12">
+                                      <small class="text-muted">
+                                        Seus dados serão tokenizados com segurança pelo Mercado Pago.
+                                      </small>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
                             
                               <div class="d-flex mt-3">
                                 <button type="button" class="btn btn-outline-secondary px-4 me-auto" onclick="stepper1.previous()">
@@ -281,7 +322,10 @@
   </div>
 
   <script src="<%= asset_path('plugins/bs-stepper/js/bs-stepper.min.js') %>"></script>
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
   <%= javascript_include_tag "viacep", defer: true %>
+  <%= javascript_include_tag "payment_method_toggle", defer: true %>
+  <%= javascript_include_tag "card_tokenization", defer: true %>
 
   <%= render 'layouts/partials/footer' %>
   <%= render 'layouts/partials/scripts' %>

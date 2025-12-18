@@ -28,7 +28,7 @@ class User < ApplicationRecord
   before_validation :normalize_name
   before_validation :set_default_password_for_tecnico, on: :create
 
-  after_create :send_welcome_email
+  # after_create :send_welcome_email
 
   def can_be_assigned_to_orders?
     tecnico?
