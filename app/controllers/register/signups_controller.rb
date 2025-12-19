@@ -107,7 +107,7 @@ class Register::SignupsController < ApplicationController
     when "pix"
       ::Payments::PixPaymentJob.perform_later(company.id)
     when "credit_card"
-      ::Payments::CreditCardPaymentJob.perform_later(company.id, cc_token)
+      ::Cmd::MercadoPago::CreateCreditCardPayment.new(company, cc_token).call
     end
   end
 end

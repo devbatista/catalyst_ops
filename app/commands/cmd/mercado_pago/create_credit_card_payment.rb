@@ -6,7 +6,7 @@ module Cmd
       def initialize(company, cc_token)
         @company = company
         @plan = company.plan
-        @cc_token = cc_token || 'b11e1570a64670e09c6df6585c8e2c57'
+        @cc_token = cc_token
       end
 
       def call
@@ -41,12 +41,6 @@ module Cmd
           external_reference: company.id.to_s,
           payer_email: company.email,
           card_token_id: cc_token,
-          auto_recurring: {
-            frequency: 1,
-            frequency_type: 'months',
-            transaction_amount: plan.transaction_amount.to_i,
-            currency_id: 'BRL',
-          },
           back_url: 'https://yourapp.com/payment_success',
           notification_url: 'https://yourapp.com/mercado_pago_notifications',
           status: 'authorized'
