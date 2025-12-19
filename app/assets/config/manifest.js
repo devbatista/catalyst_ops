@@ -11,3 +11,5 @@
 //= link controllers/stimulus.js
 //= link controllers/index.js
 //= link viacep.js
+//= link payment_method_toggle.js
+//= link card_tokenization.js

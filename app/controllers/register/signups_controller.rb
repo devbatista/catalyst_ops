@@ -5,6 +5,7 @@ class Register::SignupsController < ApplicationController
   Result = Struct.new(:success?, :errors)
 
   before_action :sanitize_phone, only: :create
+  before_action :set_form_dependencies, only: [:new, :create]
 
   def new
     @company = Company.new
@@ -28,7 +29,8 @@ class Register::SignupsController < ApplicationController
       return render :new, status: :unprocessable_entity
     end
 
-    # handle_payment_flow(@company, @company.payment_method)
+    cc_token = @company.payment_method == "credit_card" ? params.dig(:signup, :card_token) : nil
+    handle_payment_flow(@company, @company.payment_method, cc_token)
     
     redirect_to success_path(company_id: @company.id)
   end
@@ -42,6 +44,11 @@ class Register::SignupsController < ApplicationController
   end
 
   private
+
+  def set_form_dependencies
+    @payment_methods = %w[pix credit_card boleto]
+    @plans = Plan.where(status: :active).order(:transaction_amount)
+  end
 
   def company_params
     params.require(:signup).require(:company).permit(
@@ -83,7 +90,7 @@ class Register::SignupsController < ApplicationController
       raise ActiveRecord::Rollback, Array(user_res.errors).join(", ") unless user_res.success?
 
       company.update_attribute(:responsible_id, user.id)
-      company.subscriptions.create!(subscription_params)
+      company.subscriptions.create!(subscription_params) || raise(ActiveRecord::Rollback, "Erro ao criar assinatura para a empresa.")
 
       return Result.new(true, nil)
     end
@@ -93,14 +100,14 @@ class Register::SignupsController < ApplicationController
                e.message.presence || (Array(company.errors.full_messages) + Array(user.errors.full_messages)))
   end
 
-  def handle_payment_flow(company, payment_method)
+  def handle_payment_flow(company, payment_method, cc_token = nil)
     case payment_method
     when "boleto"
-      ::Payments::BoletoPaymentJob.perform_async(company.id)
+      ::Payments::BoletoPaymentJob.perform_later(company.id)
     when "pix"
-      ::Payments::PixPaymentJob.perform_async(company.id)
+      ::Payments::PixPaymentJob.perform_later(company.id)
     when "credit_card"
-      ::Payments::CreditCardPayment.perform_async(company.id)
+      ::Cmd::MercadoPago::CreateCreditCardPayment.new(company, cc_token).call
     end
   end
 end
