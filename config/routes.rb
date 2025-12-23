@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   draw :app
   draw :login
   draw :register
+  draw :sidekiq
 
   # Rotas padrão (sem subdomínio)
   # root to: "home#index"

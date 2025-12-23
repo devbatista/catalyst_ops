@@ -85,6 +85,7 @@ Rails.application.configure do
   config.hosts << "admin.catalystops.local"
   config.hosts << "login.catalystops.local"
   config.hosts << "register.catalystops.local"
+  config.hosts << "sidekiq.catalystops.local"
   config.hosts << /.*\.catalystops\.local/
 
   config.action_dispatch.tld_length = 1
