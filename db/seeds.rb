@@ -1,7 +1,6 @@
-load Rails.root.join('db/seeds/0-prepare.rb')
-load Rails.root.join('db/seeds/1-companies.rb')
-load Rails.root.join('db/seeds/2-users.rb')
-load Rails.root.join('db/seeds/3-clients.rb')
-load Rails.root.join('db/seeds/4-order_services.rb')
-load Rails.root.join('db/seeds/5-assignments.rb')
-load Rails.root.join('db/seeds/6-service_items.rb')
+Dir[Rails.root.join('db/seeds/common/*.rb')].sort.each { |file| load file }
+
+env_dir = Rails.root.join('db', 'seeds', Rails.env)
+if Dir.exist?(env_dir)
+  Dir[env_dir.join('*.rb')].sort.each { |file| load file }
+end
