@@ -25,6 +25,18 @@ COMPANIES = Array.new(rand(3..10)) do
     active: true
   )
 
+  gestor = User.create!(
+    name: Faker::Name.name,
+    email: Faker::Internet.unique.email,
+    password: "senha123",
+    role: :gestor,
+    company: company,
+    phone: Faker::PhoneNumber.cell_phone_in_e164,
+    active: true,
+    can_be_technician: [true, false].sample
+  )
+  company.update!(responsible_id: gestor.id)
+
   company.subscriptions.create!(
     preapproval_plan_id: plan.external_id,
     status: ['active', 'pending', 'cancelled'].sample, 
