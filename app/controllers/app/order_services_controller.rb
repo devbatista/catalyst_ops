@@ -1,6 +1,7 @@
 class App::OrderServicesController < ApplicationController
   before_action :set_other_resources, only: [:new, :edit, :update, :schedule]
   before_action :set_attachment_on_update, only: [:update]
+  before_action :can_add_order_service, only: [:new, :create]
 
   load_and_authorize_resource
 
@@ -187,6 +188,12 @@ class App::OrderServicesController < ApplicationController
       render :edit, status: :unprocessable_entity
     else
       redirect_to app_order_service_url(@order_service), notice: "Ordem de serviço atualizada com sucesso."
+    end
+  end
+
+  def can_add_order_service
+    unless current_user.company.can_create_order?
+      redirect_to app_order_services_path, alert: "Limite de ordens de serviço atingido para o seu plano atual."
     end
   end
 end
