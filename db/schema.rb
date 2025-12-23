@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_12_13_114644) do
+ActiveRecord::Schema[7.1].define(version: 2025_12_23_154316) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -429,6 +429,9 @@ ActiveRecord::Schema[7.1].define(version: 2025_12_13_114644) do
     t.string "back_url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "max_technicians"
+    t.integer "max_orders"
+    t.string "support_level"
     t.index ["external_id"], name: "index_plans_on_external_id", unique: true
     t.index ["external_reference"], name: "index_plans_on_external_reference", unique: true
     t.index ["status"], name: "index_plans_on_status"

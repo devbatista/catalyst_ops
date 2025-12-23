@@ -1,5 +1,6 @@
 class App::TechniciansController < ApplicationController
   before_action :set_technician, only: [:show, :edit, :update, :destroy]
+  before_action :can_add_technician, only: [:new, :create]
   load_and_authorize_resource class: "User", instance_name: "technician", param_method: :user_params
 
   def index
@@ -60,5 +61,11 @@ class App::TechniciansController < ApplicationController
 
   def user_params
     params.require(:user).permit(:name, :email, :phone)
+  end
+
+  def can_add_technician
+    unless current_user.company.can_add_technician?
+      redirect_to app_technicians_path, alert: "Limite de técnicos atingido para o seu plano atual."
+    end
   end
 end

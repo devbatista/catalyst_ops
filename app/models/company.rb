@@ -87,6 +87,35 @@ class Company < ApplicationRecord
     active? && adimplente?
   end
 
+  def current_plan
+    subscriptions.current.first&.plan  
+  end
+
+  def max_technicians
+    current_plan&.max_technicians
+  end
+  
+  def max_orders
+    current_plan&.max_orders
+  end
+
+  def support_level
+    current_plan&.support_level
+  end
+
+  def can_add_technician?
+    return true unless max_technicians.present?
+    
+    users.where(active: true)
+         .where('role = ? OR can_be_technician = ?', User.roles[:tecnico], true)
+         .count < max_technicians
+  end
+
+  def can_create_order?
+    return true unless max_orders.present?
+    order_services.where('created_at >= ?', Time.current.beginning_of_month).count < max_orders
+  end
+
   private
 
   def normalize_document
