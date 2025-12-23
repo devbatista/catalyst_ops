@@ -24,7 +24,8 @@ COMPANIES.each do |company|
       role: :gestor,
       company: company,
       phone: Faker::PhoneNumber.cell_phone_in_e164,
-      active: true
+      active: true,
+      can_be_technician: [true, false].sample
     )
   end
   rand(1..5).times do
