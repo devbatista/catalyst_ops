@@ -7,8 +7,8 @@ OrderService.delete_all
 Address.delete_all
 Client.delete_all
 User.delete_all
-Company.delete_all
 Subscription.delete_all
+Company.delete_all
 Plan.delete_all
 
 puts 'Base limpa!'

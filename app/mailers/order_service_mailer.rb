@@ -38,7 +38,8 @@ class OrderServiceMailer < ApplicationMailer
 
   def notify_overdue(order_service)
     @order_service = order_service
-    @responsible_email = @order_service.company.email
+    @gestor = @order_service.company.responsible
+    @responsible_email = @gestor.email
     mail(to: @responsible_email, subject: "A ordem de serviço ##{@order_service.code} está atrasada!")
   end
 end
