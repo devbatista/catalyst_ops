@@ -125,16 +125,7 @@ class App::OrderServicesController < ApplicationController
     attachment = @order_service.attachments.find(params[:attachment_id])
     attachment.purge
 
-    respond_to do |format|
-      format.html { redirect_to edit_app_order_service_path(@order_service), notice: "Anexo removido com sucesso." }
-      format.turbo_stream do
-        render turbo_stream: turbo_stream.replace(
-          "attachments_#{@order_service.id}",
-          partial: "app/order_services/attachments",
-          locals: { order_service: @order_service },
-        )
-      end
-    end
+    redirect_to edit_app_order_service_path(@order_service), notice: "Anexo removido com sucesso."
   end
 
   private
