@@ -20,7 +20,7 @@ class User < ApplicationRecord
   has_many :clients, foreign_key: :company_id, primary_key: :company_id, class_name: "Client"
   has_many :reports, dependent: :destroy
 
-  scope :tecnicos, -> { where(role: :tecnico) }
+  scope :tecnicos, -> { where(role: :tecnico).or(where(can_be_technician: true)) }
   scope :gestores, -> { where(role: :gestor) }
   scope :active, -> { where(active: true) }
   scope :inactive, -> { where(active: false) }
@@ -28,7 +28,7 @@ class User < ApplicationRecord
   before_validation :normalize_name
   before_validation :set_default_password_for_tecnico, on: :create
 
-  # after_create :send_welcome_email
+  after_create :send_welcome_email
 
   def can_be_assigned_to_orders?
     tecnico?
