@@ -13,4 +13,10 @@ class OrderServiceMailerPreview < ActionMailer::Preview
     order_service = OrderService.first
     OrderServiceMailer.notify_create(order_service)
   end
+
+  def notify_technical_on_scheduled
+    order_service = OrderService.agendada.first
+    user = order_service.users.first
+    OrderServiceMailer.notify_technical_on_scheduled(order_service, user)
+  end
 end
