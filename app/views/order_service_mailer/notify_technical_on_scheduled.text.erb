@@ -1,0 +1,11 @@
+Olá, <%= @user.name %>!
+
+Você foi designado para a Ordem de Serviço <%= @order_service.code %>.
+
+Cliente: <%= @order_service.client.name %>
+Endereço: <%= @order_service.client.address %>
+Data e Hora do Agendamento: <%= l(@order_service.scheduled_at, format: :default) %>
+
+Fique atento ao horário e prepare-se para o atendimento!
+
+Equipe CatalystOps
