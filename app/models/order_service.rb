@@ -44,6 +44,7 @@ class OrderService < ApplicationRecord
   validate :started_at_logic
   validate :finished_at_logic
   validate :scheduled_at_is_required_if_technicians_are_present
+  validate :plan_order_service_limit, on: :create
 
   scope :by_status, ->(status) { where(status: status) }
   scope :by_client, ->(client_id) { where(client_id: client_id) }
@@ -272,6 +273,12 @@ class OrderService < ApplicationRecord
   def scheduled_at_is_required_if_technicians_are_present
     if users.any? && scheduled_at.blank?
       errors.add(:scheduled_at, "é obrigatório quando um ou mais técnicos são atribuídos")
+    end
+  end
+
+  def plan_order_service_limit
+    unless company.can_create_order?
+      errors.add(:base, "Limite de ordens de serviço atingido para o plano atual da empresa.")
     end
   end
 end
