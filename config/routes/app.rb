@@ -33,6 +33,8 @@ constraints subdomain: "app" do
 
   get "calendar/events", to: "app/calendar#events"
 
+  resources :support, only: [:index], module: "app", as: :app_support
+
   devise_scope :user do
     delete "/logout", to: "sessions#destroy", as: :logout_app
   end
