@@ -28,7 +28,7 @@ class User < ApplicationRecord
   before_validation :normalize_name
   before_validation :set_default_password_for_tecnico, on: :create
 
-  after_create :send_welcome_email
+  after_update :send_welcome_email_on_activation
 
   def can_be_assigned_to_orders?
     tecnico?
@@ -94,8 +94,11 @@ class User < ApplicationRecord
     end
   end
 
-  def send_welcome_email
-    token = set_reset_password_token
-    UserMailer.welcome_email(self, token).deliver_later
+  def send_welcome_email_on_activation
+    if saved_change_to_active? && active? && welcome_email_sent_at.nil?
+      token = set_reset_password_token
+      UserMailer.welcome_email(self, token).deliver_later
+      update_column(:welcome_email_sent_at, Time.current)
+    end
   end
 end
