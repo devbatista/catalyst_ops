@@ -5,7 +5,7 @@ orders_to_schedule = ORDER_SERVICES.sample((ORDER_SERVICES.size * 0.75).to_i)
 
 orders_to_schedule.each do |os|
   # Seleciona técnicos da mesma empresa da OS.
-  all_technicians = USERS.select { |u| u.role == "tecnico" && u.company_id == os.company_id }
+  all_technicians = USERS.select { |u| (u.can_be_tecnico? || u.role == "tecnico") && u.company_id == os.company_id }
   next if all_technicians.empty?
 
   # CRÍTICO: Define uma data de agendamento para esta OS.

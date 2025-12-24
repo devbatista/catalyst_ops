@@ -4,7 +4,9 @@ puts "Criando ordens de serviço"
 
 ORDER_SERVICES = []
 CLIENTS.each do |client|
-  rand(3..10).times do
+  rand(1..5).times do
+    next unless client.company.can_create_order?
+    
     os = OrderService.create!(
       title: Faker::Commerce.product_name,
       description: Faker::Lorem.sentence(word_count: 8),
