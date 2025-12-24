@@ -108,8 +108,7 @@ class User < ApplicationRecord
     return unless company && tecnico?
     return unless company.max_technicians
 
-    current_technicians_count = company.users.tecnicos.count
-    if current_technicians_count >= company.max_technicians
+    unless company.can_add_technician?
       errors.add(:base, "Limite de técnicos atingido para o plano atual da empresa.")
     end
   end
