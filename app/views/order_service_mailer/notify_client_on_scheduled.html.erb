@@ -1,0 +1,14 @@
+<h2>Olá, <%= @client.name %>!</h2>
+<p>
+  A ordem de serviço <strong>#<%= @order_service.code %></strong> foi atribuída e agendada com sucesso.
+</p>
+<p>
+  Data agendada: <strong><%= l(@order_service.scheduled_at, format: :long) if @order_service.scheduled_at %></strong>
+</p>
+<p>
+  Em breve, um técnico entrará em contato para atendimento.
+</p>
+<p>
+  Atenciosamente,<br>
+  Equipe <%= @order_service.company.name %>
+</p>

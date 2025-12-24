@@ -4,4 +4,9 @@ class OrderServiceMailerPreview < ActionMailer::Preview
 
     OrderServiceMailer.notify_overdue(order_service)
   end
+
+  def notify_client_on_scheduled
+    order_service = OrderService.where.not(client_id: nil).first
+    OrderServiceMailer.notify_client_on_scheduled(order_service)
+  end
 end
