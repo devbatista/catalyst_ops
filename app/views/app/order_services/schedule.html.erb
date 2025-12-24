@@ -6,14 +6,12 @@
         <h4 class="mb-0 text-uppercase">Atribuir e agendar OS #<%= @order_service.code %></h6>
       </div>
 
-      <% if @order_service.errors.any? %>
-      <div class="alert alert-danger">
-        <ul>
-          <% @order_service.errors.full_messages.each do |msg| %>
-          <li><%= msg %></li>
-          <% end %>
-        </ul>
-      </div>
+      <% flash.each do |type, message| %>
+        <% bootstrap_class = { notice: "alert-success", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
+        <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert">
+          <%= message %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
       <% end %>
 
       <!--end breadcrumb-->

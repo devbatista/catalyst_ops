@@ -85,11 +85,18 @@ class App::OrderServicesController < ApplicationController
   def schedule;end
 
   def perform_schedule
-    if @order_service.update(schedule_params)
-      redirect_to app_order_service_path(@order_service), notice: 'Ordem de Serviço agendada com sucesso.'
-    else
+    begin
+      if @order_service.update(schedule_params)
+        redirect_to app_order_service_path(@order_service), notice: 'Ordem de Serviço agendada com sucesso.'
+      else
+        set_other_resources
+        flash.now[:alert] = @order_service.errors.full_messages.join(', ')
+        render :schedule, status: :unprocessable_entity
+      end
+    rescue ActiveRecord::RecordInvalid => e
       set_other_resources
-      flash.now[:alert] = @order_service.errors.full_messages.join(', ')
+      all_errors = @order_service.errors.full_messages + (e.record&.errors&.full_messages || [])
+      flash.now[:alert] = all_errors.uniq.join(', ')
       render :schedule, status: :unprocessable_entity
     end
   end
