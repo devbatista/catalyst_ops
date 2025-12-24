@@ -55,10 +55,10 @@
       <div class="menu-title">Configuração</div>
       <% end %>
     </li>
-    <li>
-      <%= link_to url: "https://themeforest.net/user/codervent", target: "_blank" do %>
-      <div class="parent-icon"><i class="bx bx-support"></i></div>
-      <div class="menu-title">Suporte</div>
+    <li class="list-group-item <%= active_menu_class(app_support_index_path) %>">
+      <%= link_to app_support_index_path do %>
+        <div class="parent-icon"><i class="bx bx-support"></i></div>
+        <div class="menu-title">Suporte</div>
       <% end %>
     </li>
     <li class="list-group-item <%= active_menu_class(logout_app_url) %>">
