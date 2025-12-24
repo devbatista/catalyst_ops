@@ -107,6 +107,15 @@ a {
 
 }
 
+#sidebar {
+	display: flex;
+	flex-direction: column;
+}
+
+.sidebar-footer {
+	margin-top: auto!important;
+}
+
 
 
 .logo-icon {
