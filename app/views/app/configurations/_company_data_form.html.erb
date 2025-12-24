@@ -1,0 +1,54 @@
+<%= form_with model: company, url: update_company_app_configurations_path, method: :patch, local: true do |f| %>
+  <div class="row mb-3">
+    <div class="col-sm-3"><h6 class="mb-0">Razão Social</h6></div>
+    <div class="col-sm-9 text-secondary"><%= f.text_field :name, class: "form-control" %></div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-sm-3"><h6 class="mb-0">CNPJ/CPF</h6></div>
+    <div class="col-sm-9 text-secondary"><%= f.text_field :document, class: "form-control" %></div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-sm-3"><h6 class="mb-0">E-mail</h6></div>
+    <div class="col-sm-9 text-secondary"><%= f.email_field :email, class: "form-control" %></div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-sm-3"><h6 class="mb-0">Telefone</h6></div>
+    <div class="col-sm-9 text-secondary"><%= f.text_field :phone, class: "form-control" %></div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-sm-3"><h6 class="mb-0">Rua</h6></div>
+    <div class="col-sm-9 text-secondary"><%= f.text_field :street, class: "form-control" %></div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-sm-3"><h6 class="mb-0">Número</h6></div>
+    <div class="col-sm-9 text-secondary"><%= f.text_field :number, class: "form-control" %></div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-sm-3"><h6 class="mb-0">Complemento</h6></div>
+    <div class="col-sm-9 text-secondary"><%= f.text_field :complement, class: "form-control" %></div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-sm-3"><h6 class="mb-0">Bairro</h6></div>
+    <div class="col-sm-9 text-secondary"><%= f.text_field :neighborhood, class: "form-control" %></div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-sm-3"><h6 class="mb-0">Cidade</h6></div>
+    <div class="col-sm-9 text-secondary"><%= f.text_field :city, class: "form-control" %></div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-sm-3"><h6 class="mb-0">Estado</h6></div>
+    <div class="col-sm-9 text-secondary"><%= f.text_field :state, class: "form-control" %></div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-sm-3"><h6 class="mb-0">CEP</h6></div>
+    <div class="col-sm-9 text-secondary"><%= f.text_field :zip_code, class: "form-control" %></div>
+  </div>
+  <div class="row">
+    <div class="col-sm-3"></div>
+    <div class="col-sm-9 text-secondary">
+      <%= f.submit "Salvar Alterações", class: "btn btn-success px-4" %>
+    </div>
+  </div>
+<% end %>
+
+<%= javascript_include_tag "viacep" %>

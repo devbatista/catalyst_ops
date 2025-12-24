@@ -2500,6 +2500,10 @@ form select.error:focus {
 
 }
 
+.nav-link.active {
+	color: #fff!important;
+}
+
 
 
 .chat-tab-menu .nav-pills .nav-link.active,

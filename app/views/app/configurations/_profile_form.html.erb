@@ -1,0 +1,53 @@
+<div class="card">
+  <div class="card-body">
+    <%= form_with model: user, url: update_profile_app_configurations_path, method: :patch, local: true do |f| %>
+      <div class="row mb-3">
+        <div class="col-sm-3">
+          <h6 class="mb-0">Nome completo</h6>
+        </div>
+        <div class="col-sm-9 text-secondary">
+          <%= f.text_field :name, class: "form-control" %>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-sm-3">
+          <h6 class="mb-0">Email</h6>
+        </div>
+        <div class="col-sm-9 text-secondary">
+          <%= f.email_field :email, class: "form-control" %>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-sm-3">
+          <h6 class="mb-0">Telefone</h6>
+        </div>
+        <div class="col-sm-9 text-secondary">
+          <%= f.text_field :phone, class: "form-control" %>
+        </div>
+      </div>
+      <hr>
+      <div class="row mb-3">
+        <div class="col-sm-3">
+          <h6 class="mb-0">Nova senha</h6>
+        </div>
+        <div class="col-sm-9 text-secondary">
+          <%= f.password_field :password, class: "form-control", autocomplete: "new-password" %>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-sm-3">
+          <h6 class="mb-0">Confirme a nova senha</h6>
+        </div>
+        <div class="col-sm-9 text-secondary">
+          <%= f.password_field :password_confirmation, class: "form-control", autocomplete: "new-password" %>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-9 text-secondary">
+          <%= f.submit "Salvar Alterações", class: "btn btn-primary px-4" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

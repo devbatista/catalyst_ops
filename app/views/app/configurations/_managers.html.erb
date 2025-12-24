@@ -1,0 +1,36 @@
+<div class="card mb-3">
+  <div class="card-body">
+    <h5 class="card-title mb-3">Gestores</h5>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>E-mail</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% company_managers.each do |manager| %>
+          <tr>
+            <td><%= manager.name %></td>
+            <td><%= manager.email %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <% if can_promote_manager? %>
+      <hr>
+      <h6>Promover Técnico a Gestor</h6>
+      <%= form_with url: promote_manager_app_configurations_path, method: :post, local: true do |f| %>
+        <div class="row mb-3">
+          <div class="col-sm-8">
+            <%= f.collection_select :user_id, company_technicians, :id, :name, prompt: "Selecione um técnico", class: "form-select" %>
+          </div>
+          <div class="col-sm-4">
+            <%= f.submit "Promover", class: "btn btn-primary" %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
