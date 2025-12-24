@@ -1,0 +1,49 @@
+<div class="card mb-3">
+  <div class="card-body">
+    <% subscription = current_user.company.subscriptions.find_by(status: :active) %>
+    <% if subscription && subscription.plan %>
+      <div class="row mb-2">
+        <div class="col-md-4"><strong>Plano:</strong></div>
+        <div class="col-md-8"><%= subscription.plan.name %></div>
+      </div>
+      <div class="row mb-2">
+        <div class="col-md-4"><strong>Status:</strong></div>
+        <div class="col-md-8">
+          <span class="badge bg-<%= subscription_badge_class(subscription.status) %>">
+            <%= subscription.status.humanize %>
+          </span>
+        </div>
+      </div>
+      <div class="row mb-2">
+        <div class="col-md-4"><strong>Início:</strong></div>
+        <div class="col-md-8"><%= l(subscription.start_date, format: :short) if subscription.start_date %></div>
+      </div>
+      <div class="row mb-2">
+        <div class="col-md-4"><strong>Fim:</strong></div>
+        <div class="col-md-8"><%= l(subscription.end_date, format: :short) if subscription.end_date %></div>
+      </div>
+      <div class="row mb-2">
+        <div class="col-md-4"><strong>Valor:</strong></div>
+        <div class="col-md-8">
+          <%= number_to_currency(subscription.plan.transaction_amount, unit: "R$") if subscription.plan.transaction_amount %>
+        </div>
+      </div>
+      <div class="row mb-2">
+        <div class="col-md-4"><strong>Limite de Técnicos:</strong></div>
+        <div class="col-md-8"><%= subscription.plan.max_technicians || "Ilimitado" %></div>
+      </div>
+      <div class="row mb-2">
+        <div class="col-md-4"><strong>Limite de Ordens:</strong></div>
+        <div class="col-md-8"><%= subscription.plan.max_orders || "Ilimitado" %></div>
+      </div>
+      <div class="row mb-2">
+        <div class="col-md-4"><strong>Tipo de suporte:</strong></div>
+        <div class="col-md-8"><%= subscription.plan.support_level %></div>
+      </div>
+    <% else %>
+      <div class="alert alert-warning mb-0">
+        Nenhuma assinatura ativa encontrada para sua empresa.
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -23,7 +23,13 @@ constraints subdomain: "app" do
   end
   resources :technicians, module: "app", as: :app_technicians
   resources :calendar, only: [:index], module: "app", as: :app_calendar
-  resources :configurations, module: "app", as: :app_configurations
+  resources :configurations, only: [:index], module: "app", as: :app_configurations do
+    collection do
+      patch :update_profile
+      patch :update_company
+      post :promote_manager
+    end
+  end
 
   get "calendar/events", to: "app/calendar#events"
 
