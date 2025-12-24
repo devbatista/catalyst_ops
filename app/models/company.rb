@@ -2,7 +2,7 @@ class Company < ApplicationRecord
   has_many :users, dependent: :destroy
   has_many :clients, dependent: :destroy
   has_many :order_services
-  has_many :technicians, -> { where(role: :tecnico, active: true) }, class_name: "User"
+  has_many :technicians, -> { active.where(role: :tecnico).or(active.where(can_be_technician: true)) }, class_name: "User"
   has_many :subscriptions, dependent: :destroy
   has_one :current_subscription, -> { current }, class_name: "Subscription"
 
@@ -23,11 +23,11 @@ class Company < ApplicationRecord
   validates :state_registration, length: { maximum: 30 }, allow_blank: true
   validates :municipal_registration, length: { maximum: 30 }, allow_blank: true
   validates :website, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]), allow_blank: true }
-  validates :number,  presence: true, length: { maximum: 20 }
+  validates :number, presence: true, length: { maximum: 20 }
   validates :complement, length: { maximum: 60 }, allow_blank: true
   validates :neighborhood, presence: true, length: { maximum: 80 }
-  validates :city,     presence: true, length: { maximum: 80 }
-  validates :state,    presence: true, length: { is: 2 }, format: { with: /\A[A-Z]{2}\z/, message: "use UF em maiúsculas, ex: SP" }
+  validates :city, presence: true, length: { maximum: 80 }
+  validates :state, presence: true, length: { is: 2 }, format: { with: /\A[A-Z]{2}\z/, message: "use UF em maiúsculas, ex: SP" }
   validates :zip_code, presence: true, format: { with: /\A\d{8}\z/, message: "deve conter 8 números" }
 
   validate :document_must_be_cpf_or_cnpj

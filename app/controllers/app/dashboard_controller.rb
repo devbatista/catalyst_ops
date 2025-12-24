@@ -13,9 +13,10 @@ class App::DashboardController < ApplicationController
       @recent_orders = OrderService.includes(:client).order(created_at: :desc).limit(5)
     when "gestor"
       # --- Coleções Base ---
-      @order_services = current_user.company.order_services
-      company_clients = current_user.company.clients
-      company_technicians = User.where(role: :tecnico, company_id: current_user.company_id)
+      company = current_user.company
+      @order_services = company.order_services
+      company_clients = company.clients
+      company_technicians = company.technicians
 
       # --- KPIs Principais (já existentes) ---
       @clients_count = company_clients.count
