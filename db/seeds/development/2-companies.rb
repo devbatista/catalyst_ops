@@ -39,7 +39,7 @@ COMPANIES = Array.new(rand(3..10)) do
 
   company.subscriptions.create!(
     preapproval_plan_id: plan.external_id,
-    status: ['active', 'pending', 'cancelled'].sample, 
+    status: :active, 
     start_date: Time.current,
     end_date: 1.month.from_now
   )

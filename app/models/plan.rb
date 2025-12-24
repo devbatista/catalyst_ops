@@ -1,4 +1,5 @@
 class Plan < ApplicationRecord
+  has_many :subscriptions, primary_key: :external_id, foreign_key: :preapproval_plan_id, class_name: 'Subscription'
   
   validates :name, :reason, :status,
             :external_id, :external_reference,
