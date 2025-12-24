@@ -1,6 +1,8 @@
 class Subscription < ApplicationRecord
   belongs_to :company
 
+  has_one :plan, primary_key: :preapproval_plan_id, foreign_key: :external_id, class_name: 'Plan'
+
   enum status: {
     pending: 'pending',
     active: 'active',

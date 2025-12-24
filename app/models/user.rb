@@ -12,6 +12,8 @@ class User < ApplicationRecord
   validates :role, presence: true
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :active, inclusion: { in: [true, false] }
+  
+  validate :plan_technician_limit, on: :create
 
   belongs_to :company, optional: true
 
@@ -99,6 +101,16 @@ class User < ApplicationRecord
       token = set_reset_password_token
       UserMailer.welcome_email(self, token).deliver_later
       update_column(:welcome_email_sent_at, Time.current)
+    end
+  end
+
+  def plan_technician_limit
+    return unless company && tecnico?
+    return unless company.max_technicians
+
+    current_technicians_count = company.users.tecnicos.count
+    if current_technicians_count >= company.max_technicians
+      errors.add(:base, "Limite de técnicos atingido para o plano atual da empresa.")
     end
   end
 end

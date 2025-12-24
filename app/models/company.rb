@@ -92,19 +92,19 @@ class Company < ApplicationRecord
   end
 
   def max_technicians
-    current_plan&.max_technicians
+    current_subscription.plan&.max_technicians
   end
   
   def max_orders
-    current_plan&.max_orders
+    current_subscription.plan&.max_orders
   end
 
   def support_level
-    current_plan&.support_level
+    current_subscription.plan&.support_level
   end
 
   def can_add_technician?
-    return true unless max_technicians.present?
+    return true if max_technicians.nil?
     
     users.tecnicos.active.count < max_technicians
   end
