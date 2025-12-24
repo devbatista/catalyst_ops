@@ -8,7 +8,8 @@
           <li>
             <%= link_to attachment.filename, url_for(attachment), target: "_blank" %>
             <%= link_to purge_attachment_app_order_service_path(order_service, attachment_id: attachment.id),
-              data: { turbo_method: :delete, turbo_confirm: "Tem certeza que deseja remover este anexo?" },
+              method: :delete,
+              data: { confirm: "Tem certeza que deseja remover este anexo?" },
               title: "Remover" do %>
               <i class="bx bx-trash"></i>
             <% end %>
