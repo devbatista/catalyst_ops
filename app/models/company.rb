@@ -106,9 +106,7 @@ class Company < ApplicationRecord
   def can_add_technician?
     return true unless max_technicians.present?
     
-    users.where(active: true)
-         .where('role = ? OR can_be_technician = ?', User.roles[:tecnico], true)
-         .count < max_technicians
+    users.tecnicos.active.count < max_technicians
   end
 
   def can_create_order?
