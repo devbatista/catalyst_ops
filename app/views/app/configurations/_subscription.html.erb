@@ -29,6 +29,10 @@
         </div>
       </div>
       <div class="row mb-2">
+        <div class="col-md-4"><strong>Forma de pagamento:</strong></div>
+        <div class="col-md-8"><%= subscription.company.payment_method || "Não especificado" %></div>
+      </div>
+      <div class="row mb-2">
         <div class="col-md-4"><strong>Limite de Técnicos:</strong></div>
         <div class="col-md-8"><%= subscription.plan.max_technicians || "Ilimitado" %></div>
       </div>
