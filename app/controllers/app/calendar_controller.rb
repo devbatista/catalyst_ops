@@ -13,6 +13,7 @@ class App::CalendarController < ApplicationController
         id: os.id,
         title: "#{os.title} - Técnicos: #{os.users.map(&:name).join(', ')}",
         start: os.scheduled_at,
+        end: os.expected_end_at,
         url: app_order_service_url(os, subdomain: "app"), allow_other_host: true
       }
     end

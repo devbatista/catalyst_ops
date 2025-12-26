@@ -56,6 +56,18 @@
                 </div>
               </div>
 
+              <div class="row mb-3">
+                <label for="expected_end_at" class="col-sm-3 col-form-label">Data e Hora do Término Previsto</label>
+                <div class="col-sm-9">
+                  <%= f.datetime_local_field :expected_end_at,
+                                              class: "form-control",
+                                              required: true,
+                                              step: 60,
+                                              value: (@order_service.expected_end_at || Time.current + 1.hour).in_time_zone
+                                                                                                  .strftime("%Y-%m-%dT%H:%M") %>
+                </div>
+              </div>
+
               <%# --- Botões Alinhados à Esquerda --- %>
               <div class="mt-4">
                 <%= f.submit "Confirmar Agendamento", class: "btn btn-primary" %>
