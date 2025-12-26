@@ -1,7 +1,5 @@
 import { formatPhone, formatCEP } from "../utils/formatters";
 
-console.error("Company Form JS loaded");
-
 document.addEventListener("DOMContentLoaded", function () {
   // Máscara para telefone
   document.querySelectorAll('input[data-mask="phone"]').forEach(input => {
