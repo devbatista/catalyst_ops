@@ -13,7 +13,7 @@
   </div>
   <div class="row mb-3">
     <div class="col-sm-3"><h6 class="mb-0">Telefone</h6></div>
-    <div class="col-sm-9 text-secondary"><%= f.text_field :phone, class: "form-control" %></div>
+    <div class="col-sm-9 text-secondary"><%= f.text_field :phone, class: "form-control", data: { mask: "phone" } %></div>
   </div>
   <div class="row mb-3">
     <div class="col-sm-3"><h6 class="mb-0">Rua</h6></div>
@@ -41,7 +41,7 @@
   </div>
   <div class="row mb-3">
     <div class="col-sm-3"><h6 class="mb-0">CEP</h6></div>
-    <div class="col-sm-9 text-secondary"><%= f.text_field :zip_code, class: "form-control" %></div>
+    <div class="col-sm-9 text-secondary"><%= f.text_field :zip_code, class: "form-control", data: { mask: "cep" } %></div>
   </div>
   <div class="row">
     <div class="col-sm-3"></div>
@@ -52,3 +52,4 @@
 <% end %>
 
 <%= javascript_include_tag "viacep" %>
+<%= javascript_import_module_tag "app/company_form" %>

@@ -12,7 +12,7 @@
   </div>
   <div class="col-md-12">
     <%= f.label :phone, "Telefone", class: "form-label" %>
-    <%= f.text_field :phone, class: "form-control" %>
+    <%= f.text_field :phone, class: "form-control", data: { mask: "phone" } %>
   </div>
 
   <div class="col-md-12">
@@ -33,5 +33,5 @@
   </div>
 </div>
 
-<%= javascript_include_tag "viacep", "data-turbo-track": "reload" %>
+<%= javascript_import_module_tag "app/technicians_form" %>
 <% end %>

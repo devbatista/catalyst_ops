@@ -1,3 +1,5 @@
+import { formatDoc, formatPhone, formatCEP, onlyDigits } from "../utils/formatters";
+
 document.addEventListener("DOMContentLoaded", function () {
   // Init BS Stepper
   const el = document.querySelector("#stepper1");
@@ -35,39 +37,8 @@ document.addEventListener("DOMContentLoaded", function () {
   bindToggle("#show_hide_password");
   bindToggle("#show_hide_password_conf");
 
-  // Helpers CPF/CNPJ
-  const onlyDigits = (v) => (v || "").replace(/\D/g, "");
+  // Helpers
   const isAllEqual = (s) => /^(\d)\1+$/.test(s);
-
-  // Formatadores
-  function formatCPF(value) {
-    const v = onlyDigits(value).slice(0, 11);
-    const parts = [];
-    if (v.length > 3) parts.push(v.slice(0, 3));
-    if (v.length > 6) parts.push(v.slice(3, 6));
-    if (v.length > 9) parts.push(v.slice(6, 9));
-    let last = v.slice(9);
-    let formatted = "";
-    if (v.length <= 3) formatted = v;
-    else if (v.length <= 6) formatted = `${v.slice(0,3)}.${v.slice(3)}`;
-    else if (v.length <= 9) formatted = `${v.slice(0,3)}.${v.slice(3,6)}.${v.slice(6)}`;
-    else formatted = `${v.slice(0,3)}.${v.slice(3,6)}.${v.slice(6,9)}-${v.slice(9)}`;
-    return formatted;
-  }
-
-  function formatCNPJ(value) {
-    const v = onlyDigits(value).slice(0, 14);
-    if (v.length <= 2) return v;
-    if (v.length <= 5) return `${v.slice(0,2)}.${v.slice(2)}`;
-    if (v.length <= 8) return `${v.slice(0,2)}.${v.slice(2,5)}.${v.slice(5)}`;
-    if (v.length <= 12) return `${v.slice(0,2)}.${v.slice(2,5)}.${v.slice(5,8)}/${v.slice(8)}`;
-    return `${v.slice(0,2)}.${v.slice(2,5)}.${v.slice(5,8)}/${v.slice(8,12)}-${v.slice(12)}`;
-  }
-
-  function formatDoc(value) {
-    const digits = onlyDigits(value);
-    return digits.length <= 11 ? formatCPF(digits) : formatCNPJ(digits);
-  }
 
   // Validações
   function validateCPF(cpf) {
@@ -138,11 +109,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Formatar enquanto digita
     docInput.addEventListener("input", function (e) {
-      const cursorPos = docInput.selectionStart;
       const prev = docInput.value;
       docInput.value = formatDoc(prev);
-
-      // Ajuste simples do cursor ao fim (evita pular no meio)
       docInput.setSelectionRange(docInput.value.length, docInput.value.length);
     });
 
@@ -168,20 +136,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Formatador de telefone (Brasil)
-  const onlyDigitsPhone = (v) => (v || "").replace(/\D/g, "");
-
-  function formatPhone(value) {
-    const v = onlyDigitsPhone(value).slice(0, 11); // 10 ou 11 dígitos
-    const ddd = v.slice(0, 2);
-
-    if (v.length <= 2) return `(${v}`;
-    if (v.length <= 6) return `(${ddd}) ${v.slice(2)}`;
-    if (v.length <= 10) return `(${ddd}) ${v.slice(2, 6)}-${v.slice(6)}`;
-    return `(${ddd}) ${v.slice(2, 7)}-${v.slice(7)}`;
-  }
-
-  // Campo telefone
+  // Campo telefone (Brasil)
   const phoneInput = document.querySelector('[name="signup[company][phone]"]');
   if (phoneInput) {
     phoneInput.addEventListener("input", function () {
@@ -192,7 +147,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // validação simples: 10 ou 11 dígitos
     phoneInput.addEventListener("blur", function () {
-      const digits = onlyDigitsPhone(phoneInput.value);
+      const digits = onlyDigits(phoneInput.value);
       const valid = digits.length === 10 || digits.length === 11;
       const errorId = "company_phone_error";
       let el = document.getElementById(errorId);
@@ -212,16 +167,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // Campo CEP
   const zipInput = document.querySelector('[name="signup[company][zip_code]"]');
   if (zipInput) {
-    const onlyDigits = (v) => (v || "").replace(/\D/g, "");
-    const formatCEP = (v) => {
-      const d = onlyDigits(v).slice(0, 8);
-      if (d.length <= 5) return d;
-      return `${d.slice(0, 5)}-${d.slice(5)}`;
-    };
-    const isValidCEP = (v) => onlyDigits(v).length === 8;
-
     const errorId = "company_zip_error";
     const ensureErrorEl = () => {
       let el = document.getElementById(errorId);
@@ -253,7 +201,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // valida ao sair
     zipInput.addEventListener("blur", () => {
-      if (!isValidCEP(zipInput.value)) {
+      if (onlyDigits(zipInput.value).length !== 8) {
         showError("CEP inválido. Use o formato 00000-000.");
       } else {
         clearError();
@@ -265,7 +213,7 @@ document.addEventListener("DOMContentLoaded", function () {
       btn.addEventListener("click", function (e) {
         const pane = btn.closest("#step-company");
         if (!pane) return;
-        if (!isValidCEP(zipInput.value)) {
+        if (onlyDigits(zipInput.value).length !== 8) {
           e.preventDefault();
           showError("CEP inválido. Use o formato 00000-000.");
           zipInput.focus();

@@ -8,7 +8,11 @@
   </div>
   <div class="col-md-12">
     <%= f.label :document, "Documento", class: "form-label" %>
-    <%= f.text_field :document, class: "form-control", value: @client.formatted_document, readonly: @client.persisted?, disabled: @client.persisted? %>
+    <%= f.text_field :document, class: "form-control",
+                                value: @client.formatted_document,
+                                readonly: @client.persisted?,
+                                disabled: @client.persisted?,
+                                data: { mask: "document" } %>
   </div>
   <div class="col-md-12">
     <%= f.label :email, "Email", class: "form-label" %>
@@ -16,13 +20,13 @@
   </div>
   <div class="col-md-12">
     <%= f.label :phone, "Telefone", class: "form-label" %>
-    <%= f.text_field :phone, class: "form-control" %>
+    <%= f.text_field :phone, class: "form-control", data: { mask: "phone" } %>
   </div>
 
   <%= f.fields_for :addresses do |a| %>
   <div class="col-md-4">
     <%= a.label :zip_code, "CEP", class: "form-label" %>
-    <%= a.text_field :zip_code, class: "form-control" %>
+    <%= a.text_field :zip_code, class: "form-control", data: { mask: "cep" } %>
   </div>
   <div class="col-md-2">
     <%= a.label :state, "Estado", class: "form-label" %>
@@ -69,4 +73,5 @@
 </div>
 
 <%= javascript_include_tag "viacep" %>
+<%= javascript_import_module_tag "app/clients_form" %>
 <% end %>
