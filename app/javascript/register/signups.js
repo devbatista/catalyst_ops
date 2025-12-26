@@ -1,4 +1,5 @@
 import { formatDoc, formatPhone, formatCEP, onlyDigits } from "../utils/formatters";
+import { isValidCPF, isValidCNPJ } from "../utils/validators";
 
 document.addEventListener("DOMContentLoaded", function () {
   // Init BS Stepper
@@ -40,45 +41,11 @@ document.addEventListener("DOMContentLoaded", function () {
   // Helpers
   const isAllEqual = (s) => /^(\d)\1+$/.test(s);
 
-  // Validações
-  function validateCPF(cpf) {
-    cpf = onlyDigits(cpf);
-    if (cpf.length !== 11 || isAllEqual(cpf)) return false;
-    let sum = 0;
-    for (let i = 0; i < 9; i++) sum += parseInt(cpf[i], 10) * (10 - i);
-    let d1 = 11 - (sum % 11);
-    d1 = d1 > 9 ? 0 : d1;
-    if (d1 !== parseInt(cpf[9], 10)) return false;
-
-    sum = 0;
-    for (let i = 0; i < 10; i++) sum += parseInt(cpf[i], 10) * (11 - i);
-    let d2 = 11 - (sum % 11);
-    d2 = d2 > 9 ? 0 : d2;
-    return d2 === parseInt(cpf[10], 10);
-  }
-
-  function validateCNPJ(cnpj) {
-    cnpj = onlyDigits(cnpj);
-    if (cnpj.length !== 14 || isAllEqual(cnpj)) return false;
-    const calcDigit = (base) => {
-      let sum = 0, pos = base - 7;
-      for (let i = base; i >= 1; i--) {
-        sum += parseInt(cnpj[base - i], 10) * pos--;
-        if (pos < 2) pos = 9;
-      }
-      const res = sum % 11 < 2 ? 0 : 11 - (sum % 11);
-      return res;
-    };
-    const d1 = calcDigit(12);
-    if (d1 !== parseInt(cnpj[12], 10)) return false;
-    const d2 = calcDigit(13);
-    return d2 === parseInt(cnpj[13], 10);
-  }
-
+  // Validação de documento (CPF/CNPJ)
   function validateDoc(value) {
     const digits = onlyDigits(value);
-    if (digits.length <= 11) return validateCPF(digits);
-    return validateCNPJ(digits);
+    if (digits.length <= 11) return isValidCPF(digits);
+    return isValidCNPJ(digits);
   }
 
   // Campo documento
@@ -108,7 +75,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Formatar enquanto digita
-    docInput.addEventListener("input", function (e) {
+    docInput.addEventListener("input", function () {
       const prev = docInput.value;
       docInput.value = formatDoc(prev);
       docInput.setSelectionRange(docInput.value.length, docInput.value.length);
