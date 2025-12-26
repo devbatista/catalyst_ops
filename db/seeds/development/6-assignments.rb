@@ -31,6 +31,7 @@ orders_to_schedule.each do |os|
   os.update!(
     status: :agendada,
     scheduled_at: scheduled_time,
+    expected_end_at: scheduled_time + rand(1..4).hours,
     users: [chosen_technician]
   )
 end
