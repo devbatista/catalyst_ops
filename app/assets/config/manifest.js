@@ -13,3 +13,7 @@
 //= link viacep.js
 //= link payment_method_toggle.js
 //= link card_tokenization.js
+//= link app/clients_form.js
+//= link app/technicians_form.js
+//= link app/profile_form.js
+//= link app/company_form.js
