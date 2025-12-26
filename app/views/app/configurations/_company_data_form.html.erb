@@ -5,7 +5,7 @@
   </div>
   <div class="row mb-3">
     <div class="col-sm-3"><h6 class="mb-0">CNPJ/CPF</h6></div>
-    <div class="col-sm-9 text-secondary"><%= f.text_field :document, class: "form-control" %></div>
+    <div class="col-sm-9 text-secondary"><%= f.text_field :document, class: "form-control", value: company.formatted_document, readonly: true, disabled: true %></div>
   </div>
   <div class="row mb-3">
     <div class="col-sm-3"><h6 class="mb-0">E-mail</h6></div>

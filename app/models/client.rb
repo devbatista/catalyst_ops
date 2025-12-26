@@ -18,6 +18,7 @@ class Client < ApplicationRecord
                     }
 
   validate :document_must_be_valid
+  validate :document_cannot_be_changed, on: :update
 
   belongs_to :company
 
@@ -148,6 +149,12 @@ class Client < ApplicationRecord
 
     unless CPF.valid?(clean_document) || CNPJ.valid?(clean_document)
       errors.add(:document, "deve ser um CPF ou CNPJ válido")
+    end
+  end
+
+  def document_cannot_be_changed
+    if document_changed? && persisted? && document_was.present?
+      errors.add(:document, "não pode ser alterado após a criação do cliente, para alterar entre em contato com o suporte.")
     end
   end
 end
