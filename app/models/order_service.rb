@@ -38,12 +38,14 @@ class OrderService < ApplicationRecord
   validates :scheduled_at, presence: true, if: -> { !pendente? }
   validates :client_id, presence: true
   validates :code, presence: true, uniqueness: { scope: :company_id }
+  validates :expected_end_at, presence: true, if: -> { scheduled_at.present? }
 
-  validate :scheduled_at_cannot_be_in_the_past, on: :create
+  validate :scheduled_at_cannot_be_in_the_past, on: [:create, :update]
+  validate :expected_end_at_cannot_be_in_the_past, on: [:create, :update]
   validate :must_have_technician_to_start
   validate :started_at_logic
   validate :finished_at_logic
-  validate :scheduled_at_is_required_if_technicians_are_present
+  validate :datetimes_fields_are_required_if_technicians_are_present
   validate :plan_order_service_limit, on: :create
 
   scope :by_status, ->(status) { where(status: status) }
@@ -161,6 +163,18 @@ class OrderService < ApplicationRecord
     end
   end
 
+  def expected_end_at_cannot_be_in_the_past
+    return unless expected_end_at.present?
+
+    if !pendente? && expected_end_at < Time.current
+      errors.add(:expected_end_at, "não pode ser no passado")
+    end
+
+    if scheduled_at.present? && expected_end_at < scheduled_at
+      errors.add(:expected_end_at, "não pode ser anterior ao horário agendado")
+    end
+  end
+
   def must_have_technician_to_start
     if status_changed? && em_andamento? && users.empty?
       errors.add(:base, "Não é possível iniciar a OS sem técnico atribuído")
@@ -270,9 +284,10 @@ class OrderService < ApplicationRecord
     end
   end
 
-  def scheduled_at_is_required_if_technicians_are_present
-    if users.any? && scheduled_at.blank?
-      errors.add(:scheduled_at, "é obrigatório quando um ou mais técnicos são atribuídos")
+  def datetimes_fields_are_required_if_technicians_are_present
+    if users.any? && scheduled_at.blank? && expected_end_at.blank?
+      errors.add(:scheduled_at, "é obrigatório quando um ou mais técnicos são atribuídos") if scheduled_at.blank?
+      errors.add(:expected_end_at, "é obrigatório quando um ou mais técnicos são atribuídos") if expected_end_at.blank?
     end
   end
 

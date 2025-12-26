@@ -137,6 +137,7 @@ class App::OrderServicesController < ApplicationController
       :client_id,
       :status,
       :scheduled_at,
+      :expected_end_at,
       :signed_by_client,
       :observations,
       attachments: [],
@@ -149,7 +150,7 @@ class App::OrderServicesController < ApplicationController
 
   def schedule_params
     params.require(:order_service)
-          .permit(:scheduled_at, user_ids: [])
+          .permit(:scheduled_at, :expected_end_at, user_ids: [])
           .merge(status: :agendada)
   end
 

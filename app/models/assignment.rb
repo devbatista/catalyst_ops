@@ -53,7 +53,7 @@ class Assignment < ApplicationRecord
 
     # Verificar se o técnico já tem outra OS no mesmo horário
     if conflicting_assignments.exists?
-      errors.add(:user, "já possui outra OS agendada para este dia")
+      errors.add(:user, "já possui outra OS agendada para este período")
     end
   end
 
@@ -62,9 +62,11 @@ class Assignment < ApplicationRecord
       .joins(:order_service)
       .where.not(order_services: { status: [:concluida, :cancelada] })
       .where.not(id: id)
-      .where(order_services: {
-               scheduled_at: order_service.scheduled_at.beginning_of_day..order_service.scheduled_at.end_of_day,
-             })
+      .where(
+        "(order_services.scheduled_at, order_services.expected_end_at) OVERLAPS (?, ?)",
+        order_service.scheduled_at - 1.hour,
+        order_service.expected_end_at + 1.hour
+      )
   end
 
   def notify_technician
