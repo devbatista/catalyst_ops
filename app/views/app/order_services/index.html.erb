@@ -26,13 +26,13 @@
                   <form method="get" class="showing-entries-form">
                     <select name="per" class="form-select form-select-sm showing-entries-select" onchange="this.form.submit()">
                       <% [10, 20, 30].each do |n| %>
-                      <option value="<%= n %>" <%= params[:per].to_i == n ? 'selected' : '' %>><%= n %></option>
+                        <option value="<%= n %>" <%= params[:per].to_i == n ? 'selected' : '' %>><%= n %></option>
                       <% end %>
                     </select>
                   </form>
                   <span class="showing-entries-text">registros</span>
                 </div>
-                <form method="get" class="flex-grow-1" style="min-width: 0;">
+                <form method="get" class="flex-grow-1 d-flex gap-2" style="min-width: 0;">
                   <div class="input-group input-search-group">
                     <div class="input-group-prepend">
                       <span class="input-group-text">
@@ -42,6 +42,12 @@
                     <input type="number" name="code" value="<%= params[:code] %>" class="form-control input-search" placeholder="Código..." aria-label="Search">
                     <input type="hidden" name="per" value="<%= params[:per] %>">
                   </div>
+                  <select name="status" class="form-select ms-2" style="max-width: 180px;" onchange="this.form.submit()">
+                    <option value="" disabled selected>Todos os status</option>
+                    <% OrderService.statuses.keys.each do |status| %>
+                      <option value="<%= status %>" <%= params[:status] == status ? 'selected' : '' %>><%= status.humanize %></option>
+                    <% end %>
+                  </select>
                 </form>
               </div>
               <div class="col-md-6 d-flex justify-content-end">
