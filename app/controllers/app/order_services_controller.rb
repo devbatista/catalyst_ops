@@ -20,6 +20,10 @@ class App::OrderServicesController < ApplicationController
     if params[:code].present?
       @order_services = @order_services.where(code: params[:code])
     end
+
+    if params[:status].present?
+      @order_services = @order_services.where(status: params[:status])
+    end
   end
 
   def show
