@@ -67,7 +67,11 @@ class Ability
 
     # Pode atualizar status das OSs atribuídas
     can :update, OrderService do |order_service|
-      order_service.users.include?(user) && !order_service.concluida?
+      order_service.users.include?(user) && !order_service.concluida? && !order_service.cancelada?
+    end
+
+    can :update_status, OrderService do |order_service|
+      order_service.users.include?(user) && !order_service.cancelada?
     end
 
     # Pode gerenciar itens de serviço das suas OSs
