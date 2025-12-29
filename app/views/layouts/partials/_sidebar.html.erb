@@ -12,6 +12,7 @@
       <div class="menu-title">Dashboard</div>
       <% end %>
     </li>
+
     <% if can?(:manage, Client) %>
     <li class="list-group-item <%= active_menu_class(app_clients_path) %>">
       <%= link_to app_clients_path do %>
@@ -20,6 +21,7 @@
       <% end %>
     </li>
     <% end %>
+
     <% if can?(:manage, OrderService) || can?(:read, OrderService) %>
     <li class="list-group-item <%= active_menu_class(app_order_services_path) %>">
       <%= link_to app_order_services_path do %>
@@ -28,6 +30,7 @@
       <% end %>
     </li>
     <% end %>
+
     <% if can?(:manage, User) %>
     <li class="list-group-item <%= active_menu_class(app_technicians_path) %>">
       <%= link_to app_technicians_path do %>
@@ -36,31 +39,41 @@
       <% end %>
     </li>
     <% end %>
+
+    <% if can?(:manage, Report) %>
     <li class="list-group-item <%= active_menu_class(app_reports_path) %>">
       <%= link_to app_reports_path do %>
       <div class="parent-icon"><i class='bx bx-file'></i></div>
       <div class="menu-title">Relatórios</div>
       <% end %>
     </li>
+    <% end %>
     
+    <% if can?(:read, :calendar) %>
     <li class="list-group-item <%= active_menu_class(app_calendar_index_path) %>">
       <%= link_to app_calendar_index_path do %>
       <div class="parent-icon"><i class='bx bx-calendar'></i></div>
       <div class="menu-title">Calendário</div>
       <% end %>
     </li>
+    <% end %>
+
     <li class="list-group-item <%= active_menu_class(app_configurations_path) %>">
       <%= link_to app_configurations_path do %>
       <div class="parent-icon"><i class='bx bx-wrench'></i></div>
       <div class="menu-title">Configuração</div>
       <% end %>
     </li>
+
+    <% if can?(:read, :support) %>
     <li class="list-group-item <%= active_menu_class(app_support_index_path) %>">
       <%= link_to app_support_index_path do %>
         <div class="parent-icon"><i class="bx bx-support"></i></div>
         <div class="menu-title">Suporte</div>
       <% end %>
     </li>
+    <% end %>
+    
     <li class="list-group-item <%= active_menu_class(logout_app_url) %>">
       <%= link_to logout_app_url, method: :delete do %>
       <div class="parent-icon"><i class='bx bx-log-out'></i></div>

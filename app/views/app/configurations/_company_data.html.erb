@@ -20,10 +20,13 @@
       <div class="col-md-3"><strong>Endereço:</strong></div>
       <div class="col-md-9"><%= current_user.company.full_address %></div>
     </div>
-    <!-- Adicione outros campos conforme necessário -->
+    
+    <% if can?(:manage, Company) %>
     <div class="mt-3">
       <%= link_to "Editar Dados da Empresa", "#", class: "btn btn-primary", data: { bs_toggle: "collapse", bs_target: "#editCompanyPanel" } %>
     </div>
+    <% end %>
+    
   </div>
 </div>
 
