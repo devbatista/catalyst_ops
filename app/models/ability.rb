@@ -25,8 +25,8 @@ class Ability
   end
 
   def gestor_abilities(user)
-    # NÃO pode gerenciar Company
-    cannot :manage, Company
+    # Pode gerenciar Company
+    can :manage, Company
 
     # Pode gerenciar clientes
     can :manage, Client, company_id: user.company_id
@@ -46,11 +46,18 @@ class Ability
     # Pode gerenciar usuários que são técnicos
     can :manage, User, role: "tecnico", company_id: user.company_id
 
+    # Pode gerenciar assinatura da empresa
+    can :manage, Subscription, company_id: user.company_id
+
     # Pode editar próprio perfil
     can [:read, :update], User, id: user.id
 
     # Pode gerenciar relatórios
     can :manage, Report, company_id: user.company_id
+
+    can :read, :calendar
+
+    can :read, :support
 
     # Dashboard
     can :read, :dashboard
@@ -92,6 +99,8 @@ class Ability
 
     # NÃO pode gerenciar relatórios
     cannot :manage, Report
+
+    can :read, :calendar
 
     can :read, :dashboard
   end
