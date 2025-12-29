@@ -4,10 +4,12 @@
       <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h4 class="mb-0 text-uppercase">Ordens de Serviço</h4>
-          <div class="d-flex gap-2">
-            <%= link_to "OS atrasadas", overdue_app_order_services_path, class: "btn btn-danger" %>
-            <%= link_to "OS não atribuídas", unassigned_app_order_services_path, class: "btn btn-dark" %>
-          </div>
+          <% if current_user.gestor? %>
+            <div class="d-flex gap-2">
+              <%= link_to "OS atrasadas", overdue_app_order_services_path, class: "btn btn-danger" %>
+              <%= link_to "OS não atribuídas", unassigned_app_order_services_path, class: "btn btn-dark" %>
+            </div>
+          <% end %>
         </div>
 
         <% flash.each do |type, message| %>
@@ -50,11 +52,13 @@
                   </select>
                 </form>
               </div>
-              <div class="col-md-6 d-flex justify-content-end">
-                <%= link_to raw('<i class="bx bx-plus"></i> Nova OS'),
-                    new_app_order_service_path,
-                    class: "btn btn-outline-primary btn-add-new" %>
-              </div>
+              <% if current_user.gestor? %>
+                <div class="col-md-6 d-flex justify-content-end">
+                  <%= link_to raw('<i class="bx bx-plus"></i> Nova OS'),
+                      new_app_order_service_path,
+                      class: "btn btn-outline-primary btn-add-new" %>
+                </div>
+              <% end%>
             </div>
             <table class="table mb-0 table-hover">
               <thead>

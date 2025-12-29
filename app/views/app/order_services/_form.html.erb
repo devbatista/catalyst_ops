@@ -85,43 +85,46 @@
       </div>
     </div>
 
-    <div class="row mb-3">
-      <div class="col-md-12">
-        <h5>Itens de Serviço</h5>
-        <div id="service-items-list">
-          <% @order_service.service_items.each_with_index do |item, idx| %>
-          <div class="input-group mb-2">
-            <%= f.fields_for :service_items, item do |item_fields| %>
-            <%= item_fields.text_field :description, class: "form-control", placeholder: "Nome do item" %>
-            <%= item_fields.text_field :quantity, class: "form-control", placeholder: "Quantidade" %>
-            <%= item_fields.text_field :unit_price, class: "form-control", placeholder: "Valor unitário" %>
-            <%= item_fields.hidden_field :_destroy, class: "service-item-destroy-flag" %>
-            <button type="button" class="btn btn-danger remove-item">Remover</button>
+    <% if current_user.gestor? %>
+
+      <div class="row mb-3">
+        <div class="col-md-12">
+          <h5>Itens de Serviço</h5>
+          <div id="service-items-list">
+            <% @order_service.service_items.each_with_index do |item, idx| %>
+            <div class="input-group mb-2">
+              <%= f.fields_for :service_items, item do |item_fields| %>
+              <%= item_fields.text_field :description, class: "form-control", placeholder: "Nome do item" %>
+              <%= item_fields.text_field :quantity, class: "form-control", placeholder: "Quantidade" %>
+              <%= item_fields.text_field :unit_price, class: "form-control", placeholder: "Valor unitário" %>
+              <%= item_fields.hidden_field :_destroy, class: "service-item-destroy-flag" %>
+              <button type="button" class="btn btn-danger remove-item">Remover</button>
+              <% end %>
+            </div>
             <% end %>
           </div>
-          <% end %>
+          <button type="button" class="btn btn-outline-primary" id="add-service-item">Adicionar item</button>
         </div>
-        <button type="button" class="btn btn-outline-primary" id="add-service-item">Adicionar item</button>
       </div>
-    </div>
 
-    <div id="service-item-template" style="display:none;">
-      <div class="input-group mb-2 service-item-row">
-        <input type="text"
-                name="order_service[service_items_attributes][NEW_INDEX][description]"
-                class="form-control"
-                placeholder="Nome do item" />
-        <input type="text"
-                name="order_service[service_items_attributes][NEW_INDEX][quantity]"
-                class="form-control"
-                placeholder="Quantidade" />
-        <input type="text"
-                name="order_service[service_items_attributes][NEW_INDEX][unit_price]"
-                class="form-control"
-                placeholder="Valor unitário" />
-        <button type="button" class="btn btn-danger remove-item">Remover</button>
+      <div id="service-item-template" style="display:none;">
+        <div class="input-group mb-2 service-item-row">
+          <input type="text"
+                  name="order_service[service_items_attributes][NEW_INDEX][description]"
+                  class="form-control"
+                  placeholder="Nome do item" />
+          <input type="text"
+                  name="order_service[service_items_attributes][NEW_INDEX][quantity]"
+                  class="form-control"
+                  placeholder="Quantidade" />
+          <input type="text"
+                  name="order_service[service_items_attributes][NEW_INDEX][unit_price]"
+                  class="form-control"
+                  placeholder="Valor unitário" />
+          <button type="button" class="btn btn-danger remove-item">Remover</button>
+        </div>
       </div>
-    </div>
+    <% end %>
 
     <div class="row">
       <div class="col-md-12 mt-3">

@@ -116,19 +116,24 @@
         <% else %>
         <p>Nenhum item cadastrado para esta ordem de serviço.</p>
         <% end %>
+
         <div class="mt-3 d-flex justify-content-between align-items-center">
           <div>
             <%= link_to "Voltar", app_order_services_path, class: "btn btn-secondary" %>
             <%= link_to "Editar", edit_app_order_service_path(@order_service), class: "btn btn-primary" %>
           </div>
+
           <div>
             <% if @order_service.atrasada? %>
-            <%= button_to "Reagendar",
-                    schedule_app_order_service_path(@order_service),
-                    class: "btn btn-#{OrderService.new(status: 'agendada').status_color} btn-sm ms-2",
-                    method: :get %>
+              <% if current_user.gestor?%>
+                <%= button_to "Reagendar",
+                        schedule_app_order_service_path(@order_service),
+                        class: "btn btn-#{OrderService.new(status: 'agendada').status_color} btn-sm ms-2",
+                        method: :get %>
+              <% end %>
             <% else %>
               <% @order_service.available_actions.each do |action| %>
+              <% next if current_user.tecnico? && ["Finalizar", "Cancelar"].include?(action[:label]) %>
               <% if @order_service.pendente? %>
               <%= button_to "Agendar",
                       schedule_app_order_service_path(@order_service),

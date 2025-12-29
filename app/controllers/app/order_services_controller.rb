@@ -1,10 +1,12 @@
 class App::OrderServicesController < ApplicationController
+  load_and_authorize_resource
+  
   before_action :set_other_resources, only: [:new, :edit, :update, :schedule]
   before_action :set_attachment_on_update, only: [:update]
   before_action :can_add_order_service, only: [:new, :create]
-
-  load_and_authorize_resource
-
+  before_action :ensure_technician_only_updates_allowed_fields, only: [:update]
+  before_action :restrict_status_update_for_technician, only: [:update_status]
+  
   def index
     @order_services = case current_user.role
     when "admin"
@@ -135,21 +137,28 @@ class App::OrderServicesController < ApplicationController
   private
 
   def order_service_params
-    params.require(:order_service).permit(
-      :title,
-      :description,
-      :client_id,
-      :status,
-      :scheduled_at,
-      :expected_end_at,
-      :signed_by_client,
-      :observations,
-      attachments: [],
-      user_ids: [],
-      service_items_attributes: [
-        :id, :description, :quantity, :unit_price, :_destroy,
-      ],
-    )
+    if current_user.gestor?
+      params.require(:order_service).permit(
+        :title,
+        :description,
+        :client_id,
+        :status,
+        :scheduled_at,
+        :expected_end_at,
+        :signed_by_client,
+        :observations,
+        attachments: [],
+        user_ids: [],
+        service_items_attributes: [
+          :id, :description, :quantity, :unit_price, :_destroy,
+        ],
+      )
+    else
+      params.require(:order_service).permit(
+        :observations,
+        attachments: []
+      )
+    end
   end
 
   def schedule_params
@@ -197,6 +206,38 @@ class App::OrderServicesController < ApplicationController
   def can_add_order_service
     unless current_user.company.can_create_order?
       redirect_to app_order_services_path, alert: "Limite de ordens de serviço atingido para o seu plano atual."
+    end
+  end
+
+  def ensure_technician_only_updates_allowed_fields
+    return unless current_user.tecnico?
+
+    allowed_params = %w[observations attachments]
+    datetime_params = %w[scheduled_at expected_end_at]
+    submitted = params[:order_service]
+
+    updated_datetimes = changed_attr_datetimes?
+
+    @order_service.assign_attributes(submitted.permit!)
+    changed = @order_service.changed - allowed_params - datetime_params
+
+    if changed.any? || updated_datetimes
+      redirect_to app_order_service_url, alert: "Você só tem permissão para alterar observações e anexos."
+    end
+  end
+
+  def changed_attr_datetimes?
+    scheduled_updated = @order_service.scheduled_at != Time.zone.parse(params[:order_service][:scheduled_at])
+    expected_updated = @order_service.expected_end_at != (Time.zone.parse(params[:order_service][:expected_end_at]))
+
+    scheduled_updated || expected_updated
+  end
+
+  def restrict_status_update_for_technician
+    return if current_user.gestor?
+
+    if params[:status].present? && %w[finalizada cancelada].include?(params[:status])
+      redirect_to app_order_service_url, alert: "Você não tem permissão para atualizar o status para '#{params[:status]}'."
     end
   end
 end
