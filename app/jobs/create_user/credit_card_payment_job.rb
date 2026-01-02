@@ -1,4 +1,4 @@
-class Payments::CreditCardPaymentJob < ApplicationJob
+class CreateUser::CreditCardPaymentJob < ApplicationJob
   queue_as :default
 
   def perform(company_id, cc_token)

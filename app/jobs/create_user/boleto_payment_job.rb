@@ -1,10 +1,10 @@
-class Payments::BoletoPaymentJob < ApplicationJob
+class CreateUser::BoletoPaymentJob < ApplicationJob
   queue_as :default
 
   def perform(company_id)
     company = Company.find_by(id: company_id)
     
-    Cmd::MercadoPago::CreateBoletoPayment.new(
+    result = Cmd::MercadoPago::CreateBoletoPayment.new(
       company: company
     ).call
   end

@@ -40,7 +40,7 @@ module Cmd
         {
           transaction_amount: plan.transaction_amount.to_i,
           payment_method_id: 'bolbradesco',
-          description: "Assinatura do plano #{plan.name}",
+          description: "Assinatura mensal do plano #{plan.name}",
           external_reference: company.id.to_s,
           additional_info: {
             items: [

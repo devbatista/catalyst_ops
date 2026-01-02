@@ -17,6 +17,16 @@ class Subscription < ApplicationRecord
   scope :by_status, ->(status) { where(status: status) }
   scope :recent, -> { order(created_at: :desc) }
   scope :current, -> { where(status: :active).where('end_date > ?', Time.current) }
+  
+  scope :ready_to_cycle, -> { 
+    joins(:company)
+      .where(status: :active)
+      .where(end_date: Date.today + 7.days)
+      .where.not(companies: {
+        payment_method: 'credit_card',
+      }
+    )
+  }
 
   after_commit :sync_company_access, on: :update, if: -> { previous_change.key?('status') }
   

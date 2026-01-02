@@ -103,9 +103,9 @@ class Register::SignupsController < ApplicationController
   def handle_payment_flow(company, payment_method, cc_token = nil)
     case payment_method
     when "boleto"
-      ::Payments::BoletoPaymentJob.perform_later(company.id)
+      ::CreateUser::BoletoPaymentJob.perform_later(company.id)
     when "pix"
-      ::Payments::PixPaymentJob.perform_later(company.id)
+      ::CreateUser::PixPaymentJob.perform_later(company.id)
     when "credit_card"
       ::Cmd::MercadoPago::CreateCreditCardPayment.new(company, cc_token).call
     end
