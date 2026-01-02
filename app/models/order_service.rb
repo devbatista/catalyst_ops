@@ -51,7 +51,7 @@ class OrderService < ApplicationRecord
   scope :by_status, ->(status) { where(status: status) }
   scope :by_client, ->(client_id) { where(client_id: client_id) }
   scope :scheduled_for_today, -> { where(scheduled_at: Date.current.beginning_of_day..Date.current.end_of_day) }
-  scope :to_overdue, -> { agendada.where("scheduled_at < ?", Time.current) }
+  scope :to_overdue, -> { agendada.where("scheduled_at < ?", Time.current + 1.minute) }
   scope :overdue, -> { by_status(:atrasada) }
   scope :recent, -> { order(created_at: :desc) }
   scope :by_technician, ->(user_id) { joins(:users).where(users: { id: user_id }) }
@@ -155,7 +155,8 @@ class OrderService < ApplicationRecord
 
   private
 
-  def scheduled_at_cannot_be_in_the_past
+  def scheduled_at_cannot_be_in_the_past``
+    return if will_save_change_to_status? && status_change_to_be_saved&.last == "atrasada"
     return unless scheduled_at.present?
 
     if !pendente? && scheduled_at < Time.current
@@ -164,6 +165,7 @@ class OrderService < ApplicationRecord
   end
 
   def expected_end_at_cannot_be_in_the_past
+    return if will_save_change_to_status? && status_change_to_be_saved&.last == "atrasada"
     return unless expected_end_at.present?
 
     if !pendente? && expected_end_at < Time.current
