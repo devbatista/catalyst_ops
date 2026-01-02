@@ -155,7 +155,7 @@ class OrderService < ApplicationRecord
 
   private
 
-  def scheduled_at_cannot_be_in_the_past``
+  def scheduled_at_cannot_be_in_the_past
     return if will_save_change_to_status? && status_change_to_be_saved&.last == "atrasada"
     return unless scheduled_at.present?
 
