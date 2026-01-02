@@ -1,5 +1,4 @@
-class MarkOverdueOrderServicesJob < 
-  include Sidekiq::Job
+class MarkOverdueOrderServicesJob < ApplicationJob
   sidekiq_options queue: :default, retry: 3
 
   def perform
