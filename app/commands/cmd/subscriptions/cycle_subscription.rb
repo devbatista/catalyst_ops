@@ -10,17 +10,43 @@ module Cmd
 
       def call
         return unless Rails.env.production?
-        
+
         payment_method = @subscription.company.payment_method
 
         case payment_method
         when 'boleto'
-          Cmd::MercadoPago::CreateBoletoPayment.new(@company).call
+          create_boleto_payment
         when 'pix'
-          
+          create_pix_payment
         else
           raise "Método de pagamento desconhecido: #{payment_method}"
         end
+      end
+
+      private
+
+      def create_boleto_payment
+        result = Cmd::MercadoPago::CreateBoletoPayment.new(@company).call
+
+        if result.success?
+          Payments::BoletoMailer.with(result.mailer_params).ticket_email.deliver_later
+        else
+          raise "Falha ao criar pagamento via boleto: #{result.errors}"
+        end
+      rescue => e
+        Rails.logger.error("Erro ao ciclar assinatura ID #{@subscription.id}: #{e.message}")
+      end
+
+      def create_pix_payment
+        result = Cmd::MercadoPago::CreatePixPayment.new(@company).call
+
+        if result.success?
+          Payments::PixMailer.with(result.mailer_params).pix_email.deliver_later
+        else
+          raise "Falha ao criar pagamento Pix: #{result.errors}"
+        end
+      rescue => e
+        Rails.logger.error("Erro ao ciclar assinatura ID #{@subscription.id}: #{e.message}")
       end
     end
   end
