@@ -39,3 +39,5 @@
 /bin/rails_bkp
 
 *.diff
+
+config/credentials.yml.enc.bak
