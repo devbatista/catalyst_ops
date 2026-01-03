@@ -2,13 +2,20 @@ services:
   db:
     image: postgres:15
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: catalyst_ops_development
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-}:5432"
     volumes:
       - ./tmp/db:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7
+    ports:
+      - "${REDIS_PORT:-}:6379"
+    restart: unless-stopped
 
   web:
     build: .
@@ -16,15 +23,34 @@ services:
       - .:/rails
       - ./storage:/rails/storage
     ports:
-      - "3000:3000"
+      - "${WEB_PORT:-}:3000"
     depends_on:
       - db
+      - redis
     environment:
-      DATABASE_URL: postgres://postgres:postgres@db:5432/catalyst_ops_development
-      RAILS_ENV: development
-    command: sh -c "bundle install && bin/rails server -b 0.0.0.0"
-    stdin_open: true
-    tty: true
+      RAILS_ENV: ${RAILS_ENV}
+      DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
+      REDIS_URL: "redis://redis:6379/0"
+      RAILS_LOG_TO_STDOUT: "${RAILS_LOG_TO_STDOUT:-true}"
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+    command: bin/rails server -b 0.0.0.0 -p 3000
+    restart: unless-stopped
+
+  sidekiq:
+    build: .
+    command: bundle exec sidekiq -C config/sidekiq.yml
+    environment:
+      RAILS_ENV: ${RAILS_ENV}
+      DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
+      REDIS_URL: "redis://redis:6379/0"
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+    volumes:
+      - .:/rails
+      - ./storage:/rails/storage
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
 
   nginx:
     image: nginx:latest
@@ -37,28 +63,7 @@ services:
       - ./docker/nginx/ssl.key:/etc/nginx/ssl/ssl.key
     depends_on:
       - web
-
-  redis:
-    image: redis:7
-    ports:
-      - "6379:6379"
-
-  sidekiq:
-    build: .
-    command: bundle exec sidekiq -C config/sidekiq.yml
-    environment:
-      DATABASE_URL: postgres://postgres:postgres@db:5432/catalyst_ops_development
-      RAILS_ENV: development
-      REDIS_URL: redis://redis:6379/0
-    volumes:
-      - .:/rails
-      - ./storage:/rails/storage
-    depends_on:
-      - db
-      - redis
-
-volumes:
-  n8n_data:
+    restart: unless-stopped
 
 networks:
   default:
