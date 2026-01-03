@@ -4,6 +4,7 @@ require 'cpf_cnpj'
 puts 'Criando as empresas'
 
 PLANS = Plan.all.to_a
+PAYMENT_METHODS = %w[credit_card boleto pix debit_card]
 
 COMPANIES = Array.new(rand(3..10)) do
   plan = PLANS.sample
@@ -22,6 +23,7 @@ COMPANIES = Array.new(rand(3..10)) do
     state: Faker::Address.state_abbr,
     zip_code: Faker::Address.zip_code.delete('-'),
     street: Faker::Address.street_name,
+    payment_method: PAYMENT_METHODS.sample,
     active: true
   )
 
@@ -40,7 +42,7 @@ COMPANIES = Array.new(rand(3..10)) do
   company.subscriptions.create!(
     preapproval_plan_id: plan.external_id,
     status: :active, 
-    start_date: Time.current,
+    start_date: Date.today,
     end_date: 1.month.from_now
   )
 

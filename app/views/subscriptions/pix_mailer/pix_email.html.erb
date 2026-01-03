@@ -1,0 +1,56 @@
+<% content_for :title, "Assinatura CatalystOps - Pagamento via PIX" %>
+
+<h2 style="margin-top:0;">Sua assinatura foi renovada!</h2>
+
+<p style="font-size:16px; line-height:1.6;">
+  Olá, <strong><%= (@company.responsible&.name.presence || @company.name) %></strong>.
+</p>
+
+<p style="font-size:16px; line-height:1.6;">
+  Sua assinatura CatalystOps foi ciclada e está aguardando pagamento via <strong>PIX</strong>.
+</p>
+
+<p style="font-size:14px; line-height:1.6; color:#555;">
+  Assim que o pagamento for confirmado, sua conta será renovada automaticamente.
+</p>
+
+<% if @expires_on.present? %>
+  <p style="font-size:14px; color:#666;">
+    Vencimento do PIX: <%= I18n.l(@expires_on.to_date, format: :long, locale: :'pt-BR') rescue @expires_on %>
+  </p>
+<% end %>
+
+<% if @pix_ticket_url.present? %>
+  <div style="margin:24px 0;">
+    <a href="<%= @pix_ticket_url %>" target="_blank" rel="noopener"
+       style="background:#0d6efd; color:#fff; text-decoration:none; padding:14px 32px; border-radius:4px; font-size:16px; font-weight:bold; display:inline-block;">
+      Visualizar comprovante PIX
+    </a>
+  </div>
+<% end %>
+
+<% if @pix_image_url.present? %>
+  <p style="font-size:14px; line-height:1.6;">
+    Escaneie o QR Code abaixo para pagar:
+  </p>
+  <div style="margin:16px 0;">
+    <img src="data:image/png;base64,<%= @pix_image_url %>"
+         alt="QR Code PIX"
+         width="160" height="160"
+         style="width:160px; height:160px; border:1px solid #e5e7eb; border-radius:6px; display:inline-block;"
+    >
+  </div>
+<% end %>
+
+<% if @pix_code.present? %>
+  <p style="font-size:14px; line-height:1.6;">
+    Ou copie e cole o código PIX:
+  </p>
+  <p style="font-family:monospace; font-size:14px; background:#f7f7f7; padding:10px 12px; border-radius:4px; word-break:break-all;">
+    <%= @pix_code %>
+  </p>
+<% end %>
+
+<p style="font-size:14px; color:#888;">
+  Em caso de dúvidas, responda este e-mail ou fale com nosso suporte.
+</p>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_12_26_154051) do
+ActiveRecord::Schema[7.1].define(version: 2026_01_02_161740) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -543,8 +543,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_12_26_154051) do
     t.string "preapproval_plan_id", null: false
     t.string "reason"
     t.string "external_reference"
-    t.datetime "start_date"
-    t.datetime "end_date"
+    t.date "start_date"
+    t.date "end_date"
     t.datetime "canceled_date"
     t.decimal "transaction_amount", precision: 12, scale: 2
     t.string "status", default: "pending", null: false

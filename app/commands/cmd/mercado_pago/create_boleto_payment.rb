@@ -40,8 +40,9 @@ module Cmd
         {
           transaction_amount: plan.transaction_amount.to_i,
           payment_method_id: 'bolbradesco',
-          description: "Assinatura do plano #{plan.name}",
+          description: "Assinatura mensal do plano #{plan.name}",
           external_reference: company.id.to_s,
+          date_of_expiration: (Date.today + 7.days).end_of_day.iso8601,
           additional_info: {
             items: [
               id: plan.id,

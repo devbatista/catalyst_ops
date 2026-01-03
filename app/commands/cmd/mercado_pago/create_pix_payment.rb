@@ -1,6 +1,7 @@
 module Cmd
   module MercadoPago
     class CreatePixPayment
+      Result = Struct.new(:success?, :mailer_params, :errors)
       attr_reader :company, :plan, :response
 
       def initialize(company)
@@ -16,12 +17,14 @@ module Cmd
         )
 
         if response['status'].include?('pending')
-          Payments::PixMailer.with(mailer_params).pix_email.deliver_later
+          Result.new(true, mailer_params, nil)
         else
-          raise "Failed to create pix payment: #{response['status_detail']}"
+          error = "Falha ao criar o pagamento via pix: #{response['status_detail']}"
+          Result.new(false, nil, error)
         end
       rescue => e
         Rails.logger.error("Erro ao criar pix para a company id #{@company.id}: #{e.message}")
+        Result.new(false, nil, "Erro ao criar o pagamento via pix: #{e.message}")
       end
 
       private
@@ -41,7 +44,7 @@ module Cmd
         {
           transaction_amount: plan.transaction_amount.to_i,
           payment_method_id: 'pix',
-          description: "Assinatura do plano #{plan.name}",
+          description: "Assinatura mensal do plano #{plan.name}",
           external_reference: company.id.to_s,
           additional_info: {
             items: [

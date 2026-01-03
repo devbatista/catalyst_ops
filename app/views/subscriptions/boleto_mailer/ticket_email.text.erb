@@ -1,0 +1,26 @@
+Assinatura CatalystOps - Boleto gerado
+
+Olá, <%= (@company.respond_to?(:responsible) && @company.responsible&.name.presence) || @company.name %>.
+
+Sua assinatura CatalystOps foi ciclada e está aguardando pagamento via boleto.
+
+Assim que o pagamento for confirmado, sua conta será renovada automaticamente.
+
+<% if @expires_on.present? %>
+Vencimento do boleto: <%= I18n.l(@expires_on.to_date, format: :long, locale: :'pt-BR') rescue @expires_on %>
+<% end %>
+
+<% if @status.present? %>
+Status do pagamento: <%= @status.to_s.capitalize %>
+<% end %>
+
+<% if @url.present? %>
+Baixe seu boleto aqui: <%= @url %>
+<% end %>
+
+<% if @barcode.present? %>
+Linha digitável do boleto:
+<%= @barcode %>
+<% end %>
+
+Em caso de dúvidas, responda este e-mail ou fale com nosso suporte.
