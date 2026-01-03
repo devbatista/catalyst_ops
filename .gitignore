@@ -43,3 +43,5 @@
 config/credentials.yml.enc.bak
 
 docker-compose.override.yml
+
+nginx.conf
