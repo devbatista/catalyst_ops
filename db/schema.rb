@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_01_02_161740) do
+ActiveRecord::Schema[7.1].define(version: 2026_01_03_010110) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -553,6 +553,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_02_161740) do
     t.jsonb "raw_payload"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.date "expired_date"
     t.index ["company_id", "status"], name: "index_subscriptions_on_company_id_and_status"
     t.index ["company_id"], name: "index_subscriptions_on_company_id"
     t.index ["external_reference"], name: "index_subscriptions_on_external_reference"
