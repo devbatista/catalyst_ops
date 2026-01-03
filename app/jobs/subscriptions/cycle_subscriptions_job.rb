@@ -1,4 +1,3 @@
-
 class Subscriptions::CycleSubscriptionsJob
   include Sidekiq::Job
   sidekiq_options queue: :default, retry: 3

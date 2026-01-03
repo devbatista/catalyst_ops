@@ -28,24 +28,31 @@ class Subscription < ApplicationRecord
     )
   }
 
-  after_commit :sync_company_access, on: :update, if: -> { previous_change.key?('status') }
+  after_commit :sync_company_access, on: :update, if: -> { previous_changes.key?('status') }
   
   def allows_access?
     active?
   end
 
-  private
-
   def activate!
     update!(status: :active,
             start_date: Time.current,
-            end_date: Time.current + 1.month)
+            end_date: Time.current + 1.month,
+            canceled_date: nil,
+            expired_date: nil)
   end
 
   def cancel!
     update!(status: :cancelled,
             canceled_date: Time.current)
   end
+
+  def expire!
+    update!(status: :expired,
+            expired_date: Time.current)
+  end
+  
+  private
 
   def sync_company_access
     allows_access? ? company.activate! : company.deactivate!
