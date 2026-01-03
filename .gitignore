@@ -41,3 +41,5 @@
 *.diff
 
 config/credentials.yml.enc.bak
+
+docker-compose.override.yml
