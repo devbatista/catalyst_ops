@@ -65,5 +65,8 @@ services:
       - web
     restart: unless-stopped
 
+volumes:
+  n8n_data:
+
 networks:
   default:
