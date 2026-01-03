@@ -11,10 +11,10 @@
   <small>Para concluir, efetue o pagamento via PIX usando o QR Code ou o código “copia e cola”.</small>
 </p>
 
-<% if @expires_on.present? %>
+<% if @pix_expiration_date.present? %>
   <div style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:6px; padding:10px 12px; margin:12px 0 18px;">
     <span style="font-size:14px; color:#555;">Vencimento:</span>
-    <strong style="font-size:14px; color:#111;"><%= I18n.l(Date.parse(@expires_on.to_s), format: :long, locale: :'pt-BR') rescue @expires_on %></strong>
+    <strong style="font-size:14px; color:#111;"><%= I18n.l(Date.parse(@pix_expiration_date.to_s), format: :long, locale: :'pt-BR') rescue @pix_expiration_date %></strong>
   </div>
 <% end %>
 

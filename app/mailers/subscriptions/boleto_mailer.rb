@@ -10,7 +10,7 @@ class Subscriptions::BoletoMailer < ApplicationMailer
 
     mail(
       to: @company.email,
-      subject: "Receba seu boleto para a assinatura do CatalystOps"
+      subject: "Receba seu boleto para a renovação do CatalystOps"
     )
   end
 end

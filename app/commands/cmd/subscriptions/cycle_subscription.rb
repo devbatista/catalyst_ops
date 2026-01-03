@@ -29,7 +29,7 @@ module Cmd
         result = Cmd::MercadoPago::CreateBoletoPayment.new(@company).call
 
         if result.success?
-          Payments::BoletoMailer.with(result.mailer_params).ticket_email.deliver_later
+          Subscriptions::BoletoMailer.with(result.mailer_params).ticket_email.deliver_later
         else
           raise "Falha ao criar pagamento via boleto: #{result.errors}"
         end
@@ -41,7 +41,7 @@ module Cmd
         result = Cmd::MercadoPago::CreatePixPayment.new(@company).call
 
         if result.success?
-          Payments::PixMailer.with(result.mailer_params).pix_email.deliver_later
+          Subscriptions::PixMailer.with(result.mailer_params).pix_email.deliver_later
         else
           raise "Falha ao criar pagamento Pix: #{result.errors}"
         end

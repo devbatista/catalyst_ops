@@ -1,0 +1,24 @@
+
+Assinatura CatalystOps - Pagamento via PIX
+
+Olá, <%= (@company.responsible&.name.presence || @company.name) %>.
+
+Sua assinatura CatalystOps foi ciclada e está aguardando pagamento via PIX.
+
+Assim que o pagamento for confirmado, sua conta será renovada automaticamente.
+
+<% if @expires_on.present? %>
+Vencimento do PIX: <%= I18n.l(@expires_on.to_date, format: :long, locale: :'pt-BR') rescue @expires_on %>
+<% end %>
+
+<% if @pix_ticket_url.present? %>
+Visualizar página PIX: <%= @pix_ticket_url %>
+<% end %>
+
+<% if @pix_code.present? %>
+Ou copie e cole o código PIX abaixo no seu app bancário:
+
+<%= @pix_code %>
+<% end %>
+
+Em caso de dúvidas, responda este e-mail ou fale com nosso suporte.
