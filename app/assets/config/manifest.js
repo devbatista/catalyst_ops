@@ -1,4 +1,5 @@
 //= link_tree ../images
+//= link favicon-32x32.png
 //= link_tree ../../../vendor/javascript .js
 //= link_tree ../stylesheets .css
 //= link_tree ../stylesheets .js
