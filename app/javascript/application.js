@@ -1,4 +1,7 @@
-import * as Rails from "@rails/ujs"
+if (window.Rails && typeof window.Rails.start === "function") {
+  window.Rails.start()
+}
+
 import "./controllers"
 
 import "jquery"
