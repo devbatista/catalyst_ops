@@ -94,4 +94,10 @@ Rails.application.configure do
   # ]
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+  
+  config.hosts << "app.catalystops.com.br"
+  config.hosts << "admin.catalystops.com.br"
+  config.hosts << "login.catalystops.com.br"
+  config.hosts << "register.catalystops.com.br"
+  config.hosts << "sidekiq.catalystops.com.br"
 end
