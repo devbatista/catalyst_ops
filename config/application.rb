@@ -36,5 +36,7 @@ module CatalystOps
     config.i18n.default_locale = :'pt-BR'
 
     config.active_job.queue_adapter = :sidekiq
+
+    config.action_dispatch.tld_length = 2
   end
 end
