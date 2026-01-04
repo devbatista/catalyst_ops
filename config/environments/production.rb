@@ -100,4 +100,6 @@ Rails.application.configure do
   config.hosts << "login.catalystops.com.br"
   config.hosts << "register.catalystops.com.br"
   config.hosts << "sidekiq.catalystops.com.br"
+
+  config.public_file_server.enabled = true
 end
