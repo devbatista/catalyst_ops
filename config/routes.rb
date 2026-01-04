@@ -12,17 +12,17 @@ Rails.application.routes.draw do
     ]
   }, via: :all
 
-  devise_for :users, skip: [:sessions]
+  # devise_for :users, skip: [:sessions]
 
-  draw :admin
-  draw :app
-  draw :login
-  draw :register
-  draw :sidekiq
+  # draw :admin
+  # draw :app
+  # draw :login
+  # draw :register
+  # draw :sidekiq
 
   # Rotas padrão (sem subdomínio)
   # root to: "home#index"
-  match '/', to: proc { [204, {}, []] }, via: :options
+  # match '/', to: proc { [204, {}, []] }, via: :options
 
   if Rails.env.development?
     mount LetterOpenerWeb::Engine, at: "/letter_opener"
