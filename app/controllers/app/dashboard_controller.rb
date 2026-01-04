@@ -1,5 +1,6 @@
 class App::DashboardController < ApplicationController
   def index
+    Rails.logger.info "SUBDOMAIN: #{request.subdomain.inspect} | HOST: #{request.host.inspect}"
     authorize! :read, :dashboard
 
     initialize_default_dashboard_variables

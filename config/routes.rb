@@ -18,4 +18,14 @@ Rails.application.routes.draw do
   if Rails.env.development?
     mount LetterOpenerWeb::Engine, at: "/letter_opener"
   end
+
+  # --- CATCH-ALL PARA DEBUG ---
+  match "*path", to: proc { |env|
+    [
+      200,
+      { "Content-Type" => "text/plain" },
+      ["DEBUG: HOST=#{env['HTTP_HOST']} | PATH=#{env['PATH_INFO']}"]
+    ]
+  }, via: :all
+  # --- FIM CATCH-ALL ---
 end
