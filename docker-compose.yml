@@ -55,8 +55,6 @@ services:
       - "443:443"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ${SSL_HOST_CRT}:${SSL_CONTAINER_CRT}:ro
-      - ${SSL_HOST_KEY}:${SSL_CONTAINER_KEY}:ro
     depends_on:
       - web
     restart: unless-stopped
