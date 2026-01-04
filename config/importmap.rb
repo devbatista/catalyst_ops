@@ -8,6 +8,7 @@ pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"
 pin "perfect-scrollbar", to: "https://ga.jspm.io/npm:perfect-scrollbar@1.5.5/dist/perfect-scrollbar.esm.js"
 pin_all_from "app/javascript/controllers", under: "controllers"
 pin_all_from "app/javascript/register", under: "register"
+pin_all_from "app/javascript/utils", under: "utils"
 
 pin "jquery", to: "https://ga.jspm.io/npm:jquery@3.7.1/dist/jquery.js"
 pin "select2", to: "https://ga.jspm.io/npm:select2@4.1.0-rc.0/dist/js/select2.js" # Linha adicionada pelo comando
