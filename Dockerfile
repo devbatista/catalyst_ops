@@ -37,9 +37,11 @@ COPY . .
 
 RUN bundle exec bootsnap precompile app/ lib/
 
-# Assets só quando RAILS_ENV=production (runtime)
-RUN if [ "$RAILS_ENV" = "production" ]; then \
-      SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile ; \
+ARG PRECOMPILE_ASSETS=0
+ARG ASSETS_SECRET_KEY_BASE=""
+
+RUN if [ "$PRECOMPILE_ASSETS" = "1" ]; then \
+      RAILS_ENV=production SECRET_KEY_BASE="$ASSETS_SECRET_KEY_BASE" bundle exec rails assets:clobber assets:precompile ; \
     fi
 
 # ------------------------
