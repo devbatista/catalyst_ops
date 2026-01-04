@@ -1,5 +1,5 @@
 class ApplicationController < ActionController::Base
-  before_action :custom_authenticate_user!
+  before_action :custom_authenticate_user!, unless: :register_subdomain?
   before_action :block_inactive_company_access, if: :app_subdomain?
   before_action :configure_permitted_parameters, if: :devise_controller?
 
@@ -35,6 +35,10 @@ class ApplicationController < ActionController::Base
 
   def app_subdomain?
     request.subdomain == "app"
+  end
+
+  def register_subdomain?
+    request.subdomain == "register"
   end
 
   def configure_permitted_parameters
