@@ -20,7 +20,7 @@ Rails.application.routes.draw do
   end
 
   # --- CATCH-ALL PARA DEBUG ---
-  match "*path", to: proc { |env|
+  match "/", to: proc { |env|
     [
       200,
       { "Content-Type" => "text/plain" },
