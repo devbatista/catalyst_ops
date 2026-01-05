@@ -18,7 +18,12 @@ services:
     restart: unless-stopped
 
   web:
-    build: .
+    image: catalystops-app
+    build:
+      context: .
+      args:
+        PRECOMPILE_ASSETS: "${PRECOMPILE_ASSETS:-0}"
+        ASSETS_SECRET_KEY_BASE: "${SECRET_KEY_BASE:-}"
     ports:
       - "${WEB_PORT:-}:3000"
     depends_on:
@@ -35,7 +40,8 @@ services:
     restart: unless-stopped
 
   sidekiq:
-    build: .
+    image: catalystops-app
+    # Reutiliza a mesma imagem buildada pelo serviço "web"
     command: bundle exec sidekiq -C config/sidekiq.yml
     depends_on:
       - db

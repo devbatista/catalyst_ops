@@ -16,7 +16,6 @@ gem "sprockets-rails"
 gem "importmap-rails"
 
 # Hotwire
-gem "turbo-rails"
 gem "stimulus-rails"
 
 # JSON

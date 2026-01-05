@@ -1,5 +1,8 @@
-import * as Rails from "@rails/ujs"
-import "./controllers"
+if (window.Rails && typeof window.Rails.start === "function") {
+  window.Rails.start()
+}
+
+import "controllers"
 
 import "jquery"
 
@@ -7,7 +10,7 @@ import "select2"
 import "metisMenu"
 import PerfectScrollbar from "perfect-scrollbar"
 
-import "./register/signups"
+import "register/signups"
 
 document.addEventListener('click', function (e) {
   if (e.target.matches('#add-service-item')) {

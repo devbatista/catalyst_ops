@@ -18,3 +18,6 @@
 //= link app/technicians_form.js
 //= link app/profile_form.js
 //= link app/company_form.js
+//= link register/signups.js
+//= link utils/formatters.js
+//= link utils/validators.js

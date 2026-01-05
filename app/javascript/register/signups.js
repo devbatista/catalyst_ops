@@ -1,5 +1,5 @@
-import { formatDoc, formatPhone, formatCEP, onlyDigits } from "../utils/formatters";
-import { isValidCPF, isValidCNPJ } from "../utils/validators";
+import { formatDoc, formatPhone, formatCEP, onlyDigits } from "utils/formatters"
+import { isValidCPF, isValidCNPJ } from "utils/validators"
 
 document.addEventListener("DOMContentLoaded", function () {
   // Init BS Stepper
