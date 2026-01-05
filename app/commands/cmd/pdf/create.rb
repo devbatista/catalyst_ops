@@ -36,7 +36,7 @@ module Cmd
             { content: "#{@company.name}
                         #{@company.formatted_document} || #{@company.formatted_phone}
                         #{@company.email}
-                        #{@company.address}", align: :center, valign: :center },
+                        #{@company.full_address}", align: :center, valign: :center },
           ],
         ]
         pdf.table(
