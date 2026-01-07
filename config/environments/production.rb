@@ -73,6 +73,29 @@ Rails.application.configure do
 
   config.action_mailer.perform_caching = false
 
+  config.action_mailer.perform_deliveries = true
+  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.delivery_method = :smtp
+
+  config_action_mailer.default_url_options = {
+    host: ENV.fectch('APP_HOST'),
+    protocol: 'https'
+  }
+
+  config.action_mailer.smtp_settings = {
+    address: ENV.fech('SMTP_ADDRESS'),
+    port: ENV.fecth('SMTP_PORT'),
+    domain: ENV.fecth('SMTP_DOMAIN'),
+    user_name: ENV.fecth('SMTP_USERNAME'),
+    password: ENV.fecth('SMTP_PASSWORD'),
+    authentication: ENV.fecth('SMTP_AUTHENTICATION').to_sym,
+    enable_starttls_auto: ENV.fecth('SMTP_ENABLE_STARTTLS_AUTO') == 'true'
+  }
+
+  #email: contato@catalystops.com.br
+  #senha: 5mOqd4AQxOmM
+
+
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   # config.action_mailer.raise_delivery_errors = false

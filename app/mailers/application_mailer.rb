@@ -1,4 +1,4 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: "no-reply@catalystops.com.br"
+  default from: ENV.fetch('MAILER_FROM')
   layout "mailer"
 end
