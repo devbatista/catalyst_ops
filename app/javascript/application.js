@@ -12,7 +12,40 @@ import PerfectScrollbar from "perfect-scrollbar"
 
 import "register/signups"
 
-document.addEventListener('click', function (e) {
+document.addEventListener('click', async function (e) {
+  // Logout via DELETE usando JavaScript
+  const logoutLink = e.target.closest('a.js-logout')
+  if (logoutLink) {
+    e.preventDefault()
+
+    const csrfToken = document
+      .querySelector('meta[name="csrf-token"]')
+      ?.getAttribute('content')
+
+    try {
+      const resp = await fetch(logoutLink.href, {
+        method: 'DELETE',
+        headers: {
+          'X-CSRF-Token': csrfToken || '',
+          'Accept': 'text/html,application/xhtml+xml'
+        },
+        credentials: 'same-origin',
+        redirect: 'follow'
+      })
+
+      if (resp.redirected) {
+        window.location.href = resp.url
+      } else {
+        window.location.reload()
+      }
+    } catch (_err) {
+      window.location.href = logoutLink.href
+    }
+
+    return
+  }
+
+  // Botão de adicionar item de serviço
   if (e.target.matches('#add-service-item')) {
     e.preventDefault();
     const serviceItemsContainer = document.getElementById('service-items-list');

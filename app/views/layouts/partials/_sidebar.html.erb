@@ -75,7 +75,7 @@
     <% end %>
     
     <li class="list-group-item <%= active_menu_class(logout_app_url) %>">
-      <%= link_to logout_app_url, method: :delete do %>
+      <%= link_to logout_app_url, class: "js-logout" do %>
       <div class="parent-icon"><i class='bx bx-log-out'></i></div>
       <div class="menu-title">Logout</div>
       <% end %>
