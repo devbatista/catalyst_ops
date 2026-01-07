@@ -48,8 +48,11 @@ class App::TechniciansController < ApplicationController
   end
 
   def destroy
-    @technician.destroy
-    redirect_to app_technicians_path, notice: "Técnico removido com sucesso."
+    if @technician.destroy
+      redirect_to app_technicians_path, notice: "Técnico removido com sucesso."
+    else
+      redirect_to app_technicians_path(@technician), alert: @technician.errors.full_messages.to_sentence
+    end
   end
 
   private

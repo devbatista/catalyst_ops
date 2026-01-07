@@ -1,4 +1,15 @@
 pt-BR:
+  activerecord:
+    attributes:
+      user:
+        assignments: "Atribuições"
+    errors:
+      models:
+        user:
+          attributes:
+            base:
+              restrict_dependent_destroy:
+                has_many: "Não é possível remover o técnico, pois ele está associado a ordens de serviço."
   date:
     formats:
       default: "%d/%m/%Y"
