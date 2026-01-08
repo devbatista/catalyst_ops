@@ -30,16 +30,20 @@ document.addEventListener('click', async function (e) {
           'Accept': 'text/html,application/xhtml+xml'
         },
         credentials: 'same-origin',
-        redirect: 'follow'
+        redirect: 'manual'
       })
 
-      if (resp.redirected) {
-        window.location.href = resp.url
-      } else {
-        window.location.reload()
+      if (resp.status === 302 || resp.status === 303) {
+        const location = resp.headers.get('Location')
+        if (location) {
+          window.location.href = location
+          return
+        }
       }
+
+      window.location.href = '/'
     } catch (_err) {
-      window.location.href = logoutLink.href
+      window.location.href = '/'
     }
 
     return
