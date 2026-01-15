@@ -13,7 +13,7 @@
           <div class="card-body">
             <!-- filtros iguais aos da index (opcional) -->
             <div class="row align-items-center mb-4">
-              <div class="col-md-6 d-flex">
+              <div class="col-12 col-md-6 d-flex flex-column flex-md-row align-items-stretch gap-2">
                 <div class="showing-entries-group flex-shrink-0">
                   <span class="showing-entries-label">Mostrar</span>
                   <form method="get" class="showing-entries-form">
@@ -25,47 +25,38 @@
                   </form>
                   <span class="showing-entries-text">registros</span>
                 </div>
-                <form method="get" class="flex-grow-1" style="min-width: 0;">
-                  <div class="input-group input-search-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text">
-                        <i class="bx bx-search"></i>
-                      </span>
-                    </div>
-                    <input type="number" name="code" value="<%= params[:code] %>" class="form-control input-search" placeholder="Código..." aria-label="Search">
-                    <input type="hidden" name="per" value="<%= params[:per] %>">
-                  </div>
-                </form>
               </div>
             </div>
 
-            <table class="table mb-0 table-hover">
-              <thead>
-                <tr>
-                  <th>Código</th>
-                  <th>Cliente</th>
-                  <th>Status</th>
-                  <th>Agendada</th>
-                  <th>Técnicos</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% @order_services.each do |os| %>
+            <div class="table-responsive">
+              <table class="table mb-0 table-hover">
+                <thead>
                   <tr>
-                    <td><%= os.code %></td>
-                    <td><%= os.client&.name %></td>
-                    <td><%= os.status.humanize %></td>
-                    <td><%= l(os.scheduled_at, format: :short) if os.scheduled_at %></td>
-                    <td><%= os.assignments.map { |a| a.user.name }.join(", ") %></td>
-                    <td>
-                      <%= link_to 'Ver', app_order_service_path(os), class: "btn btn-sm btn-primary" %>
-                      <%= link_to 'Reagendar', schedule_app_order_service_path(os), class: "btn btn-sm btn-outline-secondary" %>
-                    </td>
+                    <th>Código</th>
+                    <th>Cliente</th>
+                    <th>Status</th>
+                    <th>Agendada</th>
+                    <th>Técnicos</th>
+                    <th>Ações</th>
                   </tr>
-                <% end %>
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  <% @order_services.each do |os| %>
+                    <tr>
+                      <td><%= os.code %></td>
+                      <td><%= os.client&.name %></td>
+                      <td><%= os.status.humanize %></td>
+                      <td><%= l(os.scheduled_at, format: :short) if os.scheduled_at %></td>
+                      <td><%= os.assignments.map { |a| a.user.name }.join(", ") %></td>
+                      <td>
+                        <%= link_to 'Ver', app_order_service_path(os), class: "btn btn-sm btn-primary" %>
+                        <%= link_to 'Reagendar', schedule_app_order_service_path(os), class: "btn btn-sm btn-outline-secondary" %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
 
             <div class="d-flex justify-content-between align-items-center mt-3">
               <div class="text-muted">
