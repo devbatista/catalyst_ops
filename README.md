@@ -320,4 +320,4 @@ Se algo não funcionar conforme esperado:
 3. Revise `docker-compose.yml` e `docker-compose.override.yml`
 
 Para dúvidas específicas, abra uma issue interna ou consulte a documentação
-em `docs_usuario_final/` e `docs_tecnico/`.
+em `docs/`.
