@@ -68,7 +68,8 @@ $(document).off('.app-events').on("click.app-events", ".mobile-search-icon", fun
 }).on("click.app-events", ".search-close", function() {
     $(".search-bar").removeClass("full-search-bar");
 }).on("click.app-events", ".mobile-toggle-menu", function() {
-    $(".wrapper").addClass("toggled");
+    // antes: $(".wrapper").addClass("toggled");
+    $(".wrapper").toggleClass("toggled"); // abre se estiver fechado, fecha se estiver aberto
 }).on("click.app-events", ".toggle-icon", function() {
     $(".wrapper").toggleClass("toggled");
 }).on("click.app-events", ".switcher-btn", function() {
