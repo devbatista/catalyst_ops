@@ -1,5 +1,5 @@
 constraints subdomain: "admin" do
-  get "/", to: "admin/companies#index", as: :admin_dashboard
+  get "/", to: "admin/dashboard#index", as: :admin_dashboard
 
   namespace :admin do
     resources :companies
