@@ -9,17 +9,17 @@
   <ul class="metismenu" id="menu" style="position: relative; z-index: 10;">
 
     <!-- Dashboard -->
-    <li class="list-group-item <%= active_menu_class(app_dashboard_path) %>">
-      <%= link_to app_dashboard_path do %>
+    <li class="list-group-item <%= active_menu_class(admin_dashboard_path) %>">
+      <%= link_to admin_dashboard_path do %>
         <div class="parent-icon"><i class='bx bx-home-alt'></i></div>
         <div class="menu-title">Dashboard</div>
       <% end %>
     </li>
 
     <!-- Empresas -->
-    <% if can?(:manage, Client) %>
-      <li class="list-group-item <%= active_menu_class(app_clients_path) %>">
-        <%= link_to app_clients_path do %>
+    <% if can?(:manage, Company) %>
+      <li class="list-group-item <%= active_menu_class(admin_companies_path) %>">
+        <%= link_to admin_companies_path do %>
           <div class="parent-icon"><i class='bx bx-buildings'></i></div>
           <div class="menu-title">Empresas</div>
         <% end %>
@@ -28,8 +28,8 @@
 
     <!-- Usuários -->
     <% if can?(:manage, User) %>
-      <li class="list-group-item <%= active_menu_class(app_technicians_path) %>">
-        <%= link_to app_technicians_path do %>
+      <li class="list-group-item <%= active_menu_class(admin_users_path) %>">
+        <%= link_to admin_users_path do %>
           <div class="parent-icon"><i class='bx bx-user'></i></div>
           <div class="menu-title">Usuários</div>
         <% end %>
@@ -37,16 +37,16 @@
     <% end %>
 
     <!-- Assinaturas -->
-    <li class="list-group-item <%= active_menu_class(app_subscriptions_path) if defined?(app_subscriptions_path) %>">
-      <%= link_to (defined?(app_subscriptions_path) ? app_subscriptions_path : "#") do %>
+    <li class="list-group-item <%= active_menu_class(admin_subscriptions_path) if defined?(admin_subscriptions_path) %>">
+      <%= link_to (defined?(admin_subscriptions_path) ? admin_subscriptions_path : "#") do %>
         <div class="parent-icon"><i class='bx bx-receipt'></i></div>
         <div class="menu-title">Assinaturas</div>
       <% end %>
     </li>
 
     <!-- Planos -->
-    <li class="list-group-item <%= active_menu_class(app_plans_path) if defined?(app_plans_path) %>">
-      <%= link_to (defined?(app_plans_path) ? app_plans_path : "#") do %>
+    <li class="list-group-item <%= active_menu_class(admin_plans_path) if defined?(admin_plans_path) %>">
+      <%= link_to (defined?(admin_plans_path) ? admin_plans_path : "#") do %>
         <div class="parent-icon"><i class='bx bx-layer'></i></div>
         <div class="menu-title">Planos</div>
       <% end %>
@@ -54,18 +54,18 @@
 
     <!-- Ordens de Serviço (visão global) -->
     <% if can?(:manage, OrderService) || can?(:read, OrderService) %>
-      <li class="list-group-item <%= active_menu_class(app_order_services_path) %>">
-        <%= link_to app_order_services_path do %>
+      <li class="list-group-item <%= active_menu_class(admin_order_services_path) %>">
+        <%= link_to admin_order_services_path do %>
           <div class="parent-icon"><i class='bx bx-edit'></i></div>
-          <div class="menu-title">Ordens de Serviço (visão global)</div>
+          <div class="menu-title">Ordens de Serviço</div>
         <% end %>
       </li>
     <% end %>
 
     <!-- Suporte -->
     <% if can?(:read, :support) %>
-      <li class="list-group-item <%= active_menu_class(app_support_index_path) %>">
-        <%= link_to app_support_index_path do %>
+      <li class="list-group-item <%= active_menu_class(admin_support_index_path) %>">
+        <%= link_to admin_support_index_path do %>
           <div class="parent-icon"><i class="bx bx-support"></i></div>
           <div class="menu-title">Suporte</div>
         <% end %>
@@ -73,40 +73,40 @@
     <% end %>
 
     <!-- Logs -->
-    <li class="list-group-item <%= active_menu_class(app_logs_path) if defined?(app_logs_path) %>">
-      <%= link_to (defined?(app_logs_path) ? app_logs_path : "#") do %>
+    <li class="list-group-item <%= active_menu_class(admin_logs_path) if defined?(admin_logs_path) %>">
+      <%= link_to (defined?(admin_logs_path) ? admin_logs_path : "#") do %>
         <div class="parent-icon"><i class='bx bx-list-check'></i></div>
         <div class="menu-title">Logs</div>
       <% end %>
     </li>
 
     <!-- Métricas -->
-    <li class="list-group-item <%= active_menu_class(app_metrics_path) if defined?(app_metrics_path) %>">
-      <%= link_to (defined?(app_metrics_path) ? app_metrics_path : "#") do %>
+    <li class="list-group-item <%= active_menu_class(admin_metrics_path) if defined?(admin_metrics_path) %>">
+      <%= link_to (defined?(admin_metrics_path) ? admin_metrics_path : "#") do %>
         <div class="parent-icon"><i class='bx bx-pulse'></i></div>
         <div class="menu-title">Métricas</div>
       <% end %>
     </li>
 
     <!-- Configurações -->
-    <li class="list-group-item <%= active_menu_class(app_configurations_path) %>">
-      <%= link_to app_configurations_path do %>
+    <li class="list-group-item <%= active_menu_class(admin_configurations_path) %>">
+      <%= link_to admin_configurations_path do %>
         <div class="parent-icon"><i class='bx bx-wrench'></i></div>
         <div class="menu-title">Configurações</div>
       <% end %>
     </li>
 
     <!-- Conteúdo -->
-    <li class="list-group-item <%= active_menu_class(app_contents_path) if defined?(app_contents_path) %>">
-      <%= link_to (defined?(app_contents_path) ? app_contents_path : "#") do %>
+    <li class="list-group-item <%= active_menu_class(admin_contents_path) if defined?(admin_contents_path) %>">
+      <%= link_to (defined?(admin_conten) ? admin_conten : "#") do %>
         <div class="parent-icon"><i class='bx bx-news'></i></div>
         <div class="menu-title">Conteúdo</div>
       <% end %>
     </li>
 
     <!-- Logout -->
-    <li class="list-group-item <%= active_menu_class(logout_app_url) %>">
-      <%= link_to logout_app_url, class: "js-logout" do %>
+    <li class="list-group-item <%= active_menu_class(logout_admin_path) %>">
+      <%= link_to logout_admin_path, class: "js-logout" do %>
         <div class="parent-icon"><i class='bx bx-log-out'></i></div>
         <div class="menu-title">Logout</div>
       <% end %>
