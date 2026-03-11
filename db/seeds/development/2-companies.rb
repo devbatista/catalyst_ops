@@ -4,7 +4,7 @@ require 'cpf_cnpj'
 puts 'Criando as empresas'
 
 PLANS = Plan.all.to_a
-PAYMENT_METHODS = %w[credit_card boleto pix debit_card]
+PAYMENT_METHODS = %w[credit_card boleto pix]
 
 COMPANIES = Array.new(rand(3..10)) do
   plan = PLANS.sample
