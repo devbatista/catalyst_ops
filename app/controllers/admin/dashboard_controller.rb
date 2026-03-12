@@ -1,7 +1,4 @@
-class Admin::DashboardController < ApplicationController
-  skip_authorization_check
-  layout "admin"
-
+class Admin::DashboardController < AdminController
   def index
     @companies = Company.all
   end
