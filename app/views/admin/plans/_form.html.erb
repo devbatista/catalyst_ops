@@ -1,0 +1,70 @@
+<%= form_with model: [:admin, @plan], local: true do |f| %>
+  <% if @plan.errors.any? %>
+    <div class="alert alert-danger">
+      <p><strong><%= pluralize(@plan.errors.count, "erro") %> impediram salvar o plano:</strong></p>
+      <ul>
+        <% @plan.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <%= f.label :name, "Nome" %>
+      <%= f.text_field :name, class: "form-control" %>
+    </div>
+    <div class="col-md-6">
+      <%= f.label :reason, "Descrição" %>
+      <%= f.text_field :reason, class: "form-control" %>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <%= f.label :status, "Status" %>
+      <%= f.select :status, Plan::STATUSES.map { |s| [s.humanize, s] },
+                   {}, class: "form-select" %>
+    </div>
+    <div class="col-md-4">
+      <%= f.label :frequency, "Frequência" %>
+      <%= f.number_field :frequency, class: "form-control" %>
+    </div>
+    <div class="col-md-4">
+      <%= f.label :frequency_type, "Tipo de frequência" %>
+      <%= f.text_field :frequency_type, class: "form-control" %>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <%= f.label :transaction_amount, "Valor (R$)" %>
+      <%= f.number_field :transaction_amount, step: 0.01, class: "form-control" %>
+    </div>
+    <div class="col-md-4">
+      <%= f.label :max_technicians, "Máx. técnicos" %>
+      <%= f.number_field :max_technicians, class: "form-control" %>
+    </div>
+    <div class="col-md-4">
+      <%= f.label :max_orders, "Máx. OS/mês" %>
+      <%= f.number_field :max_orders, class: "form-control" %>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <%= f.label :support_level, "Nível de suporte" %>
+      <%= f.text_field :support_level, class: "form-control" %>
+    </div>
+    <div class="col-md-6">
+      <%= f.label :external_reference, "External reference" %>
+      <%= f.text_field :external_reference, class: "form-control" %>
+    </div>
+  </div>
+
+  <div class="mt-3">
+    <%= f.submit @plan.new_record? ? "Criar plano" : "Atualizar plano", class: "btn btn-primary" %>
+    <%= link_to "Voltar", admin_plans_path, class: "btn btn-secondary ms-2" %>
+  </div>
+<% end %>

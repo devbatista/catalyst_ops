@@ -45,19 +45,24 @@
 
               <!-- Filtro por status alinhado à direita -->
               <div class="col-12 col-md-6 d-flex justify-content-md-end mt-3 mt-md-0">
-                <form method="get" class="d-flex align-items-center gap-2">
-                  <span class="showing-entries-label">Status</span>
-                  <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
-                    <option value="">Todos</option>
-                    <option value="active"   <%= 'selected' if params[:status] == 'active' %>>Ativos</option>
-                    <option value="inactive" <%= 'selected' if params[:status] == 'inactive' %>>Inativos</option>
-                  </select>
-                  <input type="hidden" name="q" value="<%= params[:q] %>">
-                  <input type="hidden" name="per" value="<%= params[:per].presence || 10 %>">
-                </form>
+                <div class="d-flex align-items-center gap-2">
+                  <form method="get" class="d-flex align-items-center gap-2 mb-0">
+                    <span class="showing-entries-label">Status</span>
+                    <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                      <option value="">Todos</option>
+                      <option value="active"   <%= 'selected' if params[:status] == 'active' %>>Ativos</option>
+                      <option value="inactive" <%= 'selected' if params[:status] == 'inactive' %>>Inativos</option>
+                    </select>
+                    <input type="hidden" name="q" value="<%= params[:q] %>">
+                    <input type="hidden" name="per" value="<%= params[:per].presence || 10 %>">
+                  </form>
+              
+                  <%= link_to raw('<i class="bx bx-plus"></i> Novo plano'),
+                      new_admin_plan_path,
+                      class: "btn btn-sm btn-outline-primary ms-2" %>
+                </div>
               </div>
             </div>
-
             <div class="table-responsive">
               <table class="table mb-0 table-hover">
                 <thead>
@@ -97,7 +102,7 @@
                       <td><%= plan.support_level.presence || "-" %></td>
                       <td>
                         <%= link_to 'Ver', admin_plan_path(plan), class: "btn btn-sm btn-primary" %>
-                        <%#= link_to 'Editar', edit_admin_plan_path(plan), class: "btn btn-sm btn-warning" %>
+                        <%= link_to 'Editar', edit_admin_plan_path(plan), class: "btn btn-sm btn-warning ms-2" %>
                       </td>
                     </tr>
                   <% end %>
