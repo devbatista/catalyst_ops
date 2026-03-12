@@ -35,7 +35,7 @@ Plan.find_or_create_by!(external_reference: "ENTERPRISE") do |plan|
   plan.frequency_type = "months"
   plan.transaction_amount = 399.0
   plan.max_technicians = nil
-  plan.max_orders = 300
+  plan.max_orders = 200
   plan.support_level = "dedicado"
 end
 
