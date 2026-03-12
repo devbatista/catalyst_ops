@@ -1,0 +1,130 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="mb-3">
+          <h4 class="mb-0 text-uppercase">Informações da empresa</h4>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <strong>Nome:</strong>
+                <p><%= @company.name %></p>
+              </div>
+              <div class="col-md-3">
+                <strong>Documento:</strong>
+                <p><%= @company.formatted_document %></p>
+              </div>
+              <div class="col-md-3">
+                <strong>Telefone:</strong>
+                <p><%= @company.formatted_phone %></p>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <strong>Email:</strong>
+                <p><%= @company.email %></p>
+              </div>
+              <div class="col-md-6">
+                <strong>Website:</strong>
+                <p>
+                  <% if @company.website.present? %>
+                    <%= link_to @company.website, @company.website, target: "_blank", rel: "noopener" %>
+                  <% else %>
+                    <span class="text-muted">Não informado</span>
+                  <% end %>
+                </p>
+              </div>
+            </div>
+
+            <hr>
+
+            <h5>Endereço</h5>
+            <div class="row mb-2">
+              <div class="col-md-3">
+                <strong>CEP:</strong>
+                <p><%= @company.formatted_zip_code %></p>
+              </div>
+              <div class="col-md-5">
+                <strong>Rua / Número / Compl.:</strong>
+                <p><%= @company.full_address %></p>
+              </div>
+              <div class="col-md-4">
+                <strong>Bairro:</strong>
+                <p><%= @company.neighborhood %></p>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <strong>Cidade:</strong>
+                <p><%= @company.city %></p>
+              </div>
+              <div class="col-md-2">
+                <strong>UF:</strong>
+                <p><%= @company.state %></p>
+              </div>
+              <div class="col-md-3">
+                <strong>Inscrição Estadual:</strong>
+                <p><%= @company.state_registration.presence || "-" %></p>
+              </div>
+              <div class="col-md-3">
+                <strong>Inscrição Municipal:</strong>
+                <p><%= @company.municipal_registration.presence || "-" %></p>
+              </div>
+            </div>
+
+            <hr>
+
+            <h5>Plano e Status</h5>
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <strong>Plano atual:</strong>
+                <p><%= @company.current_plan&.name || @company.plan&.name || "Sem plano" %></p>
+              </div>
+              <div class="col-md-4">
+                <strong>Forma de pagamento:</strong>
+                <p><%= @company.payment_method&.humanize || "-" %></p>
+              </div>
+              <div class="col-md-4">
+                <strong>Status de acesso:</strong>
+                <p>
+                  <% if @company.access_enabled? %>
+                    <span class="badge bg-success">Acesso ativo</span>
+                  <% elsif @company.active? %>
+                    <span class="badge bg-warning text-dark">Ativa (sem assinatura)</span>
+                  <% else %>
+                    <span class="badge bg-secondary">Inativa</span>
+                  <% end %>
+                </p>
+              </div>
+            </div>
+
+            <hr>
+
+            <h5>Responsável</h5>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <strong>Responsável:</strong>
+                <p><%= @company.responsible&.name || "Não definido" %></p>
+              </div>
+              <div class="col-md-6">
+                <strong>Email do responsável:</strong>
+                <p><%= @company.responsible&.email || "-" %></p>
+              </div>
+            </div>
+
+            <div class="mt-3">
+              <%= link_to "Voltar", admin_companies_path, class: "btn btn-secondary" %>
+              <%# Quando tiver edição no admin, pode habilitar: %>
+              <%#= link_to "Editar", edit_admin_company_path(@company), class: "btn btn-primary" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
