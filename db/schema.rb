@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_01_03_010110) do
+ActiveRecord::Schema[7.1].define(version: 2026_03_12_221558) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -211,6 +211,41 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_03_010110) do
     t.index ["preapproval_plan_id"], name: "index_subscriptions_on_preapproval_plan_id"
   end
 
+  create_table "support_messages", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "support_ticket_id", null: false
+    t.uuid "user_id", null: false
+    t.text "body", null: false
+    t.boolean "internal", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["support_ticket_id", "created_at"], name: "index_support_messages_on_support_ticket_id_and_created_at"
+    t.index ["support_ticket_id"], name: "index_support_messages_on_support_ticket_id"
+    t.index ["user_id"], name: "index_support_messages_on_user_id"
+  end
+
+  create_table "support_tickets", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "user_id", null: false
+    t.uuid "order_service_id"
+    t.string "subject", null: false
+    t.text "description", null: false
+    t.integer "category", default: 0, null: false
+    t.integer "impact", default: 1, null: false
+    t.integer "status", default: 0, null: false
+    t.integer "priority", default: 1, null: false
+    t.uuid "assigned_to_id"
+    t.datetime "last_reply_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["assigned_to_id"], name: "index_support_tickets_on_assigned_to_id"
+    t.index ["company_id", "created_at"], name: "index_support_tickets_on_company_id_and_created_at"
+    t.index ["company_id", "priority"], name: "index_support_tickets_on_company_id_and_priority"
+    t.index ["company_id", "status"], name: "index_support_tickets_on_company_id_and_status"
+    t.index ["company_id"], name: "index_support_tickets_on_company_id"
+    t.index ["order_service_id"], name: "index_support_tickets_on_order_service_id"
+    t.index ["user_id"], name: "index_support_tickets_on_user_id"
+  end
+
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -249,5 +284,11 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_03_010110) do
   add_foreign_key "reports", "users"
   add_foreign_key "service_items", "order_services"
   add_foreign_key "subscriptions", "companies"
+  add_foreign_key "support_messages", "support_tickets"
+  add_foreign_key "support_messages", "users"
+  add_foreign_key "support_tickets", "companies"
+  add_foreign_key "support_tickets", "order_services"
+  add_foreign_key "support_tickets", "users"
+  add_foreign_key "support_tickets", "users", column: "assigned_to_id"
   add_foreign_key "users", "companies"
 end
