@@ -1,0 +1,132 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="mb-3">
+          <h4 class="mb-0 text-uppercase">Assinaturas</h4>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="row align-items-center mb-4">
+              <!-- Filtros (mostra + busca por empresa/plano) -->
+              <div class="col-12 col-md-6 d-flex flex-column flex-md-row align-items-stretch gap-2">
+                <div class="showing-entries-group flex-shrink-0">
+                  <span class="showing-entries-label">Mostrar</span>
+                  <form method="get" class="showing-entries-form">
+                    <select name="per" class="form-select form-select-sm showing-entries-select" onchange="this.form.submit()">
+                      <% [10, 20, 30].each do |n| %>
+                        <option value="<%= n %>" <%= params[:per].to_i == n ? 'selected' : '' %>><%= n %></option>
+                      <% end %>
+                    </select>
+                    <input type="hidden" name="q" value="<%= params[:q] %>">
+                    <input type="hidden" name="status" value="<%= params[:status] %>">
+                  </form>
+                  <span class="showing-entries-text">registros</span>
+                </div>
+
+                <!-- Busca -->
+                <form method="get" class="flex-grow-1" style="min-width: 0;">
+                  <div class="input-group input-search-group">
+                    <span class="input-group-text">
+                      <i class="bx bx-search"></i>
+                    </span>
+                    <input type="text"
+                           name="q"
+                           value="<%= params[:q] %>"
+                           class="form-control input-search"
+                           placeholder="Buscar por empresa ou plano..."
+                           aria-label="Buscar assinatura">
+                    <input type="hidden" name="per" value="<%= params[:per].presence || 10 %>">
+                    <input type="hidden" name="status" value="<%= params[:status] %>">
+                  </div>
+                </form>
+              </div>
+
+              <!-- Filtro por status alinhado à direita -->
+              <div class="col-12 col-md-6 d-flex justify-content-md-end mt-3 mt-md-0">
+                <form method="get" class="d-flex align-items-center gap-2">
+                  <span class="showing-entries-label">Status</span>
+                  <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="">Todos</option>
+                    <% Subscription.statuses.keys.each do |st| %>
+                      <option value="<%= st %>" <%= 'selected' if params[:status] == st %>>
+                        <%= st.humanize %>
+                      </option>
+                    <% end %>
+                  </select>
+                  <input type="hidden" name="q" value="<%= params[:q] %>">
+                  <input type="hidden" name="per" value="<%= params[:per].presence || 10 %>">
+                </form>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table mb-0 table-hover">
+                <thead>
+                  <tr>
+                    <th>Empresa</th>
+                    <th>Plano</th>
+                    <th>Status</th>
+                    <th>Início</th>
+                    <th>Término</th>
+                    <th>Valor</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @subscriptions.each do |subscription| %>
+                    <tr>
+                      <td><%= subscription.company&.name || "-" %></td>
+                      <td><%= subscription.plan&.name || subscription.preapproval_plan_id %></td>
+                      <td>
+                        <% case subscription.status %>
+                        <% when "active" %>
+                          <span class="badge bg-success">Ativa</span>
+                        <% when "pending" %>
+                          <span class="badge bg-warning text-dark">Pendente</span>
+                        <% when "cancelled" %>
+                          <span class="badge bg-danger">Cancelada</span>
+                        <% when "expired" %>
+                          <span class="badge bg-secondary">Expirada</span>
+                        <% else %>
+                          <span class="badge bg-secondary"><%= subscription.status %></span>
+                        <% end %>
+                      </td>
+                      <td><%= l(subscription.start_date) if subscription.start_date %></td>
+                      <td><%= l(subscription.end_date) if subscription.end_date %></td>
+                      <td>
+                        <% if subscription.plan.transaction_amount.present? %>
+                          R$ <%= number_with_precision(
+                                 subscription.plan.transaction_amount,
+                                 precision: 2,
+                                 separator: ',',
+                                 delimiter: '.'
+                               ) %>
+                        <% else %>
+                          -
+                        <% end %>
+                      </td>
+                      <td>
+                        <%= link_to 'Ver', admin_subscription_path(subscription), class: "btn btn-sm btn-primary" %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <div class="text-muted">
+                Mostrando <%= @subscriptions.size %> de <%= @subscriptions.total_count %> registros
+              </div>
+              <nav aria-label="Page navigation">
+                <%= custom_paginate(@subscriptions) %>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

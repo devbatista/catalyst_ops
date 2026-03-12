@@ -1,0 +1,136 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="mb-3">
+          <h4 class="mb-0 text-uppercase">Detalhes da assinatura</h4>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <!-- Empresa e plano -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <strong>Empresa:</strong>
+                <p>
+                  <% if @subscription.company.present? %>
+                    <%= link_to @subscription.company.name,
+                                admin_company_path(@subscription.company),
+                                class: "link-light" %>
+                  <% else %>
+                    <span class="text-muted">Sem empresa</span>
+                  <% end %>
+                </p>
+              </div>
+              <div class="col-md-6">
+                <strong>Plano:</strong>
+                <p><%= @subscription.plan&.name || @subscription.preapproval_plan_id %></p>
+              </div>
+            </div>
+
+            <!-- Status e datas -->
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <strong>Status:</strong>
+                <p>
+                  <% case @subscription.status %>
+                  <% when "active" %>
+                    <span class="badge bg-success">Ativa</span>
+                  <% when "pending" %>
+                    <span class="badge bg-warning text-dark">Pendente</span>
+                  <% when "cancelled" %>
+                    <span class="badge bg-danger">Cancelada</span>
+                  <% when "expired" %>
+                    <span class="badge bg-secondary">Expirada</span>
+                  <% else %>
+                    <span class="badge bg-secondary"><%= @subscription.status %></span>
+                  <% end %>
+                </p>
+              </div>
+              <div class="col-md-4">
+                <strong>Início:</strong>
+                <p><%= l(@subscription.start_date) if @subscription.start_date %></p>
+              </div>
+              <div class="col-md-4">
+                <strong>Término:</strong>
+                <p><%= l(@subscription.end_date) if @subscription.end_date %></p>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <strong>Cancelada em:</strong>
+                <p><%= l(@subscription.canceled_date) if @subscription.canceled_date %></p>
+              </div>
+              <div class="col-md-4">
+                <strong>Expirada em:</strong>
+                <p><%= l(@subscription.expired_date) if @subscription.expired_date %></p>
+              </div>
+              <div class="col-md-4">
+                <strong>Valor da cobrança:</strong>
+                <p>
+                  <% if @subscription.plan&.transaction_amount.present? %>
+                    R$ <%= number_with_precision(@subscription.plan.transaction_amount,
+                                                 precision: 2,
+                                                 separator: ',',
+                                                 delimiter: '.') %>
+                  <% elsif @subscription.transaction_amount.present? %>
+                    R$ <%= number_with_precision(@subscription.transaction_amount,
+                                                 precision: 2,
+                                                 separator: ',',
+                                                 delimiter: '.') %>
+                  <% else %>
+                    -
+                  <% end %>
+                </p>
+              </div>
+            </div>
+
+            <hr>
+
+            <!-- Identificadores externos -->
+            <h5>Identificadores</h5>
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <strong>Gateway:</strong>
+                <p><%= @subscription.gateway.presence || "-" %></p>
+              </div>
+              <div class="col-md-4">
+                <strong>ID do plano (preapproval_plan_id):</strong>
+                <p><%= @subscription.preapproval_plan_id %></p>
+              </div>
+              <div class="col-md-4">
+                <strong>ID da assinatura no gateway:</strong>
+                <p><%= @subscription.external_subscription_id.presence || "-" %></p>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <strong>Reason:</strong>
+                <p><%= @subscription.reason.presence || "-" %></p>
+              </div>
+              <div class="col-md-6">
+                <strong>External reference:</strong>
+                <p><%= @subscription.external_reference.presence || "-" %></p>
+              </div>
+            </div>
+
+            <!-- Payload bruto (opcional, só se existir) -->
+            <% if @subscription.raw_payload.present? %>
+              <hr>
+              <h5>Payload do gateway</h5>
+              <pre class="bg-dark text-light p-3 rounded-3" style="white-space: pre-wrap; word-break: break-all;">
+<%= JSON.pretty_generate(@subscription.raw_payload) rescue @subscription.raw_payload.to_json %>
+              </pre>
+            <% end %>
+
+            <div class="mt-3">
+              <%= link_to "Voltar", admin_subscriptions_path, class: "btn btn-secondary" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
