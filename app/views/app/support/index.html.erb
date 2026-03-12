@@ -1,8 +1,74 @@
 <div class="page-wrapper">
-  <div class="page-content d-flex flex-column align-items-center justify-content-center" style="min-height: 60vh;">
-    <h2 class="mb-4"><i class="bx bx-support"></i> Suporte</h2>
-    <div class="alert alert-info text-center" style="max-width: 400px;">
-      Em breve você terá acesso a nossa central de suporte!
+  <div class="page-content">
+    <div class="row" style="min-height: 80vh;">
+      <div class="col-12">
+        <div class="mb-3 d-flex justify-content-between align-items-center">
+          <h4 class="mb-0 text-uppercase">
+            <i class="bx bx-support"></i> Suporte
+          </h4>
+        </div>
+
+        <% if @section == 'overview' %>
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <div class="text-muted small">Tickets totais</div>
+                <div class="h4 mb-0"><%= @total_tickets %></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <div class="text-muted small">Em aberto</div>
+                <div class="h4 mb-0"><%= @open_tickets_count %></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <div class="text-muted small">Resolvidos (30 dias)</div>
+                <div class="h4 mb-0"><%= @resolved_last_30_days %></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <div class="text-muted small">Último ticket aberto</div>
+                <div class="small mb-0">
+                  <% if @last_open_ticket %>
+                    <strong><%= @last_open_ticket.subject %></strong><br>
+                    <span class="text-muted"><%= l(@last_open_ticket.last_reply_at || @last_open_ticket.created_at, format: :short) %></span>
+                  <% else %>
+                    Nenhum ticket em aberto.
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <% end %>
+
+        <div class="card">
+          <div class="card-body">
+            <% case @section %>
+            <% when 'tickets' %>
+              <%= render 'tickets' %>
+            <% when 'knowledge_base' %>
+              <%= render 'knowledge_base' %>
+            <% when 'suggestions' %>
+              <%= render 'suggestions' %>
+            <% when 'quick_contact' %>
+              <%= render 'quick_contact' %>
+            <% else %> <%# overview %>
+              <%= render 'overview' %>
+            <% end %>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

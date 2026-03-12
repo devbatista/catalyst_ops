@@ -1,0 +1,29 @@
+<div class="py-2">
+  <h5 class="mb-3">Central de suporte</h5>
+
+  <p class="text-muted">
+    Aqui você acompanha seus tickets, acessa a base de conhecimento
+    e fala com nosso time quando precisar. Use os números acima para
+    ter uma visão rápida da saúde do seu atendimento.
+  </p>
+
+  <div class="alert alert-info d-flex justify-content-between align-items-center">
+    <div>
+      <strong>Precisa de ajuda agora?</strong><br>
+      Abra um ticket explicando sua dúvida ou problema e nosso time
+      entra em contato o quanto antes.
+    </div>
+    <div>
+      <%= link_to "Abrir novo ticket",
+                  app_support_index_path(section: "tickets"),
+                  class: "btn btn-primary" %>
+    </div>
+  </div>
+
+  <p class="mb-1"><strong>Próximos passos recomendados:</strong></p>
+  <ul class="mb-0">
+    <li>Se é uma dúvida comum, consulte a <%= link_to "Base de Conhecimento", app_support_index_path(section: "knowledge_base") %>.</li>
+    <li>Se é um problema específico, use a aba <%= link_to "Tickets", app_support_index_path(section: "tickets") %> para detalhar o caso.</li>
+    <li>Se tiver ideias de melhoria, envie em <%= link_to "Sugestões", app_support_index_path(section: "suggestions") %>.</li>
+  </ul>
+</div>

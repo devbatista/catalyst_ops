@@ -1,0 +1,48 @@
+<div class="py-2">
+  <h5 class="mb-3">Contato Rápido</h5>
+
+  <% unless @can_use_quick_contact %>
+    <div class="alert alert-warning">
+      O contato rápido está disponível apenas para os planos
+      <strong>Profissional</strong> e <strong>Enterprise</strong>.
+    </div>
+  <% else %>
+    <p class="text-muted">
+      Precisa de ajuda imediata? Use um dos canais abaixo.
+    </p>
+
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <div class="card h-100">
+          <div class="card-body d-flex flex-column">
+            <h6><i class="bx bxl-whatsapp"></i> WhatsApp</h6>
+            <p class="text-muted small">
+              Atendimento rápido em horário comercial.
+            </p>
+            <a href="https://wa.me/SEU_NUMERO_AQUI?text=Ol%C3%A1,+preciso+de+ajuda+no+CatalystOps"
+               target="_blank"
+               rel="noopener"
+               class="btn btn-success mt-auto">
+              Abrir WhatsApp
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <div class="card h-100">
+          <div class="card-body d-flex flex-column">
+            <h6><i class="bx bx-envelope"></i> E-mail</h6>
+            <p class="text-muted small">
+              Para dúvidas mais detalhadas ou não urgentes.
+            </p>
+            <a href="mailto:suporte@seu-dominio.com?subject=Suporte%20CatalystOps"
+               class="btn btn-outline-primary mt-auto">
+              Enviar e-mail
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,124 @@
+<div class="py-2">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">Tickets</h5>
+    <%= link_to "Abrir novo ticket",
+                new_app_support_ticket_path,
+                class: "btn btn-primary" %>
+  </div>
+
+  <!-- Filtros -->
+  <div class="card mb-3">
+    <div class="card-body">
+      <%= form_with url: app_support_index_path(section: "tickets"),
+                    method: :get,
+                    local: true,
+                    class: "row g-2 align-items-end" do |f| %>
+        <div class="col-md-4">
+          <label class="form-label">Status</label>
+          <%= select_tag :status,
+                         options_for_select([["Todos", ""]] + SupportTicket.statuses.keys.map { |s| [s.humanize, s] }, params[:status]),
+                         class: "form-select" %>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Categoria</label>
+          <%= select_tag :category,
+                         options_for_select([["Todas", ""]] + SupportTicket.categories.keys.map { |c| [c.humanize, c] }, params[:category]),
+                         class: "form-select" %>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Por página</label>
+          <%= select_tag :per,
+                         options_for_select([10, 20, 30], params[:per].presence || 10),
+                         class: "form-select" %>
+        </div>
+        <div class="col-md-2">
+          <%= hidden_field_tag :section, "tickets" %>
+          <button type="submit" class="btn btn-outline-secondary w-100">Filtrar</button>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Lista de tickets -->
+  <h6 class="mb-3">Meus tickets</h6>
+  <% if @support_tickets.present? %>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Assunto</th>
+            <th>Categoria</th>
+            <th>Status</th>
+            <th>Impacto</th>
+            <th>Atualizado em</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @support_tickets.each do |ticket| %>
+            <tr>
+              <td>
+                <%= link_to ticket.id,
+                            app_support_ticket_path(ticket),
+                            class: "text-decoration-none" %>
+              </td>
+              <td>
+                <%= link_to app_support_ticket_path(ticket),
+                            class: "text-decoration-none" do %>
+                  <%= truncate(ticket.subject, length: 60) %>
+                <% end %>
+              </td>
+              <td><%= ticket.category.humanize %></td>
+              <td>
+                <% status_class =
+                     case ticket.status.to_sym
+                     when :aberto              then "secondary"
+                     when :em_andamento        then "info"
+                     when :aguardando_cliente  then "warning"
+                     when :resolvido           then "success"
+                     when :fechado, :cancelado then "dark"
+                     else "secondary"
+                     end %>
+                <span class="badge bg-<%= status_class %>">
+                  <%= ticket.status.humanize %>
+                </span>
+              </td>
+              <td>
+                <% impact_class =
+                     case ticket.impact.to_sym
+                     when :bloqueante then "danger"
+                     when :alto       then "warning"
+                     when :medio      then "info"
+                     else "secondary"
+                     end %>
+                <span class="badge bg-<%= impact_class %>">
+                  <%= ticket.impact.humanize %>
+                </span>
+              </td>
+              <td>
+                <%= l(ticket.last_reply_at || ticket.created_at, format: :short) %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      <div class="text-muted">
+        Mostrando <%= @support_tickets.size %> de <%= @support_tickets.total_count %> tickets
+      </div>
+      <nav aria-label="Page navigation">
+        <%= custom_paginate(@support_tickets) if respond_to?(:custom_paginate) %>
+      </nav>
+    </div>
+  <% else %>
+    <div class="alert alert-light border">
+      <p class="mb-1">Você ainda não abriu nenhum ticket.</p>
+      <p class="mb-0">
+        Quando precisar de ajuda, clique em
+        <%= link_to "Abrir novo ticket", new_app_support_ticket_path %>.
+      </p>
+    </div>
+  <% end %>
+</div>

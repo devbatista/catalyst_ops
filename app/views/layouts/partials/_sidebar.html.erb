@@ -67,10 +67,39 @@
 
     <% if can?(:read, :support) %>
     <li class="list-group-item <%= active_menu_class(app_support_index_path) %>">
-      <%= link_to app_support_index_path do %>
+      <a href="javascript:;" class="has-arrow">
         <div class="parent-icon"><i class="bx bx-support"></i></div>
         <div class="menu-title">Suporte</div>
+      </a>
+      <ul>
+        <li class="<%= active_menu_class(app_support_index_path(section: 'overview')) %>">
+          <%= link_to app_support_index_path(section: 'overview') do %>
+            <i class="bx bx-info-circle"></i> Visão Geral
+          <% end %>
+        </li>
+        <li class="<%= active_menu_class(app_support_index_path(section: 'tickets')) %>">
+          <%= link_to app_support_index_path(section: 'tickets') do %>
+            <i class="bx bx-list-ul"></i> Tickets
+          <% end %>
+        </li>
+        <li class="<%= active_menu_class(app_support_index_path(section: 'knowledge_base')) %>">
+          <%= link_to app_support_index_path(section: 'knowledge_base') do %>
+            <i class="bx bx-book-open"></i> Base de Conhecimento
+          <% end %>
+        </li>
+        <li class="<%= active_menu_class(app_support_index_path(section: 'suggestions')) %>">
+          <%= link_to app_support_index_path(section: 'suggestions') do %>
+            <i class="bx bx-bulb"></i> Sugestões
+          <% end %>
+        </li>
+        <% if current_user.company&.plan&.name.in?(["Profissional", "Enterprise"]) %>
+        <li class="<%= active_menu_class(app_support_index_path(section: 'quick_contact')) %>">
+          <%= link_to app_support_index_path(section: 'quick_contact') do %>
+            <i class="bx bx-phone"></i> Contato Rápido
+          <% end %>
+        </li>
       <% end %>
+      </ul>
     </li>
     <% end %>
     

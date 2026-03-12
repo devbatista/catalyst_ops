@@ -1,0 +1,62 @@
+<div class="py-2">
+  <h5 class="mb-3">Sugestões</h5>
+
+  <p class="text-muted">
+    Use este espaço para sugerir melhorias no CatalystOps: novas funcionalidades,
+    ajustes de interface, relatórios ou qualquer coisa que ajude seu dia a dia.
+  </p>
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <h6 class="mb-3">Enviar nova sugestão</h6>
+
+      <%= form_with url: "#", method: :post, local: true do |f| %>
+        <div class="mb-3">
+          <label class="form-label">Título da sugestão</label>
+          <input type="text"
+                 class="form-control"
+                 placeholder="Ex: Relatório de OS por técnico com filtros avançados"
+                 disabled>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Tipo</label>
+            <select class="form-select" disabled>
+              <option>Produto</option>
+              <option>Interface</option>
+              <option>Relatórios</option>
+              <option>Integrações</option>
+              <option>Outro</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Impacto</label>
+            <select class="form-select" disabled>
+              <option>Ajuda bastante</option>
+              <option>Importante</option>
+              <option>Essencial</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Descreva sua ideia</label>
+          <textarea rows="4"
+                    class="form-control"
+                    placeholder="Explique o cenário em que essa melhoria ajudaria"
+                    disabled></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-secondary" disabled>
+          Enviar (em breve)
+        </button>
+      <% end %>
+    </div>
+  </div>
+
+  <p class="text-muted small mb-0">
+    Em uma próxima versão, suas sugestões serão registradas como tickets internos,
+    permitindo acompanhar o que está em análise, planejado ou entregue.
+  </p>
+</div>
