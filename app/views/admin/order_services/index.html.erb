@@ -1,0 +1,114 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="mb-3">
+          <h4 class="mb-0 text-uppercase">Ordens de Serviço</h4>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="row align-items-center mb-4">
+              <!-- Mostrar + Busca -->
+              <div class="col-12 col-md-6 d-flex flex-column flex-md-row align-items-stretch gap-2">
+                <div class="showing-entries-group flex-shrink-0">
+                  <span class="showing-entries-label">Mostrar</span>
+                  <form method="get" class="showing-entries-form">
+                    <select name="per" class="form-select form-select-sm showing-entries-select" onchange="this.form.submit()">
+                      <% [10, 20, 30].each do |n| %>
+                        <option value="<%= n %>" <%= params[:per].to_i == n ? 'selected' : '' %>><%= n %></option>
+                      <% end %>
+                    </select>
+                    <input type="hidden" name="q" value="<%= params[:q] %>">
+                    <input type="hidden" name="status" value="<%= params[:status] %>">
+                  </form>
+                  <span class="showing-entries-text">registros</span>
+                </div>
+
+                <!-- Busca -->
+                <form method="get" class="flex-grow-1" style="min-width: 0;">
+                  <div class="input-group input-search-group">
+                    <span class="input-group-text">
+                      <i class="bx bx-search"></i>
+                    </span>
+                    <input type="text"
+                           name="q"
+                           value="<%= params[:q] %>"
+                           class="form-control input-search"
+                           placeholder="Buscar por código ou cliente..."
+                           aria-label="Buscar OS">
+                    <input type="hidden" name="per" value="<%= params[:per].presence || 10 %>">
+                    <input type="hidden" name="status" value="<%= params[:status] %>">
+                  </div>
+                </form>
+              </div>
+
+              <!-- Filtro por status -->
+              <div class="col-12 col-md-6 d-flex justify-content-md-end mt-3 mt-md-0">
+                <form method="get" class="d-flex align-items-center gap-2">
+                  <span class="showing-entries-label">Status</span>
+                  <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="">Todos</option>
+                    <% OrderService.statuses.keys.each do |st| %>
+                      <option value="<%= st %>" <%= 'selected' if params[:status] == st %>>
+                        <%= st.humanize %>
+                      </option>
+                    <% end %>
+                  </select>
+                  <input type="hidden" name="q" value="<%= params[:q] %>">
+                  <input type="hidden" name="per" value="<%= params[:per].presence || 10 %>">
+                </form>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table mb-0 table-hover">
+                <thead>
+                  <tr>
+                    <th>Código</th>
+                    <th>Título</th>
+                    <th>Cliente</th>
+                    <th>Status</th>
+                    <th>Agendada para</th>
+                    <th>Técnicos</th>
+                    <th>Valor total</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @order_services.each do |os| %>
+                    <tr>
+                      <td><%= os.code %></td>
+                      <td><%= os.title %></td>
+                      <td><%= os.client&.name || "-" %></td>
+                      <td>
+                        <span class="badge bg-<%= os.status_color %>">
+                          <%= os.status.humanize %>
+                        </span>
+                      </td>
+                      <td><%= l(os.scheduled_at) if os.scheduled_at %></td>
+                      <td><%= os.technician_names.presence || "-" %></td>
+                      <td><%= os.formatted_total_value %></td>
+                      <td>
+                        <%= link_to 'Ver', admin_order_service_path(os), class: "btn btn-sm btn-primary" %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <div class="text-muted">
+                Mostrando <%= @order_services.size %> de <%= @order_services.total_count %> registros
+              </div>
+              <nav aria-label="Page navigation">
+                <%= custom_paginate(@order_services) %>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

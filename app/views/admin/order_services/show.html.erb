@@ -1,0 +1,174 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="mb-3 d-flex justify-content-between align-items-center">
+          <h4 class="mb-0 text-uppercase">Detalhes da Ordem de Serviço</h4>
+        
+          <%= link_to "Gerar PDF",
+                      generate_pdf_app_order_service_path(@order_service),
+                      class: "btn btn-outline-secondary",
+                      target: "_blank",
+                      rel: "noopener" %>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <!-- Infos principais -->
+            <div class="row mb-3">
+              <div class="col-md-3">
+                <strong>ID:</strong>
+                <p><%= @order_service.id %></p>
+              </div>
+              <div class="col-md-3">
+                <strong>Código:</strong>
+                <p><%= @order_service.code %></p>
+              </div>
+              <div class="col-md-6">
+                <strong>Cliente:</strong>
+                <p><%= @order_service.client&.name || "-" %></p>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <strong>Empresa:</strong>
+                <p>
+                  <% if @order_service.company.present? %>
+                    <%= link_to @order_service.company.name,
+                                admin_company_path(@order_service.company),
+                                class: "link-light" %>
+                  <% else %>
+                    <span class="text-muted">Sem empresa</span>
+                  <% end %>
+                </p>
+              </div>
+              <div class="col-md-4">
+                <strong>Status:</strong>
+                <p>
+                  <span class="badge bg-<%= @order_service.status_color %>">
+                    <%= @order_service.status.humanize %>
+                  </span>
+                </p>
+              </div>
+              <div class="col-md-4">
+                <strong>Criada em:</strong>
+                <p><%= l(@order_service.created_at, format: :short) %></p>
+              </div>
+            </div>
+
+            <!-- Datas e técnicos -->
+            <div class="row mb-3">
+              <div class="col-md-3">
+                <strong>Agendada para:</strong>
+                <p><%= l(@order_service.scheduled_at, format: :short) if @order_service.scheduled_at %></p>
+              </div>
+              <div class="col-md-3">
+                <strong>Previsão de término:</strong>
+                <p><%= l(@order_service.expected_end_at, format: :short) if @order_service.expected_end_at %></p>
+              </div>
+              <div class="col-md-3">
+                <strong>Início:</strong>
+                <p><%= l(@order_service.started_at, format: :short) if @order_service.started_at %></p>
+              </div>
+              <div class="col-md-3">
+                <strong>Fim:</strong>
+                <p><%= l(@order_service.finished_at, format: :short) if @order_service.finished_at %></p>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <strong>Técnicos:</strong>
+                <p><%= @order_service.technician_names.presence || "Nenhum técnico atribuído." %></p>
+              </div>
+              <div class="col-md-6">
+                <strong>Duração (horas):</strong>
+                <p><%= @order_service.duration_in_hours %></p>
+              </div>
+            </div>
+
+            <!-- Texto -->
+            <div class="row mb-3">
+              <div class="col-md-12">
+                <strong>Título:</strong>
+                <p><%= @order_service.title %></p>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-12">
+                <strong>Descrição:</strong>
+                <p><%= @order_service.description %></p>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-12">
+                <strong>Observações:</strong>
+                <p><%= @order_service.observations.presence || "Nenhuma observação." %></p>
+              </div>
+            </div>
+
+            <!-- Anexos -->
+            <div class="row mb-3">
+              <div class="col-md-12">
+                <strong>Anexos:</strong>
+                <% if @order_service.attachments.attached? %>
+                  <ul class="mt-2">
+                    <% @order_service.attachments.each do |attachment| %>
+                      <li>
+                        <%= link_to attachment.filename,
+                                    url_for(attachment),
+                                    target: "_blank",
+                                    rel: "noopener" %>
+                        (<%= number_to_human_size(attachment.byte_size) %>)
+                      </li>
+                    <% end %>
+                  </ul>
+                <% else %>
+                  <p class="text-muted mb-0">Nenhum anexo.</p>
+                <% end %>
+              </div>
+            </div>
+
+            <hr>
+
+            <!-- Itens de serviço -->
+            <h5>Itens do Serviço</h5>
+            <% if @service_items.present? %>
+              <div class="table-responsive">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Descrição</th>
+                      <th>Quantidade</th>
+                      <th>Valor Unitário</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% @service_items.each do |item| %>
+                      <tr>
+                        <td><%= item.description %></td>
+                        <td><%= item.quantity %></td>
+                        <td><%= currency_br(item.unit_price) %></td>
+                        <td><%= currency_br(item.quantity * item.unit_price) %></td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+            <% else %>
+              <p class="text-muted">Nenhum item cadastrado para esta ordem de serviço.</p>
+            <% end %>
+
+            <div class="mt-3">
+              <%= link_to "Voltar", admin_order_services_path, class: "btn btn-secondary" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
