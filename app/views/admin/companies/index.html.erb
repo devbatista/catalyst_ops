@@ -1,10 +1,110 @@
-<!-- filepath: app/views/admin/companies/index.html.erb -->
-<h1>Empresas</h1>
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="mb-3">
+          <h4 class="mb-0 text-uppercase">Empresas</h4>
+        </div>
 
-<%= button_to "Logout", logout_admin_path, method: :delete, form: { data: { turbo: false } } %>
+        <% flash.each do |type, message| %>
+          <% bootstrap_class = { notice: "alert-success", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
+          <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert">
+            <%= message %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        <% end %>
 
-<ul>
-  <% @companies.each do |company| %>
-    <li><%= company.name %></li>
-  <% end %>
-</ul>
+        <div class="card">
+          <div class="card-body">
+            <div class="row align-items-center mb-4">
+              <!-- Filtros (mostra + busca) -->
+              <div class="col-12 col-md-6 d-flex flex-column flex-md-row align-items-stretch gap-2">
+                <div class="showing-entries-group flex-shrink-0">
+                  <span class="showing-entries-label">Mostrar</span>
+                  <form method="get" class="showing-entries-form">
+                    <select name="per" class="form-select form-select-sm showing-entries-select" onchange="this.form.submit()">
+                      <% [10, 20, 30].each do |n| %>
+                        <option value="<%= n %>" <%= params[:per].to_i == n ? 'selected' : '' %>><%= n %></option>
+                      <% end %>
+                    </select>
+                    <input type="hidden" name="q" value="<%= params[:q] %>">
+                  </form>
+                  <span class="showing-entries-text">registros</span>
+                </div>
+
+                <!-- Bloco Search -->
+                <form method="get" class="flex-grow-1" style="min-width: 0;">
+                  <div class="input-group input-search-group">
+                    <span class="input-group-text">
+                      <i class="bx bx-search"></i>
+                    </span>
+                    <input type="text" name="q" value="<%= params[:q] %>" class="form-control input-search" placeholder="Buscar..." aria-label="Search">
+                    <input type="hidden" name="per" value="<%= params[:per] %>">
+                  </div>
+                </form>
+              </div>
+
+              <!-- Coluna direita sem botão de criar -->
+              <div class="col-12 col-md-6 d-flex justify-content-md-end mt-3 mt-md-0">
+                <!-- Intencionalmente vazio (sem botão "Nova empresa") -->
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table mb-0 table-hover">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Nome</th>
+                    <th>Documento</th>
+                    <th>Email</th>
+                    <th>Telefone</th>
+                    <th>Cidade / UF</th>
+                    <th>Plano</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @companies.each do |company| %>
+                    <tr>
+                      <td><%= company.id %></td>
+                      <td><%= company.name %></td>
+                      <td><%= company.formatted_document %></td>
+                      <td><%= company.email %></td>
+                      <td><%= company.formatted_phone %></td>
+                      <td><%= [company.city, company.state].compact.join(" / ") %></td>
+                      <td><%= company.current_plan&.name || company.plan&.name || "-" %></td>
+                      <td>
+                        <% if company.access_enabled? %>
+                          <span class="badge bg-success">Acesso ativo</span>
+                        <% elsif company.active? %>
+                          <span class="badge bg-warning text-dark">Ativa (sem assinatura)</span>
+                        <% else %>
+                          <span class="badge bg-secondary">Inativa</span>
+                        <% end %>
+                      </td>
+                      <td>
+                        <%= link_to 'Ver', admin_company_path(company), class: "btn btn-sm btn-primary" %>
+                        <%#= link_to 'Editar', edit_admin_company_path(company), class: "btn btn-sm btn-warning" %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <div class="text-muted">
+                Mostrando <%= @companies.size %> de <%= @companies.total_count %> registros
+              </div>
+              <nav aria-label="Page navigation">
+                <%= custom_paginate(@companies) %>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

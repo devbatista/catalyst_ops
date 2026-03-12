@@ -34,6 +34,14 @@ class Company < ApplicationRecord
 
   scope :active, -> { where(active: true) }
 
+  def self.search(query = nil)
+    if query.present?
+      where("name ILIKE :q OR email ILIKE :q OR document ILIKE :q", q: "%#{query}%")
+    else
+      all
+    end
+  end
+
   def formatted_document
     return document unless document.present?
 

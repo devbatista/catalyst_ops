@@ -760,6 +760,27 @@ html.dark-theme .input-group-text {
 	background-color: #3e464c;
 	border: 1px solid rgb(255 255 255 / 35%)
 }
+html.dark-theme .input-search-group {
+  background: #111827;
+  border-radius: 999px;
+  border: 1px solid #2d3748;
+}
+html.dark-theme .input-search-group .input-group-text {
+  background: transparent;
+  border: 0;
+  color: #e5e7eb;
+  padding-left: 8px;
+  padding-right: 6px;
+}
+html.dark-theme .input-search-group .input-group-text i {
+  font-size: 1.0rem;
+  line-height: 1;
+}
+html.dark-theme .input-search {
+  color: #e5e7eb;
+  background: transparent;
+  border: 0;
+}
 html.dark-theme .table-bordered td, html.dark-theme .table-bordered th {
 	border: 1px solid rgb(255 255 255 / 12%)
 }
