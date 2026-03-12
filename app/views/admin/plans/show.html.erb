@@ -1,0 +1,111 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="mb-3">
+          <h4 class="mb-0 text-uppercase">Detalhes do plano</h4>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <!-- Dados principais -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <strong>Nome:</strong>
+                <p><%= @plan.name %></p>
+              </div>
+              <div class="col-md-6">
+                <strong>Descrição (reason):</strong>
+                <p><%= @plan.reason %></p>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <strong>Status:</strong>
+                <p>
+                  <% if @plan.status == "active" %>
+                    <span class="badge bg-success">Ativo</span>
+                  <% else %>
+                    <span class="badge bg-secondary">Inativo</span>
+                  <% end %>
+                </p>
+              </div>
+              <div class="col-md-4">
+                <strong>Frequência:</strong>
+                <p><%= "#{@plan.frequency} #{@plan.frequency_type}" %></p>
+              </div>
+              <div class="col-md-4">
+                <strong>Valor:</strong>
+                <p>
+                  R$
+                  <%= number_with_precision(@plan.transaction_amount,
+                                            precision: 2,
+                                            separator: ',',
+                                            delimiter: '.') %>
+                </p>
+              </div>
+            </div>
+
+            <hr>
+
+            <!-- Limites e suporte -->
+            <h5>Limites e suporte</h5>
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <strong>Máx. técnicos:</strong>
+                <p><%= @plan.max_technicians.presence || "Ilimitado" %></p>
+              </div>
+              <div class="col-md-4">
+                <strong>Máx. OS por mês:</strong>
+                <p><%= @plan.max_orders.presence || "Ilimitado" %></p>
+              </div>
+              <div class="col-md-4">
+                <strong>Nível de suporte:</strong>
+                <p><%= @plan.support_level.presence || "-" %></p>
+              </div>
+            </div>
+
+            <hr>
+
+            <!-- Identificadores externos -->
+            <h5>Identificadores</h5>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <strong>External ID (plano):</strong>
+                <p><%= @plan.external_id %></p>
+              </div>
+              <div class="col-md-6">
+                <strong>External reference:</strong>
+                <p><%= @plan.external_reference %></p>
+              </div>
+            </div>
+
+            <!-- Assinaturas relacionadas (resumo) -->
+            <hr>
+            <h5>Assinaturas relacionadas</h5>
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <strong>Total de assinaturas:</strong>
+                <p><%= @plan.subscriptions.count %></p>
+              </div>
+              <div class="col-md-4">
+                <strong>Ativas:</strong>
+                <p><%= @plan.subscriptions.where(status: :active).count %></p>
+              </div>
+              <div class="col-md-4">
+                <strong>Canceladas/expiradas:</strong>
+                <p><%= @plan.subscriptions.where(status: [:cancelled, :expired]).count %></p>
+              </div>
+            </div>
+
+            <div class="mt-3">
+              <%= link_to "Voltar", admin_plans_path, class: "btn btn-secondary" %>
+              <%#= link_to "Editar", edit_admin_plan_path(@plan), class: "btn btn-primary" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
