@@ -77,6 +77,18 @@ a {
 
 }
 
+.sidebar-wrapper .metismenu li.mm-active > a.has-arrow,
+.sidebar-wrapper .metismenu li.mm-active > a.has-arrow:hover,
+.sidebar-wrapper .metismenu li.mm-active > a.has-arrow:focus {
+  background-color: #0d6efd !important;
+  color: #ffffff !important;
+}
+
+.sidebar-wrapper .metismenu li.mm-active > a.has-arrow .parent-icon i,
+.sidebar-wrapper .metismenu li.mm-active > a.has-arrow .menu-title {
+  color: #ffffff !important;
+}
+
 
 
 .sidebar-header {

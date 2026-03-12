@@ -3,6 +3,14 @@ module ApplicationHelper
     current_page?(path) ? "active" : ""
   end
 
+  def active_support_menu_class
+    if controller_path.start_with?("app/support") || controller_path == "app/support_tickets"
+      "active"
+    else
+      ""
+    end
+  end
+
   def currency_br(value)
     number_to_currency(
       value,
