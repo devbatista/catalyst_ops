@@ -9,7 +9,7 @@ Plan.find_or_create_by!(external_reference: "BASICO") do |plan|
   plan.frequency_type = "months"
   plan.transaction_amount = 99.0
   plan.max_technicians = 1
-  plan.max_orders = 25
+  plan.max_orders = 15
   plan.support_level = "email"
 end
 
@@ -22,7 +22,7 @@ Plan.find_or_create_by!(external_reference: "PROFISSIONAL") do |plan|
   plan.frequency_type = "months"
   plan.transaction_amount = 199.0
   plan.max_technicians = 6
-  plan.max_orders = 100
+  plan.max_orders = 60
   plan.support_level = "prioritario"
 end
 
