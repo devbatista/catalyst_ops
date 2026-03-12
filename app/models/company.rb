@@ -4,6 +4,8 @@ class Company < ApplicationRecord
   has_many :order_services
   has_many :technicians, -> { active.where(role: :tecnico).or(active.where(can_be_technician: true)) }, class_name: "User"
   has_many :subscriptions, dependent: :destroy
+  has_many :support_tickets, dependent: :destroy
+
   has_one :current_subscription, -> { current }, class_name: "Subscription"
 
   belongs_to :responsible, class_name: "User", optional: true

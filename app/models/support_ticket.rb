@@ -43,4 +43,14 @@ class SupportTicket < ApplicationRecord
   validates :category, :impact, :status, :priority, presence: true
 
   scope :recent, -> { order(last_reply_at: :desc, created_at: :desc) }
+  scope :by_company, ->(company_id) { where(company_id: company_id) }
+  scope :open_status, -> { where(status: [:aberto, :em_andamento, :aguardando_cliente]) }
+
+  before_create :set_initial_last_reply_at
+
+  private
+
+  def set_initial_last_reply_at
+    self.last_reply_at ||= Time.current
+  end
 end

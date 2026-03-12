@@ -21,6 +21,8 @@ class User < ApplicationRecord
   has_many :order_services, through: :assignments
   has_many :clients, foreign_key: :company_id, primary_key: :company_id, class_name: "Client"
   has_many :reports, dependent: :destroy
+  has_many :support_tickets, dependent: :nullify
+  has_many :assigned_support_tickets, class_name: "SupportTicket", foreign_key: :assigned_to_id, dependent: :nullify
 
   scope :tecnicos, -> { where(role: :tecnico).or(where(can_be_technician: true)) }
   scope :gestores, -> { where(role: :gestor) }
