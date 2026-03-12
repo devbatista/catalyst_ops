@@ -1,0 +1,113 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="mb-3">
+          <h4 class="mb-0 text-uppercase">Usuários</h4>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="row align-items-center mb-4">
+              <!-- Filtros (mostra + busca) -->
+              <div class="col-12 col-md-6 d-flex flex-column flex-md-row align-items-stretch gap-2">
+                <div class="showing-entries-group flex-shrink-0">
+                  <span class="showing-entries-label">Mostrar</span>
+                  <form method="get" class="showing-entries-form">
+                    <select name="per" class="form-select form-select-sm showing-entries-select" onchange="this.form.submit()">
+                      <% [10, 20, 30].each do |n| %>
+                        <option value="<%= n %>" <%= params[:per].to_i == n ? 'selected' : '' %>><%= n %></option>
+                      <% end %>
+                    </select>
+                    <input type="hidden" name="q" value="<%= params[:q] %>">
+                    <input type="hidden" name="role" value="<%= params[:role] %>">
+                  </form>
+                  <span class="showing-entries-text">registros</span>
+                </div>
+            
+                <!-- Bloco Search -->
+                <form method="get" class="flex-grow-1" style="min-width: 0;">
+                  <div class="input-group input-search-group">
+                    <span class="input-group-text">
+                      <i class="bx bx-search"></i>
+                    </span>
+                    <input type="text"
+                           name="q"
+                           value="<%= params[:q] %>"
+                           class="form-control input-search"
+                           placeholder="Buscar usuário..."
+                           aria-label="Buscar usuário">
+                    <input type="hidden" name="per" value="<%= params[:per].presence || 10 %>">
+                    <input type="hidden" name="role" value="<%= params[:role] %>">
+                  </div>
+                </form>
+              </div>
+            
+              <!-- Filtro por função alinhado à direita -->
+              <div class="col-12 col-md-6 d-flex justify-content-md-end mt-3 mt-md-0">
+                <form method="get" class="d-flex align-items-center gap-2">
+                  <span class="showing-entries-label">Função</span>
+                  <select name="role" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="">Todas</option>
+                    <option value="admin"   <%= 'selected' if params[:role] == 'admin' %>>Admins</option>
+                    <option value="gestor"  <%= 'selected' if params[:role] == 'gestor' %>>Gestores</option>
+                    <option value="tecnico" <%= 'selected' if params[:role] == 'tecnico' %>>Técnicos</option>
+                  </select>
+                  <input type="hidden" name="q" value="<%= params[:q] %>">
+                  <input type="hidden" name="per" value="<%= params[:per].presence || 10 %>">
+                </form>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table mb-0 table-hover">
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Telefone</th>
+                    <th>Função</th>
+                    <th>Empresa</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @users.each do |user| %>
+                    <tr>
+                      <td><%= user.full_name %></td>
+                      <td><%= user.email %></td>
+                      <td><%= user.phone %></td>
+                      <td><%= user.role.humanize %></td>
+                      <td><%= user.company&.name || "-" %></td>
+                      <td>
+                        <% if user.active? %>
+                          <span class="badge bg-success">Ativo</span>
+                        <% else %>
+                          <span class="badge bg-secondary">Inativo</span>
+                        <% end %>
+                      </td>
+                      <td>
+                        <%= link_to 'Ver', admin_user_path(user), class: "btn btn-sm btn-primary" %>
+                        <%#= link_to 'Editar', edit_admin_user_path(user), class: "btn btn-sm btn-warning" %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <div class="text-muted">
+                Mostrando <%= @users.size %> de <%= @users.total_count %> registros
+              </div>
+              <nav aria-label="Page navigation">
+                <%= custom_paginate(@users) %>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

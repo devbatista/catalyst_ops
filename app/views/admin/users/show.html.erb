@@ -1,0 +1,138 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="mb-3">
+          <h4 class="mb-0 text-uppercase">Informações do usuário</h4>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <!-- Dados principais -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <strong>Nome:</strong>
+                <p><%= @user.full_name %></p>
+              </div>
+              <div class="col-md-3">
+                <strong>Email:</strong>
+                <p><%= @user.email %></p>
+              </div>
+              <div class="col-md-3">
+                <strong>Telefone:</strong>
+                <p><%= @user.phone.presence || "-" %></p>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <strong>Função:</strong>
+                <p><%= @user.role.humanize %></p>
+              </div>
+              <div class="col-md-4">
+                <strong>Empresa:</strong>
+                <p>
+                  <% if @user.company.present? %>
+                    <%= link_to @user.company.name, admin_company_path(@user.company), class: "link-light" %>
+                  <% else %>
+                    <span class="text-muted">Sem empresa</span>
+                  <% end %>
+                </p>
+              </div>
+              <div class="col-md-4">
+                <strong>Status:</strong>
+                <p>
+                  <% if @user.active? %>
+                    <span class="badge bg-success">Ativo</span>
+                  <% else %>
+                    <span class="badge bg-secondary">Inativo</span>
+                  <% end %>
+                </p>
+              </div>
+            </div>
+
+            <% unless @user.admin? %>
+              <hr>
+              
+              <h5>Resumo de ordens de serviço</h5>
+              <div class="row mb-3">
+                <div class="col-md-4">
+                  <strong>Total de ordens:</strong>
+                  <p><%= @user.orders_count %></p>
+                </div>
+                <div class="col-md-4">
+                  <strong>Em aberto:</strong>
+                  <p><%= @user.pending_orders_count %></p>
+                </div>
+                <div class="col-md-4">
+                  <strong>Concluídas:</strong>
+                  <p><%= @user.completed_orders_count %></p>
+                </div>
+              </div>
+            <% end %>
+
+            <hr>
+            
+            <h5>Empresa do usuário</h5>
+            
+            <% if @user.company.present? %>
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <strong>Nome da empresa:</strong>
+                  <p><%= @user.company.name %></p>
+                </div>
+                <div class="col-md-3">
+                  <strong>Documento:</strong>
+                  <p><%= @user.company.formatted_document %></p>
+                </div>
+                <div class="col-md-3">
+                  <strong>Telefone:</strong>
+                  <p><%= @user.company.formatted_phone %></p>
+                </div>
+              </div>
+            
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <strong>Email:</strong>
+                  <p><%= @user.company.email %></p>
+                </div>
+                <div class="col-md-6">
+                  <strong>Plano atual:</strong>
+                  <p><%= @user.company.current_plan&.name || @user.company.plan&.name || "Sem plano" %></p>
+                </div>
+              </div>
+            
+              <div class="row mb-3">
+                <div class="col-md-12">
+                  <strong>Endereço:</strong>
+                  <p><%= @user.company.full_address %></p>
+                </div>
+              </div>
+            
+              <div class="row mb-3">
+                <div class="col-md-4">
+                  <strong>Status de acesso:</strong>
+                  <p>
+                    <% if @user.company.access_enabled? %>
+                      <span class="badge bg-success">Acesso ativo</span>
+                    <% elsif @user.company.active? %>
+                      <span class="badge bg-warning text-dark">Ativa (sem assinatura)</span>
+                    <% else %>
+                      <span class="badge bg-secondary">Inativa</span>
+                    <% end %>
+                  </p>
+                </div>
+              </div>
+            <% else %>
+              <p class="text-muted">Este usuário não está vinculado a nenhuma empresa.</p>
+            <% end %>
+
+            <div class="mt-3">
+              <%= link_to "Voltar", admin_users_path, class: "btn btn-secondary" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

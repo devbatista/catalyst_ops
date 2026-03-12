@@ -32,6 +32,14 @@ class User < ApplicationRecord
 
   after_update :send_welcome_email_on_activation
 
+  def self.search(query = nil)
+    if query.present?
+      where("name ILIKE :q OR email ILIKE :q", q: "%#{query}%")
+    else
+      all
+    end
+  end
+
   def can_be_assigned_to_orders?
     tecnico?
   end
