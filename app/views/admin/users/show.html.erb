@@ -53,7 +53,7 @@
 
             <% unless @user.admin? %>
               <hr>
-              
+
               <h5>Resumo de ordens de serviço</h5>
               <div class="row mb-3">
                 <div class="col-md-4">
@@ -85,9 +85,13 @@
                   <strong>Documento:</strong>
                   <p><%= @user.company.formatted_document %></p>
                 </div>
-                <div class="col-md-3">
-                  <strong>Telefone:</strong>
-                  <p><%= @user.company.formatted_phone %></p>
+                <div class="col-md-3 text-md-end">
+                  <strong>Ações:</strong>
+                  <p class="mt-1">
+                    <%= link_to "Ver empresa",
+                                admin_company_path(@user.company),
+                                class: "btn btn-sm btn-outline-light" %>
+                  </p>
                 </div>
               </div>
             
