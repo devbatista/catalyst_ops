@@ -8,9 +8,20 @@
             Ticket #<%= @ticket.id %>
           </h4>
 
-          <%= link_to "Voltar para tickets",
-                      admin_tickets_path,
-                      class: "btn btn-light" %>
+          <div class="d-flex gap-2">
+            <% last_message = @support_messages.last %>
+
+            <% if last_message&.user&.admin? && (@ticket.aberto? || @ticket.em_andamento? || @ticket.aguardando_cliente?) %>
+              <%= link_to "Marcar como resolvido",
+                          resolve_admin_ticket_path(@ticket),
+                          class: "btn btn-success btn-sm js-resolve-ticket",
+                          data: { confirm: "Tem certeza que deseja marcar este ticket como resolvido?" } %>
+            <% end %>
+
+            <%= link_to "Voltar para tickets",
+                        admin_tickets_path,
+                        class: "btn btn-light" %>
+          </div>
         </div>
 
         <!-- Detalhes do ticket -->
@@ -189,3 +200,5 @@
     </div>
   </div>
 </div>
+
+<%= javascript_import_module_tag "admin/tickets" %>

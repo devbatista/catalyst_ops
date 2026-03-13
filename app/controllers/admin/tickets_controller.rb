@@ -24,4 +24,15 @@ class Admin::TicketsController < AdminController
 
     @support_messages = @ticket.support_messages.order(:created_at)
   end
+
+  def resolve
+    @ticket = SupportTicket.find(params[:id])
+
+    if @ticket.update(status: :resolvido)
+      redirect_to admin_ticket_path(@ticket), notice: "Ticket marcado como resolvido."
+    else
+      redirect_to admin_ticket_path(@ticket),
+                  alert: @ticket.errors.full_messages.to_sentence
+    end
+  end
 end

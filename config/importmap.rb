@@ -20,3 +20,5 @@ pin "app/clients_form"
 pin "app/technicians_form"
 pin "app/profile_form"
 pin "app/company_form"
+
+pin "admin/tickets"
