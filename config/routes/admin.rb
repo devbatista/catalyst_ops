@@ -10,7 +10,8 @@ constraints subdomain: "admin" do
       get :generate_pdf
     end
   end
-  resources :tickets, only: [:index], module: "admin", as: :admin_tickets
+  resources :tickets, only: [:index, :show], module: "admin", as: :admin_tickets
+  resources :support_messages, only: [:create], module: "admin", as: :admin_support_messages
   resources :configurations, only: [:index, :edit, :update], module: "admin", as: :admin_configurations
   resources :contents, module: "admin", as: :admin_contents
   

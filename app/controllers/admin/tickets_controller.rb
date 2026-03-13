@@ -16,4 +16,12 @@ class Admin::TicketsController < AdminController
     per_page = (params[:per].presence || 10).to_i
     @tickets = @tickets.page(params[:page]).per(per_page)
   end
+
+  def show
+    @ticket = SupportTicket
+      .includes(:company, :user, :order_service, support_messages: :user)
+      .find(params[:id])
+
+    @support_messages = @ticket.support_messages.order(:created_at)
+  end
 end

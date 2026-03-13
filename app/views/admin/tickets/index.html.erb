@@ -78,13 +78,14 @@
                     <% @tickets.each do |ticket| %>
                       <tr>
                         <td>
-                          <%= link_to ticket.id,
-                                      admin_tickets_path(ticket),
-                                      class: "text-decoration-none" %>
+                          <%= link_to admin_ticket_path(ticket),
+                                      class: "text-decoration-none" do %>
+                            <%= truncate(ticket.id, length: 60) %>
+                          <% end %>
                         </td>
 
                         <td>
-                          <%= link_to admin_tickets_path(ticket),
+                          <%= link_to admin_ticket_path(ticket),
                                       class: "text-decoration-none" do %>
                             <%= truncate(ticket.subject, length: 60) %>
                           <% end %>
@@ -98,10 +99,10 @@
                         <td>
                           <% status_class =
                                case ticket.status.to_sym
-                               when :aberto              then "secondary"
-                               when :em_andamento        then "info"
-                               when :aguardando_cliente  then "warning"
-                               when :resolvido           then "success"
+                               when :aberto then "secondary"
+                               when :em_andamento then "info"
+                               when :aguardando_cliente then "warning"
+                               when :resolvido then "success"
                                when :fechado, :cancelado then "dark"
                                else "secondary"
                                end %>
@@ -114,8 +115,8 @@
                           <% impact_class =
                                case ticket.impact.to_sym
                                when :bloqueante then "danger"
-                               when :alto       then "warning"
-                               when :medio      then "info"
+                               when :alto then "warning"
+                               when :medio then "info"
                                else "secondary"
                                end %>
                           <span class="badge bg-<%= impact_class %>">
@@ -128,7 +129,7 @@
                         </td>
 
                         <td class="text-end">
-                          <%= link_to 'Ver', admin_tickets_path(ticket), class: "btn btn-sm btn-primary" %>
+                          <%= link_to 'Ver', admin_ticket_path(ticket), class: "btn btn-sm btn-primary" %>
                         </td>
                       </tr>
                     <% end %>

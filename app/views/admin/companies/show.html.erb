@@ -218,7 +218,7 @@
                         </td>
                         <td><%= l(ticket.last_reply_at || ticket.created_at, format: :short) %></td>
                         <td class="text-end">
-                          <%= link_to "Ver", admin_tickets_path(ticket), class: "btn btn-sm btn-primary" %>
+                          <%= link_to "Ver", admin_ticket_path(ticket), class: "btn btn-sm btn-primary" %>
                         </td>
                       </tr>
                     <% end %>

@@ -101,7 +101,12 @@ a {
   color: #ffffff !important;
 }
 
-
+input[type="file"].form-control.bg-dark::-webkit-file-upload-button,
+input[type="file"].form-control.bg-dark::file-selector-button {
+  background-color: #111827; /* fundo escuro */
+  color: #e5e7eb;           /* texto claro */
+  border-color: #4b5563;
+}
 
 .sidebar-header {
 

@@ -1,0 +1,184 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row justify-content-center">
+      <div class="col-lg-9">
+        <div class="mb-3 d-flex justify-content-between align-items-center">
+          <h4 class="mb-0 text-uppercase">
+            <i class="bx bx-message-alt-detail"></i>
+            Ticket #<%= @ticket.id %>
+          </h4>
+
+          <%= link_to "Voltar para tickets",
+                      admin_tickets_path,
+                      class: "btn btn-light" %>
+        </div>
+
+        <!-- Detalhes do ticket -->
+        <div class="card mb-3">
+          <div class="card-body">
+            <div class="row mb-3">
+              <div class="col-md-12">
+                <strong>Assunto:</strong>
+                <p class="mb-0"><%= @ticket.subject %></p>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <strong>Empresa:</strong>
+                <p class="mb-0">
+                  <% if @ticket.company %>
+                    <%= link_to @ticket.company.name,
+                                admin_company_path(@ticket.company),
+                                class: "link-light" %>
+                  <% else %>
+                    -
+                  <% end %>
+                </p>
+              </div>
+
+              <div class="col-md-4">
+                <strong>Cliente:</strong>
+                <p class="mb-0">
+                  <% if @ticket.user %>
+                    <%= link_to(@ticket.user.full_name.presence || @ticket.user.name,
+                                admin_user_path(@ticket.user),
+                                class: "link-light") %>
+                  <% else %>
+                    -
+                  <% end %>
+                </p>
+              </div>
+
+              <div class="col-md-4">
+                <strong>OS relacionada:</strong>
+                <p class="mb-0">
+                  <% if @ticket.order_service %>
+                    <%= link_to "##{@ticket.order_service.code}",
+                                admin_order_service_path(@ticket.order_service),
+                                class: "text-decoration-underline" %>
+                  <% else %>
+                    Nenhuma
+                  <% end %>
+                </p>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <strong>Categoria:</strong>
+                <p class="mb-0"><%= @ticket.category&.humanize || "-" %></p>
+              </div>
+
+              <div class="col-md-4">
+                <strong>Impacto:</strong>
+                <p class="mb-0"><%= @ticket.impact&.humanize || "-" %></p>
+              </div>
+
+              <div class="col-md-4">
+                <strong>Prioridade:</strong>
+                <p class="mb-0"><%= @ticket.priority&.humanize || "-" %></p>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <strong>Criado em:</strong>
+                <p class="mb-0"><%= l(@ticket.created_at, format: :short) %></p>
+              </div>
+
+              <div class="col-md-4">
+                <strong>Última resposta:</strong>
+                <p class="mb-0">
+                  <%= l(@ticket.last_reply_at, format: :short) if @ticket.last_reply_at %>
+                </p>
+              </div>
+
+              <div class="col-md-4">
+                <strong>Responsável interno:</strong>
+                <p class="mb-0"><%= @ticket.assigned_to&.full_name || "-" %></p>
+              </div>
+            </div>
+
+            <hr>
+
+            <h5>Descrição</h5>
+            <div class="row mb-3">
+              <div class="col-md-12">
+                <div class="border border-secondary rounded p-2 bg-dark text-light">
+                  <%= simple_format(@ticket.description) %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Histórico de mensagens -->
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Histórico de mensagens</h5>
+          </div>
+          <div class="card-body">
+            <% if @support_messages.present? %>
+              <div class="mb-4">
+                <% @support_messages.each do |msg| %>
+                  <% from_admin = msg.user.admin? %>
+
+                  <div class="mb-3 d-flex <%= from_admin ? 'justify-content-end' : 'justify-content-start' %>">
+                    <div style="max-width: 75%;">
+                      <div class="small mb-1 <%= from_admin ? 'text-end text-primary' : 'text-start text-light' %>">
+                        <strong><%= msg.user.name %></strong>
+                        <span class="ms-1 text-muted">
+                          (<%= msg.user.role.humanize %>)
+                        </span>
+                      </div>
+
+                      <div class="p-2 rounded-3 <%= from_admin ? 'bg-primary' : 'bg-dark border border-secondary' %>">
+                        <div class="small mb-1 <%= from_admin ? 'text-white-50' : 'text-muted' %>">
+                          <%= l(msg.created_at, format: :short) %>
+                        </div>
+                        <%= simple_format(
+                              msg.body,
+                              class: (from_admin ? 'text-white' : 'text-light')
+                            ) %>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+              <p class="text-muted mb-4">Ainda não há mensagens neste ticket.</p>
+            <% end %>
+
+            <hr>
+
+            <h5 class="mb-3">Nova mensagem</h5>
+
+            <%= form_with model: SupportMessage.new,
+                          url: admin_support_messages_path,
+                          local: true do |f| %>
+              <%= f.hidden_field :support_ticket_id, value: @ticket.id %>
+
+              <div class="mb-3">
+                <%= f.label :body, "Mensagem", class: "form-label" %>
+                <%= f.text_area :body, rows: 4, class: "form-control", required: true %>
+              </div>
+
+              <div class="mb-3">
+                <%= f.label :attachments, "Anexos (opcional)", class: "form-label" %>
+                <%= f.file_field :attachments,
+                                  multiple: true,
+                                  class: "form-control bg-dark text-light border-secondary" %>
+              </div>
+
+              <div class="d-flex justify-content-end">
+                <%= f.submit "Enviar mensagem", class: "btn btn-primary" %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
