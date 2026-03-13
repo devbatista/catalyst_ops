@@ -48,10 +48,38 @@ class SupportTicket < ApplicationRecord
 
   before_create :set_initial_last_reply_at
 
+  def add_message!(user:, body:, attachments: [])
+    transaction do
+      message = support_messages.create!(
+        user: user,
+        body: body,
+        attachments: attachments
+      )
+      
+      apply_status_rules_after_message_from(user)
+      apply_assignment_rules_after_message_from(user)
+      
+      save!
+      message
+    end
+  end
+
   private
 
-  def open_status
-    recent.where(status: [:aberto, :em_andamento, :aguardando_cliente]).limit(5)
+  def apply_status_rules_after_message_from(user)
+    if user.admin?
+      self.status = :aguardando_cliente unless %w[resolvido fechado cancelado].include?(status)
+    else
+      case status.to_sym
+        when :aguardando_cliente then self.status = :em_andamento
+      end
+    end
+  end
+
+  def apply_assignment_rules_after_message_from(user)
+    return unless user.admin?
+    
+    self.assigned_to ||= user
   end
 
   def set_initial_last_reply_at
