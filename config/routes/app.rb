@@ -36,6 +36,7 @@ constraints subdomain: "app" do
   resources :support, only: [:index], module: "app", as: :app_support
 
   resources :support_tickets, module: "app", as: :app_support_tickets, only: [:index, :show, :new, :create]
+  resources :support_messages, only: [:create], module: "app", as: :app_support_messages
 
   devise_scope :user do
     delete "/logout", to: "sessions#destroy", as: :logout_app

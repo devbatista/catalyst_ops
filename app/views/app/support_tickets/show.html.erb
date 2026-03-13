@@ -1,0 +1,125 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="mb-3 d-flex justify-content-between align-items-center">
+          <h4 class="mb-0 text-uppercase">
+            <i class="bx bx-message-alt-detail"></i>
+            Ticket #<%= @support_ticket.id %>
+          </h4>
+
+          <%= link_to "Voltar para tickets",
+                      app_support_index_path(section: "tickets"),
+                      class: "btn btn-light" %>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <div class="text-muted small mb-1">Assunto</div>
+                <h5 class="mb-0"><%= @support_ticket.subject %></h5>
+              </div>
+              <% if @support_ticket.status %>
+                <span class="badge bg-primary">
+                  <%= @support_ticket.status.humanize %>
+                </span>
+              <% end %>
+            </div>
+        
+            <div class="row text-muted small mb-3">
+              <div class="col-md-3 mb-2">
+                <div class="fw-semibold text-dark">Categoria</div>
+                <div><%= @support_ticket.category&.humanize || "-" %></div>
+              </div>
+              <div class="col-md-3 mb-2">
+                <div class="fw-semibold text-dark">Impacto</div>
+                <div><%= @support_ticket.impact&.humanize || "-" %></div>
+              </div>
+              <div class="col-md-3 mb-2">
+                <div class="fw-semibold text-dark">Prioridade</div>
+                <div><%= @support_ticket.priority&.humanize || "-" %></div>
+              </div>
+              <div class="col-md-3 mb-2">
+                <div class="fw-semibold text-dark">OS relacionada</div>
+                <div>
+                  <% if @support_ticket.order_service %>
+                    <%= link_to "##{@support_ticket.order_service.code}",
+                                app_order_service_path(@support_ticket.order_service),
+                                class: "text-decoration-underline" %>
+                  <% else %>
+                    Nenhuma
+                  <% end %>
+                </div>
+              </div>
+            </div>
+        
+            <div>
+              <div class="fw-semibold mb-1">Descrição</div>
+              <div class="border rounded p-2 bg-light">
+                <%= simple_format(@support_ticket.description) %>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Histórico de mensagens</span>
+          </div>
+          <div class="card-body">
+            <% if @support_messages.present? %>
+              <div class="mb-4">
+                <% @support_messages.each do |msg| %>
+                  <% from_manager = msg.user.gestor? %>
+              
+                  <div class="mb-3 d-flex <%= from_manager ? 'justify-content-end' : 'justify-content-start' %>">
+                    <div style="max-width: 75%;">
+                      <div class="small mb-1 <%= from_manager ? 'text-end text-primary' : 'text-start text-muted' %>">
+                        <strong><%= msg.user.name %></strong>
+                      </div>
+                  
+                      <div class="p-2 rounded-3 <%= from_manager ? 'bg-primary text-white' : 'bg-light' %>">
+                        <div class="small mb-1 <%= from_manager ? 'text-white-50' : 'text-muted' %>">
+                          <%= l(msg.created_at, format: :short) %>
+                        </div>
+                        <div><%= simple_format(msg.body) %></div>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+              <p class="text-muted">Ainda não há mensagens neste ticket.</p>
+            <% end %>
+        
+            <hr>
+        
+            <h6 class="mb-3">Nova mensagem</h6>
+        
+            <%= form_with model: SupportMessage.new,
+                          url: app_support_messages_path,
+                          local: true do |f| %>
+              <%= f.hidden_field :support_ticket_id, value: @support_ticket.id %>
+        
+              <div class="mb-3">
+                <%= f.label :body, "Mensagem", class: "form-label" %>
+                <%= f.text_area :body, rows: 4, class: "form-control", required: true %>
+              </div>
+        
+              <div class="mb-3">
+                <%= f.label :attachments, "Anexos (opcional)", class: "form-label" %>
+                <%= f.file_field :attachments, multiple: true, class: "form-control" %>
+              </div>
+        
+              <div class="d-flex justify-content-end">
+                <%= f.submit "Enviar mensagem", class: "btn btn-primary" %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
