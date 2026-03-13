@@ -50,6 +50,10 @@ class SupportTicket < ApplicationRecord
 
   private
 
+  def open_status
+    recent.where(status: [:aberto, :em_andamento, :aguardando_cliente]).limit(5)
+  end
+
   def set_initial_last_reply_at
     self.last_reply_at ||= Time.current
   end

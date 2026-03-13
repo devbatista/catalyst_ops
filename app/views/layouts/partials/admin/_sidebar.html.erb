@@ -62,12 +62,12 @@
       </li>
     <% end %>
 
-    <!-- Suporte -->
+    <!-- Tickets -->
     <% if can?(:read, :support) %>
-      <li class="list-group-item <%= active_menu_class(admin_support_index_path) %>">
-        <%= link_to admin_support_index_path do %>
+      <li class="list-group-item <%= active_menu_class(admin_tickets_path) %>">
+        <%= link_to admin_tickets_path do %>
           <div class="parent-icon"><i class="bx bx-support"></i></div>
-          <div class="menu-title">Suporte</div>
+          <div class="menu-title">Tickets</div>
         <% end %>
       </li>
     <% end %>

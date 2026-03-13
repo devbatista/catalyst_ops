@@ -6,5 +6,6 @@ class Admin::CompaniesController < AdminController
 
   def show
     @company = Company.find(params[:id])
+    @tickets = @company.support_tickets.open_status
   end
 end
