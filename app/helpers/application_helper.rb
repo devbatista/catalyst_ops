@@ -69,6 +69,42 @@ module ApplicationHelper
     content_tag :span, ticket.status.humanize, class: "badge bg-#{status_class}"
   end
 
+  def ticket_impact_badge(ticket)
+    impact_sym = ticket.impact&.to_sym
+
+    impact_class =
+      case impact_sym
+      when :bloqueante then "danger"
+      when :alto       then "warning"
+      when :medio      then "info"
+      else "secondary"
+      end
+
+    content_tag :span,
+                (ticket.impact&.humanize || "-"),
+                class: "badge bg-#{impact_class}"
+  end
+
+  def subscription_status_badge(subscription)
+    status = subscription.status.to_s
+
+    css_class, label =
+      case status
+      when "active"
+        ["success",   "Ativa"]
+      when "pending"
+        ["warning text-dark", "Pendente"]
+      when "cancelled"
+        ["danger",    "Cancelada"]
+      when "expired"
+        ["secondary", "Expirada"]
+      else
+        ["secondary", status]
+      end
+
+    content_tag :span, label, class: "badge bg-#{css_class}"
+  end
+
   private
 
   def page_item(label, page_number, current_page, is_disabled = false)

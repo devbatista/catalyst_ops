@@ -32,20 +32,7 @@
             <div class="row mb-3">
               <div class="col-md-4">
                 <strong>Status:</strong>
-                <p>
-                  <% case @subscription.status %>
-                  <% when "active" %>
-                    <span class="badge bg-success">Ativa</span>
-                  <% when "pending" %>
-                    <span class="badge bg-warning text-dark">Pendente</span>
-                  <% when "cancelled" %>
-                    <span class="badge bg-danger">Cancelada</span>
-                  <% when "expired" %>
-                    <span class="badge bg-secondary">Expirada</span>
-                  <% else %>
-                    <span class="badge bg-secondary"><%= @subscription.status %></span>
-                  <% end %>
-                </p>
+                <p> <%= subscription_status_badge(@subscription) %> </p>
               </div>
               <div class="col-md-4">
                 <strong>Início:</strong>

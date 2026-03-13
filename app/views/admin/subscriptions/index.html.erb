@@ -79,20 +79,7 @@
                     <tr>
                       <td><%= subscription.company&.name || "-" %></td>
                       <td><%= subscription.plan&.name || subscription.preapproval_plan_id %></td>
-                      <td>
-                        <% case subscription.status %>
-                        <% when "active" %>
-                          <span class="badge bg-success">Ativa</span>
-                        <% when "pending" %>
-                          <span class="badge bg-warning text-dark">Pendente</span>
-                        <% when "cancelled" %>
-                          <span class="badge bg-danger">Cancelada</span>
-                        <% when "expired" %>
-                          <span class="badge bg-secondary">Expirada</span>
-                        <% else %>
-                          <span class="badge bg-secondary"><%= subscription.status %></span>
-                        <% end %>
-                      </td>
+                      <td><%= subscription_status_badge(subscription) %></td>
                       <td><%= l(subscription.start_date) if subscription.start_date %></td>
                       <td><%= l(subscription.end_date) if subscription.end_date %></td>
                       <td>

@@ -190,32 +190,8 @@
                         <td><%= ticket.id %></td>
                         <td><%= truncate(ticket.subject, length: 60) %></td>
                         <td><%= ticket.user&.full_name || ticket.user&.name %></td>
-                        <td>
-                          <% status_class =
-                               case ticket.status.to_sym
-                               when :aberto              then "secondary"
-                               when :em_andamento        then "info"
-                               when :aguardando_cliente  then "warning"
-                               when :resolvido           then "success"
-                               when :fechado, :cancelado then "dark"
-                               else "secondary"
-                               end %>
-                          <span class="badge bg-<%= status_class %>">
-                            <%= ticket.status.humanize %>
-                          </span>
-                        </td>
-                        <td>
-                          <% impact_class =
-                               case ticket.impact.to_sym
-                               when :bloqueante then "danger"
-                               when :alto       then "warning"
-                               when :medio      then "info"
-                               else "secondary"
-                               end %>
-                          <span class="badge bg-<%= impact_class %>">
-                            <%= ticket.impact.humanize %>
-                          </span>
-                        </td>
+                        <td><%= ticket_status_badge(ticket) %></td>
+                        <td><%= ticket_impact_badge(ticket) %></td>
                         <td><%= l(ticket.last_reply_at || ticket.created_at, format: :short) %></td>
                         <td class="text-end">
                           <%= link_to "Ver", admin_ticket_path(ticket), class: "btn btn-sm btn-primary" %>
