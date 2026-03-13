@@ -19,14 +19,17 @@ class App::SupportTicketsController < ApplicationController
     @support_ticket = current_user.company.support_tickets.build(
       user: current_user,
       impact: :medio,
-      priority: :normal
+      priority: :normal,
+      order_service_id: params[:order_service_id]
     )
+    @order_services = current_user.company.order_services.order(created_at: :desc)
   end
 
   def create
     @support_ticket = current_user.company.support_tickets.build(support_ticket_params)
     @support_ticket.user = current_user
     @support_ticket.status ||= :aberto
+    @order_services = current_user.company.order_services.order(created_at: :desc)
 
     if @support_ticket.save
       redirect_to app_support_ticket_path(@support_ticket),

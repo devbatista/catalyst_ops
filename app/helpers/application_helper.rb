@@ -11,6 +11,16 @@ module ApplicationHelper
     end
   end
 
+  def active_support_tickets_menu_class
+    if controller_path == "app/support" && params[:section] == "tickets"
+      "active"
+    elsif controller_path == "app/support_tickets"
+      "active"
+    else
+      ""
+    end
+  end
+
   def currency_br(value)
     number_to_currency(
       value,

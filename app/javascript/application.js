@@ -76,8 +76,31 @@ document.addEventListener('click', async function (e) {
 });
 
 function setActiveMenuItem() {
+  const menu = $('#menu');
+  if (menu.length === 0) return;
+
+  const currentActiveLis = menu.find('li.active');
+
+  // Se o servidor já marcou algum <li> como active, apenas garante os pais abertos
+  if (currentActiveLis.length > 0) {
+    currentActiveLis.each(function () {
+      const li = $(this);
+
+      // abre todos os uls ancestrais (submenus)
+      li.parents('ul').each(function () {
+        const ul = $(this);
+        if (!ul.is('#menu')) {
+          ul.addClass('mm-show');
+          ul.parent('li').addClass('mm-active');
+        }
+      });
+    });
+    return;
+  }
+
+  // Se não tiver nada ativo vindo do servidor, cai no comportamento antigo:
   const currentUrl = window.location.href;
-  const menuLinks = $("#menu li a");
+  const menuLinks = menu.find("li a");
   let bestMatch = null;
 
   menuLinks.each(function () {
@@ -89,7 +112,7 @@ function setActiveMenuItem() {
     }
   });
 
-  $("#menu li").removeClass('mm-active active');
+  menu.find("li").removeClass('mm-active active');
   menuLinks.removeClass('active');
 
   if (bestMatch) {
@@ -97,7 +120,7 @@ function setActiveMenuItem() {
     activeLink.addClass('active');
 
     const parentLi = activeLink.closest('li');
-    parentLi.addClass('mm-active').addClass('active');
+    parentLi.addClass('mm-active active');
 
     let parentUl = parentLi.parent('ul.metismenu-container');
     while (parentUl.length > 0 && !parentUl.is('#menu')) {

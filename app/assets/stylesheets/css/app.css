@@ -89,6 +89,18 @@ a {
   color: #ffffff !important;
 }
 
+.sidebar-wrapper .metismenu li.active > a,
+.sidebar-wrapper .metismenu li.active > a:hover,
+.sidebar-wrapper .metismenu li.active > a:focus {
+  background-color: #0d6efd !important;
+  color: #ffffff !important;
+}
+
+.sidebar-wrapper .metismenu li.active > a .parent-icon i,
+.sidebar-wrapper .metismenu li.active > a .menu-title {
+  color: #ffffff !important;
+}
+
 
 
 .sidebar-header {

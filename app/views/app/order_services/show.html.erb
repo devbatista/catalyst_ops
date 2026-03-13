@@ -121,6 +121,9 @@
           <div>
             <%= link_to "Voltar", app_order_services_path, class: "btn btn-secondary" %>
             <%= link_to "Editar", edit_app_order_service_path(@order_service), class: "btn btn-primary" %>
+            <%= link_to "Abrir ticket desta OS",
+                        new_app_support_ticket_path(order_service_id: @order_service.id),
+                        class: "btn btn-outline-primary ms-2" %>
           </div>
 
           <div>

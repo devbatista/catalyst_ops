@@ -1,0 +1,75 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="mb-3 d-flex justify-content-between align-items-center">
+          <h4 class="mb-0 text-uppercase">
+            <i class="bx bx-message-alt-add"></i> Novo ticket de suporte
+          </h4>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <%= form_with model: @support_ticket,
+                          url: app_support_tickets_path,
+                          local: true do |f| %>
+
+              <div class="mb-3">
+                <%= f.label :subject, "Assunto", class: "form-label" %>
+                <%= f.text_field :subject, class: "form-control", required: true %>
+              </div>
+
+              <div class="row">
+                <div class="col-md-4 mb-3">
+                  <%= f.label :category, "Categoria", class: "form-label" %>
+                  <%= f.select :category,
+                               SupportTicket.categories.keys.map { |c| [c.humanize, c] },
+                               { include_blank: "Selecione" },
+                               class: "form-select" %>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <%= f.label :impact, "Impacto", class: "form-label" %>
+                  <%= f.select :impact,
+                               SupportTicket.impacts.keys.map { |i| [i.humanize, i] },
+                               { include_blank: "Selecione" },
+                               class: "form-select" %>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <%= f.label :priority, "Prioridade", class: "form-label" %>
+                  <%= f.select :priority,
+                               SupportTicket.priorities.keys.map { |p| [p.humanize, p] },
+                               { include_blank: "Selecione" },
+                               class: "form-select" %>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <%= f.label :order_service_id, "Relacionado a uma OS (opcional)", class: "form-label" %>
+                <%= f.select :order_service_id,
+                             @order_services.map { |os| ["##{os.code} - #{os.title}", os.id] },
+                             { include_blank: "Selecione uma OS" },
+                             class: "form-select" %>
+              </div>
+
+              <div class="mb-3">
+                <%= f.label :description, "Descrição", class: "form-label" %>
+                <%= f.text_area :description, rows: 5, class: "form-control", required: true %>
+              </div>
+
+              <div class="mb-3">
+                <%= f.label :attachments, "Anexos (opcional)", class: "form-label" %>
+                <%= f.file_field :attachments, multiple: true, class: "form-control" %>
+              </div>
+
+              <div class="d-flex justify-content-between">
+                <%= link_to "Voltar", app_support_index_path(section: "tickets"), class: "btn btn-light" %>
+                <%= f.submit "Abrir ticket", class: "btn btn-primary" %>
+              </div>
+
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
