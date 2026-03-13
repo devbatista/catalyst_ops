@@ -28,7 +28,7 @@ class Admin::TicketsController < AdminController
   def resolve
     @ticket = SupportTicket.find(params[:id])
 
-    if @ticket.update(status: :resolvido)
+    if @ticket.mark_as_resolved!
       redirect_to admin_ticket_path(@ticket), notice: "Ticket marcado como resolvido."
     else
       redirect_to admin_ticket_path(@ticket),

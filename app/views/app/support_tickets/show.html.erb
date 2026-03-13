@@ -20,11 +20,21 @@
                 <div class="text-muted small mb-1">Assunto</div>
                 <h5 class="mb-0"><%= @support_ticket.subject %></h5>
               </div>
-              <% if @support_ticket.status %>
-                <span class="badge bg-primary">
-                  <%= @support_ticket.status.humanize %>
-                </span>
-              <% end %>
+              <div class="text-end">
+                <% if @support_ticket.status %>
+                  <span class="badge bg-primary">
+                    <%= @support_ticket.status.humanize %>
+                  </span>
+                <% end %>
+                <% if @support_ticket.aberto? || @support_ticket.em_andamento? || @support_ticket.aguardando_cliente? || @support_ticket.resolvido? %>
+                  <div class="mt-2">
+                    <%= link_to "Fechar ticket",
+                                close_app_support_ticket_path(@support_ticket),
+                                class: "btn btn-outline-danger btn-sm js-close-ticket",
+                                data: { confirm: "Tem certeza que deseja fechar este ticket?" } %>
+                  </div>
+                <% end %>
+              </div>
             </div>
         
             <div class="row text-muted small mb-3">
@@ -123,3 +133,5 @@
     </div>
   </div>
 </div>
+
+<%= javascript_import_module_tag "app/support_tickets" %>

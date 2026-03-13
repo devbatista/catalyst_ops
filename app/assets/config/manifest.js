@@ -22,3 +22,4 @@
 //= link utils/formatters.js
 //= link utils/validators.js
 //= link admin/tickets.js
+//= link app/support_tickets.js

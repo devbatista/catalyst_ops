@@ -40,6 +40,16 @@ class App::SupportTicketsController < ApplicationController
     end
   end
 
+  def close
+    @support_ticket = current_user.company.support_tickets.find(params[:id])
+  
+    if @support_ticket.mark_as_closed!
+      render json: { success: true, status: @support_ticket.status, message: "Ticket fechado com sucesso." }
+    else
+      render json: { success: false, errors: @support_ticket.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def support_ticket_params

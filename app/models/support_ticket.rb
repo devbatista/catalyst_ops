@@ -48,7 +48,11 @@ class SupportTicket < ApplicationRecord
 
   before_create :set_initial_last_reply_at
 
+  before_update :prevent_status_change_if_closed_or_cancelled
+
   def add_message!(user:, body:, attachments: [])
+    raise "Ticket fechado ou cancelado não pode ser reaberto, caso necessário abra um novo ticket" if fechado? || cancelado?
+
     transaction do
       message = support_messages.create!(
         user: user,
@@ -62,6 +66,14 @@ class SupportTicket < ApplicationRecord
       save!
       message
     end
+  end
+
+  def mark_as_resolved!
+    update!(status: :resolvido)
+  end
+
+  def mark_as_closed!
+    update!(status: :fechado)
   end
 
   private
@@ -94,5 +106,12 @@ class SupportTicket < ApplicationRecord
 
   def set_initial_last_reply_at
     self.last_reply_at ||= Time.current
+  end
+
+  def prevent_status_change_if_closed_or_cancelled
+    if status_changed? && status_was.in?(%w[fechado cancelado])
+      errors.add(:status, "Não pode ser alterado em tickets fechado ou cancelado")
+      throw(:abort)
+    end
   end
 end
