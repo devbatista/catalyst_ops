@@ -2,22 +2,26 @@ class App::SupportMessagesController < ApplicationController
   skip_authorization_check
 
   def create
-    @support_ticket = current_user.company.support_tickets.find(support_message_params[:support_ticket_id])
-
-    @support_message = @support_ticket.support_messages.build(
-      body: support_message_params[:body],
-      user: current_user
+    @support_ticket = current_user.company.support_tickets.find(
+      support_message_params[:support_ticket_id]
     )
-    @support_message.attachments.attach(support_message_params[:attachments]) if support_message_params[:attachments]
 
+    attachments = support_message_params[:attachments]
+
+    @support_message = @support_ticket.add_message!(
+      user: current_user,
+      body: support_message_params[:body],
+      attachments: attachments
+    )
+
+    redirect_to app_support_ticket_path(@support_ticket),
+                notice: "Mensagem enviada com sucesso."
+  rescue ActiveRecord::RecordInvalid => e
+    @support_message = e.record
     @support_messages = @support_ticket.support_messages.order(created_at: :asc)
 
-    if @support_message.save
-      redirect_to app_support_ticket_path(@support_ticket), notice: "Mensagem enviada com sucesso."
-    else
-      flash.now[:alert] = @support_message.errors.full_messages.to_sentence
-      render "app/support_tickets/show", status: :unprocessable_entity
-    end
+    flash.now[:alert] = @support_message.errors.full_messages.to_sentence
+    render "app/support_tickets/show", status: :unprocessable_entity
   end
 
   private

@@ -1,18 +1,24 @@
 class Admin::SupportMessagesController < AdminController
   def create
-    @support_message = SupportMessage.new(support_message_params)
-    @support_message.user = current_user
+    ticket = SupportTicket.find(support_message_params[:support_ticket_id])
 
-    if @support_message.save
-      redirect_to admin_ticket_path(@support_message.support_ticket),
-                  notice: "Mensagem enviada com sucesso."
-    else
-      @ticket = @support_message.support_ticket
-      @support_messages = @ticket.support_messages.order(:created_at)
+    attachments = support_message_params[:attachments]
 
-      flash.now[:alert] = "Não foi possível enviar a mensagem."
-      render "admin/tickets/show", status: :unprocessable_entity
-    end
+    @support_message = ticket.add_message!(
+      user: current_user,
+      body: support_message_params[:body],
+      attachments: attachments
+    )
+
+    redirect_to admin_ticket_path(ticket),
+                notice: "Mensagem enviada com sucesso."
+  rescue ActiveRecord::RecordInvalid => e
+    @support_message = e.record
+    @ticket = @support_message.support_ticket
+    @support_messages = @ticket.support_messages.order(:created_at)
+
+    flash.now[:alert] = @support_message.errors.full_messages.to_sentence
+    render "admin/tickets/show", status: :unprocessable_entity
   end
 
   private
