@@ -55,6 +55,20 @@ module ApplicationHelper
     end
   end
 
+  def ticket_status_badge(ticket)
+    status_class =
+      case ticket.status.to_sym
+      when :aberto              then "secondary"
+      when :em_andamento        then "info"
+      when :aguardando_cliente  then "warning"
+      when :resolvido           then "success"
+      when :fechado, :cancelado then "dark"
+      else "secondary"
+      end
+
+    content_tag :span, ticket.status.humanize, class: "badge bg-#{status_class}"
+  end
+
   private
 
   def page_item(label, page_number, current_page, is_disabled = false)
