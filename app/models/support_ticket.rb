@@ -67,11 +67,21 @@ class SupportTicket < ApplicationRecord
   private
 
   def apply_status_rules_after_message_from(user)
+    current = status.to_sym
+  
     if user.admin?
-      self.status = :aguardando_cliente unless %w[resolvido fechado cancelado].include?(status)
+      case current
+      when :aberto, :em_andamento
+        self.status = :aguardando_cliente
+      else
+        # :aguardando_cliente, :resolvido, :fechado, :cancelado → mantém
+      end
     else
-      case status.to_sym
-        when :aguardando_cliente then self.status = :em_andamento
+      case current
+      when :aberto, :em_andamento, :aguardando_cliente
+        self.status = :em_andamento
+      when :resolvido
+        self.status = :em_andamento
       end
     end
   end
