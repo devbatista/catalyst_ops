@@ -138,6 +138,7 @@ O projeto utiliza vários subdomínios para separar áreas da aplicação:
 - `login.catalystops.local`→ tela de login
 - `admin.catalystops.local`→ área administrativa
 - `register.catalystops.local` → onboarding / cadastro
+- `webhook.catalystops.local` → área para recebimento de gatilhos externos
 - `sidekiq.catalystops.local`  → painel do Sidekiq
 
 ### 1. Editar `/etc/hosts` (macOS / Linux)
@@ -156,6 +157,7 @@ Adicione as linhas:
 127.0.0.1   login.catalystops.local
 127.0.0.1   admin.catalystops.local
 127.0.0.1   register.catalystops.local
+127.0.0.1   webhook.catalystops.local
 127.0.0.1   sidekiq.catalystops.local
 ```
 
@@ -165,11 +167,12 @@ Salve e feche.
 
 Depois de subir os containers (ver seção abaixo), você poderá acessar:
 
-- `http://app.catalystops.local`
-- `http://login.catalystops.local`
-- `http://admin.catalystops.local`
-- `http://register.catalystops.local`
-- `http://sidekiq.catalystops.local` (quando configurado no nginx)
+- `https://app.catalystops.local`
+- `https://login.catalystops.local`
+- `https://admin.catalystops.local`
+- `https://register.catalystops.local`
+- `https://webhook.catalystops.local`
+- `https://sidekiq.catalystops.local` (quando configurado no nginx)
 
 O serviço `nginx` (porta 80 e 443) faz o roteamento para o container `web`.
 

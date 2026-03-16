@@ -85,6 +85,7 @@ Rails.application.configure do
   config.hosts << "admin.catalystops.local"
   config.hosts << "login.catalystops.local"
   config.hosts << "register.catalystops.local"
+  config.hosts << "webhook.catalystops.local"
   config.hosts << "sidekiq.catalystops.local"
   config.hosts << /.*\.catalystops\.local/
 
