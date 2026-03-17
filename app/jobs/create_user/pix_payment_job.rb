@@ -4,9 +4,7 @@ class CreateUser::PixPaymentJob < ApplicationJob
   def perform(company_id)
     company = Company.find(company_id)
 
-    result = Cmd::MercadoPago::CreatePixPayment.new(
-      company: company
-    ).call
+    result = Cmd::MercadoPago::CreatePixPayment.new(company).call
 
     if result.success?
       Payments::PixMailer.with(result.mailer_params).pix_email.deliver_later
