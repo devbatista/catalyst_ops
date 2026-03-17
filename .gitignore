@@ -49,3 +49,5 @@ nginx.conf
 build.log
 
 /scripts
+
+/letsencrypt
