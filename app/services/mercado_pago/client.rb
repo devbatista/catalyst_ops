@@ -12,8 +12,8 @@ module MercadoPago
 
       Rails.logger.info("MercadoPago::Client initialized with base URL: #{@access_token}")
       Rails.logger.info("MercadoPago::ENV: #{Rails.env}")
-      Rails.logger.info("MercadoPago::MP_TEST_ACCESS_TOKEN: #{ENV['MP_TEST_ACCESS_TOKEN']}")
-      Rails.logger.info("MercadoPago::MP_PRODUCTION_ACCESS_TOKEN: #{ENV['MP_PRODUCTION_ACCESS_TOKEN']}")
+      Rails.logger.info("MercadoPago::MP_TEST_ACCESS_TOKEN: #{ENV.fetch('MP_TEST_ACCESS_TOKEN')}")
+      Rails.logger.info("MercadoPago::MP_PRODUCTION_ACCESS_TOKEN: #{ENV.fetch('MP_PRODUCTION_ACCESS_TOKEN')}")
     end
 
     def request(method:, path:, body: nil, params: nil)
