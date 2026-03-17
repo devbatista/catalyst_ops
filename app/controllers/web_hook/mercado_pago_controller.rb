@@ -2,6 +2,8 @@ class WebHook::MercadoPagoController < WebHookController
   skip_before_action :verify_authenticity_token
   
   def webhook
+    Rails.logger.info("Recebido webhook do Mercado Pago: #{request}")
+      
     request = request.raw_post
     Rails.logger.info("Recebido webhook do Mercado Pago: #{request}")
     
