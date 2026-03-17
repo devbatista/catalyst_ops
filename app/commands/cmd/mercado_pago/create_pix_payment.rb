@@ -35,7 +35,8 @@ module Cmd
           pix_code: response['point_of_interaction']['transaction_data']['qr_code'],
           pix_image_url: response['point_of_interaction']['transaction_data']['qr_code_base64'],
           pix_expiration_date: response['date_of_expiration'],
-          pix_ticket_url: response['point_of_interaction']['transaction_data']['ticket_url']
+          pix_ticket_url: response['point_of_interaction']['transaction_data']['ticket_url'],
+          external_id: response['id']
         }
       end
 
