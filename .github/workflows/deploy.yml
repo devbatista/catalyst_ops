@@ -21,5 +21,20 @@ jobs:
             cd /opt/catalyst_ops
             git config --global --add safe.directory /opt/catalyst_ops
             git pull origin main
+
+            # Cria/atualiza o .env com os secrets do GitHub Actions
+            cat > .env <<EOF
+            MP_PRODUCTION_ACCESS_TOKEN=${{ secrets.MP_PRODUCTION_ACCESS_TOKEN }}
+            MP_TEST_ACCESS_TOKEN=${{ secrets.MP_TEST_ACCESS_TOKEN }}
+            MP_PUBLIC_KEY=${{ secrets.MP_PUBLIC_KEY }}
+            MP_WEBHOOK_SECRET=${{ secrets.MP_WEBHOOK_SECRET }}
+            RAILS_MASTER_KEY=${{ secrets.RAILS_MASTER_KEY }}
+            SECRET_KEY_BASE=${{ secrets.SECRET_KEY_BASE }}
+            POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+            POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+            POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+            # ...adicione outras variáveis necessárias
+            EOF
+
             docker compose down
             docker compose up -d --build
