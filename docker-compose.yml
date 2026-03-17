@@ -18,8 +18,6 @@ services:
     restart: unless-stopped
 
   web:
-    env_file:
-      - .env
     image: catalystops-app
     build:
       context: .
