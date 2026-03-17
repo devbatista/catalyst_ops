@@ -9,11 +9,6 @@ module MercadoPago
     def initialize(access_token: MP_ACCESS_TOKEN, base_url: MP_API_BASE)
       @access_token = access_token
       @api_base = base_url
-
-      Rails.logger.info("MercadoPago::Client initialized with base URL: #{@access_token}")
-      Rails.logger.info("MercadoPago::ENV: #{Rails.env}")
-      Rails.logger.info("MercadoPago::MP_TEST_ACCESS_TOKEN: #{ENV.fetch('MP_TEST_ACCESS_TOKEN')}")
-      Rails.logger.info("MercadoPago::MP_PRODUCTION_ACCESS_TOKEN: #{ENV.fetch('MP_PRODUCTION_ACCESS_TOKEN')}")
     end
 
     def request(method:, path:, body: nil, params: nil)
@@ -49,7 +44,7 @@ module MercadoPago
 
     def fetch_plans
       response = request(method: :get, path: "/preapproval_plan/search", params: { limit: 100, status: 'active' })
-      JSON.parse(response.body)["results"]
+      JSON.parse(response)["results"]
     end
   end
 end
