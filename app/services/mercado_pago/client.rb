@@ -9,6 +9,8 @@ module MercadoPago
     def initialize(access_token: MP_ACCESS_TOKEN, base_url: MP_API_BASE)
       @access_token = access_token
       @api_base = base_url
+
+      Rails.logger.info("MercadoPago::Client initialized with base URL: #{@access_token}")
     end
 
     def request(method:, path:, body: nil, params: nil)
