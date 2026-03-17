@@ -16,7 +16,8 @@ class Subscription < ApplicationRecord
 
   scope :by_status, ->(status) { where(status: status) }
   scope :recent, -> { order(created_at: :desc) }
-  scope :current, -> { where(status: :active).where('end_date > ?', Time.current) }
+  scope :current, -> { order(created_at: :desc).limit(1) }
+  scope :active, -> { where(status: :active).limit(1) }
   
   scope :ready_to_cycle, -> { 
     joins(:company)
