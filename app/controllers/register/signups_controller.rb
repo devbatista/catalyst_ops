@@ -90,7 +90,7 @@ class Register::SignupsController < ApplicationController
       raise ActiveRecord::Rollback, Array(user_res.errors).join(", ") unless user_res.success?
 
       company.update_attribute(:responsible_id, user.id)
-      subscription = company.subscriptions.create!(subscription_params) || raise(ActiveRecord::Rollback, "Erro ao criar assinatura para a empresa.")
+      company.subscriptions.create!(subscription_params) || raise(ActiveRecord::Rollback, "Erro ao criar assinatura para a empresa.")
 
       return Result.new(true, nil)
     end
