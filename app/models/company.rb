@@ -87,10 +87,12 @@ class Company < ApplicationRecord
 
   def activate!
     update!(active: true)
+    users.update_all(active: true)
   end
 
   def deactivate!
     update!(active: false)
+    users.update_all(active: false)
   end
 
   def access_enabled?

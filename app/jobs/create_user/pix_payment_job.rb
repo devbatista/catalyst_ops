@@ -7,7 +7,11 @@ class CreateUser::PixPaymentJob < ApplicationJob
     result = Cmd::MercadoPago::CreatePixPayment.new(company).call
 
     if result.success?
-      company.subscriptions.pending.order(created_at: :desc).first.update!(external_reference: result.mailer_params[:external_id])
+      company.subscriptions
+             .pending
+             .order(created_at: :desc)
+             .first
+             .update!(external_reference: result.mailer_params[:external_id])
 
       Payments::PixMailer.with(result.mailer_params).pix_email.deliver_later
       Rails.logger.info("[CreateUser::PixPaymentJob] E-mail de pagamento Pix enviado para Company ID #{company_id}.")
