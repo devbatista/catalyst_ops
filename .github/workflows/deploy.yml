@@ -24,6 +24,7 @@ jobs:
 
             # Cria/atualiza o .env com os secrets do GitHub Actions
             cat > .env <<EOF
+            RAILS_ENV=production
             MP_PRODUCTION_ACCESS_TOKEN=${{ secrets.MP_PRODUCTION_ACCESS_TOKEN }}
             MP_TEST_ACCESS_TOKEN=${{ secrets.MP_TEST_ACCESS_TOKEN }}
             MP_PUBLIC_KEY=${{ secrets.MP_PUBLIC_KEY }}
