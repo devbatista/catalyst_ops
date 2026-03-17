@@ -101,6 +101,8 @@ Rails.application.configure do
   config.hosts << "register.catalystops.com.br"
   config.hosts << "webhook.catalystops.com.br"
   config.hosts << "sidekiq.catalystops.com.br"
+  config.hosts << "localhost"
+  config.hosts << "127.0.0.1"
 
   config.public_file_server.enabled = true
 end
