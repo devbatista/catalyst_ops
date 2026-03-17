@@ -28,20 +28,20 @@
     const setId = (el, id) => { if (el && !el.id) el.id = id; return el?.id; };
 
     const numberEl = q('signup[card][card_number]');
-    const expEl = q('signup[card][card_expiration]'); // MM/YY
+    const expEl = q('signup[card][card_expiration]');
     const cvvEl = q('signup[card][card_cvv]');
     const nameEl = q('signup[card][cardholder_name]');
     const docEl = q('signup[card][cardholder_document]');
     const emailEl = q('signup[user][email]') || q('signup[company][email]');
 
-    // Mitiga interferência de extensões (password managers, etc.)
+    // Mitiga interferência de extensões
     const markIgnore = (el, ac) => {
       if (!el) return;
       el.setAttribute('autocomplete', ac || 'off');
       el.setAttribute('autocapitalize', 'off');
       el.setAttribute('spellcheck', 'false');
-      el.setAttribute('data-lpignore', 'true');   // LastPass
-      el.setAttribute('data-1p-ignore', 'true');  // 1Password
+      el.setAttribute('data-lpignore', 'true');
+      el.setAttribute('data-1p-ignore', 'true');
     };
     markIgnore(numberEl, 'cc-number'); numberEl?.setAttribute('inputmode', 'numeric');
     markIgnore(cvvEl, 'cc-csc');        cvvEl?.setAttribute('inputmode', 'numeric');
@@ -56,7 +56,6 @@
     const emailId  = setId(emailEl,  'mp_cardholder_email');
     const docId    = setId(docEl,    'mp_identification_number');
 
-    // Selects exigidos pelo cardForm (devem ser <select>, mesmo ocultos)
     function ensureHiddenSelect(id) {
       let el = document.getElementById(id);
       if (!el) {
@@ -67,26 +66,9 @@
       }
       return el;
     }
-    const idTypeSelect = ensureHiddenSelect('mp_identification_type');
-    const installmentsSelect = ensureHiddenSelect('mp_installments');
-    const issuerSelect = ensureHiddenSelect('mp_issuer');
-
-    // Sincroniza CPF/CNPJ com o select de tipo
-    const syncIdType = () => {
-      const digits = (docEl?.value || '').replace(/\D/g, '');
-      const target = digits.length > 11 ? 'CNPJ' : 'CPF';
-      const trySet = () => {
-        const opt = Array.from(idTypeSelect.options).find(o => o.value === target);
-        if (opt) {
-          idTypeSelect.value = target;
-          idTypeSelect.dispatchEvent(new Event('change', { bubbles: true }));
-          return true;
-        }
-        return false;
-      };
-      if (!trySet()) setTimeout(trySet, 120);
-    };
-    docEl?.addEventListener('input', syncIdType);
+    ensureHiddenSelect('mp_identification_type');
+    ensureHiddenSelect('mp_installments');
+    ensureHiddenSelect('mp_issuer');
 
     function ensureHidden(name) {
       let input = form.querySelector(`input[name="${name}"]`);
@@ -112,56 +94,80 @@
 
     function shouldTokenize() {
       const method = form.querySelector('input[name="signup[payment_method]"]:checked')?.value;
-      const hasCardFields = !!q('signup[card][card_number]');
-      if (method) return method === 'credit_card';
-      return hasCardFields;
+      const ccForm = document.getElementById('credit-card-form');
+      return method === 'credit_card' && ccForm && !ccForm.classList.contains('d-none');
     }
 
-    const cardForm = mp.cardForm({
-      amount: '1',
-      autoMount: true,
-      form: {
-        id: form.id,
-        cardholderName: { id: nameId },
-        cardholderEmail: { id: emailId },
-        cardNumber: { id: numberId },
-        securityCode: { id: cvvId },
-        expirationDate: { id: expId },
-        installments: { id: 'mp_installments' },
-        identificationType: { id: 'mp_identification_type' },
-        identificationNumber: { id: docId },
-        issuer: { id: 'mp_issuer' },
-      },
-      callbacks: {
-        onFormMounted: (error) => {
-          if (error) {
-            console.error('cardForm mount error', error);
-            return;
-          }
-          syncIdType();
-        },
-        onSubmit: (event) => {
-          if (!shouldTokenize()) return;
-          event.preventDefault();
+    let cardFormInstance = null;
 
-          const { token } = cardForm.getCardFormData();
-          if (!token) {
-            alert('Não foi possível tokenizar o cartão.');
-            return;
-          }
- 
-          ensureHidden('signup[card_token]').value = token;
-          removeSensitiveNames();
-          form.submit();
+    function mountCardForm() {
+      if (cardFormInstance) return;
+      cardFormInstance = mp.cardForm({
+        amount: '1',
+        autoMount: true,
+        form: {
+          id: form.id,
+          cardholderName: { id: nameId },
+          cardholderEmail: { id: emailId },
+          cardNumber: { id: numberId },
+          securityCode: { id: cvvId },
+          expirationDate: { id: expId },
+          installments: { id: 'mp_installments' },
+          identificationType: { id: 'mp_identification_type' },
+          identificationNumber: { id: docId },
+          issuer: { id: 'mp_issuer' },
         },
-        onError: (errors) => {
-          console.error('cardForm error', errors);
-          alert('Erro ao tokenizar o cartão. Verifique os dados e tente novamente.');
+        callbacks: {
+          onFormMounted: (error) => {
+            if (error) {
+              console.error('cardForm mount error', error);
+              return;
+            }
+          },
+          onSubmit: (event) => {
+            if (!shouldTokenize()) return;
+            event.preventDefault();
+
+            const { token } = cardFormInstance.getCardFormData();
+            if (!token) {
+              alert('Não foi possível tokenizar o cartão.');
+              return;
+            }
+
+            ensureHidden('signup[card_token]').value = token;
+            removeSensitiveNames();
+            form.submit();
+          },
+          onError: (errors) => {
+            console.error('cardForm error', errors);
+            alert('Erro ao tokenizar o cartão. Verifique os dados e tente novamente.');
+          }
         }
-      }
+      });
+      window.__mpCardForm = cardFormInstance;
+    }
+
+    function unmountCardForm() {
+      cardFormInstance = null;
+      window.__mpCardForm = undefined;
+      // O SDK não tem destroy, mas isso impede submit custom
+    }
+
+    // Listener para método de pagamento
+    document.querySelectorAll('input[name="signup[payment_method]"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        if (this.value === 'credit_card') {
+          mountCardForm();
+        } else {
+          unmountCardForm();
+        }
+      });
     });
 
-    // Expor para testes no console (remover em produção)
-    window.__mpCardForm = cardForm;
+    // Estado inicial ao carregar
+    const selected = document.querySelector('input[name="signup[payment_method]"]:checked');
+    if (selected && selected.value === 'credit_card') {
+      mountCardForm();
+    }
   });
 })();

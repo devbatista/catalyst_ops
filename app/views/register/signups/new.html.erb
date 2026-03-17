@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="mp-public-key" content="<%= ENV['MP_PUBLIC_KEY_TEST'] %>">
+  <meta name="mp-public-key" content="<%= ENV.fetch('MP_PUBLIC_KEY') %>">
   <title>CatalystOps</title>
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
