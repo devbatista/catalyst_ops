@@ -19,6 +19,7 @@ jobs:
           port: ${{ secrets.SERVER_SSH_PORT }}
           script: |
             cd /opt/catalyst_ops
+            git config --global --add safe.directory /opt/catalyst_ops
             git pull origin main
             docker compose down
             docker compose up -d --build
