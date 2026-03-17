@@ -43,6 +43,7 @@ services:
       MP_PRODUCTION_ACCESS_TOKEN: ${MP_PRODUCTION_ACCESS_TOKEN}
       MP_TEST_ACCESS_TOKEN: ${MP_TEST_ACCESS_TOKEN}
       MP_PUBLIC_KEY: ${MP_PUBLIC_KEY}
+      PRECOMPILE_ASSETS: "1"
       MP_WEBHOOK_SECRET: ${MP_WEBHOOK_SECRET}
     command: bin/rails server -b 0.0.0.0 -p 3000
     restart: unless-stopped
