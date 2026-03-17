@@ -1,4 +1,4 @@
-name: Deploy Catalyst Ops
+name: Deploy Catalyst Ops on VPS
 
 on:
   push:
