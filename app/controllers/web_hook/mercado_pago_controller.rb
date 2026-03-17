@@ -3,11 +3,11 @@ class WebHook::MercadoPagoController < WebHookController
   
   def webhook
     Rails.logger.info("Recebido webhook do Mercado Pago: #{request}")
-      
-    request = request.raw_post
-    Rails.logger.info("Recebido webhook do Mercado Pago: #{request}")
+
+    raw = request.raw_post
+    Rails.logger.info("Recebido webhook do Mercado Pago: #{raw}")
     
-    request = JSON.parse(request)
+    request = JSON.parse(raw)
     payment_id = request['data']['id']
 
     subscription = Subscription.find_by(external_reference: payment_id)
