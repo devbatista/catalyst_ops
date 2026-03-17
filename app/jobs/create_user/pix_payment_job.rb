@@ -10,6 +10,7 @@ class CreateUser::PixPaymentJob < ApplicationJob
       company.current_subscription.update!(external_reference: result.mailer_params[:external_id])
 
       Payments::PixMailer.with(result.mailer_params).pix_email.deliver_later
+      
       Rails.logger.info("[CreateUser::PixPaymentJob] E-mail de pagamento Pix enviado para Company ID #{company_id}.")
     else
       Rails.logger.error("[CreateUser::PixPaymentJob] Falha ao criar pagamento Pix para Company ID #{company_id}: #{result.errors}")

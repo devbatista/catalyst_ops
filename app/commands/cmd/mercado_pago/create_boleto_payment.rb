@@ -1,6 +1,7 @@
 module Cmd
   module MercadoPago
     class CreateBoletoPayment
+      Result = Struct.new(:success?, :mailer_params, :errors)
       attr_reader :company, :plan, :response
 
       def initialize(company)
@@ -16,12 +17,14 @@ module Cmd
         )
 
         if response['status'].include?('pending')
-          Payments::BoletoMailer.with(mailer_params).ticket_email.deliver_later
+          Result.new(true, mailer_params, nil)
         else
-          raise "Failed to create boleto payment: #{response['status_detail']}"
+          error = "Falha ao criar o pagamento via boleto: #{response['status_detail']}"
+          Result.new(false, nil, error)
         end
       rescue => e
         Rails.logger.error("Erro ao criar boleto para a company id #{@company.id}: #{e.message}")
+        Result.new(false, nil, " Erro ao criar o pagamento via boleto: #{e.message}")
       end
 
       private
@@ -31,7 +34,8 @@ module Cmd
           company: company,
           boleto_url: response['transaction_details']['external_resource_url'],
           boleto_expiration_date: response['date_of_expiration'],
-          boleto_barcode: response['barcode']['content']
+          boleto_barcode: response['barcode']['content'],
+          external_id: response['id']
         }
       end
       
@@ -42,7 +46,7 @@ module Cmd
           payment_method_id: 'bolbradesco',
           description: "Assinatura mensal do plano #{plan.name}",
           external_reference: company.id.to_s,
-          date_of_expiration: (Date.today + 7.days).end_of_day.iso8601,
+          date_of_expiration: (Date.today + 7.days).end_of_day.strftime("%Y-%m-%dT%H:%M:%S.000%:z"),
           additional_info: {
             items: [
               id: plan.id,
