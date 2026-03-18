@@ -1,6 +1,6 @@
 <div class="card mb-3">
   <div class="card-body">
-    <% subscription = current_user.company.subscriptions.find_by(status: :active) %>
+    <% subscription = current_user.company.current_subscription %>
     <% if subscription && subscription.plan %>
       <div class="row mb-2">
         <div class="col-md-4"><strong>Plano:</strong></div>
