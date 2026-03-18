@@ -1,0 +1,3 @@
+class KnowledgeBaseArticle < ApplicationRecord
+  
+end

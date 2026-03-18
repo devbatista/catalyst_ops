@@ -58,7 +58,7 @@
             <% when 'tickets' %>
               <%= render 'tickets' %>
             <% when 'knowledge_base' %>
-              <%= render 'knowledge_base' %>
+              <%= render 'knowledge_base', articles: @articles  %>
             <% when 'suggestions' %>
               <%= render 'suggestions' %>
             <% when 'quick_contact' %>
