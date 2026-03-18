@@ -1,0 +1,27 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="container mt-4">
+      <div class="row justify-content-center">
+        <div class="col-xl-8 mx-auto">
+          <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <h4 class="mb-0 text-uppercase">Editar Artigo da Base de Conhecimento</h4>
+          </div>
+
+          <% flash.each do |type, message| %>
+            <% bootstrap_class = { notice: "alert-success", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
+            <div class="alert <%= bootstrap_class %> alert-dismissible fade show bg-dark text-light border-light" role="alert">
+              <%= message %>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          <% end %>
+
+          <div class="card">
+            <div class="card-body">
+              <%= render 'form' %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

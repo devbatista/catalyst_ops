@@ -1,0 +1,45 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="mb-3">
+          <h4 class="mb-0 text-uppercase">Informações do Artigo</h4>
+        </div>
+
+        <% flash.each do |type, message| %>
+          <% bootstrap_class = { notice: "alert-success", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
+          <div class="alert <%= bootstrap_class %> alert-dismissible fade show bg-dark text-light border-light" role="alert">
+            <%= message %>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        <% end %>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="row mb-3">
+              <div class="col-12">
+                <h2 class="fw-bold mb-1"><%= @knowledge_base_article.title %></h2>
+                <div class="text-muted mb-3">
+                  <i class="bx bx-folder"></i>
+                  <%= @knowledge_base_article.category.presence || "Sem categoria" %>
+                </div>
+              </div>
+            </div>
+            <hr>
+            <div class="mb-3">
+              <strong>Conteúdo:</strong>
+              <div class="mt-2">
+                <%= raw @knowledge_base_article.content %>
+              </div>
+            </div>
+            <div class="mt-3">
+              <%= link_to "Voltar", admin_knowledge_base_index_path, class: "btn btn-secondary" %>
+              <%= link_to "Editar", edit_admin_knowledge_base_path(@knowledge_base_article), class: "btn btn-primary" %>
+              <%= link_to "Excluir", admin_knowledge_base_path(@knowledge_base_article), method: :delete, data: { confirm: "Tem certeza?" }, class: "btn btn-danger" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
