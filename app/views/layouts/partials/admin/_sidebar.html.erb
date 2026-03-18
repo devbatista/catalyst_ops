@@ -63,14 +63,20 @@
     <% end %>
 
     <!-- Tickets -->
-    <% if can?(:read, :support) %>
-      <li class="list-group-item <%= active_menu_class(admin_tickets_path) %>">
-        <%= link_to admin_tickets_path do %>
-          <div class="parent-icon"><i class="bx bx-support"></i></div>
-          <div class="menu-title">Tickets</div>
-        <% end %>
-      </li>
-    <% end %>
+    <li class="list-group-item <%= active_menu_class(admin_tickets_path) %>">
+      <%= link_to admin_tickets_path do %>
+        <div class="parent-icon"><i class="bx bx-support"></i></div>
+        <div class="menu-title">Tickets</div>
+      <% end %>
+    </li>
+
+    <!-- Base de Conhecimento -->
+    <li class="list-group-item <%= active_menu_class(admin_knowledge_base_index_path) %>">
+      <%= link_to admin_knowledge_base_index_path do %>
+        <div class="parent-icon"><i class="bx bx-book"></i></div>
+        <div class="menu-title">B. Conhecimento</div>
+      <% end %>
+    </li>
 
     <!-- Logs -->
     <li class="list-group-item <%= active_menu_class(admin_logs_path) if defined?(admin_logs_path) %>">
