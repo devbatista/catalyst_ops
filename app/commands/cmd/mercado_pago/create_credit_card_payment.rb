@@ -10,11 +10,15 @@ module Cmd
       end
 
       def call
-        @response = ::MercadoPago::Client.new.request(
-          method: :post,
-          path: '/preapproval',
-          body: credit_card_params,
-        )
+        @response = if Rails.env.production?
+          ::MercadoPago::Client.new.request(
+            method: :post,
+            path: '/preapproval',
+            body: credit_card_params,
+          )
+        else
+          ::MercadoPago::MockData.create_credit_card_payment(credit_card_params)
+        end
 
         if response['status'] == 'authorized'
           company.current_subscription.activate!
@@ -47,3 +51,14 @@ module Cmd
     end
   end
 end
+
+company = Company.last
+
+credit_card_params = {
+  preapproval_plan_id: plan.external_id,
+  reason: plan.reason,
+  external_reference: company.id.to_s,
+  payer_email: company.email,
+  card_token_id: 'test_token',
+  status: 'authorized'
+}
