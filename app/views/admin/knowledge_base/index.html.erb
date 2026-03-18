@@ -12,9 +12,9 @@
             <%= form_with url: admin_knowledge_base_index_path, method: :get, local: true, class: "row g-2 align-items-end" do |f| %>
               <div class="col-md-4">
                 <label class="form-label">Categoria</label>
-                <%= select_tag :category,
-                  options_for_select(["Todas", ""] + @articles.map(&:category).uniq.compact, params[:category]),
-                  class: "form-select" %>
+                  <%= select_tag :category,
+                      options_for_select([["Todas", ""]] + @all_categories.map { |c| [c, c] }, params[:category]),
+                      class: "form-select" %>
               </div>
               <div class="col-md-4">
                 <label class="form-label">Buscar</label>
@@ -62,7 +62,6 @@
                         <td class="text-end">
                           <%= link_to 'Ver', admin_knowledge_base_path(article), class: "btn btn-sm btn-primary me-1" %>
                           <%= link_to 'Editar', edit_admin_knowledge_base_path(article), class: "btn btn-sm btn-secondary me-1" %>
-                          <%= link_to 'Excluir', admin_knowledge_base_path(article), method: :delete, data: { confirm: 'Tem certeza?' }, class: "btn btn-sm btn-danger" %>
                         </td>
                       </tr>
                     <% end %>
