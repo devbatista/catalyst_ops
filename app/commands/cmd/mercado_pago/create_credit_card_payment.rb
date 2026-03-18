@@ -51,14 +51,3 @@ module Cmd
     end
   end
 end
-
-company = Company.last
-
-credit_card_params = {
-  preapproval_plan_id: plan.external_id,
-  reason: plan.reason,
-  external_reference: company.id.to_s,
-  payer_email: company.email,
-  card_token_id: 'test_token',
-  status: 'authorized'
-}
