@@ -10,6 +10,7 @@ constraints subdomain: "app" do
       patch :update_status
       get :generate_pdf
       delete :purge_attachment
+      get :attachments
       get :schedule
       patch :perform_schedule
     end

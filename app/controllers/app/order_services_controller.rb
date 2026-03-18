@@ -127,11 +127,18 @@ class App::OrderServicesController < ApplicationController
               disposition: "attachment"
   end
 
+  def attachments
+    @order_service = OrderService.find(params[:id])
+    render partial: "app/order_services/attachments", locals: { order_service: @order_service }
+  end
+
   def purge_attachment
     attachment = @order_service.attachments.find(params[:attachment_id])
     attachment.purge
-
-    redirect_to edit_app_order_service_path(@order_service), notice: "Anexo removido com sucesso."
+    respond_to do |format|
+      format.html { head :ok } # para JS
+      format.json { head :ok }
+    end
   end
 
   private

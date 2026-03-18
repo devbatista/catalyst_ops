@@ -23,3 +23,4 @@
 //= link utils/validators.js
 //= link admin/tickets.js
 //= link app/support_tickets.js
+//= link app/order_service_attachments.js
