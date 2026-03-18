@@ -1,0 +1,82 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="mb-3 d-flex justify-content-between align-items-center">
+          <h4 class="mb-0 text-uppercase">Base de Conhecimento</h4>
+          <%= link_to "Novo Artigo", new_admin_knowledge_base_path, class: "btn btn-primary" %>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-body">
+            <%= form_with url: admin_knowledge_base_index_path, method: :get, local: true, class: "row g-2 align-items-end" do |f| %>
+              <div class="col-md-4">
+                <label class="form-label">Categoria</label>
+                <%= select_tag :category,
+                  options_for_select(["Todas", ""] + @articles.map(&:category).uniq.compact, params[:category]),
+                  class: "form-select" %>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Buscar</label>
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="bx bx-search"></i>
+                  </span>
+                  <input type="text"
+                         name="q"
+                         value="<%= params[:q] %>"
+                         class="form-control"
+                         placeholder="Título, conteúdo...">
+                </div>
+              </div>
+              <div class="col-md-2 d-flex align-items-end">
+                <%= f.submit "Buscar", class: "btn btn-outline-secondary w-100" %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+        <% grouped = @articles.group_by(&:category) %>
+        <% if @articles.present? %>
+          <% grouped.each do |category, articles| %>
+            <div class="card mb-4">
+              <div class="card-header bg-light">
+                <strong><i class="bx bx-folder"></i> <%= category.presence || "Sem categoria" %></strong>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th>Título</th>
+                      <th class="d-none d-md-table-cell">Resumo</th>
+                      <th class="text-end" style="width: 180px;">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% articles.each do |article| %>
+                      <tr>
+                        <td><strong><%= article.title %></strong></td>
+                        <td class="d-none d-md-table-cell text-muted">
+                          <%= truncate(strip_tags(article.content), length: 80) %>
+                        </td>
+                        <td class="text-end">
+                          <%= link_to 'Ver', admin_knowledge_base_path(article), class: "btn btn-sm btn-primary me-1" %>
+                          <%= link_to 'Editar', edit_admin_knowledge_base_path(article), class: "btn btn-sm btn-secondary me-1" %>
+                          <%= link_to 'Excluir', admin_knowledge_base_path(article), method: :delete, data: { confirm: 'Tem certeza?' }, class: "btn btn-sm btn-danger" %>
+                        </td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="alert alert-light border">
+            <p class="mb-1">Nenhum artigo encontrado para os filtros selecionados.</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
