@@ -16,8 +16,8 @@ module Cmd
           body: credit_card_params,
         )
 
-        if response['status'] == 'pending'
-          Payments::CreditCardMailer.with(company: company, payment_url: url).credit_card_email.deliver_later
+        if response['status'] == 'authorized'
+          company.current_subscription.activate!
         else
           raise "Failed to create credit card payment: #{response['status_detail']}"
         end
@@ -41,8 +41,6 @@ module Cmd
           external_reference: company.id.to_s,
           payer_email: company.email,
           card_token_id: cc_token,
-          back_url: 'https://yourapp.com/payment_success',
-          notification_url: 'https://yourapp.com/mercado_pago_notifications',
           status: 'authorized'
         }
       end
