@@ -10,6 +10,7 @@ User.delete_all
 Subscription.delete_all
 Company.delete_all
 Plan.delete_all
+KnowledgeBaseArticle.delete_all
 
 puts 'Base limpa!'
 puts '###################################'

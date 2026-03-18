@@ -76,3 +76,5 @@ gem "sidekiq", "~> 7.2"
 gem "sidekiq-cron", "~> 1.12"
 
 gem "dotenv-rails", "~> 3.0", groups: [:development, :test]
+
+gem "redcarpet"
