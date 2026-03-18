@@ -8,7 +8,7 @@ class App::SupportController < ApplicationController
     when "tickets"
       load_tickets_section
     when "knowledge_base"
-      # por enquanto pode ser só conteúdo estático na view
+      @articles = KnowledgeBaseArticle.order(:category, :title)
     when "suggestions"
       # mesma ideia: formulário simples na view, sem lógica extra ainda
     when "quick_contact"

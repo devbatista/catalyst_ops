@@ -5603,3 +5603,21 @@ payment-methods { align-items: stretch; }
 	}
 
 }
+
+#knowledgeBaseModalBody h2 {
+  font-size: 1.25rem;
+  margin-top: 1.5em;
+  margin-bottom: 0.7em;
+  color: #2c3e50;
+  font-weight: 600;
+}
+#knowledgeBaseModalBody ol, #knowledgeBaseModalBody ul {
+  margin-left: 1.5em;
+  margin-bottom: 1em;
+}
+#knowledgeBaseModalBody li {
+  margin-bottom: 0.4em;
+}
+#knowledgeBaseModalBody p {
+  margin-bottom: 1em;
+}

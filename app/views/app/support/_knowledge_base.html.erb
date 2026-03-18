@@ -9,66 +9,49 @@
   </div>
 
   <div class="row">
-    <!-- Primeiros passos -->
-    <div class="col-md-6 mb-3">
-      <div class="card h-100">
-        <div class="card-body">
-          <h6 class="mb-2"><i class="bx bx-rocket"></i> Primeiros passos</h6>
-          <ul class="mb-0">
-            <li>Como cadastrar minha empresa</li>
-            <li>Como cadastrar usuários e técnicos</li>
-            <li>Como configurar meu plano</li>
-          </ul>
+    <% articles.group_by(&:category).each do |category, group| %>
+      <div class="col-md-6 mb-3">
+        <div class="card h-100">
+          <div class="card-body">
+            <h6 class="mb-2"><%= category.present? ? category : "Outros" %></h6>
+            <ul class="mb-0">
+              <% group.each do |article| %>
+                <li>
+                  <a href="#"
+                     class="js-knowledge-base-article"
+                     data-article-title="<%= article.title %>"
+                     data-article-content="<%= article.content.gsub('"', '&quot;').gsub("\n", "") %>">
+                    <%= article.title %>
+                  </a>
+                </li>
+              <% end %>
+            </ul>
+          </div>
         </div>
       </div>
-    </div>
-
-    <!-- Ordens de Serviço -->
-    <div class="col-md-6 mb-3">
-      <div class="card h-100">
-        <div class="card-body">
-          <h6 class="mb-2"><i class="bx bx-edit"></i> Ordens de Serviço</h6>
-          <ul class="mb-0">
-            <li>Como criar uma OS</li>
-            <li>Como agendar e reagendar uma OS</li>
-            <li>Entendendo os status da OS</li>
-            <li>Como anexar arquivos na OS</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- Assinatura e pagamentos -->
-    <div class="col-md-6 mb-3">
-      <div class="card h-100">
-        <div class="card-body">
-          <h6 class="mb-2"><i class="bx bx-credit-card"></i> Assinatura e pagamentos</h6>
-          <ul class="mb-0">
-            <li>Como funciona o limite de ordens</li>
-            <li>Como alterar meu plano</li>
-            <li>Formas de pagamento aceitas</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- Conta e acesso -->
-    <div class="col-md-6 mb-3">
-      <div class="card h-100">
-        <div class="card-body">
-          <h6 class="mb-2"><i class="bx bx-lock"></i> Conta e acesso</h6>
-          <ul class="mb-0">
-            <li>Recuperar senha</li>
-            <li>Diferença entre gestor e técnico</li>
-            <li>Resolva problemas comuns de acesso</li>
-          </ul>
-        </div>
-      </div>
-    </div>
+    <% end %>
   </div>
 
-  <p class="text-muted small mt-2 mb-0">
-    Em breve, cada item acima levará para um artigo detalhado com
-    passo a passo e imagens.
-  </p>
+  <% if params[:article_id] %>
+    <% article = articles.find { |a| a.id == params[:article_id].to_i } %>
+    <% if article %>
+      <hr>
+      <h4><%= article.title %></h4>
+      <div><%= simple_format(article.content) %></div>
+    <% end %>
+  <% end %>
 </div>
+
+<div class="modal fade" id="knowledgeBaseModal" tabindex="-1" aria-labelledby="knowledgeBaseModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="knowledgeBaseModalLabel"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body" id="knowledgeBaseModalBody"></div>
+    </div>
+  </div>
+</div>
+
+<%= javascript_include_tag "app/knowledge_base_modal" %>
