@@ -19,6 +19,7 @@ class Admin::KnowledgeBaseArticlesController < AdminController
   end
 
   def new
+    @knowledge_base_article = KnowledgeBaseArticle.new
     @all_categories = KnowledgeBaseArticle.distinct.order(:category).pluck(:category).compact
   end
 
