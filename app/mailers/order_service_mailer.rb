@@ -30,7 +30,7 @@ class OrderServiceMailer < ApplicationMailer
     mail(to: @client.email, subject: "Sua ordem de serviço foi concluída com sucesso!")
   end
 
-  def notify_finished(order_service)
+  def notify_client_on_finished(order_service)
     @order_service = order_service
     @client = @order_service.client
     mail(to: @client.email, subject: "Sua ordem de serviço foi finalizada!")
@@ -41,5 +41,11 @@ class OrderServiceMailer < ApplicationMailer
     @gestor = @order_service.company.responsible
     @responsible_email = @gestor.email
     mail(to: @responsible_email, subject: "A ordem de serviço ##{@order_service.code} está atrasada!")
+  end
+
+  def notify_technician_on_finished(order_service, user)
+    @order_service = order_service
+    @user = user
+    mail(to: @user.email, subject: "A ordem de serviço ##{@order_service.code} foi finalizada!")
   end
 end

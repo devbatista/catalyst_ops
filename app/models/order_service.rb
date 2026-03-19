@@ -266,7 +266,18 @@ class OrderService < ApplicationRecord
   end
 
   def notify_finished
-    OrderServiceMailer.notify_finished(self).deliver_later
+    notify_client_on_finished
+    notify_technician_on_finished
+  end
+
+  def notify_client_on_finished
+    OrderServiceMailer.notify_client_on_finished(self).deliver_later
+  end
+
+  def notify_technician_on_finished
+    users.each do |user|
+      OrderServiceMailer.notify_technician_on_finished(self, user).deliver_later
+    end
   end
 
   def notify_overdue
