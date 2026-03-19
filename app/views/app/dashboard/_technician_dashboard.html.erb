@@ -1,0 +1,202 @@
+<div class="row row-cols-1 row-cols-md-2 row-cols-xl-4">
+  <div class="col">
+    <div class="card radius-10 border-start border-0 border-4 border-primary">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div>
+            <p class="mb-0 text-secondary">Agenda de Hoje</p>
+            <h4 class="my-1 text-primary"><%= @today_schedule_count %></h4>
+            <p class="mb-0 font-13 text-secondary">OS agendadas para hoje</p>
+          </div>
+          <div class="widgets-icons-2 rounded-circle bg-gradient-blues text-white ms-auto">
+            <i class='bx bx-calendar'></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card radius-10 border-start border-0 border-4 border-info">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div>
+            <p class="mb-0 text-secondary">Em Andamento</p>
+            <h4 class="my-1 text-info"><%= @in_progress_count %></h4>
+            <p class="mb-0 font-13 text-secondary">Atendimentos ativos agora</p>
+          </div>
+          <div class="widgets-icons-2 rounded-circle bg-gradient-burning text-white ms-auto">
+            <i class='bx bx-loader-circle'></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card radius-10 border-start border-0 border-4 border-dark">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div>
+            <p class="mb-0 text-secondary">Atrasadas</p>
+            <h4 class="my-1 text-dark"><%= @overdue_count %></h4>
+            <p class="mb-0 font-13 text-secondary">Exigem atenção imediata</p>
+          </div>
+          <div class="widgets-icons-2 rounded-circle bg-gradient-quepal text-white ms-auto">
+            <i class='bx bx-error-circle'></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card radius-10 border-start border-0 border-4 border-success">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div>
+            <p class="mb-0 text-secondary">Concluídas no Mês</p>
+            <h4 class="my-1 text-success"><%= @completed_this_month_count %></h4>
+            <p class="mb-0 font-13 text-secondary">Concluídas ou finalizadas</p>
+          </div>
+          <div class="widgets-icons-2 rounded-circle bg-gradient-ohhappiness text-white ms-auto">
+            <i class='bx bx-check-double'></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12 col-xl-7 d-flex">
+    <div class="card radius-10 w-100">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <h6 class="mb-0">Próximas Visitas</h6>
+        <span class="badge bg-light text-dark"><%= @upcoming_schedule.size %> na fila</span>
+      </div>
+      <div class="card-body">
+        <% if @upcoming_schedule.any? %>
+          <div class="table-responsive">
+            <table class="table align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Código</th>
+                  <th>Cliente</th>
+                  <th>Agendamento</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @upcoming_schedule.each do |order| %>
+                  <tr>
+                    <td>#<%= order.code %></td>
+                    <td><%= order.client&.name %></td>
+                    <td><%= l(order.scheduled_at, format: :short) %></td>
+                    <td>
+                      <span class="badge bg-<%= order.status_color %> bg-gradient"><%= order.status.humanize %></span>
+                    </td>
+                    <td class="text-end">
+                      <%= link_to "Abrir", app_order_service_path(order), class: "btn btn-sm btn-outline-primary" %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <p class="text-muted mb-0">Nenhuma visita futura agendada para este técnico.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-xl-5 d-flex">
+    <div class="card radius-10 w-100">
+      <div class="card-header">
+        <h6 class="mb-0">Distribuição por Status</h6>
+      </div>
+      <div class="card-body">
+        <% if @order_services_by_status.any? %>
+          <div class="d-grid gap-3">
+            <% @order_services_by_status.sort_by { |status, _count| status.to_s }.each do |status, count| %>
+              <div class="d-flex align-items-center justify-content-between border rounded px-3 py-2">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="badge bg-<%= status_color_for(status) %>">&nbsp;</span>
+                  <span><%= status.to_s.humanize %></span>
+                </div>
+                <strong><%= count %></strong>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-muted mb-0">Ainda não existem ordens atribuídas a este técnico.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12 col-lg-6 d-flex">
+    <div class="card radius-10 w-100">
+      <div class="card-header">
+        <h6 class="mb-0">Atendimentos em Execução</h6>
+      </div>
+      <div class="card-body">
+        <% if @current_assignments.any? %>
+          <div class="list-group list-group-flush">
+            <% @current_assignments.each do |order| %>
+              <div class="list-group-item px-0">
+                <div class="d-flex align-items-start justify-content-between gap-3">
+                  <div>
+                    <div class="fw-semibold"><%= order.title %></div>
+                    <div class="text-muted small"><%= order.client&.name %></div>
+                    <div class="small mt-1">
+                      Iniciado em
+                      <strong><%= order.started_at.present? ? l(order.started_at, format: :short) : "processando" %></strong>
+                    </div>
+                  </div>
+                  <%= link_to "Abrir", app_order_service_path(order), class: "btn btn-sm btn-outline-primary" %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-muted mb-0">Nenhum atendimento em andamento no momento.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-6 d-flex">
+    <div class="card radius-10 w-100">
+      <div class="card-header">
+        <h6 class="mb-0">Pendentes de Finalização</h6>
+      </div>
+      <div class="card-body">
+        <% if @pending_approval_orders.any? %>
+          <div class="list-group list-group-flush">
+            <% @pending_approval_orders.each do |order| %>
+              <div class="list-group-item px-0">
+                <div class="d-flex align-items-start justify-content-between gap-3">
+                  <div>
+                    <div class="fw-semibold">#<%= order.code %> <%= order.title %></div>
+                    <div class="text-muted small"><%= order.client&.name %></div>
+                    <div class="small mt-1">
+                      Concluída em
+                      <strong><%= order.finished_at.present? ? l(order.finished_at, format: :short) : l(order.updated_at, format: :short) %></strong>
+                    </div>
+                  </div>
+                  <%= link_to "Revisar", app_order_service_path(order), class: "btn btn-sm btn-outline-primary" %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-muted mb-0">Nenhuma OS aguardando finalização.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%= render "order_services" %>

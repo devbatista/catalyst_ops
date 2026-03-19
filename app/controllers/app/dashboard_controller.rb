@@ -50,23 +50,50 @@ class App::DashboardController < ApplicationController
       # 5. Query para ações pendentes
       @pending_approval_orders = @order_services.concluida.order(created_at: :asc).limit(6)
     when "tecnico"
-      # --- Coleção Base para o Técnico ---
-      @order_services = current_user.order_services.includes(:client)
-
-      # --- KPIs para os Cards do Técnico ---
-      @order_services_by_status = @order_services.group(:status).count
-      @completed_this_month_count = @order_services.where(status: [:concluida, :finalizada])
-                                               .where("finished_at >= ?", Time.now.beginning_of_month).count
-
-      # --- Listas de Ações para o Técnico ---
-      @upcoming_schedule = @order_services.agendada.order(scheduled_at: :asc).limit(5)
-      @current_assignments = @order_services.em_andamento.order(updated_at: :desc)
-      @pending_approval_orders = @order_services.concluida.order(created_at: :asc).limit(6)
-      @recent_orders = @order_services.order(finished_at: :desc).limit(5)
+      load_technician_dashboard
     end
   end
 
   private
+
+  def load_technician_dashboard
+    @order_services = current_user.order_services.includes(:client, :users, :service_items)
+    @order_services_by_status = @order_services.group(:status).count
+
+    @today_schedule = @order_services
+      .where(status: [:agendada, :em_andamento, :concluida, :finalizada, :atrasada])
+      .where(scheduled_at: Time.current.all_day)
+      .order(:scheduled_at)
+
+    @today_schedule_count = @today_schedule.count
+    @in_progress_count = @order_services.em_andamento.count
+    @overdue_count = @order_services.atrasada.count
+    @completed_this_month_count = @order_services
+      .where(status: [:concluida, :finalizada])
+      .where("finished_at >= ?", Time.current.beginning_of_month)
+      .count
+
+    @upcoming_schedule = @order_services
+      .agendada
+      .where("scheduled_at >= ?", Time.current)
+      .order(:scheduled_at)
+      .limit(6)
+
+    @current_assignments = @order_services
+      .em_andamento
+      .order(Arel.sql("COALESCE(order_services.started_at, order_services.updated_at) DESC"))
+      .limit(6)
+
+    @pending_approval_orders = @order_services
+      .concluida
+      .order(finished_at: :asc, updated_at: :asc)
+      .limit(6)
+
+    @recent_orders = @order_services
+      .where(status: [:concluida, :finalizada])
+      .order(Arel.sql("COALESCE(order_services.finished_at, order_services.updated_at) DESC"))
+      .limit(6)
+  end
 
   def initialize_default_dashboard_variables
     # Contadores numéricos
@@ -92,5 +119,9 @@ class App::DashboardController < ApplicationController
     @recent_orders = []
     @upcoming_schedule = []
     @current_assignments = []
+    @today_schedule = []
+    @today_schedule_count = 0
+    @in_progress_count = 0
+    @overdue_count = 0
   end
 end
