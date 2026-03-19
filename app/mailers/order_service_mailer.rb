@@ -48,4 +48,11 @@ class OrderServiceMailer < ApplicationMailer
     @user = user
     mail(to: @user.email, subject: "A ordem de serviço ##{@order_service.code} foi finalizada!")
   end
+
+  def notify_in_progress(order_service)
+    @order_service = order_service
+    @technicians = @order_service.users
+    @gestor = @order_service.company.responsible
+    mail(to: @gestor.email, subject: "A ordem de serviço ##{@order_service.code} está em andamento!")
+  end
 end

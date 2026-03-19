@@ -1,0 +1,11 @@
+<title>Ordem de Serviço em andamento</title>
+
+<h2 style="margin-top:0;">Olá, <%= @gestor.name %>!</h2>
+<p style="font-size:16px; line-height:1.6;">
+  O(s) técnico(s) <strong><%= @technicians.map(&:name).join(", ") %></strong> iniciou o atendimento da Ordem de Serviço de código <strong><%= @order_service.code %></strong>.
+  <br><br>
+  Você pode acompanhar o andamento pelo sistema e será notificado sobre qualquer atualização importante.
+</p>
+<p style="font-size:14px; color:#888;">
+  Se você não reconhece esta ação, por favor, entre em contato com o suporte.
+</p>

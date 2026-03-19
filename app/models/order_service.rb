@@ -70,6 +70,7 @@ class OrderService < ApplicationRecord
   after_update :notify_complete, if: -> { saved_change_to_status?(to: "concluida") }
   after_update :notify_scheduled, if: -> { saved_change_to_status?(to: "agendada") }
   after_update :notify_finished, if: -> { saved_change_to_status?(to: "finalizada") }
+  after_update :notify_in_progress, if: -> { saved_change_to_status?(to: "em_andamento") }
   after_update :notify_overdue, if: -> { saved_change_to_status?(to: "atrasada") }
 
   def total_value
@@ -268,6 +269,10 @@ class OrderService < ApplicationRecord
   def notify_finished
     notify_client_on_finished
     notify_technician_on_finished
+  end
+
+  def notify_in_progress
+    OrderServiceMailer.notify_in_progress(self).deliver_later
   end
 
   def notify_client_on_finished
