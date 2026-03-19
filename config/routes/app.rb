@@ -34,7 +34,11 @@ constraints subdomain: "app" do
 
   get "calendar/events", to: "app/calendar#events"
 
-  resources :support, only: [:index], module: "app", as: :app_support
+  resources :support, only: [:index], module: "app", as: :app_support do
+    collection do
+      post :suggestions
+    end
+  end
 
   resources :support_tickets, module: "app", as: :app_support_tickets, only: [:index, :show, :new, :create] do
     member do

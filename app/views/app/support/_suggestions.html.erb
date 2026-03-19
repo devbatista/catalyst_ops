@@ -10,53 +10,63 @@
     <div class="card-body">
       <h6 class="mb-3">Enviar nova sugestão</h6>
 
-      <%= form_with url: "#", method: :post, local: true do |f| %>
+      <%= form_with url: suggestions_app_support_index_path, method: :post, local: true, scope: :suggestion do |f| %>
         <div class="mb-3">
-          <label class="form-label">Título da sugestão</label>
-          <input type="text"
-                 class="form-control"
-                 placeholder="Ex: Relatório de OS por técnico com filtros avançados"
-                 disabled>
+          <%= f.label :title, "Título da sugestão", class: "form-label" %>
+          <%= f.text_field :title,
+                           class: "form-control",
+                           placeholder: "Ex: Relatório de OS por técnico com filtros avançados",
+                           value: @suggestion_form[:title] %>
         </div>
 
         <div class="row mb-3">
           <div class="col-md-6">
-            <label class="form-label">Tipo</label>
-            <select class="form-select" disabled>
-              <option>Produto</option>
-              <option>Interface</option>
-              <option>Relatórios</option>
-              <option>Integrações</option>
-              <option>Outro</option>
-            </select>
+            <%= f.label :suggestion_type, "Tipo", class: "form-label" %>
+            <%= f.select :suggestion_type,
+                         options_for_select(
+                           [
+                             ["Produto", "produto"],
+                             ["Interface", "interface"],
+                             ["Relatórios", "relatorios"],
+                             ["Integrações", "integracoes"],
+                             ["Outro", "outro"],
+                           ],
+                           @suggestion_form[:suggestion_type]
+                         ),
+                         {},
+                         class: "form-select" %>
           </div>
           <div class="col-md-6">
-            <label class="form-label">Impacto</label>
-            <select class="form-select" disabled>
-              <option>Ajuda bastante</option>
-              <option>Importante</option>
-              <option>Essencial</option>
-            </select>
+            <%= f.label :impact, "Impacto", class: "form-label" %>
+            <%= f.select :impact,
+                         options_for_select(
+                           [
+                             ["Ajuda bastante", "ajuda_bastante"],
+                             ["Importante", "importante"],
+                             ["Essencial", "essencial"],
+                           ],
+                           @suggestion_form[:impact]
+                         ),
+                         {},
+                         class: "form-select" %>
           </div>
         </div>
 
         <div class="mb-3">
-          <label class="form-label">Descreva sua ideia</label>
-          <textarea rows="4"
-                    class="form-control"
-                    placeholder="Explique o cenário em que essa melhoria ajudaria"
-                    disabled></textarea>
+          <%= f.label :description, "Descreva sua ideia", class: "form-label" %>
+          <%= f.text_area :description,
+                          rows: 4,
+                          class: "form-control",
+                          placeholder: "Explique o cenário em que essa melhoria ajudaria",
+                          value: @suggestion_form[:description] %>
         </div>
 
-        <button type="submit" class="btn btn-secondary" disabled>
-          Enviar (em breve)
-        </button>
+        <%= f.submit "Enviar sugestão", class: "btn btn-primary" %>
       <% end %>
     </div>
   </div>
 
   <p class="text-muted small mb-0">
-    Em uma próxima versão, suas sugestões serão registradas como tickets internos,
-    permitindo acompanhar o que está em análise, planejado ou entregue.
+    As sugestões são enviadas por email para o time responsável e podem virar melhorias futuras no produto.
   </p>
 </div>

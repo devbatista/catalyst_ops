@@ -10,7 +10,7 @@ class App::SupportController < ApplicationController
     when "knowledge_base"
       @articles = KnowledgeBaseArticle.order(:category, :title)
     when "suggestions"
-      # mesma ideia: formulário simples na view, sem lógica extra ainda
+      build_suggestion_form
     when "quick_contact"
       load_quick_contact_section
     else # "overview"
@@ -18,7 +18,35 @@ class App::SupportController < ApplicationController
     end
   end
 
+  def suggestions
+    @section = "suggestions"
+    @suggestion_form = suggestion_params.to_h.symbolize_keys
+
+    if invalid_suggestion_form?
+      flash.now[:alert] = "Preencha título, tipo, impacto e descrição da sugestão."
+      return render :index, status: :unprocessable_entity
+    end
+
+    SuggestionsMailer.submit_suggestion(
+      user: current_user,
+      company: current_user.company,
+      suggestion: @suggestion_form,
+    ).deliver_later
+
+    redirect_to app_support_index_path(section: "suggestions"),
+                notice: "Sugestão enviada com sucesso."
+  end
+
   private
+
+  def build_suggestion_form
+    @suggestion_form = {
+      title: "",
+      suggestion_type: "produto",
+      impact: "ajuda_bastante",
+      description: "",
+    }
+  end
 
   def load_tickets_section
     scope = current_user.company.support_tickets.recent
@@ -45,5 +73,13 @@ class App::SupportController < ApplicationController
   def load_quick_contact_section
     @can_use_quick_contact =
       current_user.company&.plan&.name.in?(["Profissional", "Enterprise"])
+  end
+
+  def suggestion_params
+    params.require(:suggestion).permit(:title, :suggestion_type, :impact, :description)
+  end
+
+  def invalid_suggestion_form?
+    @suggestion_form.values_at(:title, :suggestion_type, :impact, :description).any?(&:blank?)
   end
 end

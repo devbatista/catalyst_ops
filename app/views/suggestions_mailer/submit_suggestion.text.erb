@@ -1,0 +1,10 @@
+Nova sugestao enviada pelo app
+
+Empresa: <%= @company&.name || "Nao informada" %>
+Usuario: <%= @user.name %> (<%= @user.email %>)
+Tipo: <%= @suggestion[:suggestion_type].to_s.humanize %>
+Impacto: <%= @suggestion[:impact].to_s.humanize %>
+Titulo: <%= @suggestion[:title] %>
+
+Descricao:
+<%= @suggestion[:description] %>

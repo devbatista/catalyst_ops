@@ -1,0 +1,10 @@
+<h2>Nova sugestao enviada pelo app</h2>
+
+<p><strong>Empresa:</strong> <%= @company&.name || "Nao informada" %></p>
+<p><strong>Usuario:</strong> <%= @user.name %> (<%= @user.email %>)</p>
+<p><strong>Tipo:</strong> <%= @suggestion[:suggestion_type].to_s.humanize %></p>
+<p><strong>Impacto:</strong> <%= @suggestion[:impact].to_s.humanize %></p>
+<p><strong>Titulo:</strong> <%= @suggestion[:title] %></p>
+
+<p><strong>Descricao:</strong></p>
+<p><%= simple_format(@suggestion[:description]) %></p>
