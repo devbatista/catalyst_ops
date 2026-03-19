@@ -32,6 +32,8 @@ class User < ApplicationRecord
   before_validation :normalize_name
   before_validation :set_default_password_for_tecnico, on: :create
 
+  after_create :send_welcome_email_for_technician, if: -> { tecnico? }
+
   after_update :send_welcome_email_on_activation
 
   def self.search(query = nil)
@@ -121,5 +123,11 @@ class User < ApplicationRecord
     unless company.can_add_technician?
       errors.add(:base, "Limite de técnicos atingido para o plano atual da empresa.")
     end
+  end
+
+  def send_welcome_email_for_technician
+    Rails.logger.info "###### Enviando email de boas-vindas para o técnico #{email} ######"
+    token = set_reset_password_token
+    UserMailer.welcome_email(self, token).deliver_later
   end
 end
