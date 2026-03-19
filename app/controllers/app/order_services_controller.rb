@@ -6,6 +6,7 @@ class App::OrderServicesController < ApplicationController
   before_action :can_add_order_service, only: [:new, :create]
   before_action :ensure_technician_only_updates_allowed_fields, only: [:update]
   before_action :restrict_status_update_for_technician, only: [:update_status]
+  before_action :restrict_overdue_reschedule_for_technician, only: [:schedule, :perform_schedule]
   
   def index
     @order_services = case current_user.role
@@ -255,5 +256,13 @@ class App::OrderServicesController < ApplicationController
     if params[:status].present? && %w[finalizada cancelada].include?(params[:status])
       redirect_to app_order_service_url, alert: "Você não tem permissão para atualizar o status para '#{params[:status]}'."
     end
+  end
+
+  def restrict_overdue_reschedule_for_technician
+    return if current_user.gestor?
+    return unless @order_service.atrasada?
+
+    redirect_to app_order_service_url(@order_service),
+                alert: "Somente gestores podem reagendar uma ordem de serviço atrasada."
   end
 end
