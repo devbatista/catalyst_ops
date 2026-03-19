@@ -41,6 +41,10 @@ Procure pelo objetivo que você quer atingir, por exemplo:
 ## Índice — Relatórios
 - [Como visualizar relatórios de OS](relatorios/como_ver_relatorios_os.md)
 
+## Índice — Financeira
+- [Como visualizar a área Financeira](financeira/como_ver_area_financeira.md)
+- [Como entender faturamento realizado e pendente](financeira/como_entender_faturamento_realizado_pendente.md)
+
 ## Índice — Conta e Empresa
 - [Como atualizar seu perfil](conta/como_atualizar_perfil.md)
 - [Como atualizar dados da empresa](conta/como_atualizar_empresa.md)
