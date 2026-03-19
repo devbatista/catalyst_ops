@@ -181,6 +181,8 @@ class App::OrderServicesController < ApplicationController
   end
 
   def set_attachment_on_update
+    return unless params[:order_service].present?
+
     if params[:order_service][:attachments].is_a?(Array)
       params[:order_service][:attachments].reject!(&:blank?)
       @attachments = params[:order_service].delete(:attachments)
@@ -219,6 +221,8 @@ class App::OrderServicesController < ApplicationController
   def ensure_technician_only_updates_allowed_fields
     return unless current_user.tecnico?
 
+    return unless params[:order_service].present?
+
     allowed_params = %w[observations attachments]
     datetime_params = %w[scheduled_at expected_end_at]
     submitted = params[:order_service]
@@ -234,8 +238,13 @@ class App::OrderServicesController < ApplicationController
   end
 
   def changed_attr_datetimes?
-    scheduled_updated = @order_service.scheduled_at != Time.zone.parse(params[:order_service][:scheduled_at])
-    expected_updated = @order_service.expected_end_at != (Time.zone.parse(params[:order_service][:expected_end_at]))
+    return false unless params[:order_service].present?
+
+    scheduled_raw = params[:order_service][:scheduled_at]
+    expected_raw = params[:order_service][:expected_end_at]
+
+    scheduled_updated = scheduled_raw.present? && @order_service.scheduled_at != Time.zone.parse(scheduled_raw)
+    expected_updated = expected_raw.present? && @order_service.expected_end_at != Time.zone.parse(expected_raw)
 
     scheduled_updated || expected_updated
   end
