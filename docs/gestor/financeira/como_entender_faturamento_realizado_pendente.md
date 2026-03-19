@@ -4,7 +4,7 @@
 Use este guia quando quiser interpretar corretamente os números mostrados na área **Financeira**.
 
 ## Passo a passo
-1. Abra a área **Financeira**.
+1. Abra a área **Financeiro**.
 2. Observe o status das Ordens de Serviço.
 3. Entenda a separação:
    - **Realizado**: OS com status **Finalizada**.

@@ -4,7 +4,7 @@
 Use esta área quando quiser acompanhar o valor dos itens lançados nas Ordens de Serviço, separando o que já foi **realizado** do que ainda está **pendente**.
 
 ## Passo a passo
-1. Acesse **Financeira** no menu lateral.
+1. Acesse **Financeiro** no menu lateral.
 2. Veja os cards de resumo no topo da tela.
 3. Confira:
    - **Faturamento Realizado**: valor das OS **finalizadas**.
