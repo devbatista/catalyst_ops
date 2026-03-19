@@ -20,11 +20,17 @@
       <div class="card-body">
         <div class="d-flex align-items-center">
           <div>
-            <p class="mb-0 text-secondary">Valor geral dos itens</p>
+            <p class="mb-0 text-secondary">
+              <%= current_user.gestor? ? "Faturamento bruto" : "Valor geral dos itens" %>
+            </p>
             <h4 class="my-1 text-danger">
-              <%= currency_br(@order_services.joins(:service_items).sum("service_items.unit_price")) %>
+              <%= currency_br(@total_revenue.presence || @order_services.joins(:service_items).sum("service_items.unit_price")) %>
             </h4>
-            <%= weekly_change_indicator(@revenue_current_week, @revenue_last_week) %>
+            <% if current_user.gestor? %>
+              <p class="mb-0 font-13 text-secondary">Serviços lançados</p>
+            <% else %>
+              <%= weekly_change_indicator(@revenue_current_week, @revenue_last_week) %>
+            <% end %>
           </div>
           <div class="widgets-icons-2 rounded-circle bg-gradient-burning text-white ms-auto"><i class='bx bxs-wallet'></i>
           </div>
