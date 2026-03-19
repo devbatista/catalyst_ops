@@ -56,6 +56,7 @@ class Ability
     can :manage, Report, company_id: user.company_id
 
     can :read, :calendar
+    can :read, :financial
 
     can :read, :support
 

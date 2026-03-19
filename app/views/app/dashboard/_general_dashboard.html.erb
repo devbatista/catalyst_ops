@@ -24,7 +24,7 @@
               <%= current_user.gestor? ? "Faturamento bruto" : "Valor geral dos itens" %>
             </p>
             <h4 class="my-1 text-danger">
-              <%= currency_br(@total_revenue.presence || @order_services.joins(:service_items).sum("service_items.unit_price")) %>
+              <%= currency_br(@total_revenue) %>
             </h4>
             <% if current_user.gestor? %>
               <p class="mb-0 font-13 text-secondary">Serviços lançados</p>

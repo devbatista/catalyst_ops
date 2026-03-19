@@ -22,6 +22,7 @@ constraints subdomain: "app" do
       post :service_orders
     end
   end
+  resources :financial, only: [:index], module: "app", as: :app_financial
   resources :technicians, module: "app", as: :app_technicians
   resources :calendar, only: [:index], module: "app", as: :app_calendar
   resources :configurations, only: [:index], module: "app", as: :app_configurations do

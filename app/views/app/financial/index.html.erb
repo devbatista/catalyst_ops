@@ -1,0 +1,165 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3 justify-content-between">
+      <h4 class="mb-0 text-uppercase">Financeira</h4>
+    </div>
+
+    <% flash.each do |type, message| %>
+      <% bootstrap_class = { notice: "alert-success", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
+      <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert">
+        <%= message %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    <% end %>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4">
+      <div class="col">
+        <div class="card radius-10 border-start border-0 border-4 border-success">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div>
+                <p class="mb-0 text-secondary">Faturamento Realizado</p>
+                <h4 class="my-1 text-success"><%= currency_br(@realized_total) %></h4>
+                <p class="mb-0 font-13 text-secondary">OS finalizadas</p>
+              </div>
+              <div class="widgets-icons-2 rounded-circle bg-gradient-ohhappiness text-white ms-auto">
+                <i class='bx bx-check-shield'></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card radius-10 border-start border-0 border-4 border-warning">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div>
+                <p class="mb-0 text-secondary">Faturamento Pendente</p>
+                <h4 class="my-1 text-warning"><%= currency_br(@pending_total) %></h4>
+                <p class="mb-0 font-13 text-secondary">OS ainda não finalizadas</p>
+              </div>
+              <div class="widgets-icons-2 rounded-circle bg-gradient-orange text-white ms-auto">
+                <i class='bx bx-time-five'></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card radius-10 border-start border-0 border-4 border-primary">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div>
+                <p class="mb-0 text-secondary">Volume Total</p>
+                <h4 class="my-1 text-primary"><%= currency_br(@overall_total) %></h4>
+                <p class="mb-0 font-13 text-secondary">Itens lançados nas OS</p>
+              </div>
+              <div class="widgets-icons-2 rounded-circle bg-gradient-blues text-white ms-auto">
+                <i class='bx bx-wallet'></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card radius-10 border-start border-0 border-4 border-info">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div>
+                <p class="mb-0 text-secondary">OS Monitoradas</p>
+                <h4 class="my-1 text-info"><%= @finalized_orders_count + @pending_orders_count %></h4>
+                <p class="mb-0 font-13 text-secondary"><%= @finalized_orders_count %> realizadas, <%= @pending_orders_count %> pendentes</p>
+              </div>
+              <div class="widgets-icons-2 rounded-circle bg-gradient-burning text-white ms-auto">
+                <i class='bx bx-spreadsheet'></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card radius-10">
+      <div class="card-header">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+          <div>
+            <h6 class="mb-0">Ordens de Serviço por Situação Financeira</h6>
+            <small class="text-muted">Baseado no status da ordem de serviço e no total dos itens cadastrados.</small>
+          </div>
+
+          <%= form_with url: app_financial_index_path, method: :get, local: true, class: "d-flex gap-2" do %>
+            <%= select_tag :status,
+                           options_for_select(
+                             [
+                               ["Todas", "all"],
+                               ["Realizado", "realized"],
+                               ["Pendente", "pending"],
+                             ],
+                             @filters[:status]
+                           ),
+                           class: "form-select" %>
+            <%= submit_tag "Filtrar", class: "btn btn-outline-primary" %>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Código</th>
+                <th>Título</th>
+                <th>Cliente</th>
+                <th>Status</th>
+                <th>Data de referência</th>
+                <th>Valor dos itens</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if @orders.any? %>
+                <% @orders.each do |order| %>
+                  <tr>
+                    <td>#<%= order.code %></td>
+                    <td><%= order.title %></td>
+                    <td><%= order.client&.name %></td>
+                    <td>
+                      <span class="badge bg-<%= order.status_color %> bg-gradient">
+                        <%= order.status.humanize %>
+                      </span>
+                    </td>
+                    <td>
+                      <% reference_date = order.finalizada? ? order.updated_at : order.scheduled_at || order.updated_at %>
+                      <%= l(reference_date, format: :short) if reference_date.present? %>
+                    </td>
+                    <td><%= currency_br(order.total_value) %></td>
+                    <td class="text-end">
+                      <%= link_to "Ver OS", app_order_service_path(order), class: "btn btn-sm btn-outline-primary" %>
+                    </td>
+                  </tr>
+                <% end %>
+              <% else %>
+                <tr>
+                  <td colspan="7" class="text-center">Nenhuma ordem de serviço encontrada para o filtro selecionado.</td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <% if @orders.respond_to?(:total_pages) && @orders.total_pages > 1 %>
+        <div class="card-footer d-flex justify-content-between align-items-center">
+          <span class="text-muted small">
+            Mostrando <%= @orders.size %> de <%= @orders.total_count %> registros
+          </span>
+          <%= custom_paginate(@orders) %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

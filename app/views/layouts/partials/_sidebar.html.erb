@@ -48,6 +48,15 @@
       <% end %>
     </li>
     <% end %>
+
+    <% if can?(:read, :financial) %>
+    <li class="list-group-item <%= active_menu_class(app_financial_index_path) %>">
+      <%= link_to app_financial_index_path do %>
+      <div class="parent-icon"><i class='bx bx-line-chart'></i></div>
+      <div class="menu-title">Financeira</div>
+      <% end %>
+    </li>
+    <% end %>
     
     <% if can?(:read, :calendar) %>
     <li class="list-group-item <%= active_menu_class(app_calendar_index_path) %>">

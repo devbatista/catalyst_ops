@@ -24,7 +24,7 @@ class App::DashboardController < ApplicationController
       @order_services_by_status = @order_services.group(:status).count
       @recent_orders = @order_services.order(created_at: :desc).limit(6)
       # KPI de faturamento total para o card principal
-      @total_revenue = @order_services.joins(:service_items).sum("service_items.unit_price")
+      @total_revenue = sum_order_services_items(@order_services)
 
       # --- NOVOS CÁLCULOS PARA VARIAÇÃO SEMANAL ---
 
@@ -33,11 +33,9 @@ class App::DashboardController < ApplicationController
       @orders_last_week = @order_services.where(created_at: 1.week.ago.all_week).count
 
       # 2. Variação de Faturamento (de OS concluídas na semana)
-      finished_orders = @order_services.where(status: :finished)
-      @revenue_current_week = finished_orders.where(updated_at: Time.now.all_week)
-                                             .joins(:service_items).sum("service_items.unit_price")
-      @revenue_last_week = finished_orders.where(updated_at: 1.week.ago.all_week)
-                                          .joins(:service_items).sum("service_items.unit_price")
+      finished_orders = @order_services.where(status: :finalizada)
+      @revenue_current_week = sum_order_services_items(finished_orders.where(updated_at: Time.now.all_week))
+      @revenue_last_week = sum_order_services_items(finished_orders.where(updated_at: 1.week.ago.all_week))
 
       # 3. Variação de Novos Técnicos
       @new_technicians_current_week = company_technicians.where(created_at: Time.now.all_week).count
@@ -55,6 +53,10 @@ class App::DashboardController < ApplicationController
   end
 
   private
+
+  def sum_order_services_items(scope)
+    scope.joins(:service_items).sum("COALESCE(service_items.quantity, 0) * COALESCE(service_items.unit_price, 0)")
+  end
 
   def load_technician_dashboard
     @order_services = current_user.order_services.includes(:client, :users, :service_items)
