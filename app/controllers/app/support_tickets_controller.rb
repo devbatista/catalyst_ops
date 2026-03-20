@@ -32,6 +32,7 @@ class App::SupportTicketsController < ApplicationController
     @order_services = current_user.company.order_services.order(created_at: :desc)
 
     if @support_ticket.save
+      SupportTicketNotifications.notify_created(ticket: @support_ticket, actor: current_user)
       redirect_to app_support_ticket_path(@support_ticket),
                   notice: "Ticket criado com sucesso."
     else
@@ -42,8 +43,14 @@ class App::SupportTicketsController < ApplicationController
 
   def close
     @support_ticket = current_user.company.support_tickets.find(params[:id])
+    previous_status = @support_ticket.status
   
     if @support_ticket.mark_as_closed!
+      SupportTicketNotifications.notify_status_changed(
+        ticket: @support_ticket,
+        actor: current_user,
+        previous_status: previous_status
+      )
       render json: { success: true, status: @support_ticket.status, message: "Ticket fechado com sucesso." }
     else
       render json: { success: false, errors: @support_ticket.errors.full_messages }, status: :unprocessable_entity

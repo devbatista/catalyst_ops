@@ -13,6 +13,7 @@ class App::SupportMessagesController < ApplicationController
       body: support_message_params[:body],
       attachments: attachments
     )
+    SupportTicketNotifications.notify_message(message: @support_message, actor: current_user)
 
     redirect_to app_support_ticket_path(@support_ticket),
                 notice: "Mensagem enviada com sucesso."

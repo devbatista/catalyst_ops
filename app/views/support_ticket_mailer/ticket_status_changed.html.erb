@@ -1,0 +1,16 @@
+<title>Status do ticket atualizado</title>
+<h2 style="margin-top:0;">Status do ticket #<%= @ticket.id %> atualizado</h2>
+
+<p style="font-size:16px; line-height:1.6;">
+  <strong>Empresa:</strong> <%= @company.name %><br>
+  <strong>Assunto:</strong> <%= @ticket.subject %><br>
+  <strong>Responsável pela ação:</strong> <%= @actor.full_name.presence || @actor.name %><br>
+  <strong>Status anterior:</strong> <%= @previous_status.to_s.humanize %><br>
+  <strong>Novo status:</strong> <%= @ticket.status.humanize %>
+</p>
+
+<div style="margin:32px 0;">
+  <a href="<%= @ticket_url %>" target="_blank" style="background:#0d6efd; color:#fff; text-decoration:none; padding:14px 32px; border-radius:4px; font-size:16px; font-weight:bold; display:inline-block;">
+    Ver ticket
+  </a>
+</div>

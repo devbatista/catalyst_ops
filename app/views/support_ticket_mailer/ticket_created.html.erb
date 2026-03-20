@@ -1,0 +1,27 @@
+<title>Novo ticket aberto</title>
+<h2 style="margin-top:0;">Novo ticket aberto</h2>
+
+<p style="font-size:16px; line-height:1.6;">
+  Um novo ticket foi aberto em <strong><%= @company.name %></strong>.
+</p>
+
+<p style="font-size:16px; line-height:1.6;">
+  <strong>Ticket:</strong> #<%= @ticket.id %><br>
+  <strong>Assunto:</strong> <%= @ticket.subject %><br>
+  <strong>Solicitante:</strong> <%= @requester.full_name.presence || @requester.name %><br>
+  <strong>Categoria:</strong> <%= @ticket.category.humanize %><br>
+  <strong>Impacto:</strong> <%= @ticket.impact.humanize %><br>
+  <strong>Prioridade:</strong> <%= @ticket.priority.humanize %><br>
+  <strong>Status:</strong> <%= @ticket.status.humanize %>
+</p>
+
+<p style="font-size:16px; line-height:1.6;">
+  <strong>Descrição:</strong><br>
+  <%= simple_format(@ticket.description) %>
+</p>
+
+<div style="margin:32px 0;">
+  <a href="<%= @ticket_url %>" target="_blank" style="background:#0d6efd; color:#fff; text-decoration:none; padding:14px 32px; border-radius:4px; font-size:16px; font-weight:bold; display:inline-block;">
+    Ver ticket
+  </a>
+</div>

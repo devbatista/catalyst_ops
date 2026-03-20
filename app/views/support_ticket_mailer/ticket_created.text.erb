@@ -1,0 +1,16 @@
+Novo ticket aberto
+
+Empresa: <%= @company.name %>
+Ticket: #<%= @ticket.id %>
+Assunto: <%= @ticket.subject %>
+Solicitante: <%= @requester.full_name.presence || @requester.name %>
+Categoria: <%= @ticket.category.humanize %>
+Impacto: <%= @ticket.impact.humanize %>
+Prioridade: <%= @ticket.priority.humanize %>
+Status: <%= @ticket.status.humanize %>
+
+Descricao:
+<%= @ticket.description %>
+
+Abrir ticket:
+<%= @ticket_url %>

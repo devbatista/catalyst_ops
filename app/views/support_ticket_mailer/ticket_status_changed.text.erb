@@ -1,0 +1,10 @@
+Status do ticket #<%= @ticket.id %> atualizado
+
+Empresa: <%= @company.name %>
+Assunto: <%= @ticket.subject %>
+Responsavel pela acao: <%= @actor.full_name.presence || @actor.name %>
+Status anterior: <%= @previous_status.to_s.humanize %>
+Novo status: <%= @ticket.status.humanize %>
+
+Ver ticket:
+<%= @ticket_url %>

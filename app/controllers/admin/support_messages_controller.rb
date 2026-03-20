@@ -9,6 +9,7 @@ class Admin::SupportMessagesController < AdminController
       body: support_message_params[:body],
       attachments: attachments
     )
+    SupportTicketNotifications.notify_message(message: @support_message, actor: current_user)
 
     redirect_to admin_ticket_path(ticket),
                 notice: "Mensagem enviada com sucesso."

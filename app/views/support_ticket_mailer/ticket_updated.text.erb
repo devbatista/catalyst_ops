@@ -1,0 +1,12 @@
+Nova mensagem no ticket #<%= @ticket.id %>
+
+Empresa: <%= @company.name %>
+Assunto: <%= @ticket.subject %>
+Autor da mensagem: <%= @actor.full_name.presence || @actor.name %>
+Status atual: <%= @ticket.status.humanize %>
+
+Mensagem:
+<%= @support_message.body %>
+
+Acompanhar ticket:
+<%= @ticket_url %>
