@@ -57,6 +57,8 @@ class OrderService < ApplicationRecord
   scope :by_technician, ->(user_id) { joins(:users).where(users: { id: user_id }) }
   scope :unassigned, -> { left_joins(:assignments).where(assignments: { id: nil }) }
   scope :assigned, -> { joins(:assignments).distinct }
+  scope :finished, -> { where(status: :finalizada) }
+  scope :finished_this_month, -> { finished.where(updated_at: Time.current.all_month) }
 
   before_validation :set_company_from_client, on: :create
   before_validation :set_sequencial_code, on: :create

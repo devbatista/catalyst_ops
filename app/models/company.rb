@@ -35,6 +35,21 @@ class Company < ApplicationRecord
   validate :document_must_be_cpf_or_cnpj
 
   scope :active, -> { where(active: true) }
+  scope :created_this_month, -> { where(created_at: Time.current.all_month) }
+
+  def self.top_by_order_services(limit = 8)
+    finalized_status = OrderService.statuses[:finalizada]
+
+    left_joins(:order_services)
+      .select(
+        "companies.*,
+         COUNT(order_services.id) AS order_services_count,
+         COUNT(CASE WHEN order_services.status = #{finalized_status} THEN 1 END) AS finalized_order_services_count"
+      )
+      .group("companies.id")
+      .order(Arel.sql("COUNT(order_services.id) DESC, companies.created_at DESC"))
+      .limit(limit)
+  end
 
   def self.search(query = nil)
     if query.present?

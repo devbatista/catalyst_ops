@@ -45,6 +45,7 @@ class SupportTicket < ApplicationRecord
   scope :recent, -> { order(last_reply_at: :desc, created_at: :desc) }
   scope :by_company, ->(company_id) { where(company_id: company_id) }
   scope :open_status, -> { where(status: [:aberto, :em_andamento, :aguardando_cliente]) }
+  scope :recent_first, -> { order(last_reply_at: :desc, created_at: :desc) }
 
   before_create :set_initial_last_reply_at
 

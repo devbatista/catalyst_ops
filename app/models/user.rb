@@ -28,6 +28,7 @@ class User < ApplicationRecord
   scope :gestores, -> { where(role: :gestor) }
   scope :active, -> { where(active: true) }
   scope :inactive, -> { where(active: false) }
+  scope :created_this_month, -> { where(created_at: Time.current.all_month) }
 
   before_validation :normalize_name
   before_validation :set_default_password_for_tecnico, on: :create

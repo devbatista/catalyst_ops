@@ -18,6 +18,8 @@ class Subscription < ApplicationRecord
   scope :recent, -> { order(created_at: :desc) }
   scope :current, -> { order(created_at: :desc).limit(1) }
   scope :active, -> { where(status: :active).limit(1) }
+  scope :active_records, -> { where(status: :active) }
+  scope :in_attention, -> { where(status: [:pending, :expired, :cancelled]).order(updated_at: :desc, created_at: :desc) }
   
   scope :ready_to_cycle, -> { 
     joins(:company)
@@ -33,6 +35,10 @@ class Subscription < ApplicationRecord
   
   def allows_access?
     active?
+  end
+
+  def self.estimated_mrr
+    active_records.sum(:transaction_amount)
   end
 
   def activate!
