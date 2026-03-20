@@ -67,7 +67,7 @@ class OrderService < ApplicationRecord
 
   before_save :set_timestamps_on_status_change
 
-  after_create :notify_create
+  after_commit :notify_create, on: :create
 
   after_update :notify_complete, if: -> { saved_change_to_status?(to: "concluida") }
   after_update :notify_scheduled, if: -> { saved_change_to_status?(to: "agendada") }
