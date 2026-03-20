@@ -3,7 +3,7 @@ class Subscriptions::ExpireSubscriptionsJob
   sidekiq_options queue: :default, retry: 3
 
   def perform
-    subscription_ids = Subscription.where(end_date: Date.today - 1).pluck(:id)
+    subscription_ids = Subscription.overdue_for_expiration.pluck(:id)
 
     if subscription_ids.any?
       expire_subscriptions(subscription_ids)
@@ -16,7 +16,7 @@ class Subscriptions::ExpireSubscriptionsJob
 
   def expire_subscriptions(subscription_ids)
     subscription_ids.each do |id|
-      result = Cmd::Subscriptions::ExpireSubscription.new(subscription_id: id).call
+      result = Cmd::Subscriptions::ExpireSubscriptions.new(subscription_id: id).call
 
       if result.success?
         Rails.logger.info "[Subscriptions::ExpireSubscriptionsJob] Assinatura ID #{id} expirada com sucesso."

@@ -1,0 +1,11 @@
+Ola, <%= @company.name %>.
+
+Identificamos que a assinatura do CatalystOps venceu em <%= l(@expired_on) %>.
+
+Se o pagamento nao for regularizado, o acesso sera expirado em <%= @expires_in_days %> dias.
+
+<% if @plan.present? %>
+Plano atual: <%= @plan.name %>.
+
+<% end %>
+Se precisar de ajuda, responda este email ou entre em contato com nosso suporte.

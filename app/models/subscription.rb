@@ -20,13 +20,13 @@ class Subscription < ApplicationRecord
   scope :active, -> { where(status: :active).limit(1) }
   scope :active_records, -> { where(status: :active) }
   scope :in_attention, -> { where(status: [:pending, :expired, :cancelled]).order(updated_at: :desc, created_at: :desc) }
-  scope :overdue_for_notification, -> { where(status: :active).where('end_date <= ?', Date.today - 5.days) }
-  scope :overdue_for_expiration, -> { where(status: :active).where('end_date <= ?', Date.today - 10.days) }
+  scope :overdue_for_notification, -> { where(status: :active, end_date: Date.current - 5.days) }
+  scope :overdue_for_expiration, -> { where(status: :active).where('end_date <= ?', Date.current - 10.days) }
   
   scope :ready_to_cycle, -> { 
     joins(:company)
       .where(status: :active)
-      .where(end_date: Date.today + 7.days)
+      .where(end_date: Date.current + 7.days)
       .where.not(companies: {
         payment_method: 'credit_card',
       }
