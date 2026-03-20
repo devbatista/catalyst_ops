@@ -43,7 +43,8 @@ COMPANIES = Array.new(rand(3..10)) do
     preapproval_plan_id: plan.external_id,
     status: :active, 
     start_date: Date.today,
-    end_date: 1.month.from_now
+    end_date: 1.month.from_now,
+    transaction_amount: plan.transaction_amount
   )
 
   company
