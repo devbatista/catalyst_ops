@@ -1,7 +1,5 @@
 
 class Subscriptions::PixMailer < ApplicationMailer
-  default from: "no-reply@catalystops.com.br"
-
   def pix_email
     @company  = params[:company]
     @pix_code = params[:pix_code]

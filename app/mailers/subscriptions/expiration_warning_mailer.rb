@@ -1,6 +1,4 @@
 class Subscriptions::ExpirationWarningMailer < ApplicationMailer
-  default from: "no-reply@catalystops.com.br"
-
   def warning_email
     @subscription = params[:subscription]
     @company = @subscription.company
