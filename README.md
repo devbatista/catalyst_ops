@@ -300,6 +300,28 @@ Certifique‑se de que:
 O painel do Sidekiq pode ser exposto em `sidekiq.catalystops.local`
 quando configurado nas rotas e no nginx.
 
+### Emails de Ordens de Serviço
+
+As notificações de `OrderService` são enfileiradas com `deliver_later`, então
+dependem do `sidekiq` e do `redis` para serem processadas.
+
+Fluxo atual:
+
+- Ao criar uma OS, o callback `after_create :notify_create` em `OrderService`
+  enfileira `OrderServiceMailer.notify_create(self)`.
+- Hoje esse email é enviado para o cliente (`@client.email`).
+- O template texto de `notify_create` está coerente com isso.
+
+Ajuste necessário:
+
+- O template HTML de `notify_create` referencia `@gestor.name`, mas o mailer
+  não define `@gestor` nesse método.
+- O comportamento esperado hoje é notificar o cliente, então o template HTML
+  deve usar `@client.name` ou uma variável equivalente definida no mailer.
+
+Se o `sidekiq` estiver rodando e esse ajuste ainda não tiver sido feito, o job
+de email pode falhar com erro semelhante a `undefined method 'name' for nil`.
+
 ---
 
 ## Produção (visão geral)
