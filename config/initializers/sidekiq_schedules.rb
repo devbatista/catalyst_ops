@@ -22,9 +22,9 @@ Sidekiq.configure_server do |config|
         "description" => "Notifica clientes com assinaturas vencidas há 5 dias",
         "timezone" => "America/Sao_Paulo"
       },
-      "ExpireSubscriptionsJob" => {
+      "ExpireOverdueSubscriptionsJob" => {
         "cron" => "0 11 * * *", # Diariamente às 11h00
-        "class" => "Subscriptions::ExpireSubscriptionsJob",
+        "class" => "Subscriptions::ExpireOverdueSubscriptionsJob",
         "queue" => "default",
         "description" => "Expira assinaturas vencidas há 10 dias ou mais",
         "timezone" => "America/Sao_Paulo"

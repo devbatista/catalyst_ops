@@ -1,6 +1,6 @@
 module Cmd
   module Subscriptions
-    class ExpireSubscriptions
+    class ExpireOverdueSubscriptions
       Result = Struct.new(:success?, :subscription, :errors)
 
       def initialize(subscription_id:)
@@ -9,6 +9,7 @@ module Cmd
 
       def call
         return Result.new(false, nil, "Assinatura não encontrada") unless @subscription
+        return Result.new(true, @subscription, nil) if @subscription.expired?
 
         begin
           @subscription.transaction do
