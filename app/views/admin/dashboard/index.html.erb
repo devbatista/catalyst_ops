@@ -1,1 +1,255 @@
-salve
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="mb-3">
+      <h4 class="mb-0 text-uppercase">Dashboard Administrativo</h4>
+    </div>
+
+    <% flash.each do |type, message| %>
+      <% bootstrap_class = { notice: "alert-success", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
+      <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert">
+        <%= message %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    <% end %>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4">
+      <div class="col">
+        <div class="card radius-10 border-start border-0 border-4 border-success">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div>
+                <p class="mb-0 text-secondary">Empresas Ativas</p>
+                <h4 class="my-1 text-success"><%= @active_companies_count %></h4>
+                <p class="mb-0 font-13 text-secondary">Empresas com acesso habilitado</p>
+              </div>
+              <div class="widgets-icons-2 rounded-circle bg-gradient-ohhappiness text-white ms-auto">
+                <i class='bx bx-buildings'></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card radius-10 border-start border-0 border-4 border-primary">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div>
+                <p class="mb-0 text-secondary">Assinaturas Ativas</p>
+                <h4 class="my-1 text-primary"><%= @active_subscriptions_count %></h4>
+                <p class="mb-0 font-13 text-secondary">Base recorrente ativa</p>
+              </div>
+              <div class="widgets-icons-2 rounded-circle bg-gradient-blues text-white ms-auto">
+                <i class='bx bx-receipt'></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card radius-10 border-start border-0 border-4 border-warning">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div>
+                <p class="mb-0 text-secondary">MRR Estimado</p>
+                <h4 class="my-1 text-warning"><%= currency_br(@estimated_mrr) %></h4>
+                <p class="mb-0 font-13 text-secondary">Soma das assinaturas ativas</p>
+              </div>
+              <div class="widgets-icons-2 rounded-circle bg-gradient-orange text-white ms-auto">
+                <i class='bx bx-wallet-alt'></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card radius-10 border-start border-0 border-4 border-danger">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div>
+                <p class="mb-0 text-secondary">Tickets Abertos</p>
+                <h4 class="my-1 text-danger"><%= @open_tickets_count %></h4>
+                <p class="mb-0 font-13 text-secondary">Aguardando acompanhamento</p>
+              </div>
+              <div class="widgets-icons-2 rounded-circle bg-gradient-burning text-white ms-auto">
+                <i class='bx bx-support'></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 mt-1">
+      <div class="col">
+        <div class="card radius-10 border-start border-0 border-4 border-info">
+          <div class="card-body">
+            <p class="mb-0 text-secondary">Novas Empresas no Mês</p>
+            <h4 class="my-1 text-info"><%= @new_companies_this_month %></h4>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card radius-10 border-start border-0 border-4 border-secondary">
+          <div class="card-body">
+            <p class="mb-0 text-secondary">Novos Usuários no Mês</p>
+            <h4 class="my-1 text-secondary"><%= @new_users_this_month %></h4>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card radius-10 border-start border-0 border-4 border-success">
+          <div class="card-body">
+            <p class="mb-0 text-secondary">OS Finalizadas no Mês</p>
+            <h4 class="my-1 text-success"><%= @finished_orders_this_month %></h4>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card radius-10 border-start border-0 border-4 border-dark">
+          <div class="card-body">
+            <p class="mb-0 text-secondary">OS Atrasadas</p>
+            <h4 class="my-1 text-dark"><%= @overdue_orders_count %></h4>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-2">
+      <div class="col-12 col-xl-7 d-flex">
+        <div class="card radius-10 w-100">
+          <div class="card-header">
+            <h6 class="mb-0">Empresas com Mais Ordens de Serviço</h6>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Empresa</th>
+                    <th>Total de OS</th>
+                    <th>Finalizadas</th>
+                    <th>Usuários</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% if @top_companies.any? %>
+                    <% @top_companies.each do |company| %>
+                      <tr>
+                        <td><%= company.name %></td>
+                        <td><%= company.attributes["order_services_count"] %></td>
+                        <td><%= company.attributes["finalized_order_services_count"] %></td>
+                        <td><%= company.users.count %></td>
+                        <td class="text-end">
+                          <%= link_to "Ver", admin_company_path(company), class: "btn btn-sm btn-outline-primary" %>
+                        </td>
+                      </tr>
+                    <% end %>
+                  <% else %>
+                    <tr>
+                      <td colspan="5" class="text-center">Nenhuma empresa encontrada.</td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-xl-5 d-flex">
+        <div class="card radius-10 w-100">
+          <div class="card-header">
+            <h6 class="mb-0">Tickets Recentes</h6>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Ticket</th>
+                    <th>Empresa</th>
+                    <th>Status</th>
+                    <th>Impacto</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% if @recent_tickets.any? %>
+                    <% @recent_tickets.each do |ticket| %>
+                      <tr>
+                        <td>
+                          <%= link_to admin_ticket_path(ticket), class: "text-decoration-none" do %>
+                            <strong><%= truncate(ticket.subject, length: 38) %></strong><br>
+                            <span class="text-muted small"><%= l(ticket.last_reply_at || ticket.created_at, format: :short) %></span>
+                          <% end %>
+                        </td>
+                        <td><%= ticket.company&.name %></td>
+                        <td><%= ticket_status_badge(ticket) %></td>
+                        <td><%= ticket_impact_badge(ticket) %></td>
+                      </tr>
+                    <% end %>
+                  <% else %>
+                    <tr>
+                      <td colspan="4" class="text-center">Nenhum ticket recente.</td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-2">
+      <div class="col-12 d-flex">
+        <div class="card radius-10 w-100">
+          <div class="card-header">
+            <h6 class="mb-0">Assinaturas em Atenção</h6>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Empresa</th>
+                    <th>Status</th>
+                    <th>Plano</th>
+                    <th>Valor</th>
+                    <th>Atualizado em</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% if @subscriptions_in_attention.any? %>
+                    <% @subscriptions_in_attention.each do |subscription| %>
+                      <tr>
+                        <td><%= subscription.company&.name %></td>
+                        <td><%= subscription_status_badge(subscription) %></td>
+                        <td><%= subscription.plan&.name || subscription.company&.plan&.name || "-" %></td>
+                        <td><%= currency_br(subscription.transaction_amount || 0) %></td>
+                        <td><%= l(subscription.updated_at || subscription.created_at, format: :short) %></td>
+                        <td class="text-end">
+                          <% if subscription.company.present? %>
+                            <%= link_to "Ver empresa", admin_company_path(subscription.company), class: "btn btn-sm btn-outline-primary" %>
+                          <% end %>
+                        </td>
+                      </tr>
+                    <% end %>
+                  <% else %>
+                    <tr>
+                      <td colspan="6" class="text-center">Nenhuma assinatura em atenção no momento.</td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
