@@ -1,66 +1,203 @@
-# CatalystOps — Ambiente Docker
+# CatalystOps
 
-CatalystOps é uma plataforma **SaaS para gestão de operações e serviços técnicos**,
-desenvolvida em Ruby on Rails e executada **100% em Docker**, tanto em desenvolvimento
-quanto em produção.
+CatalystOps e uma plataforma SaaS para gestao de operacoes e servicos tecnicos,
+desenvolvida em Ruby on Rails e preparada para rodar em Docker tanto em
+desenvolvimento quanto em producao.
 
-Este README é **Docker‑first**: você não precisa instalar Ruby, Rails ou PostgreSQL
-localmente para rodar o projeto.
+Este projeto foi estruturado para que o ambiente local seja o mais proximo
+possivel do ambiente real de execucao. A ideia do repositório e simples:
 
----
+- Rails para a aplicacao web
+- PostgreSQL para persistencia
+- Redis para fila e cache
+- Sidekiq para jobs em background
+- Nginx para roteamento por subdominio
 
-## Visão geral
+## Objetivo do sistema
 
-O CatalystOps permite que empresas prestadoras de serviços técnicos organizem:
+O CatalystOps permite que empresas prestadoras de servicos tecnicos organizem:
 
-- Clientes
-- Ordens de Serviço (OS)
-- Técnicos e atribuições
-- Agenda de atendimentos
-- Anexos (fotos, documentos)
-- Relatórios operacionais
+- clientes
+- ordens de servico
+- tecnicos e atribuicoes
+- agenda de atendimento
+- anexos
+- suporte interno
+- base de conhecimento
+- assinaturas e operacao SaaS
 
-A arquitetura foi pensada para:
+## Stack principal
 
-- Padronização de ambiente
-- Facilidade de onboarding de desenvolvedores
-- Escalabilidade como SaaS
+| Componente | Funcao |
+| --- | --- |
+| Ruby on Rails | aplicacao principal |
+| PostgreSQL 15 | banco de dados |
+| Redis 7 | fila e cache |
+| Sidekiq | processamento assíncrono |
+| Nginx | proxy reverso / subdominios |
+| Docker Compose | orquestracao local |
 
----
+## Estrutura geral do ambiente
 
-## Requisitos
+Os servicos sao definidos em [`docker-compose.yml`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docker-compose.yml) e, em desenvolvimento, complementados por [`docker-compose.override.yml`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docker-compose.override.yml).
 
-- Docker
-- Docker Compose (pode usar `docker compose` ou `docker-compose`)
+Servicos principais:
 
-Versões recentes são recomendadas.
-
----
-
-## Arquitetura Docker
-
-Os containers são orquestrados via `docker-compose.yml` (com
-`docker-compose.override.yml` para desenvolvimento).
-
-### Serviços principais
-
-| Serviço | Container     | Descrição                                |
-|--------|---------------|------------------------------------------|
-| web    | `catalystops-app` | Aplicação Ruby on Rails                 |
-| db     | `postgres:15` | Banco de dados PostgreSQL               |
-| redis  | `redis:7`     | Cache e background jobs (Sidekiq)       |
-| sidekiq| `catalystops-app` | Processamento de jobs em background     |
-| nginx  | `nginx:latest`| Proxy reverso / subdomínios locais      |
+| Servico | Container | Papel no ambiente |
+| --- | --- | --- |
+| `web` | `catalystops-app` | executa o Rails |
+| `sidekiq` | `catalystops-app` | processa jobs em background |
+| `db` | `postgres:15` | banco de dados |
+| `redis` | `redis:7` | fila do Sidekiq e cache |
+| `nginx` | `nginx:latest` | entrada HTTP/HTTPS e subdominios |
 
 Fluxo simplificado:
 
-`cliente → nginx → web (Rails) → PostgreSQL`  
-`                               └→ Redis (Sidekiq / cache)`
+`cliente -> nginx -> web (Rails) -> PostgreSQL`
 
-### Montagem de código (dev)
+`cliente -> nginx -> web (Rails) -> Redis -> Sidekiq`
 
-No desenvolvimento, o arquivo `docker-compose.override.yml` monta o código
-local dentro do container:
+## Requisitos
+
+Para rodar o projeto localmente, voce precisa ter:
+
+- Docker
+- Docker Compose
+- acesso ao arquivo `config/master.key` ou ao valor de `RAILS_MASTER_KEY`
+
+Voce nao precisa instalar Ruby, Rails, PostgreSQL nem Redis diretamente na sua maquina se for usar o fluxo padrao com Docker.
+
+## Variaveis de ambiente
+
+As configuracoes ficam em `.env`. Um exemplo base existe em [` .env_example `](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/.env_example).
+
+Crie o arquivo local com:
+
+```bash
+cp .env_example .env
+```
+
+Principais variaveis:
+
+```env
+MP_TEST_ACCESS_TOKEN='TEST_ACCESS_TOKEN_EXAMPLE'
+MP_PRODUCTION_ACCESS_TOKEN='APP_USR_PRODUCTION_ACCESS_TOKEN_EXAMPLE'
+MP_PUBLIC_KEY='APP_USR_PUBLIC_KEY_EXAMPLE'
+MP_PUBLIC_KEY_TEST='TEST_PUBLIC_KEY_EXAMPLE'
+MP_WEBHOOK_SECRET='WEBHOOK_SECRET_EXAMPLE'
+
+RAILS_ENV=development
+POSTGRES_DB=catalyst_ops_development
+POSTGRES_USER=user_database
+POSTGRES_PASSWORD=pass_database
+POSTGRES_PORT=5432
+
+REDIS_PORT=6379
+WEB_PORT=3000
+
+RAILS_LOG_TO_STDOUT=true
+RAILS_MASTER_KEY='your_rails_master_key_here'
+SECRET_KEY_BASE='your_secret_key_base_here'
+
+PRECOMPILE_ASSETS=0
+ASSETS_SECRET_KEY_BASE='your_assets_secret_key_base_here'
+```
+
+Observacoes:
+
+- em desenvolvimento, use `RAILS_ENV=development`
+- para desenvolvimento, `PRECOMPILE_ASSETS=0` costuma ser suficiente
+- `RAILS_MASTER_KEY` precisa bater com as credenciais do projeto
+- `SECRET_KEY_BASE` pode ser gerada com `bin/rails secret`
+
+## Subdominios locais
+
+O projeto utiliza subdominios para separar areas da aplicacao:
+
+- `catalystops.local`
+- `app.catalystops.local`
+- `login.catalystops.local`
+- `admin.catalystops.local`
+- `register.catalystops.local`
+- `webhook.catalystops.local`
+- `sidekiq.catalystops.local`
+
+### Ajuste do `/etc/hosts`
+
+No macOS ou Linux:
+
+```bash
+sudo nano /etc/hosts
+```
+
+Adicione:
+
+```text
+127.0.0.1 catalystops.local
+127.0.0.1 app.catalystops.local
+127.0.0.1 login.catalystops.local
+127.0.0.1 admin.catalystops.local
+127.0.0.1 register.catalystops.local
+127.0.0.1 webhook.catalystops.local
+127.0.0.1 sidekiq.catalystops.local
+```
+
+### Enderecos mais usados
+
+Depois de subir o ambiente:
+
+- `https://app.catalystops.local`
+- `https://login.catalystops.local`
+- `https://admin.catalystops.local`
+- `https://register.catalystops.local`
+- `https://webhook.catalystops.local`
+- `https://sidekiq.catalystops.local`
+
+Opcionalmente, voce tambem pode acessar o Rails diretamente por:
+
+- `http://localhost:3000`
+
+## Como subir o projeto
+
+### 1. Build e subida dos containers
+
+Na raiz do projeto:
+
+```bash
+docker compose up -d --build
+```
+
+Isso sobe:
+
+- `db`
+- `redis`
+- `web`
+- `sidekiq`
+- `nginx`
+
+### 2. Criar banco e rodar migrations
+
+```bash
+docker compose exec web bin/rails db:create db:migrate
+```
+
+### 3. Popular dados iniciais
+
+```bash
+docker compose exec web bin/rails db:seed
+```
+
+### 4. Validar o ambiente
+
+```bash
+docker compose ps
+docker compose logs -f web
+docker compose logs -f sidekiq
+```
+
+## Montagem de codigo no desenvolvimento
+
+O arquivo [`docker-compose.override.yml`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docker-compose.override.yml) monta o diretorio do projeto dentro dos containers `web` e `sidekiq`:
 
 ```yaml
 services:
@@ -75,157 +212,29 @@ services:
       - ./storage:/rails/storage
 ```
 
-Isso significa que **qualquer alteração no código é refletida imediatamente**
-dentro do container (não precisa rebuild da imagem; às vezes só restart se
-mexer em gems).
+Na pratica, isso significa:
 
----
+- alteracoes em Ruby, views, JS e CSS refletem imediatamente no container
+- em geral, nao e necessario rebuild quando a mudanca e apenas de codigo
+- se voce alterar gems, e recomendavel rodar `bundle install` no container e reiniciar `web` e `sidekiq`
 
-## Variáveis de ambiente (`.env`)
-
-As variáveis ficam no arquivo `.env` (não versionado).  
-Um exemplo completo está em `.env_example`.
-
-### Criar o arquivo
+Exemplo:
 
 ```bash
-cp .env_example .env
+docker compose exec web bundle install
+docker compose restart web
+docker compose restart sidekiq
 ```
 
-### Principais variáveis
-
-```env
-# Ambiente
-RAILS_ENV=development              # development para local, production para servidor
-WEB_PORT=3000                      # porta externa do Rails (nginx também usa)
-
-# Banco de dados (PostgreSQL)
-POSTGRES_DB=catalyst_ops_development
-POSTGRES_USER=user_database
-POSTGRES_PASSWORD=pass_database
-POSTGRES_PORT=5432                 # porta exposta no host
-
-# Redis
-REDIS_PORT=6379
-
-# Rails secrets / chaves
-RAILS_LOG_TO_STDOUT=true
-RAILS_MASTER_KEY='your_rails_master_key_here'
-SECRET_KEY_BASE='your_secret_key_base_here'
-
-# Assets (build de imagem, principalmente para produção)
-PRECOMPILE_ASSETS=0                # 0 para dev (não precompila), 1 para prod
-ASSETS_SECRET_KEY_BASE='your_assets_secret_key_base_here'
-
-# Integração Mercado Pago
-MP_TEST_ACCESS_TOKEN='TEST_ACCESS_TOKEN_EXAMPLE'
-MP_PRODUCTION_ACCESS_TOKEN='APP_USR_PRODUCTION_ACCESS_TOKEN_EXAMPLE'
-MP_PUBLIC_KEY='APP_USR_PUBLIC_KEY_EXAMPLE'
-MP_PUBLIC_KEY_TEST='TEST_PUBLIC_KEY_EXAMPLE'
-MP_WEBHOOK_SECRET='WEBHOOK_SECRET_EXAMPLE'
-```
-
-> Em desenvolvimento, deixe `RAILS_ENV=development` e `PRECOMPILE_ASSETS=0`.
-
----
-
-## Subdomínios locais (`/etc/hosts`)
-
-O projeto utiliza vários subdomínios para separar áreas da aplicação:
-
-- `catalystops.local`      → domínio “raiz”
-- `app.catalystops.local`  → painel principal (aplicação)
-- `login.catalystops.local`→ tela de login
-- `admin.catalystops.local`→ área administrativa
-- `register.catalystops.local` → onboarding / cadastro
-- `webhook.catalystops.local` → área para recebimento de gatilhos externos
-- `sidekiq.catalystops.local`  → painel do Sidekiq
-
-### 1. Editar `/etc/hosts` (macOS / Linux)
-
-Abra o arquivo com privilégios de administrador:
-
-```bash
-sudo nano /etc/hosts
-```
-
-Adicione as linhas:
-
-```text
-127.0.0.1   catalystops.local
-127.0.0.1   app.catalystops.local
-127.0.0.1   login.catalystops.local
-127.0.0.1   admin.catalystops.local
-127.0.0.1   register.catalystops.local
-127.0.0.1   webhook.catalystops.local
-127.0.0.1   sidekiq.catalystops.local
-```
-
-Salve e feche.
-
-### 2. Acessando a aplicação
-
-Depois de subir os containers (ver seção abaixo), você poderá acessar:
-
-- `https://app.catalystops.local`
-- `https://login.catalystops.local`
-- `https://admin.catalystops.local`
-- `https://register.catalystops.local`
-- `https://webhook.catalystops.local`
-- `https://sidekiq.catalystops.local` (quando configurado no nginx)
-
-O serviço `nginx` (porta 80 e 443) faz o roteamento para o container `web`.
-
----
-
-## Setup inicial (primeira execução)
-
-### 1. Build e subida dos containers
-
-Na raiz do projeto:
-
-```bash
-docker compose up -d --build
-# ou, se sua instalação usar o binário antigo:
-# docker-compose up -d --build
-```
-
-Isso irá:
-
-- Buildar a imagem `catalystops-app` usando o `Dockerfile`
-- Subir `db`, `redis`, `web`, `sidekiq` e `nginx`
-
-### 2. Criar banco e rodar migrations
-
-```bash
-docker compose exec web bin/rails db:create db:migrate
-# ou: docker-compose exec web bin/rails db:create db:migrate
-```
-
-### 3. (Opcional) Popular dados iniciais
-
-```bash
-docker compose exec web bin/rails db:seed
-```
-
-### 4. Acessar a aplicação
-
-Com `/etc/hosts` configurado:
-
-- `http://app.catalystops.local` (via nginx)  
-ou, diretamente no container `web`:
-
-- `http://localhost:3000` (usa `WEB_PORT` do `.env`)
-
----
-
-## Comandos úteis
+## Comandos uteis
 
 ### Logs
 
 ```bash
 docker compose logs -f web
 docker compose logs -f sidekiq
+docker compose logs -f nginx
+docker compose logs -f db
 ```
 
 ### Console Rails
@@ -234,10 +243,17 @@ docker compose logs -f sidekiq
 docker compose exec web bin/rails console
 ```
 
+### Executar um runner
+
+```bash
+docker compose exec web bin/rails runner "puts Company.count"
+```
+
 ### Migrations
 
 ```bash
 docker compose exec web bin/rails db:migrate
+docker compose exec web bin/rails db:rollback
 ```
 
 ### Testes
@@ -246,36 +262,171 @@ docker compose exec web bin/rails db:migrate
 docker compose exec web bin/rails test
 ```
 
-### Reiniciar serviços
+### Reiniciar servicos
 
 ```bash
 docker compose restart web
 docker compose restart sidekiq
+docker compose restart nginx
 ```
 
-### Parar todos os containers
+### Derrubar ambiente
 
 ```bash
 docker compose down
 ```
 
-### Reset completo (⚠️ apaga banco e volumes)
+### Reset completo do ambiente
+
+Use com cuidado. Isso apaga volumes e banco local:
 
 ```bash
 docker compose down -v
 docker compose up -d --build
 ```
 
----
+## Como funcionam os seeds
 
-## Sobre atualização de código (dev)
+O arquivo [`db/seeds.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/db/seeds.rb) carrega seeds em duas etapas:
 
-Como o `docker-compose.override.yml` monta seu diretório de trabalho dentro
-do container (`.:/rails`):
+1. tudo que estiver em `db/seeds/common`
+2. tudo que estiver em `db/seeds/<ambiente>`
 
-- Alterações em arquivos Ruby, views, JS, CSS etc. entram **na hora**.
-- Geralmente não é preciso rebuild da imagem, só recarregar a página.
-- Se você adicionar/atualizar gems, rode:
+No ambiente `development`, a ordem atual e:
+
+- [`db/seeds/common/0-prepare.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/db/seeds/common/0-prepare.rb)
+- [`db/seeds/common/1.plans.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/db/seeds/common/1.plans.rb)
+- [`db/seeds/development/2-companies.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/db/seeds/development/2-companies.rb)
+- [`db/seeds/development/3-users.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/db/seeds/development/3-users.rb)
+- [`db/seeds/development/4-clients.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/db/seeds/development/4-clients.rb)
+- [`db/seeds/development/5-order_services.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/db/seeds/development/5-order_services.rb)
+- [`db/seeds/development/6-assignments.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/db/seeds/development/6-assignments.rb)
+- [`db/seeds/development/7-service_items.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/db/seeds/development/7-service_items.rb)
+- [`db/seeds/development/8-knowledge_base_articles.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/db/seeds/development/8-knowledge_base_articles.rb)
+- [`db/seeds/development/9-support_tickets.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/db/seeds/development/9-support_tickets.rb)
+- [`db/seeds/development/9a-support_messages.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/db/seeds/development/9a-support_messages.rb)
+
+### Preparacao da base
+
+O seed [`db/seeds/common/0-prepare.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/db/seeds/common/0-prepare.rb) limpa os dados antigos antes de recriar os registros. Essa limpeza usa `disable_referential_integrity` para evitar erro de chave estrangeira durante `delete_all`.
+
+Se o `db:seed` falhar, confira primeiro:
+
+- se o banco esta acessivel
+- se as migrations estao atualizadas
+- se o comando esta rodando dentro do container correto
+
+## Background jobs com Sidekiq e Redis
+
+Redis e usado para:
+
+- fila do Sidekiq
+- cache, quando habilitado
+
+Para jobs funcionarem corretamente:
+
+- `redis` precisa estar em execucao
+- `sidekiq` precisa estar em execucao
+- o `REDIS_URL` precisa apontar para o container `redis`
+
+Cheque rapidamente:
+
+```bash
+docker compose ps
+docker compose logs -f sidekiq
+```
+
+## Fluxo de emails
+
+Os envios de email usam `deliver_later`, entao passam pelo Sidekiq.
+
+Isso vale para fluxos como:
+
+- boas-vindas de usuario
+- notificacoes de ordens de servico
+- sugestoes enviadas pela area de suporte
+
+### Ordem de Servico
+
+No model [`app/models/order_service.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/app/models/order_service.rb), existem callbacks que enfileiram emails em diferentes mudancas de estado:
+
+- `after_create :notify_create`
+- `after_update :notify_complete`
+- `after_update :notify_scheduled`
+- `after_update :notify_finished`
+- `after_update :notify_in_progress`
+- `after_update :notify_overdue`
+
+Esses callbacks chamam o [`OrderServiceMailer`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/app/mailers/order_service_mailer.rb).
+
+### Inconsistencia atual no `notify_create`
+
+Hoje, o metodo `notify_create` envia o email para o cliente:
+
+- define `@order_service`
+- define `@client`
+- envia para `@client.email`
+
+O template texto de [`notify_create.text.erb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/app/views/order_service_mailer/notify_create.text.erb) esta coerente com isso.
+
+Mas o template HTML de [`notify_create.html.erb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/app/views/order_service_mailer/notify_create.html.erb) ainda referencia `@gestor.name`.
+
+Como `@gestor` nao e definido nesse metodo, o job pode falhar com erro como:
+
+```text
+undefined method `name' for nil
+```
+
+Se a intencao de negocio continuar sendo avisar o cliente na criacao da OS, o template HTML deve usar `@client.name`.
+
+## Como interpretar logs do Sidekiq
+
+Exemplo comum:
+
+```text
+Performing ActionMailer::MailDeliveryJob ...
+Rendered order_service_mailer/notify_create.html.erb ...
+Rendered layout layouts/mailer.html.erb ...
+```
+
+Isso significa:
+
+- o job foi retirado da fila
+- o mailer começou a ser executado
+- a view do email foi renderizada
+
+Isso ainda nao garante entrega final. Para considerar sucesso, o log precisa fechar sem erro, normalmente com `Performed ActionMailer::MailDeliveryJob` ou sem `WARN` e `ERROR` subsequentes para o mesmo job.
+
+Se houver atraso grande entre `enqueued_at` e `Performing`, normalmente existe backlog ou o `sidekiq` ficou parado durante algum periodo.
+
+## Estrutura de documentacao interna
+
+O projeto tambem possui documentacao funcional em [`docs/`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docs):
+
+- [`docs/gestor`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docs/gestor)
+- [`docs/tecnico`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docs/tecnico)
+
+Esses arquivos sao usados como base para artigos da base de conhecimento.
+
+## Troubleshooting
+
+### `db:seed` falha com chave estrangeira
+
+Verifique se o seed de limpeza esta atualizado em [`db/seeds/common/0-prepare.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/db/seeds/common/0-prepare.rb) e se o comando foi rodado depois da correcao.
+
+### Sidekiq nao processa emails
+
+Confira:
+
+- `docker compose ps`
+- `docker compose logs -f sidekiq`
+- `docker compose logs -f redis`
+
+Se os jobs estiverem acumulados e depois forem processados de uma vez, isso normalmente indica indisponibilidade temporaria do `sidekiq`.
+
+### Mudanca de codigo nao refletiu
+
+Se foi mudanca de gem ou dependencia:
 
 ```bash
 docker compose exec web bundle install
@@ -283,66 +434,48 @@ docker compose restart web
 docker compose restart sidekiq
 ```
 
----
+Se foi mudanca simples de codigo Ruby ou view, normalmente basta recarregar a pagina.
 
-## Background jobs (Sidekiq) e Redis
+### Erro local de Ruby ou Bundler fora do Docker
 
-O Redis é usado para:
+Este projeto e Docker-first. Se voce rodar `bin/rails` diretamente na maquina hospedeira, pode encontrar divergencias de Ruby, Bundler ou plataforma do `Gemfile`.
 
-- Fila de jobs (Sidekiq)
-- Cache (quando habilitado)
+O caminho recomendado e executar comandos Rails dentro do container `web`.
 
-Certifique‑se de que:
+## Fluxo recomendado para desenvolvimento
 
-- `redis` esteja rodando;
-- `sidekiq` esteja em execução (`docker compose ps`).
+1. subir containers
+2. rodar `db:create db:migrate`
+3. rodar `db:seed`
+4. acessar `app.catalystops.local`
+5. acompanhar `web` e `sidekiq` nos logs durante novos fluxos
 
-O painel do Sidekiq pode ser exposto em `sidekiq.catalystops.local`
-quando configurado nas rotas e no nginx.
+## Producao
 
-### Emails de Ordens de Serviço
+Para producao, o fluxo geral e:
 
-As notificações de `OrderService` são enfileiradas com `deliver_later`, então
-dependem do `sidekiq` e do `redis` para serem processadas.
+1. preparar `.env` com valores reais
+2. subir containers com build
+3. executar migrations
+4. validar conectividade com banco e redis
+5. configurar DNS e SSL
+6. monitorar logs de `web`, `nginx` e `sidekiq`
 
-Fluxo atual:
+## Referencias rapidas
 
-- Ao criar uma OS, o callback `after_create :notify_create` em `OrderService`
-  enfileira `OrderServiceMailer.notify_create(self)`.
-- Hoje esse email é enviado para o cliente (`@client.email`).
-- O template texto de `notify_create` está coerente com isso.
+- Compose principal: [`docker-compose.yml`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docker-compose.yml)
+- Override de desenvolvimento: [`docker-compose.override.yml`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docker-compose.override.yml)
+- Exemplo de ambiente: [`.env_example`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/.env_example)
+- Seeds: [`db/seeds.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/db/seeds.rb)
+- Mailer de OS: [`app/mailers/order_service_mailer.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/app/mailers/order_service_mailer.rb)
+- Model de OS: [`app/models/order_service.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/app/models/order_service.rb)
 
-Ajuste necessário:
+## Observacao final
 
-- O template HTML de `notify_create` referencia `@gestor.name`, mas o mailer
-  não define `@gestor` nesse método.
-- O comportamento esperado hoje é notificar o cliente, então o template HTML
-  deve usar `@client.name` ou uma variável equivalente definida no mailer.
+Se algo nao funcionar como esperado:
 
-Se o `sidekiq` estiver rodando e esse ajuste ainda não tiver sido feito, o job
-de email pode falhar com erro semelhante a `undefined method 'name' for nil`.
-
----
-
-## Produção (visão geral)
-
-Para produção (servidor Linux):
-
-1. Copiar o projeto para o servidor
-2. Criar `.env` com `RAILS_ENV=production` e `PRECOMPILE_ASSETS=1`
-3. Subir containers com `docker compose up -d --build`
-4. Rodar `db:create db:migrate`
-5. Configurar DNS real + nginx/SSL (mapeando para os containers)
-
----
-
-## Observação final
-
-Se algo não funcionar conforme esperado:
-
-1. Verifique o `.env`
-2. Confira `docker compose ps` e `docker compose logs`
-3. Revise `docker-compose.yml` e `docker-compose.override.yml`
-
-Para dúvidas específicas, abra uma issue interna ou consulte a documentação
-em `docs/`.
+1. revise o `.env`
+2. confira se os containers estao saudaveis
+3. valide migrations e seeds
+4. acompanhe logs de `web` e `sidekiq`
+5. consulte a documentacao em [`docs/`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docs)
