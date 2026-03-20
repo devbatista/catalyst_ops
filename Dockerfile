@@ -45,6 +45,7 @@ ARG MP_PUBLIC_KEY=""
 ARG MP_WEBHOOK_SECRET=""
 
 # Exporte como ENV para o build
+ENV PRECOMPILE_ASSETS=$PRECOMPILE_ASSETS
 ENV MP_PRODUCTION_ACCESS_TOKEN=$MP_PRODUCTION_ACCESS_TOKEN
 ENV MP_TEST_ACCESS_TOKEN=$MP_TEST_ACCESS_TOKEN
 ENV MP_PUBLIC_KEY=$MP_PUBLIC_KEY
@@ -53,7 +54,7 @@ ENV SECRET_KEY_BASE=$ASSETS_SECRET_KEY_BASE
 
 # Precompile assets se necessário
 RUN if [ "$PRECOMPILE_ASSETS" = "1" ]; then \
-      RAILS_ENV=production bundle exec rails assets:clobber assets:precompile ; \
+      PRECOMPILE_ASSETS=$PRECOMPILE_ASSETS RAILS_ENV=production bundle exec rails assets:clobber assets:precompile ; \
     fi
 
 # ------------------------
