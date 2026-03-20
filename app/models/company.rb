@@ -111,7 +111,7 @@ class Company < ApplicationRecord
   end
 
   def access_enabled?
-    active? && adimplente?
+    adimplente?
   end
 
   def current_plan
@@ -158,6 +158,6 @@ class Company < ApplicationRecord
   end
 
   def adimplente?
-    !!current_subscription
+    current_subscription&.active? || false
   end
 end

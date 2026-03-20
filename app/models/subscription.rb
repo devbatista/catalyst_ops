@@ -20,6 +20,7 @@ class Subscription < ApplicationRecord
   scope :active, -> { where(status: :active).limit(1) }
   scope :active_records, -> { where(status: :active) }
   scope :in_attention, -> { where(status: [:pending, :expired, :cancelled]).order(updated_at: :desc, created_at: :desc) }
+  
   scope :overdue_for_notification, -> {
     where(status: :active, expiration_warning_sent_at: nil)
       .where('end_date <= ?', Date.current - 5.days)
