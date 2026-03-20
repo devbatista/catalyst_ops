@@ -13,6 +13,6 @@ class SuggestionsMailer < ApplicationMailer
   private
 
   def suggestion_recipient
-    ENV.fetch("SUGGESTIONS_RECIPIENT_EMAIL", "rafael@devbatista.com")
+    ENV.fetch("SUGGESTIONS_RECIPIENT_EMAIL", "contato@catalystops.com.br")
   end
 end
