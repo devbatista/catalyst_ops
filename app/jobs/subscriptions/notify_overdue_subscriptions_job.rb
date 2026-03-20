@@ -19,7 +19,7 @@ class Subscriptions::NotifyOverdueSubscriptionsJob
       result = Cmd::Subscriptions::NotifySubscription.new(subscription_id: id).call
 
       if result.success?
-        Rails.logger.info "[Subscriptions::NotifyOverdueSubscriptionsJob] Notificacao enviada para assinatura ID #{id}."
+        Rails.logger.info "[Subscriptions::NotifyOverdueSubscriptionsJob] Notificacao de vencimento registrada para assinatura ID #{id}."
       else
         Rails.logger.error "[Subscriptions::NotifyOverdueSubscriptionsJob] Erro ao notificar assinatura ID #{id}: #{result.errors}"
       end

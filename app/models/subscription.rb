@@ -20,7 +20,10 @@ class Subscription < ApplicationRecord
   scope :active, -> { where(status: :active).limit(1) }
   scope :active_records, -> { where(status: :active) }
   scope :in_attention, -> { where(status: [:pending, :expired, :cancelled]).order(updated_at: :desc, created_at: :desc) }
-  scope :overdue_for_notification, -> { where(status: :active, end_date: Date.current - 5.days) }
+  scope :overdue_for_notification, -> {
+    where(status: :active, expiration_warning_sent_at: nil)
+      .where('end_date <= ?', Date.current - 5.days)
+  }
   scope :overdue_for_expiration, -> { where(status: :active).where('end_date <= ?', Date.current - 10.days) }
   
   scope :ready_to_cycle, -> { 
@@ -48,7 +51,8 @@ class Subscription < ApplicationRecord
             start_date: Time.current,
             end_date: Time.current + 1.month,
             canceled_date: nil,
-            expired_date: nil)
+            expired_date: nil,
+            expiration_warning_sent_at: nil)
   end
 
   def cancel!

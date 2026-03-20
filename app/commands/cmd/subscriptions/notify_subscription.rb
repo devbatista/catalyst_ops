@@ -9,12 +9,17 @@ module Cmd
 
       def call
         return Result.new(false, nil, "Assinatura não encontrada") unless @subscription
+        return Result.new(false, @subscription, "Assinatura já notificada") if @subscription.expiration_warning_sent_at.present?
 
         begin
-          Subscriptions::ExpirationWarningMailer
-            .with(subscription: @subscription)
-            .warning_email
-            .deliver_later
+          @subscription.transaction do
+            Subscriptions::ExpirationWarningMailer
+              .with(subscription: @subscription)
+              .warning_email
+              .deliver_later
+
+            @subscription.update!(expiration_warning_sent_at: Time.current)
+          end
 
           Result.new(true, @subscription, nil)
         rescue StandardError => e
