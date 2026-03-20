@@ -1,3 +1,26 @@
+x-rails-env: &rails_env
+  RAILS_ENV: ${RAILS_ENV}
+  DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
+  REDIS_URL: "redis://redis:6379/0"
+  RAILS_MASTER_KEY: "${RAILS_MASTER_KEY:-}"
+  SECRET_KEY_BASE: "${SECRET_KEY_BASE:-}"
+  RAILS_LOG_TO_STDOUT: "${RAILS_LOG_TO_STDOUT:-true}"
+  APP_HOST: "${APP_HOST:-app.catalystops.com.br}"
+  APP_PROTOCOL: "${APP_PROTOCOL:-https}"
+  SMTP_ADDRESS: "${SMTP_ADDRESS:-}"
+  SMTP_PORT: "${SMTP_PORT:-587}"
+  SMTP_DOMAIN: "${SMTP_DOMAIN:-}"
+  SMTP_USERNAME: "${SMTP_USERNAME:-}"
+  SMTP_PASSWORD: "${SMTP_PASSWORD:-}"
+  SMTP_AUTHENTICATION: "${SMTP_AUTHENTICATION:-plain}"
+  SMTP_ENABLE_STARTTLS_AUTO: "${SMTP_ENABLE_STARTTLS_AUTO:-true}"
+  SMTP_OPEN_TIMEOUT: "${SMTP_OPEN_TIMEOUT:-5}"
+  SMTP_READ_TIMEOUT: "${SMTP_READ_TIMEOUT:-5}"
+  MP_PRODUCTION_ACCESS_TOKEN: ${MP_PRODUCTION_ACCESS_TOKEN}
+  MP_TEST_ACCESS_TOKEN: ${MP_TEST_ACCESS_TOKEN}
+  MP_PUBLIC_KEY: ${MP_PUBLIC_KEY}
+  MP_WEBHOOK_SECRET: ${MP_WEBHOOK_SECRET}
+
 services:
   db:
     image: postgres:15
@@ -34,17 +57,7 @@ services:
       - db
       - redis
     environment:
-      RAILS_ENV: ${RAILS_ENV}
-      DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
-      REDIS_URL: "redis://redis:6379/0"
-      RAILS_LOG_TO_STDOUT: "${RAILS_LOG_TO_STDOUT:-true}"
-      RAILS_MASTER_KEY: "${RAILS_MASTER_KEY:-}"
-      SECRET_KEY_BASE: "${SECRET_KEY_BASE:-}"
-      MP_PRODUCTION_ACCESS_TOKEN: ${MP_PRODUCTION_ACCESS_TOKEN}
-      MP_TEST_ACCESS_TOKEN: ${MP_TEST_ACCESS_TOKEN}
-      MP_PUBLIC_KEY: ${MP_PUBLIC_KEY}
-      PRECOMPILE_ASSETS: "1"
-      MP_WEBHOOK_SECRET: ${MP_WEBHOOK_SECRET}
+      <<: *rails_env
     command: bin/rails server -b 0.0.0.0 -p 3000
     restart: unless-stopped
 
@@ -55,15 +68,7 @@ services:
       - db
       - redis
     environment:
-      RAILS_ENV: ${RAILS_ENV}
-      DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
-      REDIS_URL: "redis://redis:6379/0"
-      RAILS_MASTER_KEY: "${RAILS_MASTER_KEY:-}"
-      SECRET_KEY_BASE: "${SECRET_KEY_BASE:-}"
-      MP_PRODUCTION_ACCESS_TOKEN: ${MP_PRODUCTION_ACCESS_TOKEN}
-      MP_TEST_ACCESS_TOKEN: ${MP_TEST_ACCESS_TOKEN}
-      MP_PUBLIC_KEY: ${MP_PUBLIC_KEY}
-      MP_WEBHOOK_SECRET: ${MP_WEBHOOK_SECRET}
+      <<: *rails_env
     restart: unless-stopped
 
   nginx:
