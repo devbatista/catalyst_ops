@@ -336,6 +336,31 @@ docker compose ps
 docker compose logs -f sidekiq
 ```
 
+### Cron jobs carregados no startup do Sidekiq
+
+Os agendamentos recorrentes sao registrados no startup do Sidekiq via
+[`config/initializers/sidekiq_schedules.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/config/initializers/sidekiq_schedules.rb),
+usando `Sidekiq::Cron::Job.load_from_hash!`.
+
+Timezone configurado para os agendamentos:
+
+- `America/Sao_Paulo`
+
+Cron jobs atuais:
+
+| Job | Cron | Frequencia | Objetivo |
+| --- | --- | --- | --- |
+| `MarkOverdueOrderServicesJob` | `* * * * *` | a cada minuto | marca OS como atrasadas quando o horario agendado ja passou |
+| `Subscriptions::CycleSubscriptionsJob` | `0 10 * * *` | diariamente as 10:00 | cicla assinaturas aptas para renovacao |
+| `Subscriptions::ExpireSubscriptionsJob` | `0 11 * * *` | diariamente as 11:00 | expira assinaturas vencidas |
+
+Observacoes:
+
+- esses cron jobs so ficam ativos com o processo `sidekiq` em execucao
+- a fila usada nesses agendamentos e `default`
+- a concorrencia base do Sidekiq esta em [`config/sidekiq.yml`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/config/sidekiq.yml)
+- para validar se os agendamentos foram carregados, acompanhe os logs do container `sidekiq`
+
 ## Fluxo de emails
 
 Os envios de email usam `deliver_later`, entao passam pelo Sidekiq.
