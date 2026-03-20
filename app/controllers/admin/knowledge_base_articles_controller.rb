@@ -9,6 +9,10 @@ class Admin::KnowledgeBaseArticlesController < AdminController
       @articles = @articles.where(category: params[:category])
     end
 
+    if params[:audience].present?
+      @articles = @articles.where(audience: params[:audience])
+    end
+
     if params[:q].present?
       q = "%#{params[:q]}%"
       @articles = @articles.where("title ILIKE ? OR content ILIKE ?", q, q)
@@ -62,6 +66,6 @@ class Admin::KnowledgeBaseArticlesController < AdminController
   end
 
   def knowledge_base_article_params
-    params.require(:knowledge_base_article).permit(:title, :content, :category)
+    params.require(:knowledge_base_article).permit(:title, :content, :category, :audience)
   end
 end

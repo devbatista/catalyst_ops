@@ -8,7 +8,7 @@ class App::SupportController < ApplicationController
     when "tickets"
       load_tickets_section
     when "knowledge_base"
-      @articles = KnowledgeBaseArticle.order(:category, :title)
+      @articles = KnowledgeBaseArticle.for_audience(current_user.role).order(:category, :title)
     when "suggestions"
       build_suggestion_form
     when "quick_contact"

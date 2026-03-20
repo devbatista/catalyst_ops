@@ -4,7 +4,7 @@ module ApplicationHelper
   end
 
   def active_support_menu_class
-    if controller_path.start_with?("app/support") || controller_path == "app/support_tickets"
+    if controller_path.start_with?("app/support") || controller_path == "app/support_tickets" || controller_path == "app/knowledge_base"
       "active"
     else
       ""

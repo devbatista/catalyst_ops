@@ -23,6 +23,10 @@
                   <i class="bx bx-folder"></i>
                   <%= @knowledge_base_article.category.presence || "Sem categoria" %>
                 </div>
+                <div class="text-muted mb-3">
+                  <i class="bx bx-user"></i>
+                  Público: <%= @knowledge_base_article.audience.to_s.humanize %>
+                </div>
               </div>
             </div>
             <hr>

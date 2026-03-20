@@ -29,6 +29,12 @@
                          placeholder="Título, conteúdo...">
                 </div>
               </div>
+              <div class="col-md-2">
+                <label class="form-label">Público</label>
+                  <%= select_tag :audience,
+                      options_for_select([["Todos", ""], ["Gestor", "gestor"], ["Técnico", "tecnico"]], params[:audience]),
+                      class: "form-select" %>
+              </div>
               <div class="col-md-2 d-flex align-items-end">
                 <%= f.submit "Buscar", class: "btn btn-outline-secondary w-100" %>
               </div>
@@ -48,6 +54,7 @@
                   <thead>
                     <tr>
                       <th>Título</th>
+                      <th>Público</th>
                       <th class="d-none d-md-table-cell">Resumo</th>
                       <th class="text-end" style="width: 180px;">Ações</th>
                     </tr>
@@ -56,6 +63,7 @@
                     <% articles.each do |article| %>
                       <tr>
                         <td><strong><%= article.title %></strong></td>
+                        <td><span class="badge bg-secondary"><%= article.audience.to_s.humanize %></span></td>
                         <td class="d-none d-md-table-cell text-muted">
                           <%= truncate(strip_tags(article.content), length: 80) %>
                         </td>

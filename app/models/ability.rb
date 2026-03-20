@@ -57,6 +57,7 @@ class Ability
 
     can :read, :calendar
     can :read, :financial
+    can :read, :knowledge_base
 
     can :read, :support
 
@@ -102,6 +103,7 @@ class Ability
     cannot :manage, Report
 
     can :read, :calendar
+    can :read, :knowledge_base
 
     can :read, :dashboard
   end

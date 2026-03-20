@@ -74,13 +74,14 @@
       <% end %>
     </li>
 
-    <% if can?(:read, :support) %>
+    <% if can?(:read, :support) || can?(:read, :knowledge_base) %>
     <li class="list-group-item <%= active_support_menu_class %>">
-      <%= link_to app_support_index_path(section: 'overview'), class: "has-arrow" do %>
+      <%= link_to (can?(:read, :support) ? app_support_index_path(section: 'overview') : app_knowledge_base_index_path), class: "has-arrow" do %>
         <div class="parent-icon"><i class="bx bx-support"></i></div>
         <div class="menu-title">Suporte</div>
       <% end %>
       <ul>
+        <% if can?(:read, :support) %>
         <li class="<%= active_menu_class(app_support_index_path(section: 'overview')) %>">
           <%= link_to app_support_index_path(section: 'overview') do %>
             <i class="bx bx-info-circle"></i> Visão Geral
@@ -91,11 +92,15 @@
             <i class="bx bx-list-ul"></i> Tickets
           <% end %>
         </li>
-        <li class="<%= active_menu_class(app_support_index_path(section: 'knowledge_base')) %>">
-          <%= link_to app_support_index_path(section: 'knowledge_base') do %>
+        <% end %>
+        <% if can?(:read, :knowledge_base) %>
+        <li class="<%= active_menu_class(app_knowledge_base_index_path) %>">
+          <%= link_to app_knowledge_base_index_path do %>
             <i class="bx bx-book-open"></i> Base de Conhecimento
           <% end %>
         </li>
+        <% end %>
+        <% if can?(:read, :support) %>
         <li class="<%= active_menu_class(app_support_index_path(section: 'suggestions')) %>">
           <%= link_to app_support_index_path(section: 'suggestions') do %>
             <i class="bx bx-bulb"></i> Sugestões
@@ -107,6 +112,7 @@
               <i class="bx bx-phone"></i> Contato Rápido
             <% end %>
           </li>
+        <% end %>
         <% end %>
       </ul>
     </li>

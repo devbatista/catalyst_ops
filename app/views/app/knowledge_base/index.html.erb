@@ -1,0 +1,23 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="mb-3 d-flex justify-content-between align-items-center">
+      <h4 class="mb-0 text-uppercase">
+        <i class="bx bx-book-open"></i> Base de Conhecimento
+      </h4>
+    </div>
+
+    <% flash.each do |type, message| %>
+      <% bootstrap_class = { notice: "alert-success", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
+      <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert">
+        <%= message %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    <% end %>
+
+    <div class="card">
+      <div class="card-body">
+        <%= render "app/support/knowledge_base", articles: @articles %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -22,6 +22,15 @@
   </div>
 
   <div class="mb-3">
+    <%= form.label :audience, "Público", class: "form-label" %>
+    <%= form.select :audience,
+                    options_for_select([["Gestor", "gestor"], ["Técnico", "tecnico"]], @knowledge_base_article.audience),
+                    {},
+                    class: "form-select",
+                    required: true %>
+  </div>
+
+  <div class="mb-3">
     <%= form.label :content, "Conteúdo (Markdown)", class: "form-label" %>
     <%= form.text_area :content, class: "form-control", rows: 10, required: true %>
   </div>
