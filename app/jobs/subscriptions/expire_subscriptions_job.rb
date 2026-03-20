@@ -3,7 +3,7 @@ class Subscriptions::ExpireSubscriptionsJob
   sidekiq_options queue: :default, retry: 3
 
   def perform
-    subscription_ids = Subscriptions.where(end_date: Date.today - 1).pluck(:id)
+    subscription_ids = Subscription.where(end_date: Date.today - 1).pluck(:id)
 
     if subscription_ids.any?
       expire_subscriptions(subscription_ids)
