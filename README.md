@@ -359,26 +359,6 @@ No model [`app/models/order_service.rb`](/Users/devbatista/Programacao/devbatist
 
 Esses callbacks chamam o [`OrderServiceMailer`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/app/mailers/order_service_mailer.rb).
 
-### Inconsistencia atual no `notify_create`
-
-Hoje, o metodo `notify_create` envia o email para o cliente:
-
-- define `@order_service`
-- define `@client`
-- envia para `@client.email`
-
-O template texto de [`notify_create.text.erb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/app/views/order_service_mailer/notify_create.text.erb) esta coerente com isso.
-
-Mas o template HTML de [`notify_create.html.erb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/app/views/order_service_mailer/notify_create.html.erb) ainda referencia `@gestor.name`.
-
-Como `@gestor` nao e definido nesse metodo, o job pode falhar com erro como:
-
-```text
-undefined method `name' for nil
-```
-
-Se a intencao de negocio continuar sendo avisar o cliente na criacao da OS, o template HTML deve usar `@client.name`.
-
 ## Como interpretar logs do Sidekiq
 
 Exemplo comum:
