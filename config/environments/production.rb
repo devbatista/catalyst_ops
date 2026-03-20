@@ -78,20 +78,40 @@ Rails.application.configure do
   }
   config.action_mailer.asset_host = "#{config.action_mailer.default_url_options[:protocol]}://#{config.action_mailer.default_url_options[:host]}"
   precompiling_assets = ENV["PRECOMPILE_ASSETS"] == "1"
+  env_or_file = lambda do |key|
+    value = ENV[key].to_s.strip
+    return value if value.present?
+
+    file_path = ENV["#{key}_FILE"].to_s.strip
+    return File.read(file_path).strip if file_path.present? && File.exist?(file_path)
+
+    nil
+  end
 
   if precompiling_assets
     config.action_mailer.perform_deliveries = false
     config.action_mailer.raise_delivery_errors = false
   else
+    smtp_address = env_or_file.call("SMTP_ADDRESS")
+    smtp_username = env_or_file.call("SMTP_USERNAME")
+    smtp_password = env_or_file.call("SMTP_PASSWORD")
+
+    missing_smtp_settings = []
+    missing_smtp_settings << "SMTP_ADDRESS" if smtp_address.blank?
+    missing_smtp_settings << "SMTP_USERNAME" if smtp_username.blank?
+    missing_smtp_settings << "SMTP_PASSWORD" if smtp_password.blank?
+
+    raise KeyError, "Missing ActionMailer SMTP settings: #{missing_smtp_settings.join(', ')}" if missing_smtp_settings.any?
+
     config.action_mailer.perform_deliveries = true
     config.action_mailer.raise_delivery_errors = true
     config.action_mailer.delivery_method = :smtp
     config.action_mailer.smtp_settings = {
-      address: ENV.fetch("SMTP_ADDRESS"),
+      address: smtp_address,
       port: ENV.fetch("SMTP_PORT", 587).to_i,
       domain: ENV.fetch("SMTP_DOMAIN", ENV.fetch("APP_HOST", "app.catalystops.com.br")),
-      user_name: ENV.fetch("SMTP_USERNAME"),
-      password: ENV.fetch("SMTP_PASSWORD"),
+      user_name: smtp_username,
+      password: smtp_password,
       authentication: ENV.fetch("SMTP_AUTHENTICATION", "plain").to_sym,
       enable_starttls_auto: ENV.fetch("SMTP_ENABLE_STARTTLS_AUTO", "true") == "true",
       open_timeout: ENV.fetch("SMTP_OPEN_TIMEOUT", 5).to_i,

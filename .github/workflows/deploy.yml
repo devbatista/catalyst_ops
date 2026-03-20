@@ -34,6 +34,19 @@ jobs:
             POSTGRES_USER=${{ secrets.POSTGRES_USER }}
             POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
             POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+            
+            APP_HOST=app.catalystops.com.br
+            APP_PROTOCOL=https
+
+            SMTP_ADDRESS=${{ secrets.SMTP_ADDRESS }}
+            SMTP_PORT=${{ secrets.SMTP_PORT }}
+            SMTP_DOMAIN=${{ secrets.SMTP_DOMAIN }}
+            SMTP_USERNAME=${{ secrets.SMTP_USERNAME }}
+            SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}
+            SMTP_AUTHENTICATION=plain
+            SMTP_ENABLE_STARTTLS_AUTO=true
+            SMTP_OPEN_TIMEOUT=5
+            SMTP_READ_TIMEOUT=5
             PRECOMPILE_ASSETS=1
             # ...adicione outras variáveis necessárias
             EOF

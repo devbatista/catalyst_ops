@@ -10,8 +10,8 @@ x-rails-env: &rails_env
   SMTP_ADDRESS: "${SMTP_ADDRESS:-}"
   SMTP_PORT: "${SMTP_PORT:-587}"
   SMTP_DOMAIN: "${SMTP_DOMAIN:-}"
-  SMTP_USERNAME: "${SMTP_USERNAME:-}"
-  SMTP_PASSWORD: "${SMTP_PASSWORD:-}"
+  SMTP_USERNAME_FILE: "/run/secrets/smtp_username"
+  SMTP_PASSWORD_FILE: "/run/secrets/smtp_password"
   SMTP_AUTHENTICATION: "${SMTP_AUTHENTICATION:-plain}"
   SMTP_ENABLE_STARTTLS_AUTO: "${SMTP_ENABLE_STARTTLS_AUTO:-true}"
   SMTP_OPEN_TIMEOUT: "${SMTP_OPEN_TIMEOUT:-5}"
@@ -58,6 +58,9 @@ services:
       - redis
     environment:
       <<: *rails_env
+    secrets:
+      - smtp_username
+      - smtp_password
     command: bin/rails server -b 0.0.0.0 -p 3000
     restart: unless-stopped
 
@@ -69,6 +72,9 @@ services:
       - redis
     environment:
       <<: *rails_env
+    secrets:
+      - smtp_username
+      - smtp_password
     restart: unless-stopped
 
   nginx:
@@ -85,3 +91,9 @@ services:
 
 volumes:
   pgdata:
+
+secrets:
+  smtp_username:
+    file: ./secrets/smtp_username.txt
+  smtp_password:
+    file: ./secrets/smtp_password.txt
