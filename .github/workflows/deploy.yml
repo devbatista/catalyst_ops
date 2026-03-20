@@ -45,8 +45,8 @@ jobs:
             SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}
             SMTP_AUTHENTICATION=plain
             SMTP_ENABLE_STARTTLS_AUTO=true
-            SMTP_OPEN_TIMEOUT=5
-            SMTP_READ_TIMEOUT=5
+            SMTP_OPEN_TIMEOUT=30
+            SMTP_READ_TIMEOUT=30
             PRECOMPILE_ASSETS=1
             # ...adicione outras variáveis necessárias
             EOF
