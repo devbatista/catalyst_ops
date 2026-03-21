@@ -5,29 +5,22 @@ class WebHook::MercadoPagoController < WebHookController
     raw = request.raw_post
     Rails.logger.info("Recebido webhook do Mercado Pago: #{raw}")
     
-    request = JSON.parse(raw)
-    payment_id = request['data']['id']
+    payload = JSON.parse(raw)
+    result = MercadoPago::WebhookProcessor.new(payload: payload).call
 
-    subscription = Subscription.find_by(external_reference: payment_id)
-
-    Rails.logger.info("Processando webhook para pagamento ID #{payment_id}, subscription ID #{subscription&.id}")
-
-    case request['type']
-    when 'payment'
-      activate_subscription(subscription)
+    if result.success?
+      Rails.logger.info("[WebHook::MercadoPagoController] #{result.message}")
+      render json: { status: "ok" }, status: :ok
+    else
+      Rails.logger.error("[WebHook::MercadoPagoController] #{result.message}")
+      render json: { status: "error", message: result.message }, status: :unprocessable_entity
     end
-    
-    render json: { status: 'ok' }, status: :ok
+  rescue JSON::ParserError => e
+    Rails.logger.error("Payload invalido no webhook do Mercado Pago: #{e.message}")
+    render json: { status: "invalid_payload" }, status: :bad_request
   end
 
   def webhook_test
     
-  end
-
-  private
-  
-  def activate_subscription(subscription)
-    return unless subscription
-    subscription.activate!
   end
 end
