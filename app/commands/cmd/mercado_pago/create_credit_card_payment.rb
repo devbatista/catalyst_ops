@@ -1,6 +1,7 @@
 module Cmd
   module MercadoPago
     class CreateCreditCardPayment
+      Result = Struct.new(:success?, :subscription, :errors)
       attr_reader :company, :plan, :cc_token, :response
 
       def initialize(company, cc_token)
@@ -20,23 +21,30 @@ module Cmd
           ::MercadoPago::MockData.create_credit_card_payment(credit_card_params)
         end
 
-        if response['status'] == 'authorized'
-          company.current_subscription.activate!
+        subscription = company.current_subscription
+
+        subscription.update!(
+          external_reference: company.id.to_s,
+          external_subscription_id: response["id"],
+          raw_payload: response
+        )
+
+        case response["status"]
+        when "authorized"
+          subscription.activate!
+          Result.new(true, subscription, nil)
+        when "pending"
+          subscription.update!(status: :pending)
+          Result.new(true, subscription, nil)
         else
           raise "Failed to create credit card payment: #{response['status_detail']}"
         end
       rescue => e
         Rails.logger.error("Erro ao criar solicitação de pagamento para a company id #{@company.id}: #{e.message}")
+        Result.new(false, company.current_subscription, e.message)
       end
 
       private
-
-      def mailer_params
-        {
-          company: company,
-          plan: plan,
-        }
-      end
 
       def credit_card_params
         {

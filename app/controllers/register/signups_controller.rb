@@ -30,7 +30,12 @@ class Register::SignupsController < ApplicationController
     end
 
     cc_token = @company.payment_method == "credit_card" ? params.dig(:signup, :card_token) : nil
-    handle_payment_flow(@company, @company.payment_method, cc_token)
+    payment_result = handle_payment_flow(@company, @company.payment_method, cc_token)
+
+    unless payment_result.success?
+      return redirect_to success_path(company_id: @company.id),
+                         alert: "Cadastro criado, mas houve falha ao iniciar o fluxo de pagamento: #{payment_result.errors}"
+    end
     
     redirect_to success_path(company_id: @company.id)
   end
@@ -69,6 +74,7 @@ class Register::SignupsController < ApplicationController
       preapproval_plan_id: plan&.external_id,
       reason: plan&.reason,
       transaction_amount: plan&.transaction_amount,
+      external_reference: @company&.id&.to_s,
     }
   end
 
@@ -104,10 +110,14 @@ class Register::SignupsController < ApplicationController
     case payment_method
     when "boleto"
       ::CreateUser::BoletoPaymentJob.perform_later(company.id)
+      Result.new(true, nil)
     when "pix"
       ::CreateUser::PixPaymentJob.perform_later(company.id)
+      Result.new(true, nil)
     when "credit_card"
       ::Cmd::MercadoPago::CreateCreditCardPayment.new(company, cc_token).call
+    else
+      Result.new(false, "Método de pagamento inválido.")
     end
   end
 end

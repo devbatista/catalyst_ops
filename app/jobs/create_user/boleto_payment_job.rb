@@ -7,8 +7,6 @@ class CreateUser::BoletoPaymentJob < ApplicationJob
     result = Cmd::MercadoPago::CreateBoletoPayment.new(company).call
 
     if result.success?
-      company.current_subscription.update!(external_reference: result.mailer_params[:external_id])
-
       Payments::BoletoMailer.with(result.mailer_params).ticket_email.deliver_later
       Rails.logger.info("[CreateUser::BoletoPaymentJob] E-mail de pagamento boleto enviado para Company ID #{company_id}.")
     else
