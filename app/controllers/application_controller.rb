@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
   before_action :custom_authenticate_user!, unless: :register_subdomain?
   before_action :block_inactive_company_access, if: :app_subdomain?
+  before_action :ensure_terms_accepted!, if: :app_subdomain?
   before_action :configure_permitted_parameters, if: :devise_controller?
 
   check_authorization unless: :devise_controller?
@@ -39,6 +40,15 @@ class ApplicationController < ActionController::Base
 
   def register_subdomain?
     request.subdomain == "register"
+  end
+
+  def ensure_terms_accepted!
+    return unless current_user&.company
+    return if current_user.company.accepted_current_terms?
+    return if controller_path == "app/terms_of_use"
+    return if request.path == "/logout"
+
+    redirect_to app_terms_of_use_path, alert: "Voce precisa aceitar o contrato de utilizacao para continuar."
   end
 
   def configure_permitted_parameters

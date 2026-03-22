@@ -13,6 +13,26 @@ document.addEventListener("DOMContentLoaded", function () {
     window.stepper1 = new window.Stepper(el, { linear: false, animation: true });
   }
 
+  const termsCheckbox = document.getElementById("signup_accept_terms");
+  const termsNextButton = document.getElementById("terms-next-button");
+
+  if (termsCheckbox && termsNextButton) {
+    termsNextButton.addEventListener("click", function () {
+      if (!termsCheckbox.checked) {
+        termsCheckbox.classList.add("is-invalid");
+        termsCheckbox.focus();
+        return;
+      }
+
+      termsCheckbox.classList.remove("is-invalid");
+      if (window.stepper1) window.stepper1.next();
+    });
+
+    termsCheckbox.addEventListener("change", function () {
+      if (termsCheckbox.checked) termsCheckbox.classList.remove("is-invalid");
+    });
+  }
+
   // Password show/hide
   function bindToggle(containerSelector) {
     var container = document.querySelector(containerSelector);

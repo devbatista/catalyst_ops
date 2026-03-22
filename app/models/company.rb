@@ -1,4 +1,7 @@
 class Company < ApplicationRecord
+  attr_accessor :require_terms_acceptance
+  attr_accessor :terms_checkbox_accepted
+
   has_many :users, dependent: :nullify
   has_many :clients, dependent: :destroy
   has_many :order_services
@@ -10,6 +13,7 @@ class Company < ApplicationRecord
 
   belongs_to :responsible, class_name: "User", optional: true
   belongs_to :plan, optional: true
+  belongs_to :terms_accepted_by_user, class_name: "User", optional: true
 
   PAYMENT_METHODS = %w[pix credit_card boleto].freeze
   
@@ -33,6 +37,7 @@ class Company < ApplicationRecord
   validates :zip_code, presence: true, format: { with: /\A\d{8}\z/, message: "deve conter 8 números" }
 
   validate :document_must_be_cpf_or_cnpj
+  validate :current_terms_must_be_accepted, if: :require_terms_acceptance
 
   scope :active, -> { where(active: true) }
   scope :created_this_month, -> { where(created_at: Time.current.all_month) }
@@ -114,6 +119,20 @@ class Company < ApplicationRecord
     adimplente?
   end
 
+  def accepted_current_terms?
+    terms_version_accepted == TermsOfUse.current_version && terms_accepted_at.present?
+  end
+
+  def accept_current_terms!(user:, ip_address:, user_agent:)
+    update!(
+      terms_version_accepted: TermsOfUse.current_version,
+      terms_accepted_at: Time.current,
+      terms_accepted_ip: ip_address,
+      terms_accepted_user_agent: user_agent,
+      terms_accepted_by_user: user
+    )
+  end
+
   def current_plan
     subscriptions.current.first&.plan  
   end
@@ -155,6 +174,12 @@ class Company < ApplicationRecord
     unless CPF.valid?(document) || CNPJ.valid?(document)
       errors.add(:document, "deve ser um CPF ou CNPJ válido")
     end
+  end
+
+  def current_terms_must_be_accepted
+    return if ActiveModel::Type::Boolean.new.cast(terms_checkbox_accepted)
+
+    errors.add(:base, "Voce precisa aceitar o contrato de utilizacao vigente.")
   end
 
   def adimplente?

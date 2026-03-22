@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_03_20_150000) do
+ActiveRecord::Schema[7.1].define(version: 2026_03_21_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -108,6 +108,11 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_20_150000) do
     t.string "city"
     t.string "state"
     t.boolean "active", default: false, null: false
+    t.string "terms_version_accepted"
+    t.datetime "terms_accepted_at"
+    t.string "terms_accepted_ip"
+    t.text "terms_accepted_user_agent"
+    t.uuid "terms_accepted_by_user_id"
     t.index ["active"], name: "index_companies_on_active"
     t.index ["city", "state"], name: "index_companies_on_city_and_state"
     t.index ["document"], name: "index_companies_on_document", unique: true
@@ -115,6 +120,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_20_150000) do
     t.index ["payment_method"], name: "index_companies_on_payment_method"
     t.index ["plan_id"], name: "index_companies_on_plan_id"
     t.index ["responsible_id"], name: "index_companies_on_responsible_id"
+    t.index ["terms_accepted_by_user_id"], name: "index_companies_on_terms_accepted_by_user_id"
+    t.index ["terms_version_accepted"], name: "index_companies_on_terms_version_accepted"
     t.index ["zip_code"], name: "index_companies_on_zip_code"
   end
 
@@ -292,6 +299,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_20_150000) do
   add_foreign_key "clients", "companies"
   add_foreign_key "companies", "plans"
   add_foreign_key "companies", "users", column: "responsible_id"
+  add_foreign_key "companies", "users", column: "terms_accepted_by_user_id"
   add_foreign_key "order_services", "clients"
   add_foreign_key "order_services", "companies"
   add_foreign_key "reports", "companies"

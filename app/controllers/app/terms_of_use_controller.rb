@@ -1,0 +1,24 @@
+class App::TermsOfUseController < ApplicationController
+  skip_authorization_check
+
+  def show
+    @company = current_user.company
+  end
+
+  def update
+    @company = current_user.company
+
+    unless params[:accept_terms] == "1"
+      flash.now[:alert] = "Voce precisa aceitar o contrato para continuar."
+      return render :show, status: :unprocessable_entity
+    end
+
+    @company.accept_current_terms!(
+      user: current_user,
+      ip_address: request.remote_ip,
+      user_agent: request.user_agent
+    )
+
+    redirect_to app_dashboard_path, notice: "Contrato de utilizacao aceito com sucesso."
+  end
+end

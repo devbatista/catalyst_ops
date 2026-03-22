@@ -20,6 +20,8 @@ class Register::SignupsController < ApplicationController
       plan_id: params.dig(:signup, :plan_id),
       payment_method: params.dig(:signup, :payment_method)
     ))
+    @company.require_terms_acceptance = true
+    @company.terms_checkbox_accepted = terms_accepted?
     @user = User.new(user_params.merge(role: :gestor))
 
     result = save_register(@company, @user)
@@ -78,6 +80,10 @@ class Register::SignupsController < ApplicationController
     }
   end
 
+  def terms_accepted?
+    params.dig(:signup, :accept_terms) == "1"
+  end
+
   def sanitize_phone
     if params.dig(:signup, :company, :phone).present?
       phone = params[:signup][:company][:phone]
@@ -96,6 +102,11 @@ class Register::SignupsController < ApplicationController
       raise ActiveRecord::Rollback, Array(user_res.errors).join(", ") unless user_res.success?
 
       company.update_attribute(:responsible_id, user.id)
+      company.accept_current_terms!(
+        user: user,
+        ip_address: request.remote_ip,
+        user_agent: request.user_agent
+      )
       company.subscriptions.create!(subscription_params) || raise(ActiveRecord::Rollback, "Erro ao criar assinatura para a empresa.")
 
       return Result.new(true, nil)
