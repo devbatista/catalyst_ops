@@ -12,44 +12,31 @@ jobs:
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          MP_PRODUCTION_ACCESS_TOKEN: ${{ secrets.MP_PRODUCTION_ACCESS_TOKEN }}
+          MP_TEST_ACCESS_TOKEN: ${{ secrets.MP_TEST_ACCESS_TOKEN }}
+          MP_PUBLIC_KEY: ${{ secrets.MP_PUBLIC_KEY }}
+          MP_WEBHOOK_SECRET: ${{ secrets.MP_WEBHOOK_SECRET }}
+          RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+          SECRET_KEY_BASE: ${{ secrets.SECRET_KEY_BASE }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          SMTP_ADDRESS: ${{ secrets.SMTP_ADDRESS }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_DOMAIN: ${{ secrets.SMTP_DOMAIN }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_SSH_PORT }}
+          envs: MP_PRODUCTION_ACCESS_TOKEN,MP_TEST_ACCESS_TOKEN,MP_PUBLIC_KEY,MP_WEBHOOK_SECRET,RAILS_MASTER_KEY,SECRET_KEY_BASE,POSTGRES_USER,POSTGRES_PASSWORD,POSTGRES_DB,SMTP_ADDRESS,SMTP_PORT,SMTP_DOMAIN,SMTP_USERNAME,SMTP_PASSWORD
           script: |
             cd /opt/catalyst_ops
             git config --global --add safe.directory /opt/catalyst_ops
-            git pull origin main
-
-            # Cria/atualiza o .env com os secrets do GitHub Actions
-            cat > .env <<EOF
-            RAILS_ENV=production
-            MP_PRODUCTION_ACCESS_TOKEN=${{ secrets.MP_PRODUCTION_ACCESS_TOKEN }}
-            MP_TEST_ACCESS_TOKEN=${{ secrets.MP_TEST_ACCESS_TOKEN }}
-            MP_PUBLIC_KEY=${{ secrets.MP_PUBLIC_KEY }}
-            MP_WEBHOOK_SECRET=${{ secrets.MP_WEBHOOK_SECRET }}
-            RAILS_MASTER_KEY=${{ secrets.RAILS_MASTER_KEY }}
-            SECRET_KEY_BASE=${{ secrets.SECRET_KEY_BASE }}
-            POSTGRES_USER=${{ secrets.POSTGRES_USER }}
-            POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
-            POSTGRES_DB=${{ secrets.POSTGRES_DB }}
-            
-            APP_HOST=app.catalystops.com.br
-            APP_PROTOCOL=https
-
-            SMTP_ADDRESS=${{ secrets.SMTP_ADDRESS }}
-            SMTP_PORT=${{ secrets.SMTP_PORT }}
-            SMTP_DOMAIN=${{ secrets.SMTP_DOMAIN }}
-            SMTP_USERNAME=${{ secrets.SMTP_USERNAME }}
-            SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}
-            SMTP_AUTHENTICATION=plain
-            SMTP_ENABLE_STARTTLS_AUTO=true
-            SMTP_OPEN_TIMEOUT=30
-            SMTP_READ_TIMEOUT=30
-            PRECOMPILE_ASSETS=1
-            # ...adicione outras variáveis necessárias
-            EOF
-
-            docker compose down
-            docker compose up -d --build
+            git fetch origin main
+            git checkout origin/main -- bin/deploy
+            chmod +x /opt/catalyst_ops/bin/deploy
+            /opt/catalyst_ops/bin/deploy

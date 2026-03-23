@@ -1,0 +1,149 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+APP_DIR="${APP_DIR:-/opt/catalyst_ops}"
+BRANCH="${DEPLOY_BRANCH:-main}"
+
+cd "$APP_DIR"
+git config --global --add safe.directory "$APP_DIR"
+
+write_env_file() {
+  cat > .env <<EOF
+RAILS_ENV=production
+MP_PRODUCTION_ACCESS_TOKEN=${MP_PRODUCTION_ACCESS_TOKEN:-}
+MP_TEST_ACCESS_TOKEN=${MP_TEST_ACCESS_TOKEN:-}
+MP_PUBLIC_KEY=${MP_PUBLIC_KEY:-}
+MP_WEBHOOK_SECRET=${MP_WEBHOOK_SECRET:-}
+RAILS_MASTER_KEY=${RAILS_MASTER_KEY:-}
+SECRET_KEY_BASE=${SECRET_KEY_BASE:-}
+POSTGRES_USER=${POSTGRES_USER:-}
+POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-}
+POSTGRES_DB=${POSTGRES_DB:-}
+
+APP_HOST=${APP_HOST:-app.catalystops.com.br}
+APP_PROTOCOL=${APP_PROTOCOL:-https}
+
+SMTP_ADDRESS=${SMTP_ADDRESS:-}
+SMTP_PORT=${SMTP_PORT:-587}
+SMTP_DOMAIN=${SMTP_DOMAIN:-}
+SMTP_USERNAME=${SMTP_USERNAME:-}
+SMTP_PASSWORD=${SMTP_PASSWORD:-}
+SMTP_AUTHENTICATION=${SMTP_AUTHENTICATION:-plain}
+SMTP_ENABLE_STARTTLS_AUTO=${SMTP_ENABLE_STARTTLS_AUTO:-true}
+SMTP_OPEN_TIMEOUT=${SMTP_OPEN_TIMEOUT:-30}
+SMTP_READ_TIMEOUT=${SMTP_READ_TIMEOUT:-30}
+PRECOMPILE_ASSETS=${PRECOMPILE_ASSETS:-1}
+EOF
+}
+
+matches_any() {
+  local file="$1"
+  shift
+
+  local pattern
+  for pattern in "$@"; do
+    if [[ "$file" == $pattern ]]; then
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+write_env_file
+
+git fetch origin "$BRANCH"
+
+CURRENT_HEAD="$(git rev-parse HEAD)"
+TARGET_HEAD="$(git rev-parse "origin/$BRANCH")"
+
+if [[ "$CURRENT_HEAD" == "$TARGET_HEAD" ]]; then
+  echo "Nenhuma alteracao nova para deploy."
+  exit 0
+fi
+
+mapfile -t CHANGED_FILES < <(git diff --name-only "$CURRENT_HEAD" "$TARGET_HEAD")
+
+echo "Arquivos alterados:"
+printf ' - %s\n' "${CHANGED_FILES[@]}"
+
+REBUILD_IMAGE=false
+RESTART_WEB=false
+RESTART_SIDEKIQ=false
+RUN_MIGRATIONS=false
+
+for file in "${CHANGED_FILES[@]}"; do
+  if matches_any "$file" \
+    "Dockerfile" \
+    ".dockerignore" \
+    "docker-compose.yml" \
+    "docker-compose.override.yml" \
+    "bin/docker-entrypoint" \
+    "Gemfile" \
+    "Gemfile.lock" \
+    "package.json" \
+    "yarn.lock" \
+    "nginx.conf" \
+    "docker/*" \
+    "config/environments/*" \
+    "config/initializers/*"; then
+    REBUILD_IMAGE=true
+    RESTART_WEB=true
+    RESTART_SIDEKIQ=true
+  fi
+
+  if matches_any "$file" "db/migrate/*" "db/schema.rb"; then
+    RUN_MIGRATIONS=true
+    RESTART_WEB=true
+    RESTART_SIDEKIQ=true
+  fi
+
+  if matches_any "$file" "app/models/*" "app/services/*" "lib/*" "config/routes*" "config/routes/*"; then
+    RESTART_WEB=true
+    RESTART_SIDEKIQ=true
+  fi
+
+  if matches_any "$file" "app/jobs/*"; then
+    RESTART_SIDEKIQ=true
+  fi
+
+  if matches_any "$file" "app/mailers/*"; then
+    RESTART_WEB=true
+    RESTART_SIDEKIQ=true
+  fi
+done
+
+git pull --ff-only origin "$BRANCH"
+
+echo "Plano de deploy:"
+echo " - REBUILD_IMAGE=$REBUILD_IMAGE"
+echo " - RESTART_WEB=$RESTART_WEB"
+echo " - RESTART_SIDEKIQ=$RESTART_SIDEKIQ"
+echo " - RUN_MIGRATIONS=$RUN_MIGRATIONS"
+
+if [[ "$REBUILD_IMAGE" == "true" ]]; then
+  docker compose build web
+fi
+
+if [[ "$RESTART_WEB" == "true" && "$REBUILD_IMAGE" == "true" ]]; then
+  docker compose up -d web
+fi
+
+if [[ "$RESTART_SIDEKIQ" == "true" && "$REBUILD_IMAGE" == "true" ]]; then
+  docker compose up -d sidekiq
+fi
+
+if [[ "$RUN_MIGRATIONS" == "true" ]]; then
+  docker compose run --rm web bundle exec rails db:migrate
+fi
+
+if [[ "$RESTART_WEB" == "true" && "$REBUILD_IMAGE" == "false" ]]; then
+  docker compose restart web
+fi
+
+if [[ "$RESTART_SIDEKIQ" == "true" && "$REBUILD_IMAGE" == "false" ]]; then
+  docker compose restart sidekiq
+fi
+
+echo "Deploy concluido."
