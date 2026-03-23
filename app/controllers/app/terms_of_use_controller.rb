@@ -9,7 +9,7 @@ class App::TermsOfUseController < ApplicationController
     @company = current_user.company
 
     unless params[:accept_terms] == "1"
-      flash.now[:alert] = "Voce precisa aceitar o contrato para continuar."
+      flash.now[:alert] = "Você precisa aceitar o contrato para continuar."
       return render :show, status: :unprocessable_entity
     end
 
@@ -19,6 +19,6 @@ class App::TermsOfUseController < ApplicationController
       user_agent: request.user_agent
     )
 
-    redirect_to app_dashboard_path, notice: "Contrato de utilizacao aceito com sucesso."
+    redirect_to app_dashboard_path, notice: "Contrato de utilização aceito com sucesso."
   end
 end

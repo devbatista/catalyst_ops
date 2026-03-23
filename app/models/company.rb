@@ -179,7 +179,7 @@ class Company < ApplicationRecord
   def current_terms_must_be_accepted
     return if ActiveModel::Type::Boolean.new.cast(terms_checkbox_accepted)
 
-    errors.add(:base, "Voce precisa aceitar o contrato de utilizacao vigente.")
+    errors.add(:base, "Você precisa aceitar o contrato de utilização vigente.")
   end
 
   def adimplente?

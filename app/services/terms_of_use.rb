@@ -1,6 +1,6 @@
 class TermsOfUse
   CURRENT_VERSION = "2026-03-21".freeze
-  TITLE = "Contrato de Utilizacao do CatalystOps".freeze
+  TITLE = "Contrato de Utilização do CatalystOps".freeze
 
   class << self
     def current_version

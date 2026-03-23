@@ -48,7 +48,7 @@ class ApplicationController < ActionController::Base
     return if controller_path == "app/terms_of_use"
     return if request.path == "/logout"
 
-    redirect_to app_terms_of_use_path, alert: "Voce precisa aceitar o contrato de utilizacao para continuar."
+    redirect_to app_terms_of_use_path, alert: "Você precisa aceitar o contrato de utilização para continuar."
   end
 
   def configure_permitted_parameters
