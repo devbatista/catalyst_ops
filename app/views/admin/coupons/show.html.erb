@@ -1,0 +1,134 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="mb-3">
+          <h4 class="mb-0 text-uppercase">Detalhes do cupom</h4>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <strong>Código:</strong>
+                <p><code><%= @coupon.code %></code></p>
+              </div>
+              <div class="col-md-4">
+                <strong>Nome:</strong>
+                <p><%= @coupon.name %></p>
+              </div>
+              <div class="col-md-4">
+                <strong>Status:</strong>
+                <p>
+                  <% if @coupon.active? %>
+                    <span class="badge bg-success">Ativo</span>
+                  <% else %>
+                    <span class="badge bg-secondary">Inativo</span>
+                  <% end %>
+                </p>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <strong>Tipo de benefício:</strong>
+                <p><%= @coupon.trial? ? "Teste" : "Desconto" %></p>
+              </div>
+              <div class="col-md-4">
+                <strong>Aplica no primeiro ciclo:</strong>
+                <p><%= @coupon.first_cycle_only? ? "Sim" : "Não" %></p>
+              </div>
+              <div class="col-md-4">
+                <strong>Disponível agora:</strong>
+                <p>
+                  <% if @coupon.available? %>
+                    <span class="badge bg-success">Sim</span>
+                  <% else %>
+                    <span class="badge bg-warning text-dark">Não</span>
+                  <% end %>
+                </p>
+              </div>
+            </div>
+
+            <% if @coupon.description.present? %>
+              <div class="row mb-3">
+                <div class="col-12">
+                  <strong>Descrição:</strong>
+                  <p class="mb-0"><%= @coupon.description %></p>
+                </div>
+              </div>
+            <% end %>
+
+            <hr>
+
+            <h5>Regras financeiras / teste</h5>
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <strong>Tipo de desconto:</strong>
+                <p>
+                  <% if @coupon.discount_type.present? %>
+                    <%= @coupon.discount_type == "percentage" ? "Percentual" : "Valor fixo" %>
+                  <% else %>
+                    -
+                  <% end %>
+                </p>
+              </div>
+              <div class="col-md-4">
+                <strong>Valor de desconto:</strong>
+                <p><%= @coupon.discount_value.presence || "-" %></p>
+              </div>
+              <div class="col-md-4">
+                <strong>Período de teste:</strong>
+                <p>
+                  <% if @coupon.trial_frequency.present? && @coupon.trial_frequency_type.present? %>
+                    <%= "#{@coupon.trial_frequency} #{@coupon.trial_frequency_type}" %>
+                  <% else %>
+                    -
+                  <% end %>
+                </p>
+              </div>
+            </div>
+
+            <hr>
+
+            <h5>Uso e vigência</h5>
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <strong>Resgates realizados:</strong>
+                <p><%= @coupon.redemptions_count %></p>
+              </div>
+              <div class="col-md-4">
+                <strong>Limite de resgates:</strong>
+                <p><%= @coupon.max_redemptions.presence || "Ilimitado" %></p>
+              </div>
+              <div class="col-md-4">
+                <strong>Resgates restantes:</strong>
+                <p><%= @coupon.remaining_redemptions.presence || "Ilimitado" %></p>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <strong>Válido a partir de:</strong>
+                <p><%= @coupon.valid_from.present? ? l(@coupon.valid_from, format: :short) : "Sem data inicial" %></p>
+              </div>
+              <div class="col-md-6">
+                <strong>Válido até:</strong>
+                <p><%= @coupon.valid_until.present? ? l(@coupon.valid_until, format: :short) : "Sem data final" %></p>
+              </div>
+            </div>
+
+            <div class="mt-3">
+              <%= link_to "Voltar", admin_coupons_path, class: "btn btn-secondary" %>
+              <%= link_to "Editar", edit_admin_coupon_path(@coupon), class: "btn btn-primary ms-2" %>
+              <%= link_to "Excluir",
+                          admin_coupon_path(@coupon),
+                          data: { turbo_method: :delete, turbo_confirm: "Tem certeza que deseja excluir este cupom?" },
+                          class: "btn btn-danger ms-2" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

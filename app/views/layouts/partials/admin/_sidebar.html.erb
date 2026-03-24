@@ -52,6 +52,14 @@
       <% end %>
     </li>
 
+    <!-- Cupons -->
+    <li class="list-group-item <%= active_menu_class(admin_coupons_path) if defined?(admin_coupons_path) %>">
+      <%= link_to (defined?(admin_coupons_path) ? admin_coupons_path : "#") do %>
+        <div class="parent-icon"><i class='bx bxs-coupon'></i></div>
+        <div class="menu-title">Cupons</div>
+      <% end %>
+    </li>
+
     <!-- Ordens de Serviço (visão global) -->
     <% if can?(:manage, OrderService) || can?(:read, OrderService) %>
       <li class="list-group-item <%= active_menu_class(admin_order_services_path) %>">

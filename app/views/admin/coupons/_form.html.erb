@@ -1,0 +1,113 @@
+<%= form_with model: [:admin, @coupon], local: true do |f| %>
+  <% if @coupon.errors.any? %>
+    <div class="alert alert-danger">
+      <p><strong><%= pluralize(@coupon.errors.count, "erro") %> impediram salvar o cupom:</strong></p>
+      <ul>
+        <% @coupon.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <%= f.label :code, "Código" %>
+      <%= f.text_field :code, class: "form-control", placeholder: "Ex.: TESTE30" %>
+    </div>
+    <div class="col-md-8">
+      <%= f.label :name, "Nome" %>
+      <%= f.text_field :name, class: "form-control", placeholder: "Nome interno do cupom" %>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-12">
+      <%= f.label :description, "Descrição" %>
+      <%= f.text_area :description, rows: 3, class: "form-control" %>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <%= f.label :benefit_type, "Tipo de benefício" %>
+      <%= f.select :benefit_type,
+                   Coupon::BENEFIT_TYPES.map { |type| [type == "trial" ? "Teste" : "Desconto", type] },
+                   {},
+                   class: "form-select" %>
+      <small class="text-muted">Para cupom de teste, preencha duração em "Período de teste".</small>
+    </div>
+    <div class="col-md-4">
+      <%= f.label :active, "Status" %>
+      <%= f.select :active,
+                   [["Ativo", true], ["Inativo", false]],
+                   {},
+                   class: "form-select" %>
+    </div>
+    <div class="col-md-4 d-flex align-items-end">
+      <div class="form-check mb-2">
+        <%= f.check_box :first_cycle_only, class: "form-check-input" %>
+        <%= f.label :first_cycle_only, "Aplicar apenas no primeiro ciclo", class: "form-check-label" %>
+      </div>
+    </div>
+  </div>
+
+  <h6 class="mb-3">Configuração de desconto (benefício: desconto)</h6>
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <%= f.label :discount_type, "Tipo de desconto" %>
+      <%= f.select :discount_type,
+                   Coupon::DISCOUNT_TYPES.map { |type| [type == "percentage" ? "Percentual" : "Valor fixo", type] },
+                   { include_blank: "Selecione" },
+                   class: "form-select" %>
+    </div>
+    <div class="col-md-4">
+      <%= f.label :discount_value, "Valor do desconto" %>
+      <%= f.number_field :discount_value, step: 0.01, min: 0, class: "form-control" %>
+      <small class="text-muted">Para percentual, informe de 0 a 100.</small>
+    </div>
+    <div class="col-md-4">
+      <%= f.label :max_redemptions, "Limite de resgates" %>
+      <%= f.number_field :max_redemptions, min: 1, class: "form-control" %>
+      <small class="text-muted">Deixe em branco para ilimitado.</small>
+    </div>
+  </div>
+
+  <h6 class="mb-3">Período de teste (benefício: teste)</h6>
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <%= f.label :trial_frequency, "Duração" %>
+      <%= f.number_field :trial_frequency, min: 1, class: "form-control" %>
+    </div>
+    <div class="col-md-4">
+      <%= f.label :trial_frequency_type, "Unidade" %>
+      <%= f.select :trial_frequency_type,
+                   Coupon::FREQUENCY_TYPES.map { |type| [type.humanize, type] },
+                   { include_blank: "Selecione" },
+                   class: "form-select" %>
+    </div>
+  </div>
+
+  <h6 class="mb-3">Vigência</h6>
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <%= f.label :valid_from, "Válido a partir de" %>
+      <%= f.datetime_local_field :valid_from,
+                                 class: "form-control",
+                                 step: 60,
+                                 value: @coupon.valid_from&.in_time_zone&.strftime("%Y-%m-%dT%H:%M") %>
+    </div>
+    <div class="col-md-6">
+      <%= f.label :valid_until, "Válido até" %>
+      <%= f.datetime_local_field :valid_until,
+                                 class: "form-control",
+                                 step: 60,
+                                 value: @coupon.valid_until&.in_time_zone&.strftime("%Y-%m-%dT%H:%M") %>
+    </div>
+  </div>
+
+  <div class="mt-3">
+    <%= f.submit @coupon.new_record? ? "Criar cupom" : "Atualizar cupom", class: "btn btn-primary" %>
+    <%= link_to "Voltar", admin_coupons_path, class: "btn btn-secondary ms-2" %>
+  </div>
+<% end %>

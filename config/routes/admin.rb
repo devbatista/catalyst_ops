@@ -5,6 +5,7 @@ constraints subdomain: "admin" do
   resources :users, module: "admin", as: :admin_users
   resources :subscriptions, module: "admin", as: :admin_subscriptions
   resources :plans, module: "admin", as: :admin_plans
+  resources :coupons, module: "admin", as: :admin_coupons
   resources :order_services, module: "admin", as: :admin_order_services do
     member do
       get :generate_pdf
