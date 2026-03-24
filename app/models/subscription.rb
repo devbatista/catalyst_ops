@@ -1,5 +1,6 @@
 class Subscription < ApplicationRecord
   belongs_to :company
+  has_many :coupon_redemptions, dependent: :restrict_with_exception
 
   has_one :plan, primary_key: :preapproval_plan_id, foreign_key: :external_id, class_name: 'Plan'
 
@@ -48,9 +49,19 @@ class Subscription < ApplicationRecord
   end
 
   def activate!
+    activate_for!
+  end
+
+  def activate_for!(frequency: 1, frequency_type: "months", started_at: Time.current)
+    period_end = MercadoPago::Subscriptions.compute_period_end(
+      started_at,
+      frequency: frequency,
+      frequency_type: frequency_type
+    )
+
     update!(status: :active,
-            start_date: Time.current,
-            end_date: Time.current + 1.month,
+            start_date: started_at,
+            end_date: period_end,
             canceled_date: nil,
             expired_date: nil,
             expiration_warning_sent_at: nil)

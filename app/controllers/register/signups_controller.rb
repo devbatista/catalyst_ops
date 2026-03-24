@@ -12,10 +12,12 @@ class Register::SignupsController < ApplicationController
     @user = User.new
     @payment_methods = %w[pix credit_card boleto]
     @plans = Plan.where(status: :active).order(:transaction_amount)
+    @coupon_code = nil
   end
 
   def create
     @payment_methods = %w[pix credit_card boleto]
+    @coupon_code = params.dig(:signup, :coupon_code).to_s.upcase.strip
     @company = Company.new(company_params.merge(
       plan_id: params.dig(:signup, :plan_id),
       payment_method: params.dig(:signup, :payment_method)
@@ -23,6 +25,12 @@ class Register::SignupsController < ApplicationController
     @company.require_terms_acceptance = true
     @company.terms_checkbox_accepted = terms_accepted?
     @user = User.new(user_params.merge(role: :gestor))
+    coupon_result = resolve_coupon_result
+
+    unless coupon_result.success?
+      flash.now[:alert] = coupon_result.errors
+      return render :new, status: :unprocessable_entity
+    end
 
     result = save_register(@company, @user)
 
@@ -32,7 +40,7 @@ class Register::SignupsController < ApplicationController
     end
 
     cc_token = @company.payment_method == "credit_card" ? params.dig(:signup, :card_token) : nil
-    payment_result = handle_payment_flow(@company, @company.payment_method, cc_token)
+    payment_result = handle_payment_flow(@company, @company.payment_method, cc_token, coupon_result)
 
     unless payment_result.success?
       return redirect_to success_path(company_id: @company.id),
@@ -84,6 +92,17 @@ class Register::SignupsController < ApplicationController
     params.dig(:signup, :accept_terms) == "1"
   end
 
+  def resolve_coupon_result
+    plan = Plan.find_by(id: params.dig(:signup, :plan_id))
+
+    Coupons::SignupBenefitResolver.new(
+      plan: plan,
+      coupon_code: @coupon_code,
+      company: @company,
+      payment_method: params.dig(:signup, :payment_method)
+    ).call
+  end
+
   def sanitize_phone
     if params.dig(:signup, :company, :phone).present?
       phone = params[:signup][:company][:phone]
@@ -117,18 +136,80 @@ class Register::SignupsController < ApplicationController
                e.message.presence || (Array(company.errors.full_messages) + Array(user.errors.full_messages)))
   end
 
-  def handle_payment_flow(company, payment_method, cc_token = nil)
+  def handle_payment_flow(company, payment_method, cc_token = nil, coupon_result = nil)
     case payment_method
     when "boleto"
-      ::CreateUser::BoletoPaymentJob.perform_later(company.id)
-      Result.new(true, nil)
+      handle_boleto_flow(company, coupon_result)
     when "pix"
-      ::CreateUser::PixPaymentJob.perform_later(company.id)
-      Result.new(true, nil)
+      handle_pix_flow(company, coupon_result)
     when "credit_card"
-      ::Cmd::MercadoPago::CreateCreditCardPayment.new(company, cc_token).call
+      handle_credit_card_flow(company, cc_token, coupon_result)
     else
       Result.new(false, "Método de pagamento inválido.")
     end
+  end
+
+  def handle_boleto_flow(company, coupon_result)
+    return activate_trial_coupon!(company, coupon_result) if coupon_result&.trial?
+
+    ::CreateUser::BoletoPaymentJob.perform_later(
+      company.id,
+      coupon_id: coupon_result&.coupon&.id,
+      original_amount: coupon_result&.original_amount,
+      final_amount: coupon_result&.final_amount
+    )
+    Result.new(true, nil)
+  end
+
+  def handle_pix_flow(company, coupon_result)
+    return activate_trial_coupon!(company, coupon_result) if coupon_result&.trial?
+
+    ::CreateUser::PixPaymentJob.perform_later(
+      company.id,
+      coupon_id: coupon_result&.coupon&.id,
+      original_amount: coupon_result&.original_amount,
+      final_amount: coupon_result&.final_amount
+    )
+    Result.new(true, nil)
+  end
+
+  def handle_credit_card_flow(company, cc_token, coupon_result)
+    return Result.new(false, "Token do cartão não informado.") if cc_token.blank?
+
+    result =
+      if coupon_result&.trial?
+        ::Cmd::MercadoPago::CreateCreditCardTrialSubscription.new(company, cc_token, coupon_result.coupon).call
+      else
+        ::Cmd::MercadoPago::CreateCreditCardPayment.new(company, cc_token).call
+      end
+
+    return result unless result.success? && coupon_result&.coupon_applied?
+
+    Coupons::Redeem.call(
+      coupon: coupon_result.coupon,
+      company: company,
+      subscription: company.current_subscription,
+      original_amount: coupon_result.original_amount,
+      final_amount: coupon_result.final_amount
+    )
+    result
+  rescue => e
+    Result.new(false, e.message)
+  end
+
+  def activate_trial_coupon!(company, coupon_result)
+    company.current_subscription.activate_for!(
+      frequency: coupon_result.coupon.trial_frequency,
+      frequency_type: coupon_result.coupon.trial_frequency_type
+    )
+
+    Coupons::Redeem.call(
+      coupon: coupon_result.coupon,
+      company: company,
+      subscription: company.current_subscription,
+      original_amount: coupon_result.original_amount,
+      final_amount: coupon_result.final_amount
+    )
+    Result.new(true, nil)
   end
 end

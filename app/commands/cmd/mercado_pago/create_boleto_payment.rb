@@ -4,9 +4,10 @@ module Cmd
       Result = Struct.new(:success?, :mailer_params, :errors)
       attr_reader :company, :plan, :response
 
-      def initialize(company)
+      def initialize(company, amount_override: nil)
         @company = company
         @plan = company.plan
+        @amount_override = amount_override
       end
 
       def call
@@ -42,7 +43,7 @@ module Cmd
       def boleto_params
         payer_name = company.responsible.name
         {
-          transaction_amount: plan.transaction_amount.to_i,
+          transaction_amount: amount_to_charge.to_f,
           payment_method_id: 'bolbradesco',
           description: "Assinatura mensal do plano #{plan.name}",
           external_reference: company.id.to_s,
@@ -52,7 +53,7 @@ module Cmd
               id: plan.id,
               title: plan.name,
               quantity: 1,
-              unit_price: plan.transaction_amount.to_i
+              unit_price: amount_to_charge.to_f
             ]
           },
           payer: {
@@ -73,6 +74,10 @@ module Cmd
             }
           }
         }
+      end
+
+      def amount_to_charge
+        @amount_to_charge ||= (@amount_override.presence || plan.transaction_amount).to_d
       end
     end
   end
