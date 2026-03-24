@@ -46,6 +46,25 @@ class SessionsController < Devise::SessionsController
     end
   end
 
+  def confirm_signup
+    token = params[:token].to_s
+    user = User.find_signed(token, purpose: :signup_confirmation)
+
+    if user.blank?
+      redirect_to login_root_url(subdomain: "login"), allow_other_host: true,
+                  alert: "Link de confirmação inválido ou expirado."
+      return
+    end
+
+    user.activate! unless user.active?
+
+    redirect_to login_root_url(subdomain: "login"), allow_other_host: true,
+                notice: "Cadastro confirmado com sucesso! Faça o login."
+  rescue ActiveSupport::MessageVerifier::InvalidSignature
+    redirect_to login_root_url(subdomain: "login"), allow_other_host: true,
+                alert: "Link de confirmação inválido ou expirado."
+  end
+
   def destroy
     sign_out(current_user)
     redirect_to login_root_url(subdomain: "login"), allow_other_host: true, notice: "Logout realizado com sucesso!"

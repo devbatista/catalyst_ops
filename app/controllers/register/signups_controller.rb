@@ -46,7 +46,14 @@ class Register::SignupsController < ApplicationController
       return redirect_to success_path(company_id: @company.id),
                          alert: "Cadastro criado, mas houve falha ao iniciar o fluxo de pagamento: #{payment_result.errors}"
     end
-    
+
+    if trial_coupon_without_mercado_pago?(coupon_result)
+      @user.send_signup_confirmation_email!
+      return redirect_to success_path(company_id: @company.id, confirmation_email: "1")
+    end
+
+    @user.send_welcome_email! if should_send_welcome_email?(coupon_result)
+
     redirect_to success_path(company_id: @company.id)
   end
 
@@ -56,6 +63,15 @@ class Register::SignupsController < ApplicationController
     unless company
       redirect_to root_path, alert: "Erro no cadastro ou empresa já cadastrada, verifique com nosso suporte."
     end
+
+    if params[:confirmation_email] == "1"
+      @success_message = "Foi enviado um link de confirmação de cadastro no email"
+      @success_subtext = nil
+      return
+    end
+
+    @success_message = "Foi enviado um email para sua conta com as informações de pagamento."
+    @success_subtext = "Por favor, verifique sua caixa de entrada."
   end
 
   private
@@ -212,4 +228,17 @@ class Register::SignupsController < ApplicationController
     )
     Result.new(true, nil)
   end
+
+  def trial_coupon_without_mercado_pago?(coupon_result)
+    coupon_result&.trial? && %w[pix boleto].include?(@company.payment_method)
+  end
+
+  def signup_without_coupon?(coupon_result)
+    coupon_result.present? && !coupon_result.coupon_applied?
+  end
+
+  def should_send_welcome_email?(coupon_result)
+    signup_without_coupon?(coupon_result) && @company.payment_method != "pix"
+  end
+
 end

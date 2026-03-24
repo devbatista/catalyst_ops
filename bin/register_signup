@@ -1,0 +1,344 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "optparse"
+require_relative "../config/environment"
+
+class RegisterSignupScript
+  Result = Struct.new(:success?, :errors)
+
+  def initialize(argv)
+    @argv = argv
+    @options = default_options
+  end
+
+  def run
+    parse_options!
+    validate_required_options!
+
+    @plan = find_plan
+    abort_with_error("Plano nao encontrado.") if @plan.blank?
+
+    @company = build_company
+    @user = build_user
+
+    coupon_result = resolve_coupon_result
+    abort_with_error(coupon_result.errors) unless coupon_result.success?
+
+    save_result = save_register
+    abort_with_error(save_result.errors) unless save_result.success?
+
+    payment_result = handle_payment_flow(@company, @options[:payment_method], @options[:cc_token], coupon_result)
+
+    unless payment_result.success?
+      puts "[WARN] Cadastro criado, mas houve falha ao iniciar o fluxo de pagamento: #{payment_result.errors}"
+      print_summary
+      return
+    end
+
+    if trial_coupon_without_mercado_pago?(coupon_result)
+      @user.send_signup_confirmation_email!
+      puts "[OK] E-mail de confirmacao de cadastro enviado."
+    elsif should_send_welcome_email?(coupon_result)
+      @user.send_welcome_email!
+      puts "[OK] E-mail de boas-vindas enviado."
+    end
+
+    print_summary
+  rescue OptionParser::InvalidOption, OptionParser::MissingArgument => e
+    abort_with_error(e.message)
+  end
+
+  private
+
+  def default_options
+    {
+      payment_method: "pix",
+      company_phone: "11999999999",
+      zip_code: "01001000",
+      street: "Rua Exemplo",
+      number: "100",
+      neighborhood: "Centro",
+      city: "Sao Paulo",
+      state: "SP",
+      can_be_technician: false,
+      accept_terms: true
+    }
+  end
+
+  def parse_options!
+    parser = OptionParser.new do |opts|
+      opts.banner = <<~USAGE
+        Uso:
+          bin/register_signup [opcoes]
+
+        Exemplo:
+          bin/register_signup \\
+            --plan-id 123 \\
+            --company-name "Empresa Exemplo" \\
+            --company-document 61408507000173 \\
+            --company-email financeiro@empresa.com \\
+            --responsible-name "Maria Silva" \\
+            --responsible-email maria@empresa.com \\
+            --password "senhaSegura123" \\
+            --payment-method pix
+      USAGE
+
+      opts.on("--plan-id ID", "ID do plano") { |v| @options[:plan_id] = v }
+      opts.on("--plan-name NOME", "Nome do plano") { |v| @options[:plan_name] = v }
+      opts.on("--plan-external-id ID", "External ID do plano") { |v| @options[:plan_external_id] = v }
+
+      opts.on("--company-name NOME", "Razao social") { |v| @options[:company_name] = v }
+      opts.on("--company-document DOC", "CNPJ/CPF") { |v| @options[:company_document] = v }
+      opts.on("--company-email EMAIL", "Email da empresa") { |v| @options[:company_email] = v }
+      opts.on("--company-phone FONE", "Telefone da empresa (apenas numeros)") { |v| @options[:company_phone] = v }
+
+      opts.on("--zip-code CEP", "CEP") { |v| @options[:zip_code] = v }
+      opts.on("--street LOGRADOURO", "Logradouro") { |v| @options[:street] = v }
+      opts.on("--number NUMERO", "Numero") { |v| @options[:number] = v }
+      opts.on("--complement COMPLEMENTO", "Complemento") { |v| @options[:complement] = v }
+      opts.on("--neighborhood BAIRRO", "Bairro") { |v| @options[:neighborhood] = v }
+      opts.on("--city CIDADE", "Cidade") { |v| @options[:city] = v }
+      opts.on("--state UF", "UF (ex: SP)") { |v| @options[:state] = v }
+      opts.on("--website URL", "Website") { |v| @options[:website] = v }
+      opts.on("--state-registration IE", "Inscricao estadual") { |v| @options[:state_registration] = v }
+      opts.on("--municipal-registration IM", "Inscricao municipal") { |v| @options[:municipal_registration] = v }
+
+      opts.on("--responsible-name NOME", "Nome do responsavel") { |v| @options[:responsible_name] = v }
+      opts.on("--responsible-email EMAIL", "Email do responsavel") { |v| @options[:responsible_email] = v }
+      opts.on("--password SENHA", "Senha do responsavel") { |v| @options[:password] = v }
+      opts.on("--can-be-technician", "Responsavel tambem pode ser tecnico") { @options[:can_be_technician] = true }
+
+      opts.on("--payment-method METODO", "pix, boleto ou credit_card") { |v| @options[:payment_method] = v }
+      opts.on("--coupon-code CUPOM", "Codigo de cupom (opcional)") { |v| @options[:coupon_code] = v }
+      opts.on("--cc-token TOKEN", "Token do cartao para credit_card") { |v| @options[:cc_token] = v }
+
+      opts.on("--[no-]accept-terms", "Aceitar termos (padrao: true)") { |v| @options[:accept_terms] = v }
+      opts.on("-h", "--help", "Mostrar ajuda") do
+        puts opts
+        exit
+      end
+    end
+
+    parser.parse!(@argv)
+  end
+
+  def validate_required_options!
+    required = %i[
+      company_name company_document company_email
+      responsible_name responsible_email password
+    ]
+
+    missing = required.select { |key| @options[key].to_s.strip.empty? }
+    abort_with_error("Campos obrigatorios ausentes: #{missing.join(', ')}") if missing.any?
+
+    unless @options[:plan_id].present? || @options[:plan_name].present? || @options[:plan_external_id].present?
+      abort_with_error("Informe um plano com --plan-id, --plan-name ou --plan-external-id.")
+    end
+
+    unless Company::PAYMENT_METHODS.include?(@options[:payment_method])
+      abort_with_error("Metodo de pagamento invalido: #{@options[:payment_method]}")
+    end
+
+    if @options[:payment_method] == "credit_card" && @options[:cc_token].to_s.strip.empty?
+      abort_with_error("Para credit_card, informe --cc-token.")
+    end
+
+    return if @options[:accept_terms]
+
+    abort_with_error("Registro exige aceite de termos. Use --accept-terms.")
+  end
+
+  def find_plan
+    return Plan.find_by(id: @options[:plan_id]) if @options[:plan_id].present?
+    return Plan.find_by(external_id: @options[:plan_external_id]) if @options[:plan_external_id].present?
+
+    Plan.find_by(name: @options[:plan_name])
+  end
+
+  def build_company
+    Company.new(
+      name: @options[:company_name],
+      document: digits_only(@options[:company_document]),
+      email: @options[:company_email],
+      phone: digits_only(@options[:company_phone]),
+      zip_code: digits_only(@options[:zip_code]),
+      street: @options[:street],
+      number: @options[:number],
+      complement: @options[:complement],
+      neighborhood: @options[:neighborhood],
+      city: @options[:city],
+      state: @options[:state].to_s.upcase,
+      website: @options[:website],
+      state_registration: @options[:state_registration],
+      municipal_registration: @options[:municipal_registration],
+      plan_id: @plan.id,
+      payment_method: @options[:payment_method],
+      require_terms_acceptance: true,
+      terms_checkbox_accepted: @options[:accept_terms]
+    )
+  end
+
+  def build_user
+    User.new(
+      name: @options[:responsible_name],
+      email: @options[:responsible_email],
+      password: @options[:password],
+      password_confirmation: @options[:password],
+      role: :gestor,
+      can_be_technician: @options[:can_be_technician]
+    )
+  end
+
+  def resolve_coupon_result
+    Coupons::SignupBenefitResolver.new(
+      plan: @plan,
+      coupon_code: @options[:coupon_code],
+      company: @company,
+      payment_method: @options[:payment_method]
+    ).call
+  end
+
+  def save_register
+    ActiveRecord::Base.transaction do
+      company_res = Cmd::Companies::Create.new(@company).call
+      raise ActiveRecord::Rollback, Array(company_res.errors).join(", ") unless company_res.success?
+
+      @user.company = @company
+      user_res = Cmd::Users::Create.new(@user).call
+      raise ActiveRecord::Rollback, Array(user_res.errors).join(", ") unless user_res.success?
+
+      @company.update_attribute(:responsible_id, @user.id)
+      @company.accept_current_terms!(
+        user: @user,
+        ip_address: "127.0.0.1",
+        user_agent: "bin/register_signup"
+      )
+
+      @company.subscriptions.create!(
+        preapproval_plan_id: @plan.external_id,
+        reason: @plan.reason,
+        transaction_amount: @plan.transaction_amount,
+        external_reference: @company.id.to_s
+      )
+
+      return Result.new(true, nil)
+    end
+
+    Result.new(true, nil)
+  rescue StandardError => e
+    Result.new(false, e.message.presence || "Falha ao salvar cadastro")
+  end
+
+  def handle_payment_flow(company, payment_method, cc_token = nil, coupon_result = nil)
+    case payment_method
+    when "boleto"
+      handle_boleto_flow(company, coupon_result)
+    when "pix"
+      handle_pix_flow(company, coupon_result)
+    when "credit_card"
+      handle_credit_card_flow(company, cc_token, coupon_result)
+    else
+      Result.new(false, "Metodo de pagamento invalido.")
+    end
+  end
+
+  def handle_boleto_flow(company, coupon_result)
+    return activate_trial_coupon!(company, coupon_result) if coupon_result&.trial?
+
+    CreateUser::BoletoPaymentJob.perform_later(
+      company.id,
+      coupon_id: coupon_result&.coupon&.id,
+      original_amount: coupon_result&.original_amount,
+      final_amount: coupon_result&.final_amount
+    )
+    Result.new(true, nil)
+  end
+
+  def handle_pix_flow(company, coupon_result)
+    return activate_trial_coupon!(company, coupon_result) if coupon_result&.trial?
+
+    CreateUser::PixPaymentJob.perform_later(
+      company.id,
+      coupon_id: coupon_result&.coupon&.id,
+      original_amount: coupon_result&.original_amount,
+      final_amount: coupon_result&.final_amount
+    )
+    Result.new(true, nil)
+  end
+
+  def handle_credit_card_flow(company, cc_token, coupon_result)
+    return Result.new(false, "Token do cartao nao informado.") if cc_token.blank?
+
+    result =
+      if coupon_result&.trial?
+        Cmd::MercadoPago::CreateCreditCardTrialSubscription.new(company, cc_token, coupon_result.coupon).call
+      else
+        Cmd::MercadoPago::CreateCreditCardPayment.new(company, cc_token).call
+      end
+
+    return result unless result.success? && coupon_result&.coupon_applied?
+
+    Coupons::Redeem.call(
+      coupon: coupon_result.coupon,
+      company: company,
+      subscription: company.current_subscription,
+      original_amount: coupon_result.original_amount,
+      final_amount: coupon_result.final_amount
+    )
+
+    result
+  rescue StandardError => e
+    Result.new(false, e.message)
+  end
+
+  def activate_trial_coupon!(company, coupon_result)
+    company.current_subscription.activate_for!(
+      frequency: coupon_result.coupon.trial_frequency,
+      frequency_type: coupon_result.coupon.trial_frequency_type
+    )
+
+    Coupons::Redeem.call(
+      coupon: coupon_result.coupon,
+      company: company,
+      subscription: company.current_subscription,
+      original_amount: coupon_result.original_amount,
+      final_amount: coupon_result.final_amount
+    )
+
+    Result.new(true, nil)
+  end
+
+  def trial_coupon_without_mercado_pago?(coupon_result)
+    coupon_result&.trial? && %w[pix boleto].include?(@options[:payment_method])
+  end
+
+  def signup_without_coupon?(coupon_result)
+    coupon_result.present? && !coupon_result.coupon_applied?
+  end
+
+  def should_send_welcome_email?(coupon_result)
+    signup_without_coupon?(coupon_result) && @options[:payment_method] != "pix"
+  end
+
+  def digits_only(value)
+    value.to_s.gsub(/\D/, "")
+  end
+
+  def print_summary
+    puts "[OK] Cadastro criado com sucesso"
+    puts "  Company ID: #{@company.id}"
+    puts "  Company Email: #{@company.email}"
+    puts "  User ID: #{@user.id}"
+    puts "  User Email: #{@user.email}"
+    puts "  Plan: #{@plan.name} (#{@plan.external_id})"
+    puts "  Payment method: #{@options[:payment_method]}"
+  end
+
+  def abort_with_error(message)
+    warn "[ERRO] #{message}"
+    exit(1)
+  end
+end
+
+RegisterSignupScript.new(ARGV).run

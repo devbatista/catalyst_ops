@@ -7,8 +7,17 @@ class Payments::PixMailer < ApplicationMailer
     @pix_ticket_url = params[:pix_ticket_url]
 
     mail(
-      to: @company.email,
+      to: recipient_emails,
       subject: "Seu código PIX CatalystOps"
     )
+  end
+
+  private
+
+  def recipient_emails
+    [
+      @company.email,
+      @company.responsible&.email
+    ].filter_map { |email| email.to_s.strip.downcase.presence }.uniq
   end
 end

@@ -28,12 +28,13 @@
         <h1 class="success-title mb-3">Cadastro concluído</h1>
 
         <p class="success-text mb-1">
-          Foi enviado um email para sua conta com as informações de pagamento.
+          <%= @success_message %>
         </p>
 
-        <br>
-
-        <p class="success-subtext mb-0">Por favor, verifique sua caixa de entrada.</p>
+        <% if @success_subtext.present? %>
+          <br>
+          <p class="success-subtext mb-0"><%= @success_subtext %></p>
+        <% end %>
       </div>
     </div>
   </div>

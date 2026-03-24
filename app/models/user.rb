@@ -97,6 +97,18 @@ class User < ApplicationRecord
     company.active? && active?
   end
 
+  def send_welcome_email!(mark_as_sent: true)
+    token = set_reset_password_token
+    UserMailer.welcome_email(self, token).deliver_later
+    update_column(:welcome_email_sent_at, Time.current) if mark_as_sent
+  end
+
+  def send_signup_confirmation_email!(expires_in: 48.hours, mark_as_sent: true)
+    confirmation_token = signed_id(purpose: :signup_confirmation, expires_in: expires_in)
+    UserMailer.signup_confirmation_email(self, confirmation_token).deliver_later
+    update_column(:welcome_email_sent_at, Time.current) if mark_as_sent
+  end
+
   private
 
   def normalize_name
@@ -111,9 +123,7 @@ class User < ApplicationRecord
 
   def send_welcome_email_on_activation
     if saved_change_to_active? && active? && welcome_email_sent_at.nil?
-      token = set_reset_password_token
-      UserMailer.welcome_email(self, token).deliver_later
-      update_column(:welcome_email_sent_at, Time.current)
+      send_welcome_email!
     end
   end
 
@@ -128,7 +138,6 @@ class User < ApplicationRecord
 
   def send_welcome_email_for_technician
     Rails.logger.info "###### Enviando email de boas-vindas para o técnico #{email} ######"
-    token = set_reset_password_token
-    UserMailer.welcome_email(self, token).deliver_later
+    send_welcome_email!(mark_as_sent: false)
   end
 end

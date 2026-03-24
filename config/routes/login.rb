@@ -6,5 +6,6 @@ constraints subdomain: "login" do
     
     get "/new_password", to: "sessions#new_password", as: :new_password
     put "/new_password", to: "sessions#update_password", as: :update_password
+    get "/confirm_signup", to: "sessions#confirm_signup", as: :confirm_signup
   end
 end
