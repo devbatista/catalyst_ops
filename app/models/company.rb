@@ -8,6 +8,7 @@ class Company < ApplicationRecord
   has_many :technicians, -> { active.where(role: :tecnico).or(active.where(can_be_technician: true)) }, class_name: "User"
   has_many :subscriptions, dependent: :destroy
   has_many :support_tickets, dependent: :destroy
+  has_many :coupon_redemptions, dependent: :restrict_with_exception
 
   has_one :current_subscription, -> { current }, class_name: "Subscription"
 
@@ -117,6 +118,10 @@ class Company < ApplicationRecord
 
   def access_enabled?
     adimplente?
+  end
+
+  def used_coupon_within_last_year?
+    CouponRedemption.used_by_company_within_last_year?(self)
   end
 
   def accepted_current_terms?

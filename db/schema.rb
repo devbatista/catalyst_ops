@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_03_21_120000) do
+ActiveRecord::Schema[7.1].define(version: 2026_03_24_103000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -123,6 +123,46 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_21_120000) do
     t.index ["terms_accepted_by_user_id"], name: "index_companies_on_terms_accepted_by_user_id"
     t.index ["terms_version_accepted"], name: "index_companies_on_terms_version_accepted"
     t.index ["zip_code"], name: "index_companies_on_zip_code"
+  end
+
+  create_table "coupon_redemptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "coupon_id", null: false
+    t.uuid "company_id", null: false
+    t.uuid "subscription_id", null: false
+    t.decimal "original_amount", precision: 10, scale: 2, null: false
+    t.decimal "discount_amount", precision: 10, scale: 2, null: false
+    t.decimal "final_amount", precision: 10, scale: 2, null: false
+    t.datetime "applied_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["applied_at"], name: "index_coupon_redemptions_on_applied_at"
+    t.index ["company_id", "applied_at"], name: "index_coupon_redemptions_on_company_id_and_applied_at"
+    t.index ["company_id"], name: "index_coupon_redemptions_on_company_id"
+    t.index ["coupon_id"], name: "index_coupon_redemptions_on_coupon_id"
+    t.index ["subscription_id"], name: "index_coupon_redemptions_on_subscription_id", unique: true
+  end
+
+  create_table "coupons", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "code", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.boolean "active", default: true, null: false
+    t.string "benefit_type", default: "discount", null: false
+    t.string "discount_type"
+    t.decimal "discount_value", precision: 10, scale: 2
+    t.integer "max_redemptions"
+    t.integer "redemptions_count", default: 0, null: false
+    t.datetime "valid_from"
+    t.datetime "valid_until"
+    t.boolean "first_cycle_only", default: true, null: false
+    t.integer "trial_frequency"
+    t.string "trial_frequency_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_coupons_on_active"
+    t.index ["benefit_type"], name: "index_coupons_on_benefit_type"
+    t.index ["code"], name: "index_coupons_on_code", unique: true
+    t.index ["valid_until"], name: "index_coupons_on_valid_until"
   end
 
   create_table "knowledge_base_articles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -300,6 +340,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_21_120000) do
   add_foreign_key "companies", "plans"
   add_foreign_key "companies", "users", column: "responsible_id"
   add_foreign_key "companies", "users", column: "terms_accepted_by_user_id"
+  add_foreign_key "coupon_redemptions", "companies"
+  add_foreign_key "coupon_redemptions", "coupons"
+  add_foreign_key "coupon_redemptions", "subscriptions"
   add_foreign_key "order_services", "clients"
   add_foreign_key "order_services", "companies"
   add_foreign_key "reports", "companies"
