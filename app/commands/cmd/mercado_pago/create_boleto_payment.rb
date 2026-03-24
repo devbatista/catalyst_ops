@@ -77,7 +77,7 @@ module Cmd
       end
 
       def amount_to_charge
-        @amount_to_charge ||= (@amount_override.presence || plan.transaction_amount).to_d
+        @amount_to_charge ||= (@amount_override.presence || plan.transaction_amount).to_d.round(2)
       end
     end
   end
