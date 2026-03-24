@@ -26,7 +26,7 @@ class CreateCouponsAndCouponRedemptions < ActiveRecord::Migration[7.1]
     create_table :coupon_redemptions, id: :uuid do |t|
       t.references :coupon, null: false, foreign_key: true, type: :uuid
       t.references :company, null: false, foreign_key: true, type: :uuid
-      t.references :subscription, null: false, foreign_key: true, type: :uuid
+      t.references :subscription, null: false, foreign_key: true, type: :uuid, index: false
       t.decimal :original_amount, precision: 10, scale: 2, null: false
       t.decimal :discount_amount, precision: 10, scale: 2, null: false
       t.decimal :final_amount, precision: 10, scale: 2, null: false
