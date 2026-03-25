@@ -18,6 +18,7 @@ module Cmd
         )
 
         if response['status'].include?('pending')
+          persist_payment_reference!
           Result.new(true, mailer_params, nil)
         else
           error = "Falha ao criar o pagamento via boleto: #{response['status_detail']}"
@@ -78,6 +79,13 @@ module Cmd
 
       def amount_to_charge
         @amount_to_charge ||= (@amount_override.presence || plan.transaction_amount).to_d.round(2)
+      end
+
+      def persist_payment_reference!
+        payment_id = response['id'].to_s
+        return if payment_id.blank?
+
+        company.current_subscription&.update!(external_reference: payment_id)
       end
     end
   end
