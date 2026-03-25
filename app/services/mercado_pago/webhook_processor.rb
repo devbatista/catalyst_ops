@@ -59,6 +59,8 @@ module MercadoPago
       case payment["status"]
       when "approved"
         subscription.activate!
+      when "pending"
+        subscription.update!(status: :pending)
       when "cancelled"
         subscription.cancel!
       end
