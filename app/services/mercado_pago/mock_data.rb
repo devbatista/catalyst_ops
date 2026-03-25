@@ -65,5 +65,54 @@ module MercadoPago
         }
       }
     end
+
+    def self.fetch_payment(
+      payment_id,
+      external_reference:,
+      status: "pending",
+      status_detail: "pending_waiting_payment",
+      payment_method_id: "bolbradesco",
+      payment_type_id: "ticket",
+      transaction_amount: 0,
+      payer_email: nil,
+      company_name: nil
+    )
+      now = Time.current.iso8601
+      amount = transaction_amount.to_d
+
+      {
+        "id" => payment_id.to_s,
+        "date_created" => now,
+        "date_last_updated" => now,
+        "date_approved" => (status == "approved" ? now : nil),
+        "external_reference" => external_reference.to_s,
+        "status" => status,
+        "status_detail" => status_detail,
+        "payment_method_id" => payment_method_id,
+        "payment_type_id" => payment_type_id,
+        "currency_id" => "BRL",
+        "transaction_amount" => amount,
+        "transaction_details" => {
+          "net_received_amount" => (status == "approved" ? amount : 0),
+          "total_paid_amount" => (status == "approved" ? amount : 0),
+          "external_resource_url" => (
+            payment_type_id == "ticket" ? "https://www.mercadopago.com.br/payments/mock-boleto.pdf" : nil
+          )
+        },
+        "payer" => {
+          "email" => payer_email,
+          "first_name" => company_name.to_s.split.first.presence || "Cliente",
+          "last_name" => company_name.to_s.split.drop(1).join(" ").presence || "Teste",
+          "identification" => {
+            "type" => "CNPJ",
+            "number" => "61408507000173"
+          }
+        },
+        "metadata" => {
+          "environment" => Rails.env,
+          "mock" => true
+        }
+      }
+    end
   end
 end

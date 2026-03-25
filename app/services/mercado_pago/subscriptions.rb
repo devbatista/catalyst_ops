@@ -20,7 +20,9 @@ module MercadoPago
       nil
     end
 
-    def self.fetch_payment(payment_id)
+    def self.fetch_payment(payment_id, mock_status: nil)
+      return mock_payment(payment_id, mock_status: mock_status) unless Rails.env.production?
+
       client.request(method: :get, path: "/v1/payments/#{payment_id}")
     rescue StandardError => e
       Rails.logger.error("[MercadoPago::Subscriptions] Erro ao consultar payment #{payment_id}: #{e.message}")
@@ -71,6 +73,80 @@ module MercadoPago
         authorized_payment_id,
         preapproval_id: subscription.external_subscription_id
       )
+    end
+
+    def self.mock_payment(payment_id, mock_status: nil)
+      subscription = Subscription.find_by(external_payment_id: payment_id.to_s) ||
+        Subscription.find_by(external_reference: payment_id.to_s) ||
+        Subscription.order(updated_at: :desc).first
+      return if subscription.blank?
+
+      company = subscription.company
+      payment_status =
+        case mock_status.to_s.downcase.presence || "approved"
+        when "approved"
+          "approved"
+        when "cancelled", "canceled", "expired"
+          "cancelled"
+        when "rejected"
+          "rejected"
+        when "in_process"
+          "in_process"
+        else
+          "approved"
+        end
+
+      payment_method = company&.payment_method.to_s
+      payment_type_id =
+        case payment_method
+        when "boleto"
+          "ticket"
+        when "pix"
+          "bank_transfer"
+        when "credit_card"
+          "credit_card"
+        else
+          "ticket"
+        end
+
+      payment_method_id =
+        case payment_method
+        when "boleto"
+          "bolbradesco"
+        when "pix"
+          "pix"
+        when "credit_card"
+          "master"
+        else
+          "bolbradesco"
+        end
+
+      MercadoPago::MockData.fetch_payment(
+        payment_id,
+        external_reference: subscription.external_reference.presence || company&.id.to_s,
+        status: payment_status,
+        status_detail: mock_payment_status_detail(payment_status),
+        payment_method_id: payment_method_id,
+        payment_type_id: payment_type_id,
+        transaction_amount: subscription.transaction_amount.to_d,
+        payer_email: company&.email,
+        company_name: company&.name
+      )
+    end
+
+    def self.mock_payment_status_detail(payment_status)
+      case payment_status
+      when "approved"
+        "accredited"
+      when "cancelled"
+        "by_collector"
+      when "rejected"
+        "cc_rejected_other_reason"
+      when "in_process"
+        "pending_contingency"
+      else
+        "pending_waiting_payment"
+      end
     end
   end
 end

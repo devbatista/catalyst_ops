@@ -38,7 +38,7 @@ module MercadoPago
       payment_id = resource_id
       return Result.new(false, "Webhook de payment sem data.id") if payment_id.blank?
 
-      payment = MercadoPago::Subscriptions.fetch_payment(payment_id)
+      payment = MercadoPago::Subscriptions.fetch_payment(payment_id, mock_status: payment_status_hint)
       return Result.new(false, "Pagamento #{payment_id} nao encontrado na API") if payment.blank?
 
       external_payment_id = payment["id"].to_s.presence || payment_id.to_s
@@ -66,6 +66,10 @@ module MercadoPago
       end
 
       Result.new(true, "Pagamento #{payment_id} processado com status #{payment['status']}")
+    end
+
+    def payment_status_hint
+      payload.dig("data", "status").presence || payload["status"].presence
     end
 
     def process_preapproval
