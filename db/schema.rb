@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_03_25_120000) do
+ActiveRecord::Schema[7.1].define(version: 2026_03_25_173000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -331,6 +331,22 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_25_120000) do
     t.index ["name"], name: "index_users_on_name"
     t.index ["phone"], name: "index_users_on_phone"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+  end
+
+  create_table "webhook_events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "provider", null: false
+    t.string "event_key", null: false
+    t.string "resource_id"
+    t.string "event_type"
+    t.string "status", default: "received", null: false
+    t.datetime "processed_at"
+    t.text "error_message"
+    t.jsonb "payload", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["provider", "event_key"], name: "index_webhook_events_on_provider_and_event_key", unique: true
+    t.index ["provider", "resource_id"], name: "index_webhook_events_on_provider_and_resource_id"
+    t.index ["status"], name: "index_webhook_events_on_status"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
