@@ -58,20 +58,20 @@ git fetch origin "$BRANCH"
 CURRENT_HEAD="$(git rev-parse HEAD)"
 TARGET_HEAD="$(git rev-parse "origin/$BRANCH")"
 
-if [[ "$CURRENT_HEAD" == "$TARGET_HEAD" ]]; then
-  echo "Nenhuma alteracao nova para deploy."
-  exit 0
-fi
-
 mapfile -t CHANGED_FILES < <(git diff --name-only "$CURRENT_HEAD" "$TARGET_HEAD")
 
-echo "Arquivos alterados:"
-printf ' - %s\n' "${CHANGED_FILES[@]}"
+if [[ "$CURRENT_HEAD" == "$TARGET_HEAD" ]]; then
+  echo "Nenhuma alteracao nova no git. O deploy vai validar migrations pendentes."
+else
+  echo "Arquivos alterados:"
+  printf ' - %s\n' "${CHANGED_FILES[@]}"
+fi
 
 REBUILD_IMAGE=false
 RESTART_WEB=false
 RESTART_SIDEKIQ=false
 RUN_MIGRATIONS=false
+CHECK_PENDING_MIGRATIONS=true
 
 for file in "${CHANGED_FILES[@]}"; do
   if matches_any "$file" \
@@ -132,12 +132,13 @@ echo " - REBUILD_IMAGE=$REBUILD_IMAGE"
 echo " - RESTART_WEB=$RESTART_WEB"
 echo " - RESTART_SIDEKIQ=$RESTART_SIDEKIQ"
 echo " - RUN_MIGRATIONS=$RUN_MIGRATIONS"
+echo " - CHECK_PENDING_MIGRATIONS=$CHECK_PENDING_MIGRATIONS"
 
 if [[ "$REBUILD_IMAGE" == "true" ]]; then
   docker compose build web
 fi
 
-if [[ "$RUN_MIGRATIONS" == "true" ]]; then
+if [[ "$RUN_MIGRATIONS" == "true" || "$CHECK_PENDING_MIGRATIONS" == "true" ]]; then
   docker compose run --rm web bundle exec rails db:migrate
 fi
 
