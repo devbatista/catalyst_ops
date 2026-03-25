@@ -95,6 +95,7 @@ for file in "${CHANGED_FILES[@]}"; do
 
   if matches_any "$file" "db/migrate/*" "db/schema.rb"; then
     RUN_MIGRATIONS=true
+    REBUILD_IMAGE=true
     RESTART_WEB=true
     RESTART_SIDEKIQ=true
   fi
