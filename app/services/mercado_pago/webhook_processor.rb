@@ -41,11 +41,20 @@ module MercadoPago
       payment = MercadoPago::Subscriptions.fetch_payment(payment_id)
       return Result.new(false, "Pagamento #{payment_id} nao encontrado na API") if payment.blank?
 
+      external_payment_id = payment["id"].to_s.presence || payment_id.to_s
       company_id = payment["external_reference"].presence
-      subscription = Company.find_by(id: company_id)&.current_subscription
-      return Result.new(false, "Assinatura local nao encontrada para company #{company_id}") if subscription.blank?
 
-      subscription.update!(raw_payload: payment)
+      subscription =
+        Subscription.find_by(external_payment_id: external_payment_id) ||
+        Subscription.find_by(external_reference: external_payment_id) ||
+        Company.find_by(id: company_id)&.current_subscription
+
+      return Result.new(false, "Assinatura local nao encontrada para payment #{external_payment_id} / company #{company_id}") if subscription.blank?
+
+      subscription.update!(
+        external_payment_id: external_payment_id,
+        raw_payload: payment
+      )
 
       case payment["status"]
       when "approved"

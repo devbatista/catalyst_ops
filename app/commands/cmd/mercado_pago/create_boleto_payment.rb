@@ -85,7 +85,7 @@ module Cmd
         payment_id = response['id'].to_s
         return if payment_id.blank?
 
-        company.current_subscription&.update!(external_reference: payment_id)
+        company.current_subscription&.update!(external_payment_id: payment_id)
       end
     end
   end
