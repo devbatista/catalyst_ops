@@ -1,0 +1,92 @@
+name: PR Window Policy
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  merge_window_policy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Evaluate change scope and allowed window
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+
+          mapfile -t changed_files < <(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
+
+          if [ "${#changed_files[@]}" -eq 0 ]; then
+            echo "Nenhum arquivo alterado no diff do PR."
+            exit 0
+          fi
+
+          echo "Arquivos alterados no PR:"
+          printf ' - %s\n' "${changed_files[@]}"
+
+          requires_off_window=false
+          has_migration=false
+          has_non_migration=false
+
+          for file in "${changed_files[@]}"; do
+            case "$file" in
+              db/migrate/*|db/schema.rb)
+                has_migration=true
+                ;;
+              *)
+                has_non_migration=true
+                ;;
+            esac
+
+            case "$file" in
+              Dockerfile|.dockerignore|docker-compose.yml|docker-compose.override.yml|bin/docker-entrypoint|Gemfile|Gemfile.lock|package.json|yarn.lock|nginx.conf|docker/*|db/migrate/*|db/schema.rb|app/*|config/*|lib/*)
+                requires_off_window=true
+                break
+                ;;
+            esac
+          done
+
+          if [ "$has_migration" = "true" ] && [ "$has_non_migration" = "true" ]; then
+            echo "PR bloqueado: quando houver migration, o PR deve conter apenas db/migrate/* e opcionalmente db/schema.rb."
+            exit 1
+          fi
+
+          hour="$(TZ=America/Sao_Paulo date +%H)"
+          weekday="$(TZ=America/Sao_Paulo date +%u)"
+
+          in_business_window=false
+          if [ "$hour" -ge 9 ] && [ "$hour" -lt 18 ]; then
+            in_business_window=true
+          fi
+
+          in_off_window=false
+          if [ "$hour" -ge 22 ] || [ "$hour" -lt 6 ]; then
+            in_off_window=true
+          fi
+
+          echo "Agora (BRT): hora=$hour, dia_semana=$weekday"
+          echo "requires_off_window=$requires_off_window"
+
+          if [ "$requires_off_window" = "true" ]; then
+            if [ "$in_off_window" = "true" ]; then
+              echo "PR permitido: mudanca sensivel em janela OFF (22:00-06:00 BRT)."
+              exit 0
+            fi
+            echo "PR bloqueado: mudanca sensivel exige janela OFF (22:00-06:00 BRT)."
+            exit 1
+          fi
+
+          if [ "$in_business_window" = "true" ]; then
+            echo "PR permitido: mudanca simples em horario comercial (09:00-18:00 BRT)."
+            exit 0
+          fi
+
+          echo "PR bloqueado: mudanca simples so pode entre 09:00-18:00 BRT."
+          exit 1
