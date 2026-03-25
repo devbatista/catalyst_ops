@@ -100,16 +100,26 @@ for file in "${CHANGED_FILES[@]}"; do
     RESTART_SIDEKIQ=true
   fi
 
-  if matches_any "$file" "app/models/*" "app/services/*" "lib/*" "config/routes*" "config/routes/*"; then
+  if matches_any "$file" \
+    "app/*" \
+    "config/routes*" \
+    "config/routes/*" \
+    "config/*.rb" \
+    "config/locales/*" \
+    "lib/*"; then
+    REBUILD_IMAGE=true
     RESTART_WEB=true
     RESTART_SIDEKIQ=true
   fi
 
   if matches_any "$file" "app/jobs/*"; then
+    REBUILD_IMAGE=true
+    RESTART_WEB=true
     RESTART_SIDEKIQ=true
   fi
 
   if matches_any "$file" "app/mailers/*"; then
+    REBUILD_IMAGE=true
     RESTART_WEB=true
     RESTART_SIDEKIQ=true
   fi
@@ -127,16 +137,16 @@ if [[ "$REBUILD_IMAGE" == "true" ]]; then
   docker compose build web
 fi
 
+if [[ "$RUN_MIGRATIONS" == "true" ]]; then
+  docker compose run --rm web bundle exec rails db:migrate
+fi
+
 if [[ "$RESTART_WEB" == "true" && "$REBUILD_IMAGE" == "true" ]]; then
   docker compose up -d web
 fi
 
 if [[ "$RESTART_SIDEKIQ" == "true" && "$REBUILD_IMAGE" == "true" ]]; then
   docker compose up -d sidekiq
-fi
-
-if [[ "$RUN_MIGRATIONS" == "true" ]]; then
-  docker compose run --rm web bundle exec rails db:migrate
 fi
 
 if [[ "$RESTART_WEB" == "true" && "$REBUILD_IMAGE" == "false" ]]; then
