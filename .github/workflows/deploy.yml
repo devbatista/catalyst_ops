@@ -38,5 +38,4 @@ jobs:
             git config --global --add safe.directory /opt/catalyst_ops
             git fetch origin main
             git checkout origin/main -- bin/deploy
-            chmod +x /opt/catalyst_ops/bin/deploy
-            /opt/catalyst_ops/bin/deploy
+            bash /opt/catalyst_ops/bin/deploy
