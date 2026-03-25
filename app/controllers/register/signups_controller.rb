@@ -238,7 +238,7 @@ class Register::SignupsController < ApplicationController
   end
 
   def should_send_welcome_email?(coupon_result)
-    signup_without_coupon?(coupon_result) && @company.payment_method != "pix"
+    signup_without_coupon?(coupon_result) && !%w[pix boleto].include?(@company.payment_method)
   end
 
 end
