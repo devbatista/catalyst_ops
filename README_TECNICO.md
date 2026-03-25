@@ -403,6 +403,56 @@ Isso cria um fluxo hibrido:
 - se um seed depender de outro, o nome do arquivo precisa refletir isso
 - ex.: `9-support_tickets.rb` antes de `9a-support_messages.rb`
 
+## CI/CD e governanca de merge
+
+### Pipeline de deploy
+
+O deploy automatizado roda via GitHub Actions em
+[` .github/workflows/deploy.yml `](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/.github/workflows/deploy.yml),
+executando [`bin/deploy`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/bin/deploy) no servidor.
+
+Detalhe operacional importante:
+
+- o workflow executa `bash /opt/catalyst_ops/bin/deploy` (sem `chmod`)
+- isso evita alterar permissao do arquivo no servidor e sujar `git status`
+
+Fluxo tecnico relevante:
+
+- `git fetch` + diff de arquivos alterados para calcular plano de deploy
+- rebuild de imagem quando houver mudancas sensiveis (ex.: `db/migrate/*`,
+  `app/*`, `config/*`, `lib/*`, dependencias e dockerfiles)
+- restart de `web`/`sidekiq` quando necessario
+- `db:migrate` executado via `docker compose run --rm web ...` para aplicar
+  pendencias
+
+Importante para troubleshooting:
+
+- producao nao usa bind mount de codigo no `web`; o codigo em runtime vem da
+  imagem Docker
+- sem rebuild, migration nova pode existir no host git mas nao no container
+- se isso ocorrer, o `db:migrate` nao enxerga o arquivo da migration
+
+### Politica de janela para PRs
+
+A politica de janela esta em
+[` .github/workflows/policy-window.yml `](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/.github/workflows/policy-window.yml).
+
+Regras implementadas:
+
+- mudancas sensiveis: somente `22:00-06:00` (America/Sao_Paulo)
+- mudancas simples: somente `09:00-18:00` (America/Sao_Paulo)
+- PR com migration deve conter apenas `db/migrate/*` e opcionalmente
+  `db/schema.rb`
+
+Observacao:
+
+- o workflow bloqueia merge via check; para aplicacao real, Branch Protection da
+  `main` deve exigir o status check `PR Window Policy / merge_window_policy`
+- como o check e avaliado no momento da execucao do job, para politica de hora
+  estrita no instante do merge recomenda-se habilitar `Require branches to be
+  up to date before merging` na `main` ou usar merge queue (`merge_group`) para
+  revalidacao no fluxo final de merge
+
 ## Pontos de atencao
 
 ### Scope global enganoso

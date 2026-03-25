@@ -466,6 +466,41 @@ Para producao, o fluxo geral e:
 5. configurar DNS e SSL
 6. monitorar logs de `web`, `nginx` e `sidekiq`
 
+### Deploy automatizado (GitHub Actions + bin/deploy)
+
+O deploy de producao e acionado por workflow do GitHub Actions em
+[` .github/workflows/deploy.yml `](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/.github/workflows/deploy.yml),
+que executa [`bin/deploy`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/bin/deploy) no servidor via SSH.
+
+Pontos importantes do `bin/deploy`:
+
+- roda `git fetch` e identifica arquivos alterados entre `HEAD` local e `origin/main`
+- decide quando precisa rebuild/restart de `web` e `sidekiq`
+- executa `docker compose run --rm web bundle exec rails db:migrate`
+  para aplicar migrations pendentes
+- nao encerra cedo apenas por nao haver commit novo; ainda valida migrations
+
+Observacao operacional:
+
+- em producao, o container `web` usa codigo da imagem Docker
+- se houver alteracao que exige imagem nova (ex.: `db/migrate`, `app/*`,
+  `config/*`, `lib/*`), o deploy precisa rebuild para o container enxergar o
+  novo codigo
+
+### Politica de PR e janela de merge
+
+Existe workflow de politica em
+[` .github/workflows/policy-window.yml `](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/.github/workflows/policy-window.yml)
+para PRs da `main`.
+
+Regras atuais:
+
+- mudanca sensivel (ex.: `db/migrate/*`, `app/*`, `config/*`, `lib/*`,
+  `Dockerfile`, `Gemfile.lock`) so passa na janela OFF: `22:00-06:00` BRT
+- mudanca simples so passa na janela comercial: `09:00-18:00` BRT
+- se houver migration no PR, ele deve conter apenas `db/migrate/*` e
+  opcionalmente `db/schema.rb`
+
 ## Referencias rapidas
 
 - Compose principal: [`docker-compose.yml`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docker-compose.yml)
