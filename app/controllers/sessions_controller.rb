@@ -4,6 +4,8 @@ class SessionsController < Devise::SessionsController
   skip_before_action :custom_authenticate_user!
   skip_authorization_check
 
+  before_action :reset_session, only: :confirm_signup
+
   def new; end
 
   def create
