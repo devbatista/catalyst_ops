@@ -102,7 +102,9 @@ class WebHook::MercadoPagoController < WebHookController
     type = payload_event_type(payload)
     resource_id = payload_resource_id(payload)
     action = payload["action"].to_s
-    fallback = [type, resource_id, action].compact.join(":")
+    status = payload_status(payload)
+    signature_ts = signature_timestamp_from_header
+    fallback = [type, resource_id, action, status, signature_ts].compact.join(":")
 
     fallback.presence || Digest::SHA256.hexdigest(payload.to_json)
   end
@@ -113,6 +115,10 @@ class WebHook::MercadoPagoController < WebHookController
 
   def payload_event_type(payload)
     payload["type"].presence || payload["topic"].presence || "unknown"
+  end
+
+  def payload_status(payload)
+    payload.dig("data", "status").presence || payload["status"].presence
   end
 
   def webhook_signature_valid?(payload)
@@ -168,6 +174,14 @@ class WebHook::MercadoPagoController < WebHookController
     end
 
     [ts, v1]
+  end
+
+  def signature_timestamp_from_header
+    signature_header = request_header("x-signature")
+    return nil if signature_header.blank?
+
+    ts, = parse_signature_header(signature_header)
+    ts.presence
   end
 
   def secure_compare_hexdigest(expected, provided)
