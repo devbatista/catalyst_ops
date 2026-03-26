@@ -1,0 +1,232 @@
+<% content_for :head do %>
+  <%= stylesheet_link_tag "https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" %>
+  <%= javascript_include_tag "https://cdn.jsdelivr.net/npm/flatpickr", defer: true %>
+  <%= javascript_include_tag "https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js", defer: true %>
+<% end %>
+
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="mb-3">
+          <h4 class="mb-0 text-uppercase">Logs</h4>
+        </div>
+
+        <div class="card shadow-sm border-0">
+          <div class="card-body">
+            <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between mb-3 gap-2">
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-secondary text-white border">Auditoria</span>
+                <span class="text-muted small">Use os filtros para investigar eventos por período e contexto.</span>
+              </div>
+            </div>
+
+            <form method="get" class="logs-filters-bar mb-4">
+              <div class="row g-2">
+                <div class="col-6 col-md-2 col-xl-1">
+                  <label class="form-label form-label-sm mb-1 small text-muted">Mostrar</label>
+                  <select name="per" class="form-select form-select-sm logs-filter-input">
+                    <% [10, 20, 30, 50].each do |n| %>
+                      <option value="<%= n %>" <%= params[:per].to_i == n ? "selected" : "" %>><%= n %></option>
+                    <% end %>
+                  </select>
+                </div>
+
+                <div class="col-12 col-md-10 col-xl-5">
+                  <label class="form-label form-label-sm mb-1 small text-muted">Usuário</label>
+                  <div class="input-group input-group-sm">
+                    <span class="input-group-text logs-filter-addon">
+                      <i class="bx bx-user"></i>
+                    </span>
+                    <input type="text"
+                           name="q"
+                           value="<%= params[:q] %>"
+                           class="form-control logs-filter-input"
+                           placeholder="Nome, email ou ID do usuário..."
+                           aria-label="Buscar por usuário">
+                  </div>
+                </div>
+
+                <div class="col-6 col-md-4 col-xl-2">
+                  <label class="form-label form-label-sm mb-1 small text-muted">Action</label>
+                  <select name="action_name" class="form-select form-select-sm logs-filter-input">
+                    <option value="">Todas</option>
+                    <% @actions.each do |action_name| %>
+                      <option value="<%= action_name %>" <%= "selected" if params[:action_name] == action_name %>><%= action_name %></option>
+                    <% end %>
+                  </select>
+                </div>
+
+                <div class="col-6 col-md-4 col-xl-2">
+                  <label class="form-label form-label-sm mb-1 small text-muted">Source</label>
+                  <select name="source" class="form-select form-select-sm logs-filter-input">
+                    <option value="">Todas</option>
+                    <% @sources.each do |source| %>
+                      <option value="<%= source %>" <%= "selected" if params[:source] == source %>><%= source %></option>
+                    <% end %>
+                  </select>
+                </div>
+
+                <div class="col-12 col-md-4 col-xl-2">
+                  <label class="form-label form-label-sm mb-1 small text-muted">Empresa</label>
+                  <select name="company_id" class="form-select form-select-sm logs-filter-input">
+                    <option value="">Todas</option>
+                    <% @companies.each do |name, id| %>
+                      <option value="<%= id %>" <%= "selected" if params[:company_id] == id %>><%= name %></option>
+                    <% end %>
+                  </select>
+                </div>
+
+                <div class="col-6 col-md-4 col-xl-2">
+                  <label class="form-label form-label-sm mb-1 small text-muted">De</label>
+                  <div class="input-group input-group-sm audit-date-group">
+                    <input type="text"
+                           name="date_from"
+                           value="<%= params[:date_from] %>"
+                           class="form-control js-audit-date-from logs-filter-input"
+                           placeholder="YYYY-MM-DD"
+                           autocomplete="off">
+                    <span class="input-group-text js-open-date-from">
+                      <i class="bx bx-calendar"></i>
+                    </span>
+                  </div>
+                </div>
+
+                <div class="col-6 col-md-4 col-xl-2">
+                  <label class="form-label form-label-sm mb-1 small text-muted">Até</label>
+                  <div class="input-group input-group-sm audit-date-group">
+                    <input type="text"
+                           name="date_to"
+                           value="<%= params[:date_to] %>"
+                           class="form-control js-audit-date-to logs-filter-input"
+                           placeholder="YYYY-MM-DD"
+                           autocomplete="off">
+                    <span class="input-group-text js-open-date-to">
+                      <i class="bx bx-calendar"></i>
+                    </span>
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-4 col-xl-8 d-flex align-items-end justify-content-end pt-1">
+                  <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-sm btn-primary logs-apply-btn">
+                    <i class="bx bx-filter-alt me-1"></i>Aplicar filtros
+                  </button>
+                  <%= link_to "Limpar", admin_logs_path, class: "btn btn-sm btn-outline-secondary logs-clear-btn" %>
+                  </div>
+                </div>
+              </div>
+            </form>
+
+            <% if params[:date_from].present? || params[:date_to].present? %>
+              <div class="mb-3">
+                <span class="badge bg-primary">
+                  Período:
+                  <%= params[:date_from].presence || "início" %>
+                  até
+                  <%= params[:date_to].presence || "hoje" %>
+                </span>
+              </div>
+            <% end %>
+
+            <div class="table-responsive">
+              <table class="table mb-0 table-hover align-middle">
+                <thead>
+                  <tr>
+                    <th>Ocorrido em</th>
+                    <th>Action</th>
+                    <th>Source</th>
+                    <th>Empresa</th>
+                    <th>Ator</th>
+                    <th>Recurso</th>
+                    <th>Request ID</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @logs.each do |log| %>
+                    <tr>
+                      <td><%= l(log.occurred_at, format: :short) %></td>
+                      <td><code><%= log.action %></code></td>
+                      <td><%= log.source.presence || "-" %></td>
+                      <td><%= log.company&.name || "-" %></td>
+                      <td>
+                        <div class="small"><%= log.actor_type.presence || "-" %></div>
+                        <div class="small text-muted"><%= log.actor_id.presence || "-" %></div>
+                      </td>
+                      <td>
+                        <div class="small"><%= log.resource_type.presence || "-" %></div>
+                        <div class="small text-muted"><%= log.resource_id.presence || "-" %></div>
+                      </td>
+                      <td>
+                        <code title="<%= log.request_id %>"><%= log.request_id.to_s.first(8).presence || "-" %></code>
+                      </td>
+                      <td>
+                        <%= link_to "Ver", admin_log_path(log), class: "btn btn-sm btn-primary" %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <div class="text-muted">
+                Mostrando <%= @logs.size %> de <%= @logs.total_count %> registros
+              </div>
+              <nav aria-label="Paginação logs">
+                <%= custom_paginate(@logs) %>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%= javascript_tag do %>
+  document.addEventListener("turbo:load", function () {
+    if (typeof flatpickr === "undefined") return;
+
+    var fromInput = document.querySelector(".js-audit-date-from");
+    var toInput = document.querySelector(".js-audit-date-to");
+    if (!fromInput || !toInput) return;
+
+    var localePt = (flatpickr.l10ns && flatpickr.l10ns.pt) ? flatpickr.l10ns.pt : "pt";
+
+    var fromPicker = flatpickr(fromInput, {
+      dateFormat: "Y-m-d",
+      allowInput: true,
+      locale: localePt,
+      defaultDate: fromInput.value || null,
+      onChange: function (selectedDates) {
+        toPicker.set("minDate", selectedDates.length ? selectedDates[0] : null);
+        if (fromInput.form) {
+          fromInput.form.requestSubmit ? fromInput.form.requestSubmit() : fromInput.form.submit();
+        }
+      }
+    });
+
+    var toPicker = flatpickr(toInput, {
+      dateFormat: "Y-m-d",
+      allowInput: true,
+      locale: localePt,
+      defaultDate: toInput.value || null,
+      onChange: function (selectedDates) {
+        fromPicker.set("maxDate", selectedDates.length ? selectedDates[0] : null);
+        if (toInput.form) {
+          toInput.form.requestSubmit ? toInput.form.requestSubmit() : toInput.form.submit();
+        }
+      }
+    });
+
+    if (fromInput.value) toPicker.set("minDate", fromInput.value);
+    if (toInput.value) fromPicker.set("maxDate", toInput.value);
+
+    var openFrom = document.querySelector(".js-open-date-from");
+    var openTo = document.querySelector(".js-open-date-to");
+    if (openFrom) openFrom.addEventListener("click", function () { fromPicker.open(); });
+    if (openTo) openTo.addEventListener("click", function () { toPicker.open(); });
+  });
+<% end %>

@@ -19,6 +19,7 @@ constraints subdomain: "admin" do
   end
   resources :support_messages, only: [:create], module: "admin", as: :admin_support_messages
   resources :knowledge_base_articles, module: "admin", as: :admin_knowledge_base
+  resources :logs, only: [:index, :show], module: "admin", as: :admin_logs
   resources :configurations, only: [:index, :edit, :update], module: "admin", as: :admin_configurations
   resources :contents, module: "admin", as: :admin_contents
   

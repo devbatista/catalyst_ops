@@ -1,0 +1,66 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="mb-0 text-uppercase">Detalhe do Log</h4>
+          <%= link_to "Voltar", admin_logs_path, class: "btn btn-outline-secondary btn-sm" %>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-body">
+            <div class="row mb-2">
+              <div class="col-md-3"><strong>ID:</strong></div>
+              <div class="col-md-9"><code><%= @log.id %></code></div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-3"><strong>Ocorrido em:</strong></div>
+              <div class="col-md-9"><%= l(@log.occurred_at, format: :long) %></div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-3"><strong>Action:</strong></div>
+              <div class="col-md-9"><code><%= @log.action %></code></div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-3"><strong>Source:</strong></div>
+              <div class="col-md-9"><%= @log.source.presence || "-" %></div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-3"><strong>Empresa:</strong></div>
+              <div class="col-md-9"><%= @log.company&.name || "-" %> (<code><%= @log.company_id || "-" %></code>)</div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-3"><strong>Ator:</strong></div>
+              <div class="col-md-9"><%= @log.actor_type.presence || "-" %> (<code><%= @log.actor_id.presence || "-" %></code>)</div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-3"><strong>Recurso:</strong></div>
+              <div class="col-md-9"><%= @log.resource_type.presence || "-" %> (<code><%= @log.resource_id.presence || "-" %></code>)</div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-3"><strong>Request ID:</strong></div>
+              <div class="col-md-9"><code><%= @log.request_id.presence || "-" %></code></div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-3"><strong>IP:</strong></div>
+              <div class="col-md-9"><%= @log.ip_address.presence || "-" %></div>
+            </div>
+            <div class="row mb-0">
+              <div class="col-md-3"><strong>User Agent:</strong></div>
+              <div class="col-md-9"><%= @log.user_agent.presence || "-" %></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <strong>Metadata</strong>
+          </div>
+          <div class="card-body">
+            <pre class="mb-0" style="white-space: pre-wrap;"><%= JSON.pretty_generate(@log.metadata || {}) %></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
