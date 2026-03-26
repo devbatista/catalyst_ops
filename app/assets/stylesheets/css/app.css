@@ -5621,3 +5621,59 @@ payment-methods { align-items: stretch; }
 #knowledgeBaseModalBody p {
   margin-bottom: 1em;
 }
+
+.audit-date-group .form-control {
+  background-color: #0f1a26;
+  color: #e8edf3;
+  border-color: #4a5562;
+}
+
+.audit-date-group .form-control::placeholder {
+  color: #a8b3bf;
+  opacity: 1;
+}
+
+.audit-date-group .input-group-text {
+  background-color: #132235;
+  border-color: #4a5562;
+  color: #e8edf3;
+  cursor: pointer;
+}
+
+.logs-filters-bar {
+  background: rgba(12, 21, 32, 0.85);
+  border: 1px solid rgba(124, 136, 149, 0.25);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.logs-filter-input {
+  min-height: 40px;
+}
+
+.logs-filter-input.form-select,
+.logs-filter-input.form-control {
+  background-color: #0f1a26;
+  color: #e8edf3;
+  border-color: #4a5562;
+}
+
+.logs-filter-input.form-select:focus,
+.logs-filter-input.form-control:focus {
+  border-color: #6ea8fe;
+  box-shadow: 0 0 0 0.2rem rgba(110, 168, 254, 0.2);
+}
+
+.logs-filter-addon {
+  background-color: #132235;
+  border-color: #4a5562;
+  color: #9fb2c5;
+}
+
+.logs-apply-btn {
+  min-width: 150px;
+}
+
+.logs-clear-btn {
+  min-width: 90px;
+}
