@@ -1,0 +1,162 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="mb-3">
+          <h4 class="mb-0 text-uppercase">Logs de Reconciliação</h4>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="row align-items-center mb-4 g-2">
+              <div class="col-12 col-xl-5 d-flex flex-column flex-md-row align-items-stretch gap-2">
+                <div class="showing-entries-group flex-shrink-0">
+                  <span class="showing-entries-label">Mostrar</span>
+                  <form method="get" class="showing-entries-form">
+                    <select name="per" class="form-select form-select-sm showing-entries-select" onchange="this.form.submit()">
+                      <% [10, 20, 30, 50].each do |n| %>
+                        <option value="<%= n %>" <%= params[:per].to_i == n ? "selected" : "" %>><%= n %></option>
+                      <% end %>
+                    </select>
+                    <input type="hidden" name="q" value="<%= params[:q] %>">
+                    <input type="hidden" name="result_status" value="<%= params[:result_status] %>">
+                    <input type="hidden" name="source_job" value="<%= params[:source_job] %>">
+                    <input type="hidden" name="divergent" value="<%= params[:divergent] %>">
+                    <input type="hidden" name="resolved" value="<%= params[:resolved] %>">
+                  </form>
+                  <span class="showing-entries-text">registros</span>
+                </div>
+
+                <form method="get" class="flex-grow-1" style="min-width: 0;">
+                  <div class="input-group input-search-group">
+                    <span class="input-group-text">
+                      <i class="bx bx-search"></i>
+                    </span>
+                    <input type="text"
+                           name="q"
+                           value="<%= params[:q] %>"
+                           class="form-control input-search"
+                           placeholder="Buscar por empresa, gateway ID ou assinatura..."
+                           aria-label="Buscar log de reconciliação">
+                    <input type="hidden" name="per" value="<%= params[:per].presence || 10 %>">
+                    <input type="hidden" name="result_status" value="<%= params[:result_status] %>">
+                    <input type="hidden" name="source_job" value="<%= params[:source_job] %>">
+                    <input type="hidden" name="divergent" value="<%= params[:divergent] %>">
+                    <input type="hidden" name="resolved" value="<%= params[:resolved] %>">
+                  </div>
+                </form>
+              </div>
+
+              <div class="col-12 col-xl-7">
+                <form method="get" class="row g-2">
+                  <input type="hidden" name="q" value="<%= params[:q] %>">
+                  <input type="hidden" name="per" value="<%= params[:per].presence || 10 %>">
+
+                  <div class="col-6 col-md-3">
+                    <select name="result_status" class="form-select form-select-sm" onchange="this.form.submit()">
+                      <option value="">Resultado</option>
+                      <% SubscriptionReconciliationEvent::RESULT_STATUSES.each do |status| %>
+                        <option value="<%= status %>" <%= "selected" if params[:result_status] == status %>><%= status.humanize %></option>
+                      <% end %>
+                    </select>
+                  </div>
+
+                  <div class="col-6 col-md-3">
+                    <select name="source_job" class="form-select form-select-sm" onchange="this.form.submit()">
+                      <option value="">Origem</option>
+                      <% @source_jobs.each do |source_job| %>
+                        <option value="<%= source_job %>" <%= "selected" if params[:source_job] == source_job %>><%= source_job %></option>
+                      <% end %>
+                    </select>
+                  </div>
+
+                  <div class="col-6 col-md-3">
+                    <select name="divergent" class="form-select form-select-sm" onchange="this.form.submit()">
+                      <option value="">Divergência</option>
+                      <option value="true" <%= "selected" if params[:divergent] == "true" %>>Com divergência</option>
+                      <option value="false" <%= "selected" if params[:divergent] == "false" %>>Sem divergência</option>
+                    </select>
+                  </div>
+
+                  <div class="col-6 col-md-3">
+                    <select name="resolved" class="form-select form-select-sm" onchange="this.form.submit()">
+                      <option value="">Resolvido</option>
+                      <option value="true" <%= "selected" if params[:resolved] == "true" %>>Sim</option>
+                      <option value="false" <%= "selected" if params[:resolved] == "false" %>>Não</option>
+                    </select>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table mb-0 table-hover align-middle">
+                <thead>
+                  <tr>
+                    <th>Processado em</th>
+                    <th>Empresa</th>
+                    <th>Assinatura</th>
+                    <th>Origem</th>
+                    <th>Status</th>
+                    <th>Divergência</th>
+                    <th>Resolvido</th>
+                    <th>Gateway</th>
+                    <th>Erro</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @subscription_reconciliation_events.each do |event| %>
+                    <tr>
+                      <td><%= l(event.processed_at, format: :short) %></td>
+                      <td><%= event.company&.name || "-" %></td>
+                      <td>
+                        <code title="<%= event.subscription_id %>"><%= event.subscription_id.to_s.first(8) %></code>
+                      </td>
+                      <td><%= event.source_job %></td>
+                      <td>
+                        <div>
+                          <span class="badge bg-secondary"><%= event.local_status_before %></span>
+                          <i class="bx bx-right-arrow-alt"></i>
+                          <span class="badge bg-primary"><%= event.local_status_after %></span>
+                        </div>
+                        <small class="text-muted">gateway: <%= event.gateway_status.presence || "-" %></small>
+                      </td>
+                      <td>
+                        <span class="badge bg-<%= event.divergent? ? "warning text-dark" : "light text-dark" %>">
+                          <%= event.divergent? ? "Sim" : "Não" %>
+                        </span>
+                      </td>
+                      <td>
+                        <span class="badge bg-<%= event.resolved? ? "success" : "secondary" %>">
+                          <%= event.resolved? ? "Sim" : "Não" %>
+                        </span>
+                      </td>
+                      <td>
+                        <div class="small"><%= event.payment_method %></div>
+                        <div class="small text-muted"><%= event.gateway_identifier %></div>
+                      </td>
+                      <td class="small text-danger"><%= truncate(event.error_message.to_s, length: 80) %></td>
+                      <td>
+                        <%= link_to "Ver", admin_subscription_reconciliation_event_path(event), class: "btn btn-sm btn-primary" %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <div class="text-muted">
+                Mostrando <%= @subscription_reconciliation_events.size %> de <%= @subscription_reconciliation_events.total_count %> registros
+              </div>
+              <nav aria-label="Paginação logs de reconciliação">
+                <%= custom_paginate(@subscription_reconciliation_events) %>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -4,6 +4,7 @@ constraints subdomain: "admin" do
   resources :companies, module: "admin", as: :admin_companies
   resources :users, module: "admin", as: :admin_users
   resources :subscriptions, module: "admin", as: :admin_subscriptions
+  resources :subscription_reconciliation_events, only: [:index, :show], module: "admin", as: :admin_subscription_reconciliation_events
   resources :plans, module: "admin", as: :admin_plans
   resources :coupons, module: "admin", as: :admin_coupons
   resources :order_services, module: "admin", as: :admin_order_services do

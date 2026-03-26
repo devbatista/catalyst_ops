@@ -45,7 +45,11 @@ class Subscriptions::ReconcileSubscriptionsJob
 
   def reconcile_subscriptions(subscription_ids)
     subscription_ids.each do |id|
-      result = Cmd::Subscriptions::ReconcileSubscription.new(subscription_id: id).call
+      result = Cmd::Subscriptions::ReconcileSubscription.new(
+        subscription_id: id,
+        source_job: self.class.name,
+        window_days: reconciliation_window_days
+      ).call
 
       if result.success?
         Rails.logger.info "[Subscriptions::ReconcileSubscriptionsJob] Assinatura ID #{id} reconciliada com sucesso."

@@ -365,17 +365,26 @@ Observacoes:
 
 ### Janela de reconciliacao de assinaturas
 
-O job `Subscriptions::ReconcileSubscriptionsJob` usa uma janela para reduzir
-chamadas ao gateway:
+Os jobs de reconciliacao/reprocessamento usam janela para reduzir chamadas ao
+gateway:
 
-- padrao: ultimos `30` dias (campo `subscriptions.updated_at`)
-- configuravel por variavel de ambiente:
+- `Subscriptions::ReconcileSubscriptionsJob`
+  usa `subscriptions.updated_at` e env:
   `SUBSCRIPTIONS_RECONCILIATION_WINDOW_DAYS`
+- `Subscriptions::ReprocessPendingPaymentsJob`
+  usa query operacional de pendentes sem webhook processado e env:
+  `SUBSCRIPTIONS_PENDING_REPROCESS_WINDOW_DAYS`
+
+Padrao para ambas:
+
+- ultimos `30` dias
+- se valor ausente/invalido (`0` ou negativo), fallback automatico para `30`
 
 Exemplo:
 
 ```env
 SUBSCRIPTIONS_RECONCILIATION_WINDOW_DAYS=30
+SUBSCRIPTIONS_PENDING_REPROCESS_WINDOW_DAYS=30
 ```
 
 ## Fluxo de emails

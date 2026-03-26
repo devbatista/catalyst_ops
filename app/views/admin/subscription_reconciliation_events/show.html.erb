@@ -1,0 +1,100 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="mb-0 text-uppercase">Detalhe do Log de Reconciliação</h4>
+          <%= link_to "Voltar", admin_subscription_reconciliation_events_path, class: "btn btn-outline-secondary btn-sm" %>
+        </div>
+
+        <% event = @subscription_reconciliation_event %>
+
+        <div class="card mb-3">
+          <div class="card-body">
+            <div class="row mb-2">
+              <div class="col-md-3"><strong>ID do evento:</strong></div>
+              <div class="col-md-9"><code><%= event.id %></code></div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-3"><strong>Processado em:</strong></div>
+              <div class="col-md-9"><%= l(event.processed_at, format: :long) %></div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-3"><strong>Origem:</strong></div>
+              <div class="col-md-9"><%= event.source_job %></div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-3"><strong>Janela (dias):</strong></div>
+              <div class="col-md-9"><%= event.window_days || "-" %></div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-3"><strong>Empresa:</strong></div>
+              <div class="col-md-9"><%= event.company&.name || "-" %> (<code><%= event.company_id %></code>)</div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-3"><strong>Assinatura:</strong></div>
+              <div class="col-md-9"><code><%= event.subscription_id %></code></div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-3"><strong>Método de pagamento:</strong></div>
+              <div class="col-md-9"><%= event.payment_method %></div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-3"><strong>Gateway ID:</strong></div>
+              <div class="col-md-9"><code><%= event.gateway_identifier %></code></div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-3"><strong>Status gateway:</strong></div>
+              <div class="col-md-9"><%= event.gateway_status.presence || "-" %></div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-3"><strong>Status local:</strong></div>
+              <div class="col-md-9">
+                <span class="badge bg-secondary"><%= event.local_status_before %></span>
+                <i class="bx bx-right-arrow-alt"></i>
+                <span class="badge bg-primary"><%= event.local_status_after %></span>
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-3"><strong>Divergência:</strong></div>
+              <div class="col-md-9">
+                <span class="badge bg-<%= event.divergent? ? "warning text-dark" : "light text-dark" %>">
+                  <%= event.divergent? ? "Sim" : "Não" %>
+                </span>
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-3"><strong>Resolvido:</strong></div>
+              <div class="col-md-9">
+                <span class="badge bg-<%= event.resolved? ? "success" : "secondary" %>">
+                  <%= event.resolved? ? "Sim" : "Não" %>
+                </span>
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-md-3"><strong>Resultado:</strong></div>
+              <div class="col-md-9">
+                <span class="badge bg-<%= event.result_status == "success" ? "success" : "danger" %>">
+                  <%= event.result_status.humanize %>
+                </span>
+              </div>
+            </div>
+            <div class="row mb-0">
+              <div class="col-md-3"><strong>Erro:</strong></div>
+              <div class="col-md-9 text-danger"><%= event.error_message.presence || "-" %></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <strong>Payload bruto</strong>
+          </div>
+          <div class="card-body">
+            <pre class="mb-0" style="white-space: pre-wrap;"><%= JSON.pretty_generate(event.raw_payload || {}) %></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
