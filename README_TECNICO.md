@@ -288,6 +288,23 @@ O projeto usa Sidekiq para execucao assíncrona, principalmente em:
 - envio de emails
 - eventos de notificacao
 
+### Variaveis de ambiente de reconciliacao
+
+Os jobs de assinaturas usam janelas de tempo para reduzir custo de chamadas ao
+gateway e limitar o volume processado por execucao.
+
+- `SUBSCRIPTIONS_RECONCILIATION_WINDOW_DAYS`
+  Controla a janela (em dias) do
+  `Subscriptions::ReconcileSubscriptionsJob`.
+  Valor padrao: `30`.
+- `SUBSCRIPTIONS_PENDING_REPROCESS_WINDOW_DAYS`
+  Controla a janela (em dias) do
+  `Subscriptions::ReprocessPendingPaymentsJob`.
+  Valor padrao: `30`.
+
+Se as variaveis estiverem ausentes, vazias, `0` ou negativas, os jobs usam
+fallback para `30` dias.
+
 Toda vez que aparecer `deliver_later`, o fluxo real passa por:
 
 1. serializacao do job

@@ -37,7 +37,11 @@ class Subscriptions::ReprocessPendingPaymentsJob
 
   def reprocess_subscriptions(subscription_ids)
     subscription_ids.each do |id|
-      result = Cmd::Subscriptions::ReconcileSubscription.new(subscription_id: id).call
+      result = Cmd::Subscriptions::ReconcileSubscription.new(
+        subscription_id: id,
+        source_job: self.class.name,
+        window_days: reprocess_window_days
+      ).call
 
       if result.success?
         Rails.logger.info "[Subscriptions::ReprocessPendingPaymentsJob] Assinatura ID #{id} reprocessada com sucesso."

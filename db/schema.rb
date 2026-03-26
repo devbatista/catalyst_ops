@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_03_25_173000) do
+ActiveRecord::Schema[7.1].define(version: 2026_03_26_112000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -247,6 +247,32 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_25_173000) do
     t.index ["order_service_id"], name: "index_service_items_on_order_service_id"
   end
 
+  create_table "subscription_reconciliation_events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "subscription_id", null: false
+    t.uuid "company_id", null: false
+    t.string "source_job", null: false
+    t.integer "window_days"
+    t.string "payment_method", null: false
+    t.string "gateway_identifier", null: false
+    t.string "gateway_status"
+    t.string "local_status_before"
+    t.string "local_status_after"
+    t.boolean "divergent", default: false, null: false
+    t.boolean "resolved", default: false, null: false
+    t.string "result_status", default: "success", null: false
+    t.text "error_message"
+    t.jsonb "raw_payload", default: {}, null: false
+    t.datetime "processed_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_subscription_reconciliation_events_on_company_id"
+    t.index ["divergent", "resolved"], name: "idx_reconciliation_events_divergent_resolved"
+    t.index ["processed_at"], name: "index_subscription_reconciliation_events_on_processed_at"
+    t.index ["result_status"], name: "index_subscription_reconciliation_events_on_result_status"
+    t.index ["source_job", "processed_at"], name: "idx_reconciliation_events_source_processed_at"
+    t.index ["subscription_id"], name: "index_subscription_reconciliation_events_on_subscription_id"
+  end
+
   create_table "subscriptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.string "preapproval_plan_id", null: false
@@ -366,6 +392,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_25_173000) do
   add_foreign_key "reports", "companies"
   add_foreign_key "reports", "users"
   add_foreign_key "service_items", "order_services"
+  add_foreign_key "subscription_reconciliation_events", "companies"
+  add_foreign_key "subscription_reconciliation_events", "subscriptions"
   add_foreign_key "subscriptions", "companies"
   add_foreign_key "support_messages", "support_tickets"
   add_foreign_key "support_messages", "users"

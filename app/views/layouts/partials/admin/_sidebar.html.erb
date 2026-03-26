@@ -44,6 +44,14 @@
       <% end %>
     </li>
 
+    <!-- Reconciliação -->
+    <li class="list-group-item <%= active_menu_class(admin_subscription_reconciliation_events_path) if defined?(admin_subscription_reconciliation_events_path) %>">
+      <%= link_to (defined?(admin_subscription_reconciliation_events_path) ? admin_subscription_reconciliation_events_path : "#") do %>
+        <div class="parent-icon"><i class='bx bx-transfer-alt'></i></div>
+        <div class="menu-title">Reconciliação</div>
+      <% end %>
+    </li>
+
     <!-- Planos -->
     <li class="list-group-item <%= active_menu_class(admin_plans_path) if defined?(admin_plans_path) %>">
       <%= link_to (defined?(admin_plans_path) ? admin_plans_path : "#") do %>
@@ -112,7 +120,7 @@
 
     <!-- Conteúdo -->
     <li class="list-group-item <%= active_menu_class(admin_contents_path) if defined?(admin_contents_path) %>">
-      <%= link_to (defined?(admin_conten) ? admin_conten : "#") do %>
+      <%= link_to (defined?(admin_contents_path) ? admin_contents_path : "#") do %>
         <div class="parent-icon"><i class='bx bx-news'></i></div>
         <div class="menu-title">Conteúdo</div>
       <% end %>
