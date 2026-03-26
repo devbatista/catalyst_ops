@@ -33,6 +33,19 @@ class App::TechniciansController < ApplicationController
     @technician.company_id = current_user.company_id if current_user.gestor?
 
     if @technician.save
+      log_audit_event!(
+        action: "technician.created",
+        actor: current_user,
+        company: @technician.company || current_user.company,
+        resource: @technician,
+        metadata: {
+          user_id: @technician.id,
+          name: @technician.name,
+          email: @technician.email,
+          role: @technician.role,
+          source: "app.technicians#create"
+        }
+      )
       redirect_to app_technician_path(@technician), notice: "Técnico criado com sucesso."
     else
       render :new, :unprocessable_entity
@@ -41,6 +54,19 @@ class App::TechniciansController < ApplicationController
 
   def update
     if @technician.update(user_params)
+      changed_fields = @technician.previous_changes.slice("name", "email", "phone", "updated_at")
+      log_audit_event!(
+        action: "technician.updated",
+        actor: current_user,
+        company: @technician.company || current_user.company,
+        resource: @technician,
+        metadata: {
+          user_id: @technician.id,
+          role: @technician.role,
+          changes: changed_fields,
+          source: "app.technicians#update"
+        }
+      )
       redirect_to app_technician_path(@technician), notice: "Técnico atualizado com sucesso."
     else
       render :edit, status: :unprocessable_entity
