@@ -35,6 +35,13 @@ Sidekiq.configure_server do |config|
         "queue" => "default",
         "description" => "Reconcilia status local de assinaturas com o gateway Mercado Pago",
         "timezone" => "America/Sao_Paulo"
+      },
+      "ReprocessPendingPaymentsJob" => {
+        "cron" => "30 12 * * *", # Diariamente às 12h30
+        "class" => "Subscriptions::ReprocessPendingPaymentsJob",
+        "queue" => "default",
+        "description" => "Reprocessa assinaturas pending (pix/boleto) sem webhook de payment processado",
+        "timezone" => "America/Sao_Paulo"
       }
     }
 
