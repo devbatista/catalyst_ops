@@ -70,6 +70,7 @@ fi
 REBUILD_IMAGE=false
 RESTART_WEB=false
 RESTART_SIDEKIQ=false
+RESTART_NGINX=false
 RUN_MIGRATIONS=false
 CHECK_PENDING_MIGRATIONS=true
 
@@ -125,12 +126,17 @@ for file in "${CHANGED_FILES[@]}"; do
   fi
 done
 
+if [[ "$RESTART_WEB" == "true" ]]; then
+  RESTART_NGINX=true
+fi
+
 git pull --ff-only origin "$BRANCH"
 
 echo "Plano de deploy:"
 echo " - REBUILD_IMAGE=$REBUILD_IMAGE"
 echo " - RESTART_WEB=$RESTART_WEB"
 echo " - RESTART_SIDEKIQ=$RESTART_SIDEKIQ"
+echo " - RESTART_NGINX=$RESTART_NGINX"
 echo " - RUN_MIGRATIONS=$RUN_MIGRATIONS"
 echo " - CHECK_PENDING_MIGRATIONS=$CHECK_PENDING_MIGRATIONS"
 
@@ -156,6 +162,10 @@ fi
 
 if [[ "$RESTART_SIDEKIQ" == "true" && "$REBUILD_IMAGE" == "false" ]]; then
   docker compose restart sidekiq
+fi
+
+if [[ "$RESTART_NGINX" == "true" ]]; then
+  docker compose restart nginx
 fi
 
 echo "Deploy concluido."
