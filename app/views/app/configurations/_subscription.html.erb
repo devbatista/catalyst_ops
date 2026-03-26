@@ -1,13 +1,16 @@
-<div class="card mb-3">
-  <div class="card-body">
+<div class="card border-0 shadow-sm mb-3">
+  <div class="card-header bg-white py-3">
+    <h5 class="card-title mb-0">Assinatura</h5>
+  </div>
+  <div class="card-body p-4">
     <% subscription = current_user.company.current_subscription %>
     <% if subscription && subscription.plan %>
       <div class="row mb-2">
-        <div class="col-md-4"><strong>Plano:</strong></div>
+        <div class="col-md-4 text-secondary"><strong>Plano:</strong></div>
         <div class="col-md-8"><%= subscription.plan.name %></div>
       </div>
       <div class="row mb-2">
-        <div class="col-md-4"><strong>Status:</strong></div>
+        <div class="col-md-4 text-secondary"><strong>Status:</strong></div>
         <div class="col-md-8">
           <span class="badge bg-<%= subscription_badge_class(subscription.status) %>">
             <%= subscription.status.humanize %>
@@ -15,33 +18,33 @@
         </div>
       </div>
       <div class="row mb-2">
-        <div class="col-md-4"><strong>Início:</strong></div>
+        <div class="col-md-4 text-secondary"><strong>Início:</strong></div>
         <div class="col-md-8"><%= l(subscription.start_date, format: :short) if subscription.start_date %></div>
       </div>
       <div class="row mb-2">
-        <div class="col-md-4"><strong>Fim:</strong></div>
+        <div class="col-md-4 text-secondary"><strong>Fim:</strong></div>
         <div class="col-md-8"><%= l(subscription.end_date, format: :short) if subscription.end_date %></div>
       </div>
       <div class="row mb-2">
-        <div class="col-md-4"><strong>Valor:</strong></div>
+        <div class="col-md-4 text-secondary"><strong>Valor:</strong></div>
         <div class="col-md-8">
           <%= number_to_currency(subscription.plan.transaction_amount, unit: "R$") if subscription.plan.transaction_amount %>
         </div>
       </div>
       <div class="row mb-2">
-        <div class="col-md-4"><strong>Forma de pagamento:</strong></div>
+        <div class="col-md-4 text-secondary"><strong>Forma de pagamento:</strong></div>
         <div class="col-md-8"><%= subscription.company.payment_method || "Não especificado" %></div>
       </div>
       <div class="row mb-2">
-        <div class="col-md-4"><strong>Limite de Técnicos:</strong></div>
+        <div class="col-md-4 text-secondary"><strong>Limite de Técnicos:</strong></div>
         <div class="col-md-8"><%= subscription.plan.max_technicians || "Ilimitado" %></div>
       </div>
       <div class="row mb-2">
-        <div class="col-md-4"><strong>Limite de Ordens:</strong></div>
+        <div class="col-md-4 text-secondary"><strong>Limite de Ordens:</strong></div>
         <div class="col-md-8"><%= subscription.plan.max_orders || "Ilimitado" %></div>
       </div>
-      <div class="row mb-2">
-        <div class="col-md-4"><strong>Tipo de suporte:</strong></div>
+      <div class="row mb-0">
+        <div class="col-md-4 text-secondary"><strong>Tipo de suporte:</strong></div>
         <div class="col-md-8"><%= subscription.plan.support_level %></div>
       </div>
     <% else %>

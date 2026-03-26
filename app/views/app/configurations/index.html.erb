@@ -1,76 +1,106 @@
-<div class="page-wrapper">
+<div class="page-wrapper configurations-page">
   <div class="page-content">
-    <div class="row" style="min-height: 80vh;">
-      <div class="col-12">
-        <div class="mb-3">
-          <h4 class="mb-0 text-uppercase">Configurações</h4>
-        </div>
-        <% flash.each do |type, message| %>
-          <% bootstrap_class = { notice: "alert-success", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
-          <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert">
-            <%= message %>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        <% end %>
-        <div class="row flex-nowrap" style="min-height: 70vh;">
-          <!-- Menu lateral -->
-          <nav class="col-md-2 border-end p-0" style="min-height: 70vh;">
-            <div class="py-4 px-3">
-              <ul class="list-unstyled nav nav-pills flex-column" id="configTabs" role="tablist">
-                <li>
-                  <a class="nav-link active text-decoration-none d-block py-2 ps-2 link-dark" id="tab-perfil" data-bs-toggle="pill" href="#perfil" role="tab" aria-controls="perfil" aria-selected="true">
-                    <i class="bx bx-user"></i> Perfil
-                  </a>
-                </li>
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+      <div>
+        <h4 class="mb-1 text-uppercase">Configurações</h4>
+        <p class="text-muted mb-0">Gerencie perfil, empresa, gestores e assinatura.</p>
+      </div>
+    </div>
 
-                <% if can?(:manage, User) %>
-                <li>
-                  <a class="nav-link text-decoration-none d-block py-2 ps-2 link-dark" id="tab-gestores" data-bs-toggle="pill" href="#gestores" role="tab" aria-controls="gestores" aria-selected="false">
-                    <i class="bx bx-group"></i> Gestores
-                  </a>
-                </li>
-                <% end %>
+    <% flash.each do |type, message| %>
+      <% bootstrap_class = { notice: "alert-success", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
+      <div class="alert <%= bootstrap_class %> alert-dismissible fade show shadow-sm" role="alert">
+        <%= message %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    <% end %>
 
+    <div class="card border-0 shadow-sm overflow-hidden">
+      <div class="row g-0">
+        <nav class="col-12 col-lg-3 col-xl-2 border-end bg-light-subtle">
+          <div class="p-3 p-lg-4">
+            <div class="text-uppercase small fw-semibold text-muted mb-3">Seções</div>
+            <ul class="list-unstyled nav nav-pills flex-column gap-2" id="configTabs" role="tablist">
+              <li>
+                <a class="nav-link active d-flex align-items-center gap-2" id="tab-perfil" data-bs-toggle="pill" href="#perfil" role="tab" aria-controls="perfil" aria-selected="true">
+                  <i class="bx bx-user"></i>
+                  <span>Perfil</span>
+                </a>
+              </li>
+
+              <% if can?(:manage, User) %>
                 <li>
-                  <a class="nav-link text-decoration-none d-block py-2 ps-2 link-dark" id="tab-empresa" data-bs-toggle="pill" href="#empresa" role="tab" aria-controls="empresa" aria-selected="false">
-                    <i class="bx bx-buildings"></i> Dados da Empresa
+                  <a class="nav-link d-flex align-items-center gap-2" id="tab-gestores" data-bs-toggle="pill" href="#gestores" role="tab" aria-controls="gestores" aria-selected="false">
+                    <i class="bx bx-group"></i>
+                    <span>Gestores</span>
                   </a>
                 </li>
-                
-                <% if can?(:manage, Subscription) %>
-                <li>
-                  <a class="nav-link text-decoration-none d-block py-2 ps-2 link-dark" id="tab-assinatura" data-bs-toggle="pill" href="#assinatura" role="tab" aria-controls="assinatura" aria-selected="false">
-                    <i class="bx bx-credit-card"></i> Assinatura
-                  </a>
-                </li>
-                <% end %>
-              </ul>
-            </div>
-          </nav>
-          <!-- Conteúdo -->
-          <div class="col-md-9">
-            <div class="tab-content py-4 px-2" id="configTabsContent">
-              <div class="tab-pane fade show active" id="perfil" role="tabpanel" aria-labelledby="tab-perfil">
-                <%= render 'profile_form', user: current_user %>
-              </div>
-              <div class="tab-pane fade" id="gestores" role="tabpanel" aria-labelledby="tab-gestores">
-                <% if can?(:manage, User) %>
-                  <%= render 'managers' %>
-                <% end %>
-              </div>
-              <div class="tab-pane fade" id="empresa" role="tabpanel" aria-labelledby="tab-empresa">
-                <%= render 'company_data' %>
-              </div>
+              <% end %>
+
+              <li>
+                <a class="nav-link d-flex align-items-center gap-2" id="tab-empresa" data-bs-toggle="pill" href="#empresa" role="tab" aria-controls="empresa" aria-selected="false">
+                  <i class="bx bx-buildings"></i>
+                  <span>Dados da Empresa</span>
+                </a>
+              </li>
 
               <% if can?(:manage, Subscription) %>
-              <div class="tab-pane fade" id="assinatura" role="tabpanel" aria-labelledby="tab-assinatura">
-                <%= render 'subscription' %>
-              </div>
+                <li>
+                  <a class="nav-link d-flex align-items-center gap-2" id="tab-assinatura" data-bs-toggle="pill" href="#assinatura" role="tab" aria-controls="assinatura" aria-selected="false">
+                    <i class="bx bx-credit-card"></i>
+                    <span>Assinatura</span>
+                  </a>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        </nav>
+
+        <div class="col-12 col-lg-9 col-xl-10">
+          <div class="tab-content p-3 p-lg-4" id="configTabsContent">
+            <div class="tab-pane fade show active" id="perfil" role="tabpanel" aria-labelledby="tab-perfil">
+              <%= render "profile_form", user: current_user %>
+            </div>
+
+            <div class="tab-pane fade" id="gestores" role="tabpanel" aria-labelledby="tab-gestores">
+              <% if can?(:manage, User) %>
+                <%= render "managers" %>
               <% end %>
             </div>
+
+            <div class="tab-pane fade" id="empresa" role="tabpanel" aria-labelledby="tab-empresa">
+              <%= render "company_data" %>
+            </div>
+
+            <% if can?(:manage, Subscription) %>
+              <div class="tab-pane fade" id="assinatura" role="tabpanel" aria-labelledby="tab-assinatura">
+                <%= render "subscription" %>
+              </div>
+            <% end %>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<style>
+  .configurations-page .nav-pills .nav-link {
+    color: #1f2937;
+    border: 1px solid transparent;
+    border-radius: 0.75rem;
+    font-weight: 500;
+  }
+
+  .configurations-page .nav-pills .nav-link:hover {
+    background-color: #eef2ff;
+    border-color: #dbe4ff;
+  }
+
+  .configurations-page .nav-pills .nav-link.active {
+    background-color: #0d6efd;
+    color: #fff;
+    border-color: #0d6efd;
+    box-shadow: 0 6px 16px rgba(13, 110, 253, 0.25);
+  }
+</style>
