@@ -55,4 +55,29 @@ class ApplicationController < ActionController::Base
     devise_parameter_sanitizer.permit(:sign_up, keys: [:name, :role])
     devise_parameter_sanitizer.permit(:account_update, keys: [:name, :role])
   end
+
+  def log_audit_event!(action:, actor: nil, company: nil, resource: nil, metadata: {})
+    Audit::EventLogger.call(
+      action: action,
+      source: audit_source,
+      actor: actor,
+      company: company,
+      resource: resource,
+      metadata: metadata,
+      request_id: request.request_id,
+      ip_address: request.remote_ip,
+      user_agent: request.user_agent
+    )
+  rescue StandardError => e
+    Rails.logger.error("[ApplicationController] Falha ao registrar auditoria #{action}: #{e.message}")
+  end
+
+  def audit_source
+    return "admin" if request.subdomain == "admin"
+    return "app" if request.subdomain == "app"
+    return "login" if request.subdomain == "login"
+    return "webhook" if request.subdomain == "webhook"
+
+    "system"
+  end
 end
