@@ -305,6 +305,25 @@ gateway e limitar o volume processado por execucao.
 Se as variaveis estiverem ausentes, vazias, `0` ou negativas, os jobs usam
 fallback para `30` dias.
 
+## Auditoria global (base)
+
+Foi adicionada a base de auditoria em tabela dedicada:
+
+- `audit_events`
+
+Campos principais:
+
+- `occurred_at`, `action`, `source`
+- `actor_type`, `actor_id`
+- `company_id`
+- `resource_type`, `resource_id`
+- `request_id`, `ip_address`, `user_agent`
+- `metadata` (`jsonb`)
+
+Para registrar eventos de forma padronizada, usar:
+
+- `Audit::EventLogger.call(...)`
+
 Toda vez que aparecer `deliver_later`, o fluxo real passa por:
 
 1. serializacao do job
