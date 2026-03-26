@@ -4,6 +4,7 @@ class AuditEvent < ApplicationRecord
   belongs_to :company, optional: true
 
   validates :action, presence: true
+  validates :action, inclusion: { in: Audit::ActionCatalog::ALL }
   validates :occurred_at, presence: true
   validates :source, inclusion: { in: SOURCES }, allow_blank: true
   validates :metadata, presence: true

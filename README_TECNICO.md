@@ -324,6 +324,27 @@ Para registrar eventos de forma padronizada, usar:
 
 - `Audit::EventLogger.call(...)`
 
+Catalogo inicial de acoes:
+
+- autenticacao: `auth.*`
+- usuarios/tecnicos: `user.*` e `technician.*`
+- clientes: `client.*`
+- ordens de servico: `order_service.*`
+- cupons: `coupon.*`
+- assinaturas/pagamentos: `subscription.*`
+- webhooks: `webhook.*`
+- sistema/jobs: `job.*` e `system.*`
+
+Padrao de nome:
+
+- `<dominio>.<evento>[.<subevento>]`
+- exemplos: `order_service.status.changed`, `webhook.signature.invalid`
+
+As acoes validas ficam centralizadas em:
+
+- `Audit::ActionCatalog::ALL`
+- arquivo: [`app/services/audit/action_catalog.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/app/services/audit/action_catalog.rb)
+
 Toda vez que aparecer `deliver_later`, o fluxo real passa por:
 
 1. serializacao do job
