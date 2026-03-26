@@ -1,4 +1,5 @@
 require "digest"
+require "openssl"
 
 class WebHook::MercadoPagoController < WebHookController
   skip_before_action :verify_authenticity_token
@@ -8,6 +9,13 @@ class WebHook::MercadoPagoController < WebHookController
     Rails.logger.info("Recebido webhook do Mercado Pago: #{raw}")
     
     payload = JSON.parse(raw)
+
+    unless webhook_signature_valid?(payload)
+      Rails.logger.warn("[WebHook::MercadoPagoController] Assinatura de webhook invalida")
+      render json: { status: "unauthorized" }, status: :unauthorized
+      return
+    end
+
     event = find_or_create_event!(payload)
 
     if event.status == "processed"
@@ -105,5 +113,77 @@ class WebHook::MercadoPagoController < WebHookController
 
   def payload_event_type(payload)
     payload["type"].presence || payload["topic"].presence || "unknown"
+  end
+
+  def webhook_signature_valid?(payload)
+    secret = ENV.fetch("MP_WEBHOOK_SECRET", "").to_s.strip
+    signature_header = request_header("x-signature")
+    request_id = request_header("x-request-id")
+
+    if secret.blank?
+      if signature_validation_required?
+        Rails.logger.error("[WebHook::MercadoPagoController] MP_WEBHOOK_SECRET ausente para validacao obrigatoria de assinatura")
+        return false
+      end
+
+      Rails.logger.warn("[WebHook::MercadoPagoController] MP_WEBHOOK_SECRET ausente; validacao de assinatura ignorada fora de producao")
+      return true
+    end
+
+    if signature_header.blank?
+      return false if signature_validation_required?
+
+      Rails.logger.warn("[WebHook::MercadoPagoController] x-signature ausente; validacao de assinatura ignorada fora de producao")
+      return true
+    end
+
+    ts, signature_v1 = parse_signature_header(signature_header)
+    return false if ts.blank? || signature_v1.blank?
+
+    data_id = payload_resource_id(payload).to_s
+    data_id = data_id.downcase if data_id.match?(/\A[a-zA-Z0-9]+\z/)
+
+    manifest = +""
+    manifest << "id:#{data_id};" if data_id.present?
+    manifest << "request-id:#{request_id};" if request_id.present?
+    manifest << "ts:#{ts};"
+
+    expected = OpenSSL::HMAC.hexdigest("SHA256", secret, manifest)
+    secure_compare_hexdigest(expected, signature_v1)
+  end
+
+  def parse_signature_header(signature_header)
+    ts = nil
+    v1 = nil
+
+    signature_header.to_s.split(",").each do |part|
+      key, value = part.split("=", 2)
+      next if key.blank? || value.blank?
+
+      normalized_key = key.strip.downcase
+      normalized_value = value.strip
+
+      ts = normalized_value if normalized_key == "ts"
+      v1 = normalized_value if normalized_key == "v1"
+    end
+
+    [ts, v1]
+  end
+
+  def secure_compare_hexdigest(expected, provided)
+    return false if expected.blank? || provided.blank?
+    return false unless expected.bytesize == provided.bytesize
+
+    ActiveSupport::SecurityUtils.secure_compare(expected, provided)
+  end
+
+  def signature_validation_required?
+    Rails.env.production? || ENV["MP_WEBHOOK_REQUIRE_SIGNATURE"] == "true"
+  end
+
+  def request_header(name)
+    request.headers[name].presence ||
+      request.headers[name.upcase].presence ||
+      request.headers["HTTP_#{name.upcase.tr('-', '_')}"].presence
   end
 end
