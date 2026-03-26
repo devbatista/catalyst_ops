@@ -5,22 +5,22 @@ module Cmd
 
       QUERY_MAP = {
         pending_pix_boleto_without_processed_webhook: lambda { |params|
-          ::Queries::Reconciliation::PendingPixBoletoWithoutProcessedWebhookQuery.call(
+          ::Reconciliation::PendingPixBoletoWithoutProcessedWebhookQuery.call(
             window_days: params.fetch(:window_days, 30)
           )
         },
         reconciliation_window_summary: lambda { |params|
-          ::Queries::Reconciliation::ReconciliationWindowSummaryQuery.call(
+          ::Reconciliation::ReconciliationWindowSummaryQuery.call(
             window_days: params.fetch(:window_days, 30)
           )
         },
         payment_events_status_breakdown: lambda { |params|
-          ::Queries::Webhooks::PaymentEventsStatusBreakdownQuery.call(
+          ::Webhooks::PaymentEventsStatusBreakdownQuery.call(
             window_days: params.fetch(:window_days, 30)
           )
         },
         possible_duplicate_payment_events: lambda { |_params|
-          ::Queries::Webhooks::PossibleDuplicatePaymentEventsQuery.call
+          ::Webhooks::PossibleDuplicatePaymentEventsQuery.call
         }
       }.freeze
 
