@@ -28,6 +28,13 @@ Sidekiq.configure_server do |config|
         "queue" => "default",
         "description" => "Expira assinaturas vencidas há 10 dias ou mais",
         "timezone" => "America/Sao_Paulo"
+      },
+      "ReconcileSubscriptionsJob" => {
+        "cron" => "0 12 * * *", # Diariamente às 12h00
+        "class" => "Subscriptions::ReconcileSubscriptionsJob",
+        "queue" => "default",
+        "description" => "Reconcilia status local de assinaturas com o gateway Mercado Pago",
+        "timezone" => "America/Sao_Paulo"
       }
     }
 
