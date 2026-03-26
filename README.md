@@ -352,7 +352,9 @@ Cron jobs atuais:
 | --- | --- | --- | --- |
 | `MarkOverdueOrderServicesJob` | `* * * * *` | a cada minuto | marca OS como atrasadas quando o horario agendado ja passou |
 | `Subscriptions::CycleSubscriptionsJob` | `0 10 * * *` | diariamente as 10:00 | cicla assinaturas aptas para renovacao |
-| `Subscriptions::ExpireSubscriptionsJob` | `0 11 * * *` | diariamente as 11:00 | expira assinaturas vencidas |
+| `Subscriptions::NotifyOverdueSubscriptionsJob` | `0 9 * * *` | diariamente as 09:00 | notifica assinaturas vencidas ha 5 dias |
+| `Subscriptions::ExpireOverdueSubscriptionsJob` | `0 11 * * *` | diariamente as 11:00 | expira assinaturas vencidas ha 10 dias ou mais |
+| `Subscriptions::ReconcileSubscriptionsJob` | `0 12 * * *` | diariamente as 12:00 | reconcilia status local de assinaturas com o Mercado Pago |
 
 Observacoes:
 
@@ -360,6 +362,21 @@ Observacoes:
 - a fila usada nesses agendamentos e `default`
 - a concorrencia base do Sidekiq esta em [`config/sidekiq.yml`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/config/sidekiq.yml)
 - para validar se os agendamentos foram carregados, acompanhe os logs do container `sidekiq`
+
+### Janela de reconciliacao de assinaturas
+
+O job `Subscriptions::ReconcileSubscriptionsJob` usa uma janela para reduzir
+chamadas ao gateway:
+
+- padrao: ultimos `30` dias (campo `subscriptions.updated_at`)
+- configuravel por variavel de ambiente:
+  `SUBSCRIPTIONS_RECONCILIATION_WINDOW_DAYS`
+
+Exemplo:
+
+```env
+SUBSCRIPTIONS_RECONCILIATION_WINDOW_DAYS=30
+```
 
 ## Fluxo de emails
 

@@ -7,16 +7,18 @@ class Subscriptions::ReconcileSubscriptionsJob
 
     if subscription_ids.any?
       reconcile_subscriptions(subscription_ids)
-      Rails.logger.info "[Subscriptions::ReconcileSubscriptionsJob] #{subscription_ids.size} assinatura(s) processada(s) na reconciliacao."
+      Rails.logger.info "[Subscriptions::ReconcileSubscriptionsJob] #{subscription_ids.size} assinatura(s) processada(s) na reconciliacao (janela: #{reconciliation_window_days} dias)."
     else
-      Rails.logger.info "[Subscriptions::ReconcileSubscriptionsJob] Nenhuma assinatura elegivel para reconciliacao."
+      Rails.logger.info "[Subscriptions::ReconcileSubscriptionsJob] Nenhuma assinatura elegivel para reconciliacao (janela: #{reconciliation_window_days} dias)."
     end
   end
 
   private
 
   def subscriptions_to_reconcile
-    base = Subscription.where(gateway: "mercado_pago", status: %w[pending active])
+    base = Subscription
+      .where(gateway: "mercado_pago", status: %w[pending active])
+      .where("subscriptions.updated_at >= ?", reconciliation_window_start)
 
     credit_card_scope = base
       .joins(:company)
@@ -29,6 +31,16 @@ class Subscriptions::ReconcileSubscriptionsJob
       .where.not(external_payment_id: [nil, ""])
 
     credit_card_scope.or(pix_boleto_scope).recent
+  end
+
+  def reconciliation_window_days
+    raw_value = ENV.fetch("SUBSCRIPTIONS_RECONCILIATION_WINDOW_DAYS", 30)
+    days = raw_value.to_i
+    days.positive? ? days : 30
+  end
+
+  def reconciliation_window_start
+    reconciliation_window_days.days.ago
   end
 
   def reconcile_subscriptions(subscription_ids)
