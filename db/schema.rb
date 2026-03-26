@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_03_26_112000) do
+ActiveRecord::Schema[7.1].define(version: 2026_03_26_170000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -68,6 +68,30 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_26_112000) do
     t.datetime "updated_at", null: false
     t.index ["order_service_id"], name: "index_assignments_on_order_service_id"
     t.index ["user_id"], name: "index_assignments_on_user_id"
+  end
+
+  create_table "audit_events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "occurred_at", null: false
+    t.string "action", null: false
+    t.string "source"
+    t.string "actor_type"
+    t.string "actor_id"
+    t.uuid "company_id"
+    t.string "resource_type"
+    t.string "resource_id"
+    t.string "request_id"
+    t.string "ip_address"
+    t.text "user_agent"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["action"], name: "index_audit_events_on_action"
+    t.index ["actor_type", "actor_id", "occurred_at"], name: "idx_audit_events_actor_occurred_at"
+    t.index ["company_id", "occurred_at"], name: "idx_audit_events_company_occurred_at"
+    t.index ["company_id"], name: "index_audit_events_on_company_id"
+    t.index ["occurred_at"], name: "index_audit_events_on_occurred_at"
+    t.index ["request_id"], name: "index_audit_events_on_request_id"
+    t.index ["resource_type", "resource_id", "occurred_at"], name: "idx_audit_events_resource_occurred_at"
   end
 
   create_table "clients", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -380,6 +404,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_26_112000) do
   add_foreign_key "addresses", "clients", on_delete: :cascade
   add_foreign_key "assignments", "order_services"
   add_foreign_key "assignments", "users"
+  add_foreign_key "audit_events", "companies"
   add_foreign_key "clients", "companies"
   add_foreign_key "companies", "plans"
   add_foreign_key "companies", "users", column: "responsible_id"
