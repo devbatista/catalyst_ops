@@ -42,6 +42,13 @@ Sidekiq.configure_server do |config|
         "queue" => "default",
         "description" => "Reprocessa assinaturas pending (pix/boleto) sem webhook de payment processado",
         "timezone" => "America/Sao_Paulo"
+      },
+      "AuditCleanupEventsJob" => {
+        "cron" => "0 2 * * *", # Diariamente às 02h00
+        "class" => "Audit::CleanupEventsJob",
+        "queue" => "default",
+        "description" => "Remove audit_events antigos conforme politica de retencao",
+        "timezone" => "America/Sao_Paulo"
       }
     }
 

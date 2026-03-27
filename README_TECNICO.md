@@ -305,6 +305,21 @@ gateway e limitar o volume processado por execucao.
 Se as variaveis estiverem ausentes, vazias, `0` ou negativas, os jobs usam
 fallback para `30` dias.
 
+### Variaveis de ambiente de retencao de auditoria
+
+O job `Audit::CleanupEventsJob` aplica a politica de retencao em `audit_events`
+no modo hot-only, removendo registros antigos em lotes.
+
+- `AUDIT_LOG_RETENTION_DAYS`
+  Janela de retencao em dias para `audit_events`.
+  Valor padrao: `180`.
+- `AUDIT_LOG_CLEANUP_BATCH_SIZE`
+  Quantidade de registros por lote durante a limpeza.
+  Valor padrao: `1000`.
+- `AUDIT_LOG_CLEANUP_DRY_RUN`
+  Quando `true`, nao remove dados; apenas mede quantos seriam removidos.
+  Valor padrao: `false`.
+
 ## Auditoria global (base)
 
 Foi adicionada a base de auditoria em tabela dedicada:
