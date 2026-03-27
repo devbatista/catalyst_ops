@@ -6,7 +6,7 @@ class OrderService < ApplicationRecord
   belongs_to :company
 
   has_many :assignments, dependent: :destroy
-  has_many :users, through: :assignments
+  has_many :users, through: :assignments, after_remove: :audit_user_unassigned
   has_many :service_items, dependent: :destroy
 
   accepts_nested_attributes_for :service_items, allow_destroy: true
@@ -209,6 +209,26 @@ class OrderService < ApplicationRecord
     return value if self.class.statuses.key?(value.to_s)
 
     self.class.statuses.key(value.to_i) || value.to_s
+  end
+
+  def audit_user_unassigned(user)
+    return if user.blank?
+
+    Audit::Log.call(
+      action: "order_service.unassigned",
+      resource: self,
+      metadata: {
+        event: "updated",
+        model: self.class.name,
+        order_service_id: id,
+        order_service_code: code,
+        company_id: company_id,
+        technician_id: user.id,
+        technician_name: user.name,
+        technician_email: user.email,
+        action_source: "order_service.user_ids"
+      }
+    )
   end
 
   def scheduled_at_cannot_be_in_the_past
