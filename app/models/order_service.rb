@@ -1,4 +1,5 @@
 class OrderService < ApplicationRecord
+  include Auditable
   include AttachmentValidations
 
   belongs_to :client
@@ -157,7 +158,58 @@ class OrderService < ApplicationRecord
     end.compact
   end
 
+  def auditable_created_action
+    "order_service.created"
+  end
+
+  def auditable_updated_actions
+    changes = previous_changes.except("updated_at")
+    return [] if changes.blank?
+
+    actions = []
+    actions << "order_service.status.changed" if changes.key?("status")
+    actions << "order_service.updated" if changes.except("status").present?
+    actions
+  end
+
+  def auditable_deleted_action
+    nil
+  end
+
+  def auditable_metadata(event_name, action:)
+    data = {
+      event: event_name.to_s,
+      model: self.class.name,
+      order_service_id: id,
+      code: code,
+      title: title,
+      status: status,
+      client_id: client_id,
+      company_id: company_id,
+      action_source: action
+    }
+
+    return data unless event_name == :updated
+
+    changes = previous_changes.except("updated_at")
+    data[:changes] = changes if changes.present?
+
+    if action == "order_service.status.changed" && previous_changes["status"].present?
+      before_status, after_status = previous_changes["status"]
+      data[:status_before] = status_name_from_change(before_status)
+      data[:status_after] = status_name_from_change(after_status)
+    end
+
+    data
+  end
+
   private
+
+  def status_name_from_change(value)
+    return value if self.class.statuses.key?(value.to_s)
+
+    self.class.statuses.key(value.to_i) || value.to_s
+  end
 
   def scheduled_at_cannot_be_in_the_past
     return if will_save_change_to_status? && status_change_to_be_saved&.last == "atrasada"
