@@ -444,6 +444,10 @@ Implicacoes tecnicas:
 
 Isso cria um fluxo hibrido:
 
+- markdown versionado em repositorio
+- conteudo indexado em banco
+- renderizacao filtrada por role no app
+
 ## Backup de banco (producao)
 
 Backup automatico diario via script de host:
@@ -462,9 +466,46 @@ Diretorio padrao dos arquivos:
 
 - `/opt/catalyst_ops/backups/postgres`
 
-- markdown versionado em repositório
-- conteudo indexado em banco
-- renderizacao filtrada por role no app
+## Restore de banco (producao/homologacao)
+
+Script de restore:
+
+- [`bin/restore_db`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/bin/restore_db)
+
+Pre-condicoes:
+
+- Fazer restore preferencialmente em homologacao para validacao.
+- Em producao, parar `web` e `sidekiq` antes do restore para evitar concorrencia.
+- Ter um arquivo `.dump` valido gerado pelo `bin/backup_db`.
+
+Restore basico:
+
+```bash
+cd /opt/catalyst_ops
+CONFIRM_RESTORE=yes ./bin/restore_db /opt/catalyst_ops/backups/postgres/catalyst_ops_production_YYYYMMDD_HHMMSS.dump
+```
+
+Restore para banco alvo especifico:
+
+```bash
+cd /opt/catalyst_ops
+TARGET_DB=catalyst_ops_homolog CONFIRM_RESTORE=yes ./bin/restore_db /opt/catalyst_ops/backups/postgres/catalyst_ops_production_YYYYMMDD_HHMMSS.dump
+```
+
+Sequencia recomendada em producao:
+
+```bash
+cd /opt/catalyst_ops
+docker compose stop web sidekiq
+CONFIRM_RESTORE=yes ./bin/restore_db /opt/catalyst_ops/backups/postgres/SEU_ARQUIVO.dump
+docker compose up -d web sidekiq
+```
+
+Validacao pos-restore:
+
+- Rodar `docker compose exec web bundle exec rails db:migrate:status`.
+- Acessar login/app/admin e validar fluxo basico de autenticacao.
+- Conferir `docker compose logs --tail=200 web sidekiq db`.
 
 ## Convencoes recomendadas
 
