@@ -16,13 +16,13 @@ module Coupons
       return success(coupon: nil, original_amount: original_amount, discount_amount: 0, final_amount: original_amount) if coupon_code.blank?
 
       coupon = Coupon.find_by(code: coupon_code)
-      return failure("Cupom inválido.") if coupon.blank?
-      return failure("Cupom indisponível no momento.") unless coupon.available?
-      return failure("Sua empresa já utilizou um cupom nos últimos 12 meses.") if company.present? && !coupon.redeemable_by?(company)
+      return failure("Cupom inválido.", coupon: nil, rejected: true) if coupon.blank?
+      return failure("Cupom indisponível no momento.", coupon: coupon, rejected: true) unless coupon.available?
+      return failure("Sua empresa já utilizou um cupom nos últimos 12 meses.", coupon: coupon, rejected: true) if company.present? && !coupon.redeemable_by?(company)
 
       final_amount = coupon.calculate_final_amount(original_amount)
-      return failure("Cupons gratuitos para o primeiro ciclo devem ser cadastrados como cupom de teste.") if final_amount.zero? && !coupon.trial?
-      return failure("Cupons de desconto no cartão ainda não são suportados neste fluxo.") if payment_method == "credit_card" && !coupon.trial?
+      return failure("Cupons gratuitos para o primeiro ciclo devem ser cadastrados como cupom de teste.", coupon: coupon, rejected: true) if final_amount.zero? && !coupon.trial?
+      return failure("Cupons de desconto no cartão ainda não são suportados neste fluxo.", coupon: coupon, rejected: true) if payment_method == "credit_card" && !coupon.trial?
 
       success(
         coupon: coupon,
@@ -45,14 +45,34 @@ module Coupons
       )
     end
 
-    def failure(message)
+    def failure(message, coupon: nil, rejected: false)
+      log_rejected_coupon(coupon: coupon, reason: message) if rejected && coupon_code.present?
+
       Result.new(
         success: false,
-        coupon: nil,
+        coupon: coupon,
         original_amount: plan&.transaction_amount.to_d || 0,
         discount_amount: BigDecimal("0"),
         final_amount: plan&.transaction_amount.to_d || 0,
         errors: message
+      )
+    end
+
+    def log_rejected_coupon(coupon:, reason:)
+      Audit::Log.call(
+        action: "coupon.rejected",
+        resource: coupon,
+        metadata: {
+          event: "rejected",
+          model: self.class.name,
+          coupon_code: coupon_code,
+          coupon_id: coupon&.id,
+          company_id: company&.id,
+          plan_id: plan&.id,
+          payment_method: payment_method,
+          reason: reason,
+          action_source: "coupons.signup_benefit_resolver"
+        }
       )
     end
 

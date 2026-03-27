@@ -1,4 +1,6 @@
 class Coupon < ApplicationRecord
+  include Auditable
+
   BENEFIT_TYPES = %w[discount trial].freeze
   DISCOUNT_TYPES = %w[percentage fixed_amount].freeze
   FREQUENCY_TYPES = %w[days weeks months].freeze
@@ -85,6 +87,48 @@ class Coupon < ApplicationRecord
   end
 
   private
+
+  def auditable_created_action
+    "coupon.created"
+  end
+
+  def auditable_updated_actions
+    changes = previous_changes.except("updated_at", "redemptions_count")
+    return [] if changes.blank?
+
+    [ "coupon.updated" ]
+  end
+
+  def auditable_deleted_action
+    "coupon.deleted"
+  end
+
+  def auditable_metadata(event_name, action:)
+    data = {
+      event: event_name.to_s,
+      model: self.class.name,
+      coupon_id: id,
+      code: code,
+      name: name,
+      benefit_type: benefit_type,
+      discount_type: discount_type,
+      discount_value: discount_value,
+      trial_frequency: trial_frequency,
+      trial_frequency_type: trial_frequency_type,
+      active: active,
+      first_cycle_only: first_cycle_only,
+      valid_from: valid_from,
+      valid_until: valid_until,
+      action_source: action
+    }
+
+    if event_name == :updated
+      changes = previous_changes.except("updated_at", "redemptions_count")
+      data[:changes] = changes if changes.present?
+    end
+
+    data
+  end
 
   def normalize_code
     self.code = code.to_s.upcase.strip

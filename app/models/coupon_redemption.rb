@@ -1,4 +1,6 @@
 class CouponRedemption < ApplicationRecord
+  include Auditable
+
   belongs_to :coupon, counter_cache: :redemptions_count
   belongs_to :company
   belongs_to :subscription
@@ -22,6 +24,35 @@ class CouponRedemption < ApplicationRecord
   end
 
   private
+
+  def auditable_created_action
+    "coupon.applied"
+  end
+
+  def auditable_updated_actions
+    []
+  end
+
+  def auditable_deleted_action
+    nil
+  end
+
+  def auditable_metadata(event_name, action:)
+    {
+      event: event_name.to_s,
+      model: self.class.name,
+      coupon_redemption_id: id,
+      coupon_id: coupon_id,
+      coupon_code: coupon&.code,
+      company_id: company_id,
+      subscription_id: subscription_id,
+      original_amount: original_amount,
+      discount_amount: discount_amount,
+      final_amount: final_amount,
+      applied_at: applied_at,
+      action_source: action
+    }
+  end
 
   def company_has_no_coupon_usage_in_last_year
     reference_time = applied_at || Time.current
