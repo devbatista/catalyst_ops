@@ -1,4 +1,6 @@
 class Assignment < ApplicationRecord
+  include Auditable
+
   belongs_to :user
   belongs_to :order_service
 
@@ -14,6 +16,7 @@ class Assignment < ApplicationRecord
 
   after_create :notify_technician
 
+  before_destroy :store_audit_snapshot
   after_destroy :revert_order_service_if_last_assignment
   after_destroy :notify_technician_removal
 
@@ -22,6 +25,49 @@ class Assignment < ApplicationRecord
   end
 
   private
+
+  def auditable_created_action
+    "order_service.assigned"
+  end
+
+  def auditable_updated_actions
+    []
+  end
+
+  def auditable_deleted_action
+    "order_service.unassigned"
+  end
+
+  def auditable_metadata(event_name, action:)
+    os = order_service || @audit_order_service
+    technician = user || @audit_user
+
+    {
+      event: event_name.to_s,
+      model: self.class.name,
+      assignment_id: id,
+      order_service_id: os&.id || @audit_order_service_id || order_service_id,
+      order_service_code: os&.code || @audit_order_service_code,
+      company_id: os&.company_id || @audit_company_id,
+      technician_id: technician&.id || @audit_user_id || user_id,
+      technician_name: technician&.name || @audit_user_name,
+      technician_email: technician&.email || @audit_user_email,
+      action_source: action
+    }
+  end
+
+  def store_audit_snapshot
+    @audit_order_service = order_service
+    @audit_user = user
+
+    @audit_order_service_id = order_service_id
+    @audit_order_service_code = order_service&.code
+    @audit_company_id = order_service&.company_id
+
+    @audit_user_id = user_id
+    @audit_user_name = user&.name
+    @audit_user_email = user&.email
+  end
 
   def order_service_is_schedulable
     return if order_service.blank?
