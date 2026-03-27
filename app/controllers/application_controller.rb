@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
   before_action :block_inactive_company_access, if: :app_subdomain?
   before_action :ensure_terms_accepted!, if: :app_subdomain?
   before_action :configure_permitted_parameters, if: :devise_controller?
+  around_action :with_current_context
 
   check_authorization unless: :devise_controller?
 
@@ -22,6 +23,17 @@ class ApplicationController < ActionController::Base
       reset_session
       redirect_to login_root_url(subdomain: "login"), allow_other_host: true
     end
+  end
+
+  def with_current_context
+    Current.user = current_user
+    Current.request_id = request.request_id
+    Current.ip_address = request.remote_ip
+    Current.user_agent = request.user_agent
+    Current.source = audit_source
+    yield
+  ensure
+    Current.reset
   end
 
   def block_inactive_company_access
@@ -54,22 +66,6 @@ class ApplicationController < ActionController::Base
   def configure_permitted_parameters
     devise_parameter_sanitizer.permit(:sign_up, keys: [:name, :role])
     devise_parameter_sanitizer.permit(:account_update, keys: [:name, :role])
-  end
-
-  def log_audit_event!(action:, actor: nil, company: nil, resource: nil, metadata: {})
-    Audit::EventLogger.call(
-      action: action,
-      source: audit_source,
-      actor: actor,
-      company: company,
-      resource: resource,
-      metadata: metadata,
-      request_id: request.request_id,
-      ip_address: request.remote_ip,
-      user_agent: request.user_agent
-    )
-  rescue StandardError => e
-    Rails.logger.error("[ApplicationController] Falha ao registrar auditoria #{action}: #{e.message}")
   end
 
   def audit_source

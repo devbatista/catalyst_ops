@@ -12,13 +12,6 @@ class SessionsController < Devise::SessionsController
     user = User.find_by(email: params[:email].to_s.downcase.strip)
     if user&.active? && user&.valid_password?(params[:password])
       sign_in(:user, user)
-      log_audit_event!(
-        action: "auth.login.succeeded",
-        actor: user,
-        company: user.company,
-        resource: user,
-        metadata: { subdomain: request.subdomain, path: request.path }
-      )
 
       if user.admin?
         redirect_to admin_dashboard_url(subdomain: "admin"),
@@ -30,18 +23,6 @@ class SessionsController < Devise::SessionsController
                     notice: "Login realizado com sucesso!"
       end
     else
-      log_audit_event!(
-        action: "auth.login.failed",
-        actor: user,
-        company: user&.company,
-        resource: user,
-        metadata: {
-          subdomain: request.subdomain,
-          path: request.path,
-          failure_reason: login_failure_reason_for(user),
-          attempted_email: params[:email].to_s.downcase.strip
-        }
-      )
       flash[:alert] = "E-mail ou senha inválidos."
       redirect_to login_root_url(subdomain: "login"), allow_other_host: true
     end
@@ -87,17 +68,8 @@ class SessionsController < Devise::SessionsController
   end
 
   def destroy
-    user = current_user
     sign_out(current_user)
-    
-    log_audit_event!(
-      action: "auth.logout.succeeded",
-      actor: user,
-      company: user&.company,
-      resource: user,
-      metadata: { subdomain: request.subdomain, path: request.path }
-    )
-    
+
     redirect_to login_root_url(subdomain: "login"), allow_other_host: true, notice: "Logout realizado com sucesso!"
   end
 
@@ -117,11 +89,4 @@ class SessionsController < Devise::SessionsController
 
   private
 
-  def login_failure_reason_for(user)
-    return "user_not_found" if user.blank?
-    return "inactive_user" unless user.active?
-    return "invalid_password" unless user.valid_password?(params[:password])
-
-    "unknown"
-  end
 end
