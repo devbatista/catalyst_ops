@@ -3,6 +3,15 @@ def draw(routes_name)
 end
 
 Rails.application.routes.draw do
+  %w[404 422 500 503].each do |code|
+    match code, to: "errors#show", via: :all, code: code
+  end
+
+  match "errors/:code",
+        to: "errors#show",
+        via: :all,
+        constraints: { code: /404|422|500|503/ }
+
   devise_for :users, skip: [:sessions]
 
   draw :admin
