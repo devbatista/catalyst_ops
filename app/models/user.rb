@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  include Auditable
+
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
@@ -139,5 +141,54 @@ class User < ApplicationRecord
   def send_welcome_email_for_technician
     Rails.logger.info "###### Enviando email de boas-vindas para o técnico #{email} ######"
     send_welcome_email!(mark_as_sent: false)
+  end
+
+  def auditable_created_action
+    tecnico? ? "technician.created" : "user.created"
+  end
+
+  def auditable_updated_actions
+    actions = [ tecnico? ? "technician.updated" : "user.updated" ]
+    actions << "user.role.changed" if saved_change_to_role?
+
+    if tecnico? && saved_change_to_active?
+      actions << (active? ? "technician.activated" : "technician.deactivated")
+    end
+
+    actions
+  end
+
+  def auditable_deleted_action
+    "user.deleted"
+  end
+
+  def auditable_metadata(event_name, action:)
+    data = {
+      event: event_name.to_s,
+      model: self.class.name,
+      user_id: id,
+      email: email,
+      role: role,
+      action_source: action
+    }
+
+    if event_name == :updated
+      changes = previous_changes.except("updated_at")
+      data[:changes] = changes if changes.present?
+
+      if action == "user.role.changed" && previous_changes["role"].present?
+        before_role, after_role = previous_changes["role"]
+        data[:role_before] = role_name_from_change(before_role)
+        data[:role_after] = role_name_from_change(after_role)
+      end
+    end
+
+    data
+  end
+
+  def role_name_from_change(value)
+    return value if self.class.roles.key?(value.to_s)
+
+    self.class.roles.key(value.to_i) || value.to_s
   end
 end
