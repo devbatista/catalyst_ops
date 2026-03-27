@@ -1,4 +1,6 @@
 class Subscription < ApplicationRecord
+  include Auditable
+
   belongs_to :company
   has_many :coupon_redemptions, dependent: :restrict_with_exception
 
@@ -78,6 +80,62 @@ class Subscription < ApplicationRecord
   end
   
   private
+
+  def auditable_created_action
+    "subscription.created"
+  end
+
+  def auditable_updated_actions
+    actions = []
+
+    actions << "subscription.status.changed" if previous_changes.key?("status")
+
+    if previous_changes.key?("external_payment_id")
+      before_payment_id, after_payment_id = previous_changes["external_payment_id"]
+      actions << "subscription.payment.generated" if before_payment_id.blank? && after_payment_id.present?
+    end
+
+    actions
+  end
+
+  def auditable_deleted_action
+    nil
+  end
+
+  def auditable_metadata(event_name, action:)
+    data = {
+      event: event_name.to_s,
+      model: self.class.name,
+      subscription_id: id,
+      company_id: company_id,
+      status: status,
+      transaction_amount: transaction_amount,
+      payment_method: company&.payment_method,
+      external_reference: external_reference,
+      external_subscription_id: external_subscription_id,
+      external_payment_id: external_payment_id,
+      action_source: action
+    }
+
+    if event_name == :updated
+      case action
+      when "subscription.status.changed"
+        if previous_changes["status"].present?
+          before_status, after_status = previous_changes["status"]
+          data[:status_before] = before_status
+          data[:status_after] = after_status
+        end
+      when "subscription.payment.generated"
+        if previous_changes["external_payment_id"].present?
+          before_payment, after_payment = previous_changes["external_payment_id"]
+          data[:external_payment_id_before] = before_payment
+          data[:external_payment_id_after] = after_payment
+        end
+      end
+    end
+
+    data
+  end
 
   def sync_company_access
     allows_access? ? company.activate! : company.deactivate!
