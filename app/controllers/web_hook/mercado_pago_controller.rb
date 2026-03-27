@@ -12,14 +12,34 @@ class WebHook::MercadoPagoController < WebHookController
 
     unless webhook_signature_valid?(payload)
       Rails.logger.warn("[WebHook::MercadoPagoController] Assinatura de webhook invalida")
+      log_webhook_audit!(
+        action: "webhook.failed",
+        payload: payload,
+        event: nil,
+        outcome: "signature_invalid",
+        message: "Assinatura de webhook invalida"
+      )
       render json: { status: "unauthorized" }, status: :unauthorized
       return
     end
 
     event = find_or_create_event!(payload)
+    log_webhook_audit!(
+      action: "webhook.received",
+      payload: payload,
+      event: event,
+      outcome: "received"
+    )
 
     if event.status == "processed"
       Rails.logger.info("[WebHook::MercadoPagoController] Webhook duplicado ignorado: #{event.event_key}")
+      log_webhook_audit!(
+        action: "webhook.duplicate",
+        payload: payload,
+        event: event,
+        outcome: "duplicate",
+        message: "Webhook duplicado ignorado"
+      )
       head :no_content
       return
     end
@@ -31,6 +51,13 @@ class WebHook::MercadoPagoController < WebHookController
       event.reload
 
       if event.status == "processed"
+        log_webhook_audit!(
+          action: "webhook.duplicate",
+          payload: payload,
+          event: event,
+          outcome: "duplicate",
+          message: "Webhook duplicado ignorado em lock"
+        )
         response_status = :no_content
         response_body = nil
         next
@@ -49,11 +76,25 @@ class WebHook::MercadoPagoController < WebHookController
       if result.success?
         event.update!(status: "processed", processed_at: Time.current, error_message: nil)
         Rails.logger.info("[WebHook::MercadoPagoController] #{result.message}")
+        log_webhook_audit!(
+          action: "webhook.processed",
+          payload: payload,
+          event: event,
+          outcome: "processed",
+          message: result.message
+        )
         response_status = :ok
         response_body = { status: "ok" }
       else
         event.update!(status: "failed", error_message: result.message)
         Rails.logger.error("[WebHook::MercadoPagoController] #{result.message}")
+        log_webhook_audit!(
+          action: "webhook.failed",
+          payload: payload,
+          event: event,
+          outcome: "failed",
+          message: result.message
+        )
         response_status = :unprocessable_entity
         response_body = { status: "error", message: result.message }
       end
@@ -66,9 +107,23 @@ class WebHook::MercadoPagoController < WebHookController
     end
   rescue JSON::ParserError => e
     Rails.logger.error("Payload invalido no webhook do Mercado Pago: #{e.message}")
+    log_webhook_audit!(
+      action: "webhook.failed",
+      payload: {},
+      event: nil,
+      outcome: "invalid_payload",
+      message: e.message
+    )
     render json: { status: "invalid_payload" }, status: :bad_request
   rescue ActiveRecord::RecordInvalid => e
     Rails.logger.error("[WebHook::MercadoPagoController] Erro ao persistir webhook: #{e.message}")
+    log_webhook_audit!(
+      action: "webhook.failed",
+      payload: payload_for_audit_fallback(raw),
+      event: nil,
+      outcome: "event_persistence_failed",
+      message: e.message
+    )
     render json: { status: "error", message: "invalid_webhook_event" }, status: :unprocessable_entity
   end
 
@@ -199,5 +254,28 @@ class WebHook::MercadoPagoController < WebHookController
     request.headers[name].presence ||
       request.headers[name.upcase].presence ||
       request.headers["HTTP_#{name.upcase.tr('-', '_')}"].presence
+  end
+
+  def log_webhook_audit!(action:, payload:, event:, outcome:, message: nil)
+    Audit::Log.call(
+      action: action,
+      resource: event,
+      metadata: {
+        event: outcome,
+        provider: WebhookEvent::PROVIDER_MERCADO_PAGO,
+        event_key: event&.event_key || payload_event_key(payload),
+        resource_id: payload_resource_id(payload),
+        event_type: payload_event_type(payload),
+        status_hint: payload_status(payload),
+        webhook_event_id: event&.id,
+        message: message
+      }.compact
+    )
+  end
+
+  def payload_for_audit_fallback(raw_payload)
+    JSON.parse(raw_payload)
+  rescue JSON::ParserError
+    {}
   end
 end
