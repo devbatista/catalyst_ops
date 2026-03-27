@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+APP_DIR="${APP_DIR:-/opt/catalyst_ops}"
+BACKUP_DIR="${BACKUP_DIR:-$APP_DIR/backups/postgres}"
+RETENTION_DAYS="${BACKUP_RETENTION_DAYS:-7}"
+COMPOSE_FILE="${COMPOSE_FILE:-$APP_DIR/docker-compose.yml}"
+
+if ! [[ "$RETENTION_DAYS" =~ ^[0-9]+$ ]] || [ "$RETENTION_DAYS" -lt 1 ]; then
+  echo "[backup_db] BACKUP_RETENTION_DAYS invalido: $RETENTION_DAYS"
+  exit 1
+fi
+
+cd "$APP_DIR"
+mkdir -p "$BACKUP_DIR"
+
+if [ ! -f "$COMPOSE_FILE" ]; then
+  echo "[backup_db] docker-compose.yml nao encontrado em: $COMPOSE_FILE"
+  exit 1
+fi
+
+TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
+DB_NAME="${POSTGRES_DB:-catalyst_ops_production}"
+TMP_FILE="$BACKUP_DIR/${DB_NAME}_${TIMESTAMP}.dump.tmp"
+FINAL_FILE="$BACKUP_DIR/${DB_NAME}_${TIMESTAMP}.dump"
+
+echo "[backup_db] Iniciando backup: $FINAL_FILE"
+
+docker compose exec -T db sh -lc '
+  set -e
+  : "${POSTGRES_USER:?POSTGRES_USER nao definido no container db}"
+  : "${POSTGRES_PASSWORD:?POSTGRES_PASSWORD nao definido no container db}"
+  : "${POSTGRES_DB:?POSTGRES_DB nao definido no container db}"
+  export PGPASSWORD="$POSTGRES_PASSWORD"
+  pg_dump -h 127.0.0.1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -F c -Z 9 -f -
+' > "$TMP_FILE"
+
+mv "$TMP_FILE" "$FINAL_FILE"
+
+FILE_SIZE="$(du -h "$FINAL_FILE" | awk '{print $1}')"
+echo "[backup_db] Backup concluido: $FINAL_FILE ($FILE_SIZE)"
+
+echo "[backup_db] Limpando backups com mais de $RETENTION_DAYS dia(s)..."
+find "$BACKUP_DIR" -type f -name '*.dump' -mtime +"$RETENTION_DAYS" -print -delete || true
+
+echo "[backup_db] Processo finalizado com sucesso."

@@ -444,6 +444,24 @@ Implicacoes tecnicas:
 
 Isso cria um fluxo hibrido:
 
+## Backup de banco (producao)
+
+Backup automatico diario via script de host:
+
+- script: [`bin/backup_db`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/bin/backup_db)
+- formato: `pg_dump` custom (`.dump`)
+- retencao padrao: `7` dias (`BACKUP_RETENTION_DAYS`)
+
+Exemplo de cron (todo dia as 02:15):
+
+```bash
+15 2 * * * cd /opt/catalyst_ops && BACKUP_RETENTION_DAYS=7 /opt/catalyst_ops/bin/backup_db >> /var/log/catalyst_ops_backup.log 2>&1
+```
+
+Diretorio padrao dos arquivos:
+
+- `/opt/catalyst_ops/backups/postgres`
+
 - markdown versionado em repositório
 - conteudo indexado em banco
 - renderizacao filtrada por role no app
