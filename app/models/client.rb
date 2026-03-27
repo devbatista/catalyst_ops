@@ -1,4 +1,6 @@
 class Client < ApplicationRecord
+  include Auditable
+
   acts_as_paranoid
 
   validates :name, presence: true, length: { minimum: 2, maximum: 100 }
@@ -131,6 +133,48 @@ class Client < ApplicationRecord
 
   def address
     addresses.first.full_address
+  end
+
+  def auditable_created_action
+    "client.created"
+  end
+
+  def auditable_updated_actions
+    changes = previous_changes.except("updated_at")
+    return [] if changes.blank?
+
+    if previous_changes["deleted_at"].present?
+      deleted_before, deleted_after = previous_changes["deleted_at"]
+      return [ "client.deleted" ] if deleted_before.nil? && deleted_after.present?
+      return [ "client.restored" ] if deleted_before.present? && deleted_after.nil?
+    end
+
+    [ "client.updated" ]
+  end
+
+  def auditable_deleted_action
+    nil
+  end
+
+  def auditable_metadata(event_name, action:)
+    data = {
+      event: event_name.to_s,
+      model: self.class.name,
+      client_id: id,
+      name: name,
+      email: email,
+      document: document,
+      phone: phone,
+      company_id: company_id,
+      action_source: action
+    }
+
+    if event_name == :updated
+      changes = previous_changes.except("updated_at")
+      data[:changes] = changes if changes.present?
+    end
+
+    data
   end
 
   private
