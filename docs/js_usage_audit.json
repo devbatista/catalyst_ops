@@ -1,0 +1,1982 @@
+{
+  "generated_at": "2026-03-28T01:06:21Z",
+  "summary": {
+    "unused_candidate": 77,
+    "used": 42,
+    "uncertain": 74
+  },
+  "totals": {
+    "js_files": 193
+  },
+  "report": [
+    {
+      "file": "app/assets/config/manifest.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/javascripts/admin/tickets.js",
+      "confidence": "used",
+      "reasons": [
+        "pin importmap aponta para 'admin/tickets.js'"
+      ],
+      "references": [
+        "importmap_to:config/importmap.rb:25"
+      ]
+    },
+    {
+      "file": "app/assets/javascripts/app/clients_form.js",
+      "confidence": "used",
+      "reasons": [
+        "pin importmap aponta para 'app/clients_form.js'"
+      ],
+      "references": [
+        "importmap_to:config/importmap.rb:19"
+      ]
+    },
+    {
+      "file": "app/assets/javascripts/app/company_form.js",
+      "confidence": "used",
+      "reasons": [
+        "pin importmap aponta para 'app/company_form.js'"
+      ],
+      "references": [
+        "importmap_to:config/importmap.rb:22"
+      ]
+    },
+    {
+      "file": "app/assets/javascripts/app/knowledge_base_modal.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'app/knowledge_base_modal'"
+      ],
+      "references": [
+        "view:app/views/app/support/_knowledge_base.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/javascripts/app/order_service_attachments.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'app/order_service_attachments'"
+      ],
+      "references": [
+        "view:app/views/app/order_services/_form.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/javascripts/app/profile_form.js",
+      "confidence": "used",
+      "reasons": [
+        "pin importmap aponta para 'app/profile_form.js'"
+      ],
+      "references": [
+        "importmap_to:config/importmap.rb:21"
+      ]
+    },
+    {
+      "file": "app/assets/javascripts/app/support_tickets.js",
+      "confidence": "used",
+      "reasons": [
+        "pin importmap aponta para 'app/support_tickets.js'"
+      ],
+      "references": [
+        "importmap_to:config/importmap.rb:23"
+      ]
+    },
+    {
+      "file": "app/assets/javascripts/app/technicians_form.js",
+      "confidence": "used",
+      "reasons": [
+        "pin importmap aponta para 'app/technicians_form.js'"
+      ],
+      "references": [
+        "importmap_to:config/importmap.rb:20"
+      ]
+    },
+    {
+      "file": "app/assets/javascripts/card_tokenization.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'card_tokenization'"
+      ],
+      "references": [
+        "view:app/views/register/signups/new.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/javascripts/payment_method_toggle.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'payment_method_toggle'"
+      ],
+      "references": [
+        "view:app/views/register/signups/new.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/javascripts/viacep.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'viacep'"
+      ],
+      "references": [
+        "view:app/views/app/clients/_form.html.erb:javascript_include_tag",
+        "view:app/views/app/configurations/_company_data_form.html.erb:javascript_include_tag",
+        "view:app/views/register/signups/new.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/js/app.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'js/app.js'"
+      ],
+      "references": [
+        "view:app/views/layouts/partials/_scripts.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/js/bootstrap.bundle.min.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'js/bootstrap.bundle.min.js'"
+      ],
+      "references": [
+        "view:app/views/layouts/partials/_scripts.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/js/index.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'js/index.js'"
+      ],
+      "references": [
+        "view:app/views/layouts/partials/_scripts.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/js/index2.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/js/index3.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/js/jquery.min.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'js/jquery.min.js'"
+      ],
+      "references": [
+        "view:app/views/layouts/partials/_scripts.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/js/pace.min.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'js/pace.min.js'"
+      ],
+      "references": [
+        "view:app/views/layouts/admin.html.erb:asset_path",
+        "view:app/views/layouts/application.html.erb:asset_path",
+        "view:app/views/register/signups/new.html.erb:asset_path",
+        "view:app/views/sessions/new.html.erb:asset_path",
+        "view:app/views/sessions/new_password.html.erb:asset_path"
+      ]
+    },
+    {
+      "file": "app/assets/js/widgets.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/Drag-And-Drop/dist/imageuploadify.min.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/apexcharts-bundle/js/apex-custom.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/apexcharts-bundle/js/apexcharts.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/apexcharts-bundle/js/apexcharts.min.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/bootstrap-material-datetimepicker/js/bootstrap-material-datetimepicker.min.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/bootstrap-material-datetimepicker/js/moment.min.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/bs-stepper/css/custom.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/bs-stepper/js/bs-stepper.min.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'plugins/bs-stepper/js/bs-stepper.min.js'"
+      ],
+      "references": [
+        "view:app/views/register/signups/new.html.erb:asset_path"
+      ]
+    },
+    {
+      "file": "app/assets/plugins/bs-stepper/js/index.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/chartjs/js/Chart.extension.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/chartjs/js/chart.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'plugins/chartjs/js/chart.js'"
+      ],
+      "references": [
+        "view:app/views/layouts/partials/_scripts.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/plugins/chartjs/js/chartjs-custom.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/datatable/js/dataTables.bootstrap5.min.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/datatable/js/jquery.dataTables.min.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/datetimepicker/js/legacy.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/datetimepicker/js/picker.date.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/datetimepicker/js/picker.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/datetimepicker/js/picker.time.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/fancy-file-uploader/cors/jquery.postmessage-transport.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/fancy-file-uploader/cors/jquery.xdr-transport.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/fancy-file-uploader/jquery.fancy-fileupload.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/fancy-file-uploader/jquery.fileupload.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/fancy-file-uploader/jquery.iframe-transport.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/fancy-file-uploader/jquery.ui.widget.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/form-repeater/repeater.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/fullcalendar/js/main.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/fullcalendar/js/main.min.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/gmaps/map-custom-script.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/highcharts/js/accessibility.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/highcharts/js/cylinder.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/highcharts/js/export-data.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/highcharts/js/exporting.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/highcharts/js/funnel3d.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/highcharts/js/highcharts-3d.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/highcharts/js/highcharts-custom.script.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/highcharts/js/highcharts-more.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/highcharts/js/highcharts.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/highcharts/js/solid-gauge.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/highcharts/js/variable-pie.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/input-tags/js/tagsinput.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/jquery-knob/excanvas.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/jquery-knob/jquery.knob.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/jquery.easy-pie-chart/easy-pie-chart.init.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/jquery.easy-pie-chart/easypiechart.min.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/jquery.easy-pie-chart/jquery.easypiechart.min.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/metismenu/js/metisMenu.min.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'plugins/metismenu/js/metisMenu.min.js'"
+      ],
+      "references": [
+        "view:app/views/layouts/partials/_scripts.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/plugins/morris/js/morris-data.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/morris/js/morris.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/morris/js/morris.min.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/notifications/js/lobibox.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/notifications/js/lobibox.min.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/notifications/js/messageboxes.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/notifications/js/messageboxes.min.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/notifications/js/notification-custom-script.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/notifications/js/notifications.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/notifications/js/notifications.min.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'plugins/perfect-scrollbar/js/perfect-scrollbar.js'"
+      ],
+      "references": [
+        "view:app/views/layouts/partials/_scripts.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/plugins/raphael/raphael-min.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/select2/js/select2-custom.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/select2/js/select2.min.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/simplebar/js/simplebar.min.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'plugins/simplebar/js/simplebar.min.js'"
+      ],
+      "references": [
+        "view:app/views/layouts/partials/_scripts.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/plugins/sparkline-charts/apex-sparkline-charts.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/sparkline-charts/jquery.sparkline.min.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/sparkline-charts/sparkline-chart-script.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/validation/jquery.validate.min.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/validation/validation-script.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/vectormap/jquery-jvectormap-2.0.2.min.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'plugins/vectormap/jquery-jvectormap-2.0.2.min.js'"
+      ],
+      "references": [
+        "view:app/views/layouts/partials/_scripts.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/plugins/vectormap/jquery-jvectormap-au-mill.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/vectormap/jquery-jvectormap-in-mill.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/vectormap/jquery-jvectormap-uk-mill-en.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/vectormap/jquery-jvectormap-us-aea-en.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/vectormap/jquery-jvectormap-world-mill-en.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'plugins/vectormap/jquery-jvectormap-world-mill-en.js'"
+      ],
+      "references": [
+        "view:app/views/layouts/partials/_scripts.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/plugins/vectormap/jvectormap.custom.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/fullcalendar/js/main.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/fullcalendar/locales/locales-all.min.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'fullcalendar/locales/locales-all.min'"
+      ],
+      "references": [
+        "view:app/views/app/calendar/index.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/fullcalendar/main.min.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'fullcalendar/main.min'"
+      ],
+      "references": [
+        "view:app/views/app/calendar/index.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/js/app.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'js/app.js'",
+        "possivel duplicata em app/assets/js/app.js"
+      ],
+      "references": [
+        "view:app/views/layouts/partials/_scripts.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/js/bootstrap.bundle.min.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'js/bootstrap.bundle.min.js'",
+        "possivel duplicata em app/assets/js/bootstrap.bundle.min.js"
+      ],
+      "references": [
+        "view:app/views/layouts/partials/_scripts.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/js/index.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'js/index.js'",
+        "possivel duplicata em app/assets/js/index.js"
+      ],
+      "references": [
+        "view:app/views/layouts/partials/_scripts.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/js/index2.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/js/index2.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/js/index3.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/js/index3.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/js/jquery.min.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'js/jquery.min.js'",
+        "possivel duplicata em app/assets/js/jquery.min.js"
+      ],
+      "references": [
+        "view:app/views/layouts/partials/_scripts.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/js/pace.min.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'js/pace.min.js'",
+        "possivel duplicata em app/assets/js/pace.min.js"
+      ],
+      "references": [
+        "view:app/views/layouts/admin.html.erb:asset_path",
+        "view:app/views/layouts/application.html.erb:asset_path",
+        "view:app/views/register/signups/new.html.erb:asset_path",
+        "view:app/views/sessions/new.html.erb:asset_path",
+        "view:app/views/sessions/new_password.html.erb:asset_path"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/js/widgets.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/js/widgets.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/Drag-And-Drop/dist/imageuploadify.min.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/Drag-And-Drop/dist/imageuploadify.min.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/apexcharts-bundle/js/apex-custom.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/apexcharts-bundle/js/apex-custom.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/apexcharts-bundle/js/apexcharts.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/apexcharts-bundle/js/apexcharts.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/apexcharts-bundle/js/apexcharts.min.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/apexcharts-bundle/js/apexcharts.min.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/bootstrap-material-datetimepicker/js/bootstrap-material-datetimepicker.min.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/bootstrap-material-datetimepicker/js/bootstrap-material-datetimepicker.min.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/bootstrap-material-datetimepicker/js/moment.min.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/bootstrap-material-datetimepicker/js/moment.min.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/bs-stepper/css/custom.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/bs-stepper/css/custom.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/bs-stepper/js/bs-stepper.min.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'plugins/bs-stepper/js/bs-stepper.min.js'",
+        "possivel duplicata em app/assets/plugins/bs-stepper/js/bs-stepper.min.js"
+      ],
+      "references": [
+        "view:app/views/register/signups/new.html.erb:asset_path"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/bs-stepper/js/index.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/bs-stepper/js/index.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/bs-stepper/js/index.spec.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/bs-stepper/js/listeners.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/bs-stepper/js/main.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/bs-stepper/js/polyfill.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/bs-stepper/js/util.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/chartjs/js/Chart.extension.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/chartjs/js/Chart.extension.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/chartjs/js/chart.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'plugins/chartjs/js/chart.js'",
+        "possivel duplicata em app/assets/plugins/chartjs/js/chart.js"
+      ],
+      "references": [
+        "view:app/views/layouts/partials/_scripts.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/chartjs/js/chartjs-custom.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/chartjs/js/chartjs-custom.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/datatable/js/dataTables.bootstrap5.min.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/datatable/js/dataTables.bootstrap5.min.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/datatable/js/jquery.dataTables.min.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/datatable/js/jquery.dataTables.min.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/datetimepicker/js/legacy.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/datetimepicker/js/legacy.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/datetimepicker/js/picker.date.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/datetimepicker/js/picker.date.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/datetimepicker/js/picker.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/datetimepicker/js/picker.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/datetimepicker/js/picker.time.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/datetimepicker/js/picker.time.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/fancy-file-uploader/cors/jquery.postmessage-transport.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/fancy-file-uploader/cors/jquery.postmessage-transport.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/fancy-file-uploader/cors/jquery.xdr-transport.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/fancy-file-uploader/cors/jquery.xdr-transport.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/fancy-file-uploader/jquery.fancy-fileupload.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/fancy-file-uploader/jquery.fancy-fileupload.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/fancy-file-uploader/jquery.fileupload.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/fancy-file-uploader/jquery.fileupload.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/fancy-file-uploader/jquery.iframe-transport.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/fancy-file-uploader/jquery.iframe-transport.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/fancy-file-uploader/jquery.ui.widget.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/fancy-file-uploader/jquery.ui.widget.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/form-repeater/repeater.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/form-repeater/repeater.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/fullcalendar/js/main.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/fullcalendar/js/main.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/fullcalendar/js/main.min.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/fullcalendar/js/main.min.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/gmaps/map-custom-script.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/gmaps/map-custom-script.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/highcharts/js/accessibility.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/highcharts/js/accessibility.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/highcharts/js/cylinder.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/highcharts/js/cylinder.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/highcharts/js/export-data.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/highcharts/js/export-data.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/highcharts/js/exporting.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/highcharts/js/exporting.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/highcharts/js/funnel3d.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/highcharts/js/funnel3d.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/highcharts/js/highcharts-3d.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/highcharts/js/highcharts-3d.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/highcharts/js/highcharts-custom.script.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/highcharts/js/highcharts-custom.script.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/highcharts/js/highcharts-more.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/highcharts/js/highcharts-more.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/highcharts/js/highcharts.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/highcharts/js/highcharts.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/highcharts/js/solid-gauge.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/highcharts/js/solid-gauge.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/highcharts/js/variable-pie.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/highcharts/js/variable-pie.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/input-tags/js/tagsinput.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/input-tags/js/tagsinput.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/jquery-knob/excanvas.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/jquery-knob/excanvas.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/jquery-knob/jquery.knob.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/jquery-knob/jquery.knob.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/jquery.easy-pie-chart/easy-pie-chart.init.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/jquery.easy-pie-chart/easy-pie-chart.init.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/jquery.easy-pie-chart/easypiechart.min.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/jquery.easy-pie-chart/easypiechart.min.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/jquery.easy-pie-chart/jquery.easypiechart.min.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/jquery.easy-pie-chart/jquery.easypiechart.min.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/metismenu/js/metisMenu.min.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'plugins/metismenu/js/metisMenu.min.js'",
+        "possivel duplicata em app/assets/plugins/metismenu/js/metisMenu.min.js"
+      ],
+      "references": [
+        "view:app/views/layouts/partials/_scripts.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/morris/js/morris-data.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/morris/js/morris-data.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/morris/js/morris.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/morris/js/morris.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/morris/js/morris.min.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/morris/js/morris.min.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/notifications/js/lobibox.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/notifications/js/lobibox.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/notifications/js/lobibox.min.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/notifications/js/lobibox.min.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/notifications/js/messageboxes.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/notifications/js/messageboxes.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/notifications/js/messageboxes.min.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/notifications/js/messageboxes.min.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/notifications/js/notification-custom-script.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/notifications/js/notification-custom-script.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/notifications/js/notifications.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/notifications/js/notifications.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/notifications/js/notifications.min.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/notifications/js/notifications.min.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/perfect-scrollbar/js/perfect-scrollbar.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'plugins/perfect-scrollbar/js/perfect-scrollbar.js'",
+        "possivel duplicata em app/assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"
+      ],
+      "references": [
+        "view:app/views/layouts/partials/_scripts.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/raphael/raphael-min.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/raphael/raphael-min.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/select2/js/select2-custom.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/select2/js/select2-custom.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/select2/js/select2.min.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/select2/js/select2.min.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/simplebar/js/simplebar.min.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'plugins/simplebar/js/simplebar.min.js'",
+        "possivel duplicata em app/assets/plugins/simplebar/js/simplebar.min.js"
+      ],
+      "references": [
+        "view:app/views/layouts/partials/_scripts.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/sparkline-charts/apex-sparkline-charts.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/sparkline-charts/apex-sparkline-charts.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/sparkline-charts/jquery.sparkline.min.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/sparkline-charts/jquery.sparkline.min.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/sparkline-charts/sparkline-chart-script.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/sparkline-charts/sparkline-chart-script.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/validation/jquery.validate.min.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/validation/jquery.validate.min.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/validation/validation-script.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/validation/validation-script.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/vectormap/jquery-jvectormap-2.0.2.min.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'plugins/vectormap/jquery-jvectormap-2.0.2.min.js'",
+        "possivel duplicata em app/assets/plugins/vectormap/jquery-jvectormap-2.0.2.min.js"
+      ],
+      "references": [
+        "view:app/views/layouts/partials/_scripts.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/vectormap/jquery-jvectormap-au-mill.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/vectormap/jquery-jvectormap-au-mill.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/vectormap/jquery-jvectormap-in-mill.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/vectormap/jquery-jvectormap-in-mill.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/vectormap/jquery-jvectormap-uk-mill-en.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/vectormap/jquery-jvectormap-uk-mill-en.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/vectormap/jquery-jvectormap-us-aea-en.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/vectormap/jquery-jvectormap-us-aea-en.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/vectormap/jquery-jvectormap-world-mill-en.js",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'plugins/vectormap/jquery-jvectormap-world-mill-en.js'",
+        "possivel duplicata em app/assets/plugins/vectormap/jquery-jvectormap-world-mill-en.js"
+      ],
+      "references": [
+        "view:app/views/layouts/partials/_scripts.html.erb:javascript_include_tag"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/vectormap/jvectormap.custom.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/vectormap/jvectormap.custom.js"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/site/js/main.js",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/javascript/application.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "pin importmap aponta para 'application.js'",
+        "pinned no importmap como 'application' (sem prova de import)"
+      ],
+      "references": [
+        "importmap_to:config/importmap.rb:3",
+        "pinned_module:config/importmap.rb"
+      ]
+    },
+    {
+      "file": "app/javascript/controllers/application.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "coberto por pin_all_from 'controllers'",
+        "controller Stimulus sem data-controller encontrado (pode ser futuro/oculto)"
+      ],
+      "references": [
+        "pin_all_from:config/importmap.rb:10"
+      ]
+    },
+    {
+      "file": "app/javascript/controllers/calendar_controller.js",
+      "confidence": "used",
+      "reasons": [
+        "coberto por pin_all_from 'controllers'",
+        "controller Stimulus encontrado em data-controller"
+      ],
+      "references": [
+        "pin_all_from:config/importmap.rb:10",
+        "stimulus:app/views/app/calendar/index.html.erb:data-controller=calendar"
+      ]
+    },
+    {
+      "file": "app/javascript/controllers/hello_controller.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "coberto por pin_all_from 'controllers'",
+        "controller Stimulus sem data-controller encontrado (pode ser futuro/oculto)"
+      ],
+      "references": [
+        "pin_all_from:config/importmap.rb:10"
+      ]
+    },
+    {
+      "file": "app/javascript/controllers/index.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "coberto por pin_all_from 'controllers'",
+        "controller Stimulus sem data-controller encontrado (pode ser futuro/oculto)"
+      ],
+      "references": [
+        "pin_all_from:config/importmap.rb:10"
+      ]
+    },
+    {
+      "file": "app/javascript/controllers/scrollbar_controller.js",
+      "confidence": "used",
+      "reasons": [
+        "coberto por pin_all_from 'controllers'",
+        "controller Stimulus encontrado em data-controller"
+      ],
+      "references": [
+        "pin_all_from:config/importmap.rb:10",
+        "stimulus:app/views/layouts/partials/_sidebar.html.erb:data-controller=scrollbar",
+        "stimulus:app/views/layouts/partials/admin/_sidebar.html.erb:data-controller=scrollbar"
+      ]
+    },
+    {
+      "file": "app/javascript/controllers/stimulus.js",
+      "confidence": "uncertain",
+      "reasons": [
+        "coberto por pin_all_from 'controllers'",
+        "controller Stimulus sem data-controller encontrado (pode ser futuro/oculto)"
+      ],
+      "references": [
+        "pin_all_from:config/importmap.rb:10"
+      ]
+    },
+    {
+      "file": "app/javascript/register/signups.js",
+      "confidence": "used",
+      "reasons": [
+        "importado como modulo 'register/signups'",
+        "coberto por pin_all_from 'register'"
+      ],
+      "references": [
+        "import:app/javascript/application.js:13",
+        "pin_all_from:config/importmap.rb:11"
+      ]
+    },
+    {
+      "file": "app/javascript/utils/formatters.js",
+      "confidence": "used",
+      "reasons": [
+        "importado como modulo 'utils/formatters'",
+        "coberto por pin_all_from 'utils'"
+      ],
+      "references": [
+        "import:app/javascript/register/signups.js:1",
+        "pin_all_from:config/importmap.rb:12"
+      ]
+    },
+    {
+      "file": "app/javascript/utils/validators.js",
+      "confidence": "used",
+      "reasons": [
+        "importado como modulo 'utils/validators'",
+        "coberto por pin_all_from 'utils'"
+      ],
+      "references": [
+        "import:app/javascript/register/signups.js:2",
+        "pin_all_from:config/importmap.rb:12"
+      ]
+    }
+  ]
+}
