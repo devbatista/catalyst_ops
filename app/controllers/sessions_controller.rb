@@ -9,9 +9,11 @@ class SessionsController < Devise::SessionsController
   def new; end
 
   def create
-    user = User.find_by(email: params[:email].to_s.downcase.strip)
+    email = params[:email].to_s.downcase.strip
+    user = User.find_by(email: email)
     if user&.active? && user&.valid_password?(params[:password])
       sign_in(:user, user)
+      Audit::AuthLogger.login_succeeded(user: user)
 
       if user.admin?
         redirect_to admin_dashboard_url(subdomain: "admin"),
@@ -23,6 +25,8 @@ class SessionsController < Devise::SessionsController
                     notice: "Login realizado com sucesso!"
       end
     else
+      Audit::AuthLogger.login_failed(email: email, user: user)
+
       flash[:alert] = "E-mail ou senha inválidos."
       redirect_to login_root_url(subdomain: "login"), allow_other_host: true
     end
@@ -68,7 +72,10 @@ class SessionsController < Devise::SessionsController
   end
 
   def destroy
-    sign_out(current_user)
+    user = current_user
+    sign_out(user)
+
+    Audit::AuthLogger.logout_succeeded(user: user)
 
     redirect_to login_root_url(subdomain: "login"), allow_other_host: true, notice: "Logout realizado com sucesso!"
   end
@@ -86,7 +93,5 @@ class SessionsController < Devise::SessionsController
       end
     end
   end
-
-  private
 
 end
