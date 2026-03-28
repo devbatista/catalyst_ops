@@ -1,0 +1,912 @@
+{
+  "generated_at": "2026-03-28T02:34:25Z",
+  "summary": {
+    "unused_candidate": 34,
+    "used": 19,
+    "uncertain": 22
+  },
+  "totals": {
+    "css_files": 75
+  },
+  "report": [
+    {
+      "file": "app/assets/plugins/Drag-And-Drop/dist/imageuploadify.min.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/apexcharts-bundle/css/apexcharts.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.min.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/bs-stepper/css/bs-stepper-custom.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/bs-stepper/css/bs-stepper.css",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'plugins/bs-stepper/css/bs-stepper.css'"
+      ],
+      "references": [
+        "view:app/views/register/signups/new.html.erb:asset_path",
+        "view:app/views/register/signups/new.html.erb:link_asset_path"
+      ]
+    },
+    {
+      "file": "app/assets/plugins/datatable/css/dataTables.bootstrap5.min.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/datetimepicker/css/classic.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/datetimepicker/css/classic.date.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/datetimepicker/css/classic.time.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/fancy-file-uploader/fancy_fileupload.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/fullcalendar/css/main.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/fullcalendar/css/main.min.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/highcharts/css/dark-unica.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/highcharts/css/grid-light.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/highcharts/css/highcharts-white.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/highcharts/css/highcharts.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/highcharts/css/sand-signika.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/input-tags/css/tagsinput.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/metismenu/css/metisMenu.min.css",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'plugins/metismenu/css/metisMenu.min.css'"
+      ],
+      "references": [
+        "view:app/views/layouts/admin.html.erb:asset_path",
+        "view:app/views/layouts/admin.html.erb:link_asset_path",
+        "view:app/views/layouts/application.html.erb:asset_path",
+        "view:app/views/layouts/application.html.erb:link_asset_path",
+        "view:app/views/register/signups/new.html.erb:asset_path",
+        "view:app/views/register/signups/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new.html.erb:asset_path",
+        "view:app/views/sessions/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new_password.html.erb:asset_path",
+        "view:app/views/sessions/new_password.html.erb:link_asset_path"
+      ]
+    },
+    {
+      "file": "app/assets/plugins/morris/css/morris.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/notifications/css/lobibox.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/notifications/css/lobibox.min.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'plugins/perfect-scrollbar/css/perfect-scrollbar.css'"
+      ],
+      "references": [
+        "view:app/views/layouts/admin.html.erb:asset_path",
+        "view:app/views/layouts/admin.html.erb:link_asset_path",
+        "view:app/views/layouts/application.html.erb:asset_path",
+        "view:app/views/layouts/application.html.erb:link_asset_path",
+        "view:app/views/register/signups/new.html.erb:asset_path",
+        "view:app/views/register/signups/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new.html.erb:asset_path",
+        "view:app/views/sessions/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new_password.html.erb:asset_path",
+        "view:app/views/sessions/new_password.html.erb:link_asset_path"
+      ]
+    },
+    {
+      "file": "app/assets/plugins/select2/css/select2-bootstrap4.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/select2/css/select2.min.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/plugins/simplebar/css/simplebar.css",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'plugins/simplebar/css/simplebar.css'"
+      ],
+      "references": [
+        "view:app/views/layouts/admin.html.erb:asset_path",
+        "view:app/views/layouts/admin.html.erb:link_asset_path",
+        "view:app/views/layouts/application.html.erb:asset_path",
+        "view:app/views/layouts/application.html.erb:link_asset_path",
+        "view:app/views/register/signups/new.html.erb:asset_path",
+        "view:app/views/register/signups/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new.html.erb:asset_path",
+        "view:app/views/sessions/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new_password.html.erb:asset_path",
+        "view:app/views/sessions/new_password.html.erb:link_asset_path"
+      ]
+    },
+    {
+      "file": "app/assets/plugins/vectormap/jquery-jvectormap-2.0.2.css",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'plugins/vectormap/jquery-jvectormap-2.0.2.css'"
+      ],
+      "references": [
+        "view:app/views/layouts/admin.html.erb:asset_path",
+        "view:app/views/layouts/admin.html.erb:link_asset_path",
+        "view:app/views/layouts/application.html.erb:asset_path",
+        "view:app/views/layouts/application.html.erb:link_asset_path",
+        "view:app/views/sessions/new.html.erb:asset_path",
+        "view:app/views/sessions/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new_password.html.erb:asset_path",
+        "view:app/views/sessions/new_password.html.erb:link_asset_path"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/css/app.css",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'css/app.css'"
+      ],
+      "references": [
+        "view:app/views/layouts/admin.html.erb:asset_path",
+        "view:app/views/layouts/admin.html.erb:link_asset_path",
+        "view:app/views/layouts/application.html.erb:asset_path",
+        "view:app/views/layouts/application.html.erb:link_asset_path",
+        "view:app/views/register/signups/new.html.erb:asset_path",
+        "view:app/views/register/signups/new.html.erb:link_asset_path",
+        "view:app/views/register/signups/success.html.erb:asset_path",
+        "view:app/views/register/signups/success.html.erb:link_asset_path",
+        "view:app/views/sessions/new.html.erb:asset_path",
+        "view:app/views/sessions/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new_password.html.erb:asset_path",
+        "view:app/views/sessions/new_password.html.erb:link_asset_path"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/css/bootstrap-extended.css",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'css/bootstrap-extended.css'"
+      ],
+      "references": [
+        "view:app/views/layouts/admin.html.erb:asset_path",
+        "view:app/views/layouts/admin.html.erb:link_asset_path",
+        "view:app/views/layouts/application.html.erb:asset_path",
+        "view:app/views/layouts/application.html.erb:link_asset_path",
+        "view:app/views/register/signups/new.html.erb:asset_path",
+        "view:app/views/register/signups/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new.html.erb:asset_path",
+        "view:app/views/sessions/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new_password.html.erb:asset_path",
+        "view:app/views/sessions/new_password.html.erb:link_asset_path"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/css/bootstrap.min.css",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'css/bootstrap.min.css'"
+      ],
+      "references": [
+        "view:app/views/layouts/admin.html.erb:asset_path",
+        "view:app/views/layouts/admin.html.erb:link_asset_path",
+        "view:app/views/layouts/application.html.erb:asset_path",
+        "view:app/views/layouts/application.html.erb:link_asset_path",
+        "view:app/views/register/signups/new.html.erb:asset_path",
+        "view:app/views/register/signups/new.html.erb:link_asset_path",
+        "view:app/views/register/signups/success.html.erb:asset_path",
+        "view:app/views/register/signups/success.html.erb:link_asset_path",
+        "view:app/views/sessions/new.html.erb:asset_path",
+        "view:app/views/sessions/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new_password.html.erb:asset_path",
+        "view:app/views/sessions/new_password.html.erb:link_asset_path"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/css/dark-theme.css",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'css/dark-theme.css'"
+      ],
+      "references": [
+        "view:app/views/layouts/admin.html.erb:asset_path",
+        "view:app/views/layouts/admin.html.erb:link_asset_path",
+        "view:app/views/layouts/application.html.erb:asset_path",
+        "view:app/views/layouts/application.html.erb:link_asset_path",
+        "view:app/views/register/signups/new.html.erb:asset_path",
+        "view:app/views/register/signups/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new.html.erb:asset_path",
+        "view:app/views/sessions/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new_password.html.erb:asset_path",
+        "view:app/views/sessions/new_password.html.erb:link_asset_path"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/css/header-colors.css",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'css/header-colors.css'"
+      ],
+      "references": [
+        "view:app/views/layouts/application.html.erb:asset_path",
+        "view:app/views/layouts/application.html.erb:link_asset_path",
+        "view:app/views/register/signups/new.html.erb:asset_path",
+        "view:app/views/register/signups/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new.html.erb:asset_path",
+        "view:app/views/sessions/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new_password.html.erb:asset_path",
+        "view:app/views/sessions/new_password.html.erb:link_asset_path"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/css/icons.css",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'css/icons.css'"
+      ],
+      "references": [
+        "view:app/views/layouts/admin.html.erb:asset_path",
+        "view:app/views/layouts/admin.html.erb:link_asset_path",
+        "view:app/views/layouts/application.html.erb:asset_path",
+        "view:app/views/layouts/application.html.erb:link_asset_path",
+        "view:app/views/register/signups/new.html.erb:asset_path",
+        "view:app/views/register/signups/new.html.erb:link_asset_path",
+        "view:app/views/register/signups/success.html.erb:asset_path",
+        "view:app/views/register/signups/success.html.erb:link_asset_path",
+        "view:app/views/sessions/new.html.erb:asset_path",
+        "view:app/views/sessions/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new_password.html.erb:asset_path",
+        "view:app/views/sessions/new_password.html.erb:link_asset_path"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/css/pace.min.css",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'css/pace.min.css'"
+      ],
+      "references": [
+        "view:app/views/layouts/admin.html.erb:asset_path",
+        "view:app/views/layouts/admin.html.erb:link_asset_path",
+        "view:app/views/layouts/application.html.erb:asset_path",
+        "view:app/views/layouts/application.html.erb:link_asset_path",
+        "view:app/views/register/signups/new.html.erb:asset_path",
+        "view:app/views/register/signups/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new.html.erb:asset_path",
+        "view:app/views/sessions/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new_password.html.erb:asset_path",
+        "view:app/views/sessions/new_password.html.erb:link_asset_path"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/css/semi-dark.css",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'css/semi-dark.css'"
+      ],
+      "references": [
+        "view:app/views/layouts/application.html.erb:asset_path",
+        "view:app/views/layouts/application.html.erb:link_asset_path",
+        "view:app/views/register/signups/new.html.erb:asset_path",
+        "view:app/views/register/signups/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new.html.erb:asset_path",
+        "view:app/views/sessions/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new_password.html.erb:asset_path",
+        "view:app/views/sessions/new_password.html.erb:link_asset_path"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/fullcalendar/css/main.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/fullcalendar/main.min.css",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'fullcalendar/main.min'"
+      ],
+      "references": [
+        "view:app/views/app/calendar/index.html.erb:stylesheet_link_tag"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/Drag-And-Drop/dist/imageuploadify.min.css",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/Drag-And-Drop/dist/imageuploadify.min.css"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/apexcharts-bundle/css/apexcharts.css",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/apexcharts-bundle/css/apexcharts.css"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.min.css",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.min.css"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/bs-stepper/css/bs-stepper-custom.css",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/bs-stepper/css/bs-stepper-custom.css"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/bs-stepper/css/bs-stepper.css",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'plugins/bs-stepper/css/bs-stepper.css'",
+        "possivel duplicata em app/assets/plugins/bs-stepper/css/bs-stepper.css"
+      ],
+      "references": [
+        "view:app/views/register/signups/new.html.erb:asset_path",
+        "view:app/views/register/signups/new.html.erb:link_asset_path"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/datatable/css/dataTables.bootstrap5.min.css",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/datatable/css/dataTables.bootstrap5.min.css"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/datetimepicker/css/classic.css",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/datetimepicker/css/classic.css"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/datetimepicker/css/classic.date.css",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/datetimepicker/css/classic.date.css"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/datetimepicker/css/classic.time.css",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/datetimepicker/css/classic.time.css"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/fancy-file-uploader/fancy_fileupload.css",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/fancy-file-uploader/fancy_fileupload.css"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/fullcalendar/css/main.css",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/fullcalendar/css/main.css"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/fullcalendar/css/main.min.css",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/fullcalendar/css/main.min.css"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/highcharts/css/dark-unica.css",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/highcharts/css/dark-unica.css"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/highcharts/css/grid-light.css",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/highcharts/css/grid-light.css"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/highcharts/css/highcharts-white.css",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/highcharts/css/highcharts-white.css"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/highcharts/css/highcharts.css",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/highcharts/css/highcharts.css"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/highcharts/css/sand-signika.css",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/highcharts/css/sand-signika.css"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/input-tags/css/tagsinput.css",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/input-tags/css/tagsinput.css"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/metismenu/css/metisMenu.min.css",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'plugins/metismenu/css/metisMenu.min.css'",
+        "possivel duplicata em app/assets/plugins/metismenu/css/metisMenu.min.css"
+      ],
+      "references": [
+        "view:app/views/layouts/admin.html.erb:asset_path",
+        "view:app/views/layouts/admin.html.erb:link_asset_path",
+        "view:app/views/layouts/application.html.erb:asset_path",
+        "view:app/views/layouts/application.html.erb:link_asset_path",
+        "view:app/views/register/signups/new.html.erb:asset_path",
+        "view:app/views/register/signups/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new.html.erb:asset_path",
+        "view:app/views/sessions/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new_password.html.erb:asset_path",
+        "view:app/views/sessions/new_password.html.erb:link_asset_path"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/morris/css/morris.css",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/morris/css/morris.css"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/notifications/css/lobibox.css",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/notifications/css/lobibox.css"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/notifications/css/lobibox.min.css",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/notifications/css/lobibox.min.css"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/perfect-scrollbar/css/perfect-scrollbar.css",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'plugins/perfect-scrollbar/css/perfect-scrollbar.css'",
+        "possivel duplicata em app/assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css"
+      ],
+      "references": [
+        "view:app/views/layouts/admin.html.erb:asset_path",
+        "view:app/views/layouts/admin.html.erb:link_asset_path",
+        "view:app/views/layouts/application.html.erb:asset_path",
+        "view:app/views/layouts/application.html.erb:link_asset_path",
+        "view:app/views/register/signups/new.html.erb:asset_path",
+        "view:app/views/register/signups/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new.html.erb:asset_path",
+        "view:app/views/sessions/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new_password.html.erb:asset_path",
+        "view:app/views/sessions/new_password.html.erb:link_asset_path"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/select2/css/select2-bootstrap4.css",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/select2/css/select2-bootstrap4.css"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/select2/css/select2.min.css",
+      "confidence": "uncertain",
+      "reasons": [
+        "possivel duplicata em app/assets/plugins/select2/css/select2.min.css"
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/simplebar/css/simplebar.css",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'plugins/simplebar/css/simplebar.css'",
+        "possivel duplicata em app/assets/plugins/simplebar/css/simplebar.css"
+      ],
+      "references": [
+        "view:app/views/layouts/admin.html.erb:asset_path",
+        "view:app/views/layouts/admin.html.erb:link_asset_path",
+        "view:app/views/layouts/application.html.erb:asset_path",
+        "view:app/views/layouts/application.html.erb:link_asset_path",
+        "view:app/views/register/signups/new.html.erb:asset_path",
+        "view:app/views/register/signups/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new.html.erb:asset_path",
+        "view:app/views/sessions/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new_password.html.erb:asset_path",
+        "view:app/views/sessions/new_password.html.erb:link_asset_path"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/plugins/vectormap/jquery-jvectormap-2.0.2.css",
+      "confidence": "used",
+      "reasons": [
+        "referenciado em view/layout via 'plugins/vectormap/jquery-jvectormap-2.0.2.css'",
+        "possivel duplicata em app/assets/plugins/vectormap/jquery-jvectormap-2.0.2.css"
+      ],
+      "references": [
+        "view:app/views/layouts/admin.html.erb:asset_path",
+        "view:app/views/layouts/admin.html.erb:link_asset_path",
+        "view:app/views/layouts/application.html.erb:asset_path",
+        "view:app/views/layouts/application.html.erb:link_asset_path",
+        "view:app/views/sessions/new.html.erb:asset_path",
+        "view:app/views/sessions/new.html.erb:link_asset_path",
+        "view:app/views/sessions/new_password.html.erb:asset_path",
+        "view:app/views/sessions/new_password.html.erb:link_asset_path"
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/site/css/base.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/site/css/contato.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/site/css/footer.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/site/css/global.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/site/css/home.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/site/css/index.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/site/css/navigation.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/site/css/projetos.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/site/css/servicos.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/site/css/sobre.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    },
+    {
+      "file": "app/assets/stylesheets/site/css/styles.css",
+      "confidence": "unused_candidate",
+      "reasons": [
+
+      ],
+      "references": [
+
+      ]
+    }
+  ]
+}
