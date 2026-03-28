@@ -20,6 +20,7 @@ class Company < ApplicationRecord
   
   before_validation :normalize_document
   before_validation { self.email = email.to_s.downcase.strip if email.present? }
+  before_validation :normalize_phone
   before_validation :normalize_zip_code
   
   validates :payment_method, inclusion: { in: PAYMENT_METHODS }
@@ -173,6 +174,10 @@ class Company < ApplicationRecord
 
   def normalize_zip_code
     self.zip_code = zip_code.to_s.gsub(/\D/, "") if zip_code.present?
+  end
+
+  def normalize_phone
+    self.phone = phone.to_s.gsub(/\D/, "") if phone.present?
   end
 
   def document_must_be_cpf_or_cnpj

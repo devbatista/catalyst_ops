@@ -33,6 +33,7 @@ class User < ApplicationRecord
   scope :created_this_month, -> { where(created_at: Time.current.all_month) }
 
   before_validation :normalize_name
+  before_validation :normalize_phone
   before_validation :set_default_password_for_tecnico, on: :create
 
   after_create :send_welcome_email_for_technician, if: -> { tecnico? }
@@ -115,6 +116,10 @@ class User < ApplicationRecord
 
   def normalize_name
     self.name = name.strip.titleize if name.present?
+  end
+
+  def normalize_phone
+    self.phone = phone.to_s.gsub(/\D/, "") if phone.present?
   end
 
   def set_default_password_for_tecnico
