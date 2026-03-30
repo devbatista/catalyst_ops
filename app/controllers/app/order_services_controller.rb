@@ -7,6 +7,7 @@ class App::OrderServicesController < ApplicationController
   before_action :ensure_technician_only_updates_allowed_fields, only: [:update]
   before_action :restrict_status_update_for_technician, only: [:update_status]
   before_action :restrict_overdue_reschedule_for_technician, only: [:schedule, :perform_schedule]
+  before_action :ensure_schedulable_status, only: [:schedule, :perform_schedule]
   
   def index
     @order_services = case current_user.role
@@ -17,7 +18,7 @@ class App::OrderServicesController < ApplicationController
                      .where(clients: { company_id: current_user.company_id })
                      .includes(:client, :users)
     when "tecnico"
-      current_user.order_services.includes(:client)
+      current_user.order_services.where.not(status: [:rascunho, :rejeitada]).includes(:client)
     end.order(created_at: :desc).page(params[:page]).per(params[:per] || 10)
 
     if params[:code].present?
@@ -58,6 +59,8 @@ class App::OrderServicesController < ApplicationController
   def new; end
 
   def create
+    @order_service.status = :rascunho
+
     if @order_service.save
       redirect_to app_order_services_url, notice: "Ordem de serviço criada com sucesso."
     else
@@ -109,15 +112,41 @@ class App::OrderServicesController < ApplicationController
   end
 
   def update_status
-    if params[:status] == 'agendada'
+    target_status = params[:status].to_s
+
+    unless allowed_status_transition?(target_status)
+      return redirect_to app_order_service_url(@order_service), alert: "Transição de status inválida."
+    end
+
+    if target_status == "agendada"
       redirect_to schedule_app_order_service_path(@order_service)
     else
-      if @order_service.update(status: params[:status])
+      if @order_service.update(status: target_status)
         redirect_to app_order_service_url(@order_service), notice: "Status atualizado com sucesso."
       else
         redirect_to app_order_service_url(@order_service), alert: @order_service.errors.full_messages.join(', ')
       end
     end
+  end
+
+  def send_for_approval
+    unless current_user.gestor?
+      return redirect_to app_order_service_url(@order_service), alert: "Somente gestor pode enviar para aprovação."
+    end
+
+    unless @order_service.rascunho? || @order_service.rejeitada?
+      return redirect_to app_order_service_url(@order_service), alert: "Apenas OS em rascunho ou rejeitada podem ser enviadas para aprovação."
+    end
+
+    if @order_service.approval_sent_at.present? && @order_service.approval_sent_at > 5.minutes.ago
+      return redirect_to app_order_service_url(@order_service),
+                         alert: "Aguarde alguns minutos antes de reenviar para aprovação."
+    end
+
+    was_rejected = @order_service.rejeitada?
+    @order_service.send_approval_request_emails!(sender_email: current_user.email)
+    message = was_rejected ? "Orçamento reenviado para aprovação com sucesso." : "Solicitação de aprovação enviada ao cliente com sucesso."
+    redirect_to app_order_service_url(@order_service), notice: message
   end
 
   def generate_pdf
@@ -150,7 +179,6 @@ class App::OrderServicesController < ApplicationController
         :title,
         :description,
         :client_id,
-        :status,
         :scheduled_at,
         :expected_end_at,
         :signed_by_client,
@@ -265,4 +293,19 @@ class App::OrderServicesController < ApplicationController
     redirect_to app_order_service_url(@order_service),
                 alert: "Somente gestores podem reagendar uma ordem de serviço atrasada."
   end
+
+  def allowed_status_transition?(target_status)
+    return false if target_status.blank?
+
+    return @order_service.pendente? if target_status == "agendada"
+
+    @order_service.next_possible_statuses.include?(target_status)
+  end
+
+  def ensure_schedulable_status
+    return if @order_service.pendente? || @order_service.atrasada?
+
+    redirect_to app_order_service_url(@order_service), alert: "Só é possível agendar ordens pendentes ou atrasadas."
+  end
+
 end

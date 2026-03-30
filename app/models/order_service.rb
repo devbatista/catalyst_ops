@@ -15,14 +15,16 @@ class OrderService < ApplicationRecord
   has_many_attached :attachments
 
   enum status: {
-    pendente: 0,
-    agendada: 1,
-    em_andamento: 2,
-    concluida: 3,
-    cancelada: 4,
+    rascunho: 0,
+    pendente: 1,
+    agendada: 2,
+    em_andamento: 3,
+    concluida: 4,
     finalizada: 5,
-    atrasada: 6,
-  }, _default: :pendente
+    cancelada: 6,
+    atrasada: 7,
+    rejeitada: 8,
+  }, _default: :rascunho
 
   STATUS_ACTIONS = {
     agendada: "Agendar",
@@ -30,13 +32,14 @@ class OrderService < ApplicationRecord
     concluida: "Concluir",
     finalizada: "Finalizar",
     cancelada: "Cancelar",
-    atrasada: "Reagendar", 
+    atrasada: "Reagendar",
+    rejeitada: "Rejeitar"
   }.freeze
 
   validates :title, presence: true, length: { minimum: 5, maximum: 100 }
   validates :description, presence: true, length: { minimum: 5, maximum: 1000 }
   validates :status, presence: true
-  validates :scheduled_at, presence: true, if: -> { !pendente? }
+  validates :scheduled_at, presence: true, if: :requires_schedule_fields?
   validates :client_id, presence: true
   validates :code, presence: true, uniqueness: { scope: :company_id }
   validates :expected_end_at, presence: true, if: -> { scheduled_at.present? }
@@ -69,13 +72,12 @@ class OrderService < ApplicationRecord
 
   before_save :set_timestamps_on_status_change
 
-  after_commit :notify_create, on: :create
-
   after_update :notify_complete, if: -> { saved_change_to_status?(to: "concluida") }
   after_update :notify_scheduled, if: -> { saved_change_to_status?(to: "agendada") }
   after_update :notify_finished, if: -> { saved_change_to_status?(to: "finalizada") }
   after_update :notify_in_progress, if: -> { saved_change_to_status?(to: "em_andamento") }
   after_update :notify_overdue, if: -> { saved_change_to_status?(to: "atrasada") }
+  after_update :notify_client_on_approval, if: -> { saved_change_to_approved_at? && approved_at.present? }
 
   def total_value
     service_items.sum(&:total_price)
@@ -116,6 +118,7 @@ class OrderService < ApplicationRecord
   end
 
   def progress_percentage
+    return 0 if rascunho? || rejeitada?
     return 0 if pendente?
     return 25 if agendada?
     return 50 if em_andamento?
@@ -126,6 +129,7 @@ class OrderService < ApplicationRecord
 
   def status_color
     case status
+    when "rascunho" then "secondary"
     when "pendente" then "secondary"
     when "agendada" then "warning"
     when "atrasada" then "dark"
@@ -133,11 +137,13 @@ class OrderService < ApplicationRecord
     when "concluida" then "success"
     when "finalizada" then "primary"
     when "cancelada" then "danger"
+    when "rejeitada" then "danger"
     end
   end
 
   def next_possible_statuses
     case status
+    when "rascunho" then []
     when "pendente" then ["cancelada"]
     when "agendada" then ["em_andamento", "cancelada"]
     when "atrasada" then ["em_andamento", "cancelada"]
@@ -145,8 +151,80 @@ class OrderService < ApplicationRecord
     when "concluida" then ["finalizada"]
     when "finalizada" then []
     when "cancelada" then []
+    when "rejeitada" then []
     else []
     end
+  end
+
+  def approval_token(expires_at: nil, expires_in: 1.week)
+    final_expires_at = expires_at || (Time.current + expires_in).end_of_day
+    ttl = final_expires_at - Time.current
+    ttl = 1.second if ttl <= 0
+
+    signed_id(purpose: :order_service_approval, expires_in: ttl)
+  end
+
+  def self.find_by_approval_token(token)
+    find_signed(token, purpose: :order_service_approval)
+  rescue ActiveSupport::MessageVerifier::InvalidSignature
+    nil
+  end
+
+  def send_approval_request_emails!(sender_email:, expires_in: 1.week)
+    sent_at = Time.current
+    update_columns(
+      status: self.class.statuses[:rascunho],
+      approval_sent_at: sent_at,
+      approved_at: nil,
+      rejected_at: nil,
+      rejection_reason: nil
+    )
+
+    expires_at = (sent_at + expires_in).end_of_day
+    token = approval_token(expires_at: expires_at)
+
+    OrderServiceMailer.approval_request_to_client(self, token).deliver_later
+    OrderServiceMailer.approval_request_copy_to_manager(self, sender_email).deliver_later if sender_email.present?
+  end
+
+  def approval_response_deadline(expires_in: 1.week)
+    return if approval_sent_at.blank?
+
+    (approval_sent_at + expires_in).end_of_day
+  end
+
+  def approve_by_client!
+    unless rascunho? || rejeitada?
+      errors.add(:status, "não permite aprovação neste estado")
+      return false
+    end
+
+    update!(
+      status: :pendente,
+      approved_at: Time.current,
+      rejected_at: nil,
+      rejection_reason: nil
+    )
+  end
+
+  def reject_by_client!(rejection_reason:)
+    unless rascunho? || rejeitada?
+      errors.add(:status, "não permite rejeição neste estado")
+      return false
+    end
+
+    reason = rejection_reason.to_s.strip
+    if reason.blank?
+      errors.add(:rejection_reason, "não pode ficar em branco")
+      return false
+    end
+
+    update!(
+      status: :rejeitada,
+      rejected_at: Time.current,
+      approved_at: nil,
+      rejection_reason: reason
+    )
   end
 
   def available_actions
@@ -236,7 +314,7 @@ class OrderService < ApplicationRecord
     return if will_save_change_to_status? && status_change_to_be_saved&.last == "atrasada"
     return unless scheduled_at.present?
 
-    if !pendente? && scheduled_at < Time.current
+    if requires_schedule_fields? && scheduled_at < Time.current
       errors.add(:scheduled_at, "não pode ser no passado")
     end
   end
@@ -245,7 +323,7 @@ class OrderService < ApplicationRecord
     return if will_save_change_to_status? && status_change_to_be_saved&.last == "atrasada"
     return unless expected_end_at.present?
 
-    if !pendente? && expected_end_at < Time.current
+    if requires_schedule_fields? && expected_end_at < Time.current
       errors.add(:expected_end_at, "não pode ser no passado")
     end
 
@@ -329,13 +407,13 @@ class OrderService < ApplicationRecord
     OrderServiceMailer.notify_manager_on_complete(self).deliver_later
   end
 
-  def notify_create
-    OrderServiceMailer.notify_create(self).deliver_later
-  end
-
   def notify_scheduled
     notify_client_on_scheduled
     notify_technical_on_scheduled
+  end
+
+  def notify_client_on_approval
+    OrderServiceMailer.notify_client_on_approval(self).deliver_later
   end
 
   def notify_client_on_scheduled
@@ -386,10 +464,16 @@ class OrderService < ApplicationRecord
   end
 
   def datetimes_fields_are_required_if_technicians_are_present
+    return if rascunho? || rejeitada? || cancelada?
+
     if users.any? && scheduled_at.blank? && expected_end_at.blank?
       errors.add(:scheduled_at, "é obrigatório quando um ou mais técnicos são atribuídos") if scheduled_at.blank?
       errors.add(:expected_end_at, "é obrigatório quando um ou mais técnicos são atribuídos") if expected_end_at.blank?
     end
+  end
+
+  def requires_schedule_fields?
+    agendada? || em_andamento? || concluida? || finalizada? || atrasada?
   end
 
   def plan_order_service_limit

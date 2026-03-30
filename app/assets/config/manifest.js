@@ -26,3 +26,4 @@
 //= link app/order_service_attachments.js
 //= link app/order_service_show_actions.js
 //= link app/knowledge_base_modal.js
+//= link cliente/order_service_approvals.js

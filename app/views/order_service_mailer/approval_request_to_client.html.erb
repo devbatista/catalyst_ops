@@ -1,0 +1,21 @@
+<p>Olá, <%= @client.name %>.</p>
+
+<p>
+  A Ordem de Serviço <strong>#<%= @order_service.code %></strong> foi enviada para sua aprovação.
+</p>
+
+<p>Para aprovar ou rejeitar, acesse o orçamento pelo botão abaixo:</p>
+
+<p style="margin: 24px 0;">
+  <a href="<%= @approval_url %>"
+     style="display:inline-block; background:#0d6efd; color:#ffffff; text-decoration:none; padding:12px 20px; border-radius:6px; font-weight:600;">
+    Orçamento
+  </a>
+</p>
+
+<p style="font-size: 14px; color: #666;">
+  Se o botão não funcionar, use este link alternativo:
+  <a href="<%= @approval_url %>">Abrir orçamento</a>
+</p>
+
+<p>Este link expira em 7 dias.</p>

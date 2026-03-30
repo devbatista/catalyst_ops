@@ -52,6 +52,18 @@
             <strong>Criada em:</strong>
             <p><%= l(@order_service.created_at, format: :short) %></p>
           </div>
+          <div class="col-md-3">
+            <strong>Aprovação enviada em:</strong>
+            <p><%= l(@order_service.approval_sent_at, format: :short) if @order_service.approval_sent_at %></p>
+          </div>
+          <div class="col-md-3">
+            <strong>Aprovada em:</strong>
+            <p><%= l(@order_service.approved_at, format: :short) if @order_service.approved_at %></p>
+          </div>
+          <div class="col-md-3">
+            <strong>Rejeitada em:</strong>
+            <p><%= l(@order_service.rejected_at, format: :short) if @order_service.rejected_at %></p>
+          </div>
         </div>
         <div class="row mb-3">
           <div class="col-md-12">
@@ -70,6 +82,14 @@
             <strong>Observações:</strong>
             <div class="form-control-plaintext">
               <%= @order_service.observations.presence || "Nenhuma observação." %>
+            </div>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-12">
+            <strong>Motivo da rejeição:</strong>
+            <div class="form-control-plaintext">
+              <%= @order_service.rejection_reason.presence || "Não informado." %>
             </div>
           </div>
         </div>
@@ -121,6 +141,14 @@
           <div>
             <%= link_to "Voltar", app_order_services_path, class: "btn btn-secondary" %>
             <%= link_to "Editar", edit_app_order_service_path(@order_service), class: "btn btn-primary" %>
+            <% if current_user.gestor? && (@order_service.rascunho? || @order_service.rejeitada?) %>
+              <%= button_to "Enviar para aprovação",
+                            send_for_approval_app_order_service_path(@order_service),
+                            method: :post,
+                            form_class: "d-inline-block",
+                            class: "btn btn-outline-success ms-2",
+                            form: { data: { os_action_confirm: "true", confirm_message: "Deseja enviar esta OS para aprovação do cliente?" } } %>
+            <% end %>
             <% unless current_user.tecnico? %>
               <%= link_to "Abrir ticket desta OS",
                           new_app_support_ticket_path(order_service_id: @order_service.id),

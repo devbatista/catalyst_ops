@@ -71,7 +71,7 @@ class Ability
 
     # Pode visualizar apenas OSs atribuídas a ele
     can :read, OrderService do |order_service|
-      order_service.users.include?(user)
+      order_service.users.include?(user) && !order_service.rascunho? && !order_service.rejeitada?
     end
 
     # Pode atualizar status das OSs atribuídas
