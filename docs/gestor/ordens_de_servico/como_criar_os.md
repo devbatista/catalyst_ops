@@ -4,12 +4,13 @@
 Use este fluxo sempre que um cliente solicitar um atendimento técnico e você precisar registrar o serviço no sistema.
 
 ## Passo a passo
-1. Acesse **Ordens de Serviço** no painel (**app**).
+1. Acesse **Ordens de Serviço** no painel.
 2. Clique em **Nova OS**.
 3. Preencha **Título** e **Descrição** (o que será feito).
 4. Selecione o **Cliente**.
 5. Se já souber quem irá atender, selecione o **Técnico** (quando aplicável).
-6. Clique em **Salvar**.
+6. Coloque data/hora de agendamento (se já tiver).
+7. Clique em **Salvar**.
 
 ## O que acontece depois
 A OS é criada e aparece na listagem. Em geral, ela começa como **Pendente** até você **agendar** (data/hora) e/ou **iniciar** o atendimento.

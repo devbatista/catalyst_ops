@@ -5,9 +5,10 @@ Quando você quer localizar ordens de serviço que ainda não têm técnico resp
 
 ## Passo a passo
 1. Acesse **Ordens de Serviço**.
-2. Abra o filtro/lista **Sem técnico** (quando disponível).
-3. Revise as OS pendentes de atribuição.
-4. Abra uma OS e use o fluxo **Atribuir técnico**.
+2. Clique no botão **OS não atribuídas**.
+3. Vá em **Atribuir**
+4. Selecione o técnico e coloque novas datas/horário.
+5. Confirme o agendamento.
 
 ## O que acontece depois
 Você consegue organizar a fila de atendimento e garantir que nenhuma OS fique esquecida sem responsável.

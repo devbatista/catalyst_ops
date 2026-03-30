@@ -11,7 +11,7 @@ Quando você quer anexar fotos, laudos, comprovantes ou qualquer evidência do a
 5. Aguarde o upload concluir.
 
 ## O que acontece depois
-O arquivo fica anexado na OS e pode ser visualizado por quem tem permissão. Dependendo do fluxo, anexos podem aparecer no PDF.
+O arquivo fica anexado na OS e pode ser visualizado por quem tem permissão.
 
 ## Erros comuns
 - Arquivo muito grande (upload falha).
