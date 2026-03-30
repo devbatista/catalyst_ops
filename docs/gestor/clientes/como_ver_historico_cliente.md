@@ -6,7 +6,7 @@ Quando você quer consultar atendimentos anteriores (para recorrência, garantia
 ## Passo a passo
 1. Acesse **Clientes**.
 2. Abra o cliente desejado.
-3. Entre na seção de **Ordens de Serviço** do cliente (histórico).
+3. Veja na seção de **Ordens de Serviço** do cliente (histórico).
 4. Filtre por período/status (quando disponível).
 
 ## O que acontece depois

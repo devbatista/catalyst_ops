@@ -4,7 +4,7 @@
 Quando você quer verificar a carga de atendimentos de um técnico específico (gestão e organização).
 
 ## Passo a passo
-1. Acesse **Agenda**.
+1. Acesse **Calendário**.
 2. Aplique o filtro/seleção de **Técnico** (quando disponível).
 3. Escolha o período (dia/semana).
 4. Revise os atendimentos agendados.

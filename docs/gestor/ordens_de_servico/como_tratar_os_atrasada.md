@@ -5,10 +5,11 @@ Quando uma OS estava agendada e passou do horário, ficando marcada como **Atras
 
 ## Passo a passo
 1. Acesse **Ordens de Serviço**.
-2. Abra a OS marcada como **Atrasada**.
-3. Verifique o motivo (cliente, técnico, falta de peça etc.).
-4. Use o fluxo **Reagendar** e defina uma nova data/hora.
-5. Salve e confirme o reagendamento.
+2. Clique no botão **OS atrasadas**.
+3. Localize a OS desejada e clique em **Reagendar**.
+4. Verifique o motivo (cliente, técnico, falta de peça etc.).
+5. Use o fluxo **Reagendar** e defina uma nova data/hora.
+6. Salve e confirme o reagendamento.
 
 ## O que acontece depois
 Ao reagendar, a OS volta a ficar **Agendada** com a nova data/hora e aparece novamente na agenda.

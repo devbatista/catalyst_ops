@@ -6,9 +6,10 @@ Quando você quer definir qual técnico executará a Ordem de Serviço.
 ## Passo a passo
 1. Acesse **Ordens de Serviço**.
 2. Abra a OS desejada.
-3. Localize o campo/opção de **Técnico**.
-4. Selecione o técnico responsável.
-5. Clique em **Salvar**.
+3. Clique em Editar
+4. Localize o campo/opção de **Técnicos Atribuídos**.
+5. Selecione o(s) técnico(s) responsável.
+6. Clique em **Salvar**.
 
 ## O que acontece depois
 A OS passa a ficar vinculada ao técnico escolhido, e ele verá a OS na sua lista e na agenda (se estiver agendada).

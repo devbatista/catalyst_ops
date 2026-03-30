@@ -6,13 +6,13 @@ Quando a OS já estava marcada e você precisa mudar data/horário (por chuva, f
 ## Passo a passo
 1. Acesse **Ordens de Serviço**.
 2. Abra a OS agendada.
-3. Clique em **Reagendar** (ou **Agendar** novamente, dependendo da tela).
-4. Defina a nova **data e hora**.
-5. Ajuste a **previsão de término** (se existir).
+3. Clique em **Editar**.
+4. Defina a nova **data e hora de agendamento**.
+5. Ajuste a **previsão de término**.
 6. Clique em **Salvar**.
 
 ## O que acontece depois
-A OS permanece/volta para **Agendada** com a nova data. A agenda é atualizada.
+A OS é salva e a agenda atualizada
 
 ## Erros comuns
 - Reagendar para horário conflitante com o técnico.

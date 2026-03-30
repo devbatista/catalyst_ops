@@ -5,10 +5,10 @@ Quando você precisa registrar serviços executados, peças, materiais ou itens 
 
 ## Passo a passo
 1. Abra a OS.
-2. Acesse a seção **Itens de serviço** (ou equivalente).
+2. Acesse a seção **Itens de serviço**
 3. Clique em **Adicionar item**.
 4. Preencha descrição/quantidade/valor (se disponível).
-5. Salve o item.
+5. Salve a OS.
 
 ## O que acontece depois
 Os itens ficam registrados na OS e podem aparecer em PDF/relatórios (dependendo da configuração).

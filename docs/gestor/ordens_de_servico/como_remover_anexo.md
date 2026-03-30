@@ -5,10 +5,11 @@ Quando um arquivo foi anexado por engano ou precisa ser substituído.
 
 ## Passo a passo
 1. Abra a OS.
+2. Clique em **Editar**
 2. Vá até a área **Anexos**.
 3. Localize o arquivo que deseja remover.
-4. Clique em **Remover/Excluir** (quando disponível).
-5. Confirme.
+4. Clique no ícone da lixeira ao lado do registro do anexo.
+5. Confirme a exclusão.
 
 ## O que acontece depois
 O anexo é removido da OS e deixa de aparecer para os usuários.

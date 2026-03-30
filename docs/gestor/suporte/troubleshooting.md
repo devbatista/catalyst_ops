@@ -1,7 +1,7 @@
 # Problemas comuns (Troubleshooting)
 
 ## Não consigo criar uma OS
-- Verifique se você está com perfil **gestor/admin**
+- Verifique se você está com perfil **gestor**
 - Confirme se o **cliente** está cadastrado
 - Preencha **título** e **descrição** com informações mínimas
 

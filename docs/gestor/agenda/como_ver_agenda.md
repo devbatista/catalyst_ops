@@ -4,7 +4,7 @@
 Quando você quer visualizar atendimentos por dia/semana para organizar a operação.
 
 ## Passo a passo
-1. Acesse **Agenda** no painel.
+1. Acesse **Calendário** no painel.
 2. Escolha o dia/semana que deseja visualizar.
 3. Clique em um item para abrir a OS (quando aplicável).
 
