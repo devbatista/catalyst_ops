@@ -12,6 +12,74 @@ import PerfectScrollbar from "perfect-scrollbar"
 
 import "register/signups"
 
+function formatCurrencyBR(rawValue) {
+  const digits = String(rawValue || "").replace(/\D/g, "");
+  if (!digits) return "";
+
+  const value = Number(digits) / 100;
+  return value.toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
+
+function parseCurrencyToNumber(rawValue) {
+  const raw = String(rawValue || "").trim();
+  if (!raw) return null;
+
+  let sanitized = raw.replace(/[^\d,.\-]/g, "");
+  if (!sanitized) return null;
+
+  const hasComma = sanitized.includes(",");
+  const hasDot = sanitized.includes(".");
+
+  if (hasComma && hasDot) {
+    if (sanitized.lastIndexOf(",") > sanitized.lastIndexOf(".")) {
+      // 1.234,56 -> 1234.56
+      sanitized = sanitized.replace(/\./g, "").replace(",", ".");
+    } else {
+      // 1,234.56 -> 1234.56
+      sanitized = sanitized.replace(/,/g, "");
+    }
+  } else if (hasComma) {
+    // 123,45 -> 123.45
+    sanitized = sanitized.replace(/\./g, "").replace(",", ".");
+  } else {
+    // 1234.56 ou 1234
+    sanitized = sanitized.replace(/,/g, "");
+  }
+
+  const parsed = Number(sanitized);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function formatNumberToCurrencyBR(value) {
+  return Number(value).toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
+
+function maskCurrencyInput(input) {
+  if (!input) return;
+  input.value = formatCurrencyBR(input.value);
+  input.setSelectionRange(input.value.length, input.value.length);
+}
+
+function initializeCurrencyMasks() {
+  document.querySelectorAll('input[data-money-mask="brl"]').forEach((input) => {
+    const parsed = parseCurrencyToNumber(input.value);
+    if (parsed !== null) {
+      input.value = formatNumberToCurrencyBR(parsed);
+    }
+  });
+}
+
+document.addEventListener("input", function (e) {
+  if (!e.target.matches('input[data-money-mask="brl"]')) return;
+  maskCurrencyInput(e.target);
+});
+
 document.addEventListener('click', async function (e) {
   // Logout via DELETE usando JavaScript
   const logoutLink = e.target.closest('a.js-logout')
@@ -210,4 +278,5 @@ function initializePage() {
 
 $(document).ready(function () {
   initializePage();
+  initializeCurrencyMasks();
 });
