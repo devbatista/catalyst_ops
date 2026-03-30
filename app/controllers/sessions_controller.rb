@@ -8,6 +8,8 @@ class SessionsController < Devise::SessionsController
 
   def new; end
 
+  def forgot_password; end
+
   def create
     email = params[:email].to_s.downcase.strip
     user = User.find_by(email: email)
@@ -30,6 +32,15 @@ class SessionsController < Devise::SessionsController
       flash[:alert] = "E-mail ou senha inválidos."
       redirect_to login_root_url(subdomain: "login"), allow_other_host: true
     end
+  end
+
+  def send_reset_password
+    email = params[:email].to_s.downcase.strip
+    user = User.find_by(email: email)
+    user&.send_password_reset_email!
+
+    redirect_to login_root_url(subdomain: "login"), allow_other_host: true,
+                notice: "Se o e-mail existir na base, você receberá o link de redefinição em instantes."
   end
 
   def new_password; end
