@@ -63,7 +63,7 @@ class App::OrderServicesController < ApplicationController
     else
       @clients = current_user.clients.order(:name)
       @technicians = current_user.company.users
-      flash.now[:alert] = @order_service.errors.full_messages
+      flash.now[:alert] = @order_service.errors.full_messages.to_sentence
       render :new, status: :unprocessable_entity
     end
   end
@@ -79,7 +79,7 @@ class App::OrderServicesController < ApplicationController
       end
     else
       @clients = Client.order(:name)
-      flash.now[:alert] = @order_service.errors.full_messages
+      flash.now[:alert] = @order_service.errors.full_messages.to_sentence
       render :edit, status: :unprocessable_entity
     end
   end
@@ -206,7 +206,7 @@ class App::OrderServicesController < ApplicationController
 
     if invalid_attachments.any?
       @clients = Client.order(:name)
-      flash.now[:alert] = @order_service.errors.full_messages
+      flash.now[:alert] = @order_service.errors.full_messages.to_sentence
       render :edit, status: :unprocessable_entity
     else
       redirect_to app_order_service_url(@order_service), notice: "Ordem de serviço atualizada com sucesso."
