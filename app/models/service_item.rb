@@ -45,11 +45,35 @@ class ServiceItem < ApplicationRecord
     !order_service.concluida?
   end
 
+  def unit_price=(value)
+    super(normalize_decimal_input(value))
+  end
+
   def blank_item?
     description.blank? && quantity.blank? && unit_price.blank?
   end
 
   private
+
+  def normalize_decimal_input(value)
+    return value unless value.is_a?(String)
+
+    sanitized = value.strip
+    return sanitized if sanitized.blank?
+
+    sanitized = sanitized.gsub(/[^\d,.\-]/, "")
+    return value if sanitized.blank?
+
+    if sanitized.include?(",")
+      sanitized = sanitized.gsub(".", "").tr(",", ".")
+    elsif sanitized.count(".") > 1
+      sanitized = sanitized.delete(".")
+    end
+
+    BigDecimal(sanitized)
+  rescue ArgumentError
+    value
+  end
 
   def cannot_edit_if_order_completed
     if order_service&.concluida? && (changed? || new_record?)
