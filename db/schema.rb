@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_03_26_170000) do
+ActiveRecord::Schema[7.1].define(version: 2026_03_30_152000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -216,6 +216,10 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_26_170000) do
     t.text "observations"
     t.integer "code"
     t.datetime "expected_end_at"
+    t.datetime "approval_sent_at"
+    t.datetime "approved_at"
+    t.datetime "rejected_at"
+    t.text "rejection_reason"
     t.index ["client_id"], name: "index_order_services_on_client_id"
     t.index ["company_id", "code"], name: "index_order_services_on_company_id_and_code", unique: true
     t.index ["company_id"], name: "index_order_services_on_company_id"

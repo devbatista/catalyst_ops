@@ -18,6 +18,7 @@ Rails.application.routes.draw do
   draw :app
   draw :login
   draw :register
+  draw :cliente
   draw :webhook
 
   # Rotas padrão (sem subdomínio)

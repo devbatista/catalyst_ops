@@ -9,6 +9,7 @@ constraints subdomain: "app" do
     get :overdue, on: :collection
     resources :service_items, module: "order_services", as: :app_service_items
     member do
+      post :send_for_approval
       patch :update_status
       get :generate_pdf
       delete :purge_attachment
@@ -17,6 +18,7 @@ constraints subdomain: "app" do
       patch :perform_schedule
     end
   end
+
   resources :attachments, only: [:index, :show, :destroy], module: "app", as: :app_attachments
   resources :reports, only: [:index, :show], module: "app", as: :app_reports do
     collection do

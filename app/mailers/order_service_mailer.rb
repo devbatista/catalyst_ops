@@ -1,10 +1,4 @@
 class OrderServiceMailer < ApplicationMailer
-  def notify_create(order_service)
-    @order_service = order_service
-    @client = @order_service.client
-    mail(to: @client.email, subject: "Uma nova Ordem de Serviço foi criada!")
-  end
-
   def notify_client_on_scheduled(order_service)
     @order_service = order_service
     @client = @order_service.client
@@ -54,5 +48,32 @@ class OrderServiceMailer < ApplicationMailer
     @technicians = @order_service.users
     @gestor = @order_service.company.responsible
     mail(to: @gestor.email, subject: "A ordem de serviço ##{@order_service.code} está em andamento!")
+  end
+
+  def approval_request_to_client(order_service, token)
+    @order_service = order_service
+    @client = @order_service.client
+    @approval_url = order_service_approval_url(token: token, subdomain: "cliente")
+
+    mail(to: @client.email, subject: "Aprovação da Ordem de Serviço ##{@order_service.code}")
+  end
+
+  def approval_request_copy_to_manager(order_service, manager_email)
+    @order_service = order_service
+    @client = @order_service.client
+
+    pdf_data = Cmd::Pdf::Create.new(@order_service).generate_pdf_data
+    attachments["ordem_servico_#{@order_service.code}.pdf"] = {
+      mime_type: "application/pdf",
+      content: pdf_data
+    }
+
+    mail(to: manager_email, subject: "Cópia da OS ##{@order_service.code} para envio ao cliente")
+  end
+
+  def notify_client_on_approval(order_service)
+    @order_service = order_service
+    @client = @order_service.client
+    mail(to: @client.email, subject: "Ordem de Serviço ##{@order_service.code} aprovada")
   end
 end

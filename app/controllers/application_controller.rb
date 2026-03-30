@@ -54,6 +54,10 @@ class ApplicationController < ActionController::Base
     request.subdomain == "register"
   end
 
+  def cliente_subdomain?
+    request.subdomain == "cliente"
+  end
+
   def ensure_terms_accepted!
     return unless current_user&.company
     return if current_user.company.accepted_current_terms?
@@ -72,6 +76,7 @@ class ApplicationController < ActionController::Base
     return "admin" if request.subdomain == "admin"
     return "app" if request.subdomain == "app"
     return "login" if request.subdomain == "login"
+    return "cliente" if request.subdomain == "cliente"
     return "webhook" if request.subdomain == "webhook"
 
     "system"
