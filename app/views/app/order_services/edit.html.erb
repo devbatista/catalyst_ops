@@ -13,16 +13,6 @@
       </div>
     <% end %>
 
-    <% if @order_service.errors.any? %>
-    <div class="alert alert-danger">
-      <ul>
-        <% @order_service.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-        <% end %>
-      </ul>
-    </div>
-    <% end %>
-
     <!--end breadcrumb-->
     <div class="row">
       <div class="col-xl-12 mx-auto">

@@ -1,6 +1,19 @@
 pt-BR:
   activerecord:
+    models:
+      service_item:
+        one: "Item de serviço"
+        other: "Itens de serviço"
     attributes:
+      order_service:
+        service_items: "Itens de serviço"
+        "service_items.description": "Descrição do item de serviço"
+        "service_items.quantity": "Quantidade do item de serviço"
+        "service_items.unit_price": "Valor unitário do item de serviço"
+      service_item:
+        description: "Descrição"
+        quantity: "Quantidade"
+        unit_price: "Valor unitário"
       user:
         assignments: "Atribuições"
     errors:
@@ -10,6 +23,14 @@ pt-BR:
             base:
               restrict_dependent_destroy:
                 has_many: "Não é possível remover o técnico, pois ele está associado a ordens de serviço."
+  errors:
+    messages:
+      blank: "não pode ficar em branco"
+      too_short: "é muito curto (mínimo: %{count} caracteres)"
+      not_a_number: "não é um número"
+      greater_than: "deve ser maior que %{count}"
+      greater_than_or_equal_to: "deve ser maior ou igual a %{count}"
+      less_than_or_equal_to: "deve ser menor ou igual a %{count}"
   date:
     formats:
       default: "%d/%m/%Y"

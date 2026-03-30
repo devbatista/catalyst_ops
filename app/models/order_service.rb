@@ -47,6 +47,7 @@ class OrderService < ApplicationRecord
   validate :started_at_logic
   validate :finished_at_logic
   validate :datetimes_fields_are_required_if_technicians_are_present
+  validate :service_items_cannot_be_blank
   validate :plan_order_service_limit, on: :create
 
   scope :by_status, ->(status) { where(status: status) }
@@ -257,6 +258,13 @@ class OrderService < ApplicationRecord
     if status_changed? && em_andamento? && users.empty?
       errors.add(:base, "Não é possível iniciar a OS sem técnico atribuído")
     end
+  end
+
+  def service_items_cannot_be_blank
+    has_blank_items = service_items.reject(&:marked_for_destruction?).any?(&:blank_item?)
+    return unless has_blank_items
+
+    errors.add(:base, "Não é possível deixar itens de serviço em branco.")
   end
 
   def started_at_logic
