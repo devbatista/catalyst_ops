@@ -151,7 +151,7 @@
                       class: "btn btn-#{OrderService.new(status: action[:target_status]).status_color} btn-sm ms-2",
                       form_class: "d-inline-block",
                       method: :patch,
-                      data: { confirm: "Tem certeza que deseja '#{action[:label]}' esta OS?" } %>
+                      form: { data: { os_action_confirm: "true", confirm_message: "Tem certeza que deseja '#{action[:label]}' esta OS?" } } %>
               <% end %>
             <% end %>
           </div>
@@ -160,3 +160,5 @@
     </div>
   </div>
 </div>
+
+<%= javascript_include_tag "app/order_service_show_actions" %>

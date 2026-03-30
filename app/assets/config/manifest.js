@@ -24,4 +24,5 @@
 //= link admin/tickets.js
 //= link app/support_tickets.js
 //= link app/order_service_attachments.js
+//= link app/order_service_show_actions.js
 //= link app/knowledge_base_modal.js
