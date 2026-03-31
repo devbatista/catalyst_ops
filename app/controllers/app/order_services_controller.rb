@@ -67,7 +67,7 @@ class App::OrderServicesController < ApplicationController
     @order_service.status = :rascunho
 
     if @order_service.save
-      redirect_to app_order_services_url, notice: "Ordem de serviço criada com sucesso."
+      redirect_to app_order_service_url(@order_service), notice: "Ordem de serviço criada com sucesso."
     else
       @clients = current_user.clients.order(:name)
       @technicians = current_user.company.users
