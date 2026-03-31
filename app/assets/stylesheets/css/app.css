@@ -5622,6 +5622,76 @@ payment-methods { align-items: stretch; }
   margin-bottom: 1em;
 }
 
+/* Calendar page - technician filter */
+.calendar-filter-card {
+  background: linear-gradient(180deg, #f8fafc 0%, #eef3f8 100%);
+  border: 1px solid #d9e2ec;
+}
+
+.calendar-tech-filter-group {
+  flex-wrap: nowrap;
+}
+
+.calendar-tech-filter-icon {
+  border-right: 0;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calendar-tech-filter-group > .select2-container {
+  flex: 1 1 auto;
+  width: 1% !important;
+}
+
+.calendar-tech-filter-group > .select2-container .select2-selection {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.calendar-filter-card .select2-container--bootstrap-5 .select2-selection {
+  min-height: 38px;
+}
+
+.calendar-filter-card .select2-container--bootstrap-5 .select2-selection--multiple {
+  min-height: 38px;
+  max-height: 112px;
+  overflow-y: auto;
+  padding: 4px 6px;
+  border-color: #b6c2cf;
+}
+
+.calendar-filter-card .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__rendered {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+.calendar-filter-card .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__choice {
+  margin: 0;
+  padding: 2px 8px;
+  border: 1px solid #bfd7ff;
+  background: #eaf2ff;
+  color: #24416b;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.calendar-filter-card .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__choice__remove {
+  margin-right: 6px;
+  color: #24416b;
+}
+
+.calendar-filter-card .select2-container--bootstrap-5.select2-container--focus .select2-selection {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
 .audit-date-group .form-control {
   background-color: #0f1a26;
   color: #e8edf3;
