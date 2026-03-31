@@ -162,3 +162,24 @@ $(function () {
 		$('html').attr('class', 'color-sidebar sidebarcolor8');
 	}
 });
+
+(function () {
+	"use strict";
+
+	function revealPageAfterIcons() {
+		const root = document.documentElement;
+		const reveal = function () {
+			root.classList.remove("page-pending");
+		};
+
+		if (document.fonts && document.fonts.ready) {
+			document.fonts.ready.then(reveal).catch(reveal);
+			setTimeout(reveal, 1200);
+		} else {
+			setTimeout(reveal, 0);
+		}
+	}
+
+	document.addEventListener("DOMContentLoaded", revealPageAfterIcons);
+	document.addEventListener("turbo:load", revealPageAfterIcons);
+})();

@@ -7,6 +7,9 @@
   <title>CatalystOps</title>
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
+  <script>
+    document.documentElement.classList.add("page-pending");
+  </script>
 
   <!--favicon-->
   <link rel="icon" href="<%= asset_path('favicon-32x32.png') %>" type="image/png" />

@@ -31,6 +31,12 @@ body {
 
 }
 
+html.page-pending .wrapper,
+html.page-pending .page-footer {
+	opacity: 0;
+	visibility: hidden;
+}
+
 
 
 a {
