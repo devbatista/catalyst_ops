@@ -18,9 +18,13 @@ USERS << User.create!(
 COMPANIES.each do |company|
   subscription = company.subscriptions.find_by(status: 'active')
   next if subscription.nil? || subscription.plan.nil? || !company.can_add_technician?
-    
+
   max_tecs = subscription.plan.max_technicians || 10
-  rand(1..max_tecs).times do
+  current_tecs = company.users.tecnicos.active.count
+  available_slots = [max_tecs - current_tecs, 0].max
+  next if available_slots.zero?
+
+  rand(1..available_slots).times do
     USERS << User.create!(
       name: Faker::Name.name,
       email: Faker::Internet.unique.email,
