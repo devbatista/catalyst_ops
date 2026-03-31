@@ -22,15 +22,6 @@
     </li>
     <% end %>
 
-    <% if can?(:manage, OrderService) || can?(:read, OrderService) %>
-    <li class="list-group-item <%= active_menu_class(app_order_services_path) %>">
-      <%= link_to app_order_services_path do %>
-      <div class="parent-icon"><i class='bx bx-edit'></i></div>
-      <div class="menu-title">Ordens de Serviço</div>
-      <% end %>
-    </li>
-    <% end %>
-
     <% if current_user.gestor? || current_user.admin? %>
     <li class="list-group-item <%= active_menu_class(app_budgets_path) %>">
       <%= link_to app_budgets_path do %>
@@ -45,6 +36,15 @@
       <%= link_to app_technicians_path do %>
       <div class="parent-icon"><i class='bx bx-run'></i></div>
       <div class="menu-title">Técnicos</div>
+      <% end %>
+    </li>
+    <% end %>
+
+    <% if can?(:manage, OrderService) || can?(:read, OrderService) %>
+    <li class="list-group-item <%= active_menu_class(app_order_services_path) %>">
+      <%= link_to app_order_services_path do %>
+      <div class="parent-icon"><i class='bx bx-edit'></i></div>
+      <div class="menu-title">Ordens de Serviço</div>
       <% end %>
     </li>
     <% end %>
