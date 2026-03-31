@@ -10,6 +10,14 @@ class Cliente::BudgetApprovalsController < ApplicationController
 
   def show; end
 
+  def generate_pdf
+    pdf_data = Cmd::Pdf::CreateBudget.new(@budget).generate_pdf_data
+    send_data pdf_data,
+              filename: "orcamento_#{@budget.code}.pdf",
+              type: "application/pdf",
+              disposition: "attachment"
+  end
+
   def approve
     if @budget.approved_at.present?
       return redirect_to budget_approval_path(token: params[:token], subdomain: "cliente"),

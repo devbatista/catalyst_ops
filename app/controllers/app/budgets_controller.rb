@@ -41,7 +41,7 @@ class App::BudgetsController < ApplicationController
   end
 
   def update
-    if @budget.update(budget_params)
+    if @budget.update(update_budget_params)
       redirect_to app_budgets_path, notice: "Orçamento atualizado com sucesso."
     else
       @budget.service_items.build if @budget.service_items.empty?
@@ -61,7 +61,7 @@ class App::BudgetsController < ApplicationController
     end
 
     @budget.send_for_approval!
-    token = @budget.approval_token
+    token = @budget.approval_token(expires_at: @budget.approval_expires_at)
     BudgetMailer.approval_request_to_client(@budget, token, sender_name: current_user.name).deliver_later
 
     redirect_to app_budget_path(@budget), notice: "Orçamento enviado para aprovação do cliente."
@@ -157,6 +157,18 @@ class App::BudgetsController < ApplicationController
     params.require(:budget).permit(
       :title, :description, :client_id, :total_value, :valid_until,
       service_items_attributes: [:id, :description, :quantity, :unit_price, :_destroy]
+    )
+  end
+
+  def update_budget_params
+    return budget_params unless @budget.rejeitado?
+
+    budget_params.merge(
+      status: :rascunho,
+      rejected_at: nil,
+      rejection_reason: nil,
+      approved_at: nil,
+      approval_sent_at: nil
     )
   end
 end

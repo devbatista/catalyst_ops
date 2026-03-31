@@ -103,7 +103,7 @@
                         <% if budget.editable? %>
                           <%= link_to "Editar", edit_app_budget_path(budget), class: "btn btn-sm btn-outline-secondary" %>
                         <% end %>
-                        <% if budget.rascunho? || budget.rejeitado? %>
+                        <% if budget.rascunho? %>
                           <%= button_to "Enviar ao cliente",
                                         send_for_approval_app_budget_path(budget),
                                         method: :post,

@@ -111,7 +111,7 @@
           </div>
 
           <div>
-            <% if @budget.rascunho? || @budget.rejeitado? %>
+            <% if @budget.rascunho? %>
               <%= button_to "Enviar ao cliente",
                             send_for_approval_app_budget_path(@budget),
                             method: :post,
@@ -119,7 +119,7 @@
                             class: "btn btn-outline-primary ms-2" %>
             <% end %>
 
-            <% if @budget.enviado? || @budget.rascunho? || @budget.rejeitado? %>
+            <% if @budget.enviado? || @budget.rascunho? %>
               <%= button_to "Aprovar (Gestor)",
                             approve_app_budget_path(@budget),
                             method: :patch,

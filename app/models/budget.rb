@@ -45,6 +45,10 @@ class Budget < ApplicationRecord
     signed_id(purpose: :budget_approval, expires_in: ttl)
   end
 
+  def approval_expires_at
+    valid_until&.end_of_day || (Time.current + 1.week).end_of_day
+  end
+
   def self.find_by_approval_token(token)
     find_signed(token, purpose: :budget_approval)
   rescue ActiveSupport::MessageVerifier::InvalidSignature
@@ -67,7 +71,10 @@ class Budget < ApplicationRecord
       raise ActiveRecord::RecordInvalid, self
     end
 
-    Budgets::ApproveAndCreateOrderService.call(budget: self, approver_role: approver_role)
+    Cmd::Budgets::ApproveAndCreateOrderService.new(
+      budget: self,
+      approver_role: approver_role
+    ).call
   end
 
   def reject!(rejection_reason:)
