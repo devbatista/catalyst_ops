@@ -64,8 +64,8 @@ class OrderServiceMailer < ApplicationMailer
     manager_user = @order_service.company.users.find_by(email: manager_email) || @order_service.company.responsible
     @manager_name = manager_user&.name.presence || "Responsável"
 
-    pdf_data = Cmd::Pdf::Create.new(@order_service).generate_pdf_data
-    attachments["ordem_servico_#{@order_service.code}.pdf"] = {
+    pdf_data = Cmd::Pdf::CreateBudget.new(@order_service).generate_pdf_data
+    attachments["orcamento_#{@order_service.code}.pdf"] = {
       mime_type: "application/pdf",
       content: pdf_data
     }
