@@ -1,7 +1,8 @@
 <p>Olá, <%= @client.name %>.</p>
 
 <p>
-  A Ordem de Serviço <strong>#<%= @order_service.code %></strong> foi enviada para sua aprovação.
+  O <strong><%= @sender_name %></strong> da empresa <strong><%= @company_name %></strong>
+  está lhe enviando o orçamento <strong>#<%= @budget.code %></strong> para sua aprovação.
 </p>
 
 <p>Para aprovar ou rejeitar, acesse o orçamento pelo botão abaixo:</p>
@@ -18,4 +19,7 @@
   <a href="<%= @approval_url %>">Abrir orçamento</a>
 </p>
 
-<p>Este link expira em 7 dias.</p>
+<p>
+  Este link expira em
+  <strong><%= l(@approval_expires_at.to_date, format: "%d/%m/%Y") %></strong>.
+</p>

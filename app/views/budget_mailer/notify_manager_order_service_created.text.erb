@@ -1,0 +1,9 @@
+Olá, equipe de gestão.
+
+O orçamento #<%= @budget.code %> foi aprovado por <%= @approver_role == "cliente" ? "cliente" : "gestor" %> e gerou automaticamente a Ordem de Serviço #<%= @order_service.code %>.
+
+Cliente: <%= @client&.name %>
+Empresa: <%= @company&.name %>
+
+Abrir OS:
+<%= @app_order_service_url %>

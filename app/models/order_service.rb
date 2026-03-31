@@ -75,7 +75,6 @@ class OrderService < ApplicationRecord
   after_update :notify_finished, if: -> { saved_change_to_status?(to: "finalizada") }
   after_update :notify_in_progress, if: -> { saved_change_to_status?(to: "em_andamento") }
   after_update :notify_overdue, if: -> { saved_change_to_status?(to: "atrasada") }
-  after_update :notify_client_on_approval, if: -> { saved_change_to_approved_at? && approved_at.present? }
 
   def total_value
     service_items.sum(&:total_price)
@@ -147,76 +146,6 @@ class OrderService < ApplicationRecord
     when "cancelada" then []
     else []
     end
-  end
-
-  def approval_token(expires_at: nil, expires_in: 1.week)
-    final_expires_at = expires_at || (Time.current + expires_in).end_of_day
-    ttl = final_expires_at - Time.current
-    ttl = 1.second if ttl <= 0
-
-    signed_id(purpose: :order_service_approval, expires_in: ttl)
-  end
-
-  def self.find_by_approval_token(token)
-    find_signed(token, purpose: :order_service_approval)
-  rescue ActiveSupport::MessageVerifier::InvalidSignature
-    nil
-  end
-
-  def send_approval_request_emails!(sender_email:, expires_in: 1.week)
-    sent_at = Time.current
-    update_columns(
-      status: self.class.statuses[:pendente],
-      approval_sent_at: sent_at,
-      approved_at: nil,
-      rejected_at: nil,
-      rejection_reason: nil
-    )
-
-    expires_at = (sent_at + expires_in).end_of_day
-    token = approval_token(expires_at: expires_at)
-
-    OrderServiceMailer.approval_request_to_client(self, token).deliver_later
-    OrderServiceMailer.approval_request_copy_to_manager(self, sender_email).deliver_later if sender_email.present?
-  end
-
-  def approval_response_deadline(expires_in: 1.week)
-    return if approval_sent_at.blank?
-
-    (approval_sent_at + expires_in).end_of_day
-  end
-
-  def approve_by_client!
-    unless pendente?
-      errors.add(:status, "não permite aprovação neste estado")
-      return false
-    end
-
-    update!(
-      approved_at: Time.current,
-      rejected_at: nil,
-      rejection_reason: nil
-    )
-  end
-
-  def reject_by_client!(rejection_reason:)
-    unless pendente?
-      errors.add(:status, "não permite rejeição neste estado")
-      return false
-    end
-
-    reason = rejection_reason.to_s.strip
-    if reason.blank?
-      errors.add(:rejection_reason, "não pode ficar em branco")
-      return false
-    end
-
-    update!(
-      status: :cancelada,
-      rejected_at: Time.current,
-      approved_at: nil,
-      rejection_reason: reason
-    )
   end
 
   def available_actions
@@ -402,11 +331,6 @@ class OrderService < ApplicationRecord
   def notify_scheduled
     notify_client_on_scheduled
     notify_technical_on_scheduled
-  end
-
-  def notify_client_on_approval
-    OrderServiceMailer.notify_client_on_approval(self).deliver_later
-    OrderServiceMailer.notify_manager_on_approval(self).deliver_later
   end
 
   def notify_client_on_scheduled

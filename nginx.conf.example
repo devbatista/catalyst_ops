@@ -1,6 +1,13 @@
 events {}
 
 http {
+  # Mitiga 502 por headers grandes (ex.: Set-Cookie/session)
+  client_header_buffer_size 16k;
+  large_client_header_buffers 8 32k;
+  proxy_buffer_size 128k;
+  proxy_buffers 8 128k;
+  proxy_busy_buffers_size 256k;
+
   server {
     listen 80;
     server_name catalystops.com.br *.catalystops.com.br;

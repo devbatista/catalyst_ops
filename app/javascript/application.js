@@ -75,6 +75,7 @@ function initializeCurrencyMasks() {
   });
 }
 
+
 document.addEventListener("input", function (e) {
   if (!e.target.matches('input[data-money-mask="brl"]')) return;
   maskCurrencyInput(e.target);

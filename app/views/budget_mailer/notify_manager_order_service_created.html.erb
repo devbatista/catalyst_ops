@@ -1,0 +1,19 @@
+<p>Olá, equipe de gestão.</p>
+
+<p>
+  O orçamento <strong>#<%= @budget.code %></strong> foi aprovado por
+  <strong><%= @approver_role == "cliente" ? "cliente" : "gestor" %></strong>
+  e gerou automaticamente a Ordem de Serviço <strong>#<%= @order_service.code %></strong>.
+</p>
+
+<p>
+  <strong>Cliente:</strong> <%= @client&.name %><br>
+  <strong>Empresa:</strong> <%= @company&.name %>
+</p>
+
+<p style="margin: 24px 0;">
+  <a href="<%= @app_order_service_url %>"
+     style="display:inline-block; background:#0d6efd; color:#ffffff; text-decoration:none; padding:12px 20px; border-radius:6px; font-weight:600;">
+    Abrir Ordem de Serviço
+  </a>
+</p>

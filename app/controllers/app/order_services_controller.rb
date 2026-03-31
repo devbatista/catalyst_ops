@@ -1,9 +1,9 @@
 class App::OrderServicesController < ApplicationController
   load_and_authorize_resource
   
-  before_action :set_other_resources, only: [:new, :edit, :update, :schedule]
+  before_action :set_other_resources, only: [:edit, :update, :schedule]
   before_action :set_attachment_on_update, only: [:update]
-  before_action :can_add_order_service, only: [:new, :create]
+  before_action :can_add_order_service, only: [:create]
   before_action :ensure_technician_only_updates_allowed_fields, only: [:update]
   before_action :restrict_status_update_for_technician, only: [:update_status]
   before_action :restrict_overdue_reschedule_for_technician, only: [:schedule, :perform_schedule]
@@ -57,21 +57,9 @@ class App::OrderServicesController < ApplicationController
                                           .per(params[:per] || 10)
   end
 
-  def new
-    prefill_client_from_params
-  end
-
   def create
-    @order_service.status = :pendente
-
-    if @order_service.save
-      redirect_to app_order_service_url(@order_service), notice: "Ordem de serviço criada com sucesso."
-    else
-      @clients = current_user.clients.order(:name)
-      @technicians = current_user.company.users
-      flash.now[:alert] = @order_service.errors.full_messages.to_sentence
-      render :new, status: :unprocessable_entity
-    end
+    redirect_to new_app_budget_path(client_id: params.dig(:order_service, :client_id)),
+                alert: "A criação manual de OS foi desativada. Crie um orçamento."
   end
 
   def edit; end
@@ -130,24 +118,6 @@ class App::OrderServicesController < ApplicationController
         redirect_to app_order_service_url(@order_service), alert: @order_service.errors.full_messages.join(', ')
       end
     end
-  end
-
-  def send_for_approval
-    unless current_user.gestor?
-      return redirect_to app_order_service_url(@order_service), alert: "Somente gestor pode enviar para aprovação."
-    end
-
-    unless @order_service.pendente?
-      return redirect_to app_order_service_url(@order_service), alert: "Apenas OS pendentes podem ser enviadas para aprovação."
-    end
-
-    if @order_service.approval_sent_at.present? && @order_service.approval_sent_at > 5.minutes.ago
-      return redirect_to app_order_service_url(@order_service),
-                         alert: "Aguarde alguns minutos antes de reenviar para aprovação."
-    end
-
-    @order_service.send_approval_request_emails!(sender_email: current_user.email)
-    redirect_to app_order_service_url(@order_service), notice: "Solicitação de aprovação enviada ao cliente com sucesso."
   end
 
   def generate_pdf

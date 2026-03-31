@@ -1,0 +1,8 @@
+Olá, <%= @client.name %>.
+
+O <%= @sender_name %> da empresa <%= @company_name %> está lhe enviando o orçamento #<%= @budget.code %> para sua aprovação.
+
+Para aprovar ou rejeitar, acesse:
+<%= @approval_url %>
+
+Este link expira em <%= l(@approval_expires_at.to_date, format: "%d/%m/%Y") %>.

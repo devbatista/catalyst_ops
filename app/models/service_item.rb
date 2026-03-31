@@ -1,5 +1,6 @@
 class ServiceItem < ApplicationRecord
-  belongs_to :order_service
+  belongs_to :order_service, optional: true
+  belongs_to :budget, optional: true
 
   with_options unless: :blank_item? do
     validates :description, presence: true, length: { minimum: 5, maximum: 200 }
@@ -14,6 +15,7 @@ class ServiceItem < ApplicationRecord
   end
 
   validate :cannot_edit_if_order_completed
+  validate :must_belong_to_order_service_or_budget
 
   before_save :calculate_total
 
@@ -38,11 +40,14 @@ class ServiceItem < ApplicationRecord
   end
 
   def can_be_edited?
-    !order_service.concluida?
+    return !order_service.concluida? if order_service.present?
+    return budget.editable? if budget.present?
+
+    false
   end
 
   def can_be_deleted?
-    !order_service.concluida?
+    can_be_edited?
   end
 
   def unit_price=(value)
@@ -81,6 +86,12 @@ class ServiceItem < ApplicationRecord
     end
   end
 
+  def must_belong_to_order_service_or_budget
+    return if order_service.present? || budget.present?
+
+    errors.add(:base, "Item de serviço deve pertencer a uma OS ou orçamento")
+  end
+
   def calculate_total
     # Este método pode ser usado para cálculos adicionais se necessário
     # Por enquanto, total_price já faz o cálculo
@@ -88,5 +99,6 @@ class ServiceItem < ApplicationRecord
 
   def update_order_service_total
     order_service.touch if order_service.present?
+    budget.touch if budget.present?
   end
 end

@@ -1,7 +1,8 @@
 constraints subdomain: "cliente" do
   scope module: :cliente do
-    get "order_service_approvals/:token", to: "order_service_approvals#show", as: :order_service_approval
-    patch "order_service_approvals/:token/approve", to: "order_service_approvals#approve", as: :approve_order_service_approval
-    patch "order_service_approvals/:token/reject", to: "order_service_approvals#reject", as: :reject_order_service_approval
+    get "budget_approvals/:token", to: "budget_approvals#show", as: :budget_approval
+    get "budget_approvals/:token/pdf", to: "budget_approvals#generate_pdf", as: :generate_pdf_budget_approval
+    patch "budget_approvals/:token/approve", to: "budget_approvals#approve", as: :approve_budget_approval
+    patch "budget_approvals/:token/reject", to: "budget_approvals#reject", as: :reject_budget_approval
   end
 end
