@@ -61,6 +61,8 @@ class OrderServiceMailer < ApplicationMailer
   def approval_request_copy_to_manager(order_service, manager_email)
     @order_service = order_service
     @client = @order_service.client
+    manager_user = @order_service.company.users.find_by(email: manager_email) || @order_service.company.responsible
+    @manager_name = manager_user&.name.presence || "Responsável"
 
     pdf_data = Cmd::Pdf::Create.new(@order_service).generate_pdf_data
     attachments["ordem_servico_#{@order_service.code}.pdf"] = {
@@ -75,5 +77,21 @@ class OrderServiceMailer < ApplicationMailer
     @order_service = order_service
     @client = @order_service.client
     mail(to: @client.email, subject: "Ordem de Serviço ##{@order_service.code} aprovada")
+  end
+
+  def notify_manager_on_approval(order_service)
+    @order_service = order_service
+    @client = @order_service.client
+    @manager_name = @order_service.company.responsible&.name.presence || "Responsável"
+    @app_order_service_url = app_order_service_url(@order_service, subdomain: "app")
+
+    manager_emails = @order_service.company.gestores.pluck(:email).uniq
+    if manager_emails.blank?
+      fallback_email = @order_service.company.responsible&.email
+      manager_emails = [ fallback_email ].compact
+    end
+    return if manager_emails.blank?
+
+    mail(to: manager_emails, subject: "Orçamento ##{@order_service.code} aprovado pelo cliente")
   end
 end

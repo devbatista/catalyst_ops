@@ -1,0 +1,20 @@
+Olá, <%= @manager_name %>.
+
+O cliente <%= @client.name %> aprovou o orçamento da OS #<%= @order_service.code %>.
+
+Para manter o andamento sem atrasos:
+- definir técnico responsável;
+- confirmar data e horário de execução;
+- atualizar o status conforme evolução da OS.
+
+Abrir OS no sistema:
+<%= @app_order_service_url %>
+
+Resumo:
+Empresa: <%= @order_service.company.name %>
+Cliente: <%= @client.name %>
+Título: <%= @order_service.title %>
+Valor total: <%= number_to_currency(@order_service.total_value, unit: "R$ ", separator: ",", delimiter: ".") %>
+Aprovado em: <%= l(@order_service.approved_at, format: :short) if @order_service.approved_at.present? %>
+
+A OS foi movida para o status pendente e está pronta para seguir no fluxo.
