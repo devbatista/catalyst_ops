@@ -15,5 +15,10 @@ module Previews
       user = order_service.users.first
       OrderServiceMailer.notify_technical_on_scheduled(order_service, user)
     end
+
+    def notify_manager_on_approval
+      order_service = OrderService.where.not(client_id: nil).where.not(approved_at: nil).first || OrderService.where.not(client_id: nil).first
+      OrderServiceMailer.notify_manager_on_approval(order_service) if order_service.present?
+    end
   end
 end

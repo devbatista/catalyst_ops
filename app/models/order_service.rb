@@ -414,6 +414,7 @@ class OrderService < ApplicationRecord
 
   def notify_client_on_approval
     OrderServiceMailer.notify_client_on_approval(self).deliver_later
+    OrderServiceMailer.notify_manager_on_approval(self).deliver_later
   end
 
   def notify_client_on_scheduled
