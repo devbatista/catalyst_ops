@@ -25,6 +25,7 @@ class Client < ApplicationRecord
   belongs_to :company
 
   has_many :order_services, dependent: :destroy
+  has_many :budgets, dependent: :destroy
   has_many :addresses, dependent: :destroy
 
   accepts_nested_attributes_for :addresses, allow_destroy: true

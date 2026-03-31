@@ -49,7 +49,7 @@
 
                     <select name="status" class="form-select" style="max-width: 100%;" onchange="this.form.submit()">
                       <option value="" <%= params[:status].blank? ? 'selected' : '' %>>Todos os status</option>
-                      <% OrderService.statuses.keys.reject { |status| %w[rascunho rejeitada].include?(status) }.each do |status| %>
+                      <% OrderService.statuses.keys.each do |status| %>
                         <option value="<%= status %>" <%= params[:status] == status ? 'selected' : '' %>><%= status.humanize %></option>
                       <% end %>
                     </select>

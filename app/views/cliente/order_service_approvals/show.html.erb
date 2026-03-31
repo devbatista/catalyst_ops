@@ -84,11 +84,11 @@
         <% end %>
       </div>
 
-      <% if @order_service.pendente? %>
+      <% if @order_service.approved_at.present? %>
         <div class="alert alert-success mb-0">Este orçamento já foi aprovado.</div>
-      <% elsif @order_service.rejeitada? %>
+      <% elsif @order_service.rejected_at.present? || @order_service.cancelada? %>
         <div class="alert alert-warning mb-0">
-          Este orçamento foi rejeitado e aguarda revisão do gestor.
+          Este orçamento foi rejeitado e cancelado.
           <% if @order_service.rejection_reason.present? %>
             <hr>
             <strong>Motivo informado:</strong> <%= @order_service.rejection_reason %>

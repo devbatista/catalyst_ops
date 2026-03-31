@@ -96,14 +96,10 @@
                       <td><%= l(budget.approval_sent_at, format: :short) if budget.approval_sent_at.present? %></td>
                       <td><span class="badge bg-light text-dark border"><%= budget_status_label(budget) %></span></td>
                       <td class="text-nowrap">
-                        <%= link_to "Ver", app_order_service_path(budget), class: "btn btn-sm btn-primary" %>
-                        <%= link_to "Editar", edit_app_order_service_path(budget), class: "btn btn-sm btn-warning" %>
-                        <% if budget.rascunho? || budget.rejeitada? %>
-                          <%= button_to "Enviar",
-                              send_for_approval_app_order_service_path(budget),
-                              method: :post,
-                              form_class: "d-inline-block",
-                              class: "btn btn-sm btn-outline-success" %>
+                        <% if budget.order_service.present? %>
+                          <%= link_to "Ver OS", app_order_service_path(budget.order_service), class: "btn btn-sm btn-primary" %>
+                        <% else %>
+                          <span class="text-muted">Sem OS vinculada</span>
                         <% end %>
                       </td>
                     </tr>

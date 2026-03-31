@@ -34,6 +34,9 @@ class Ability
     # Pode gerenciar ordens de serviço
     can :manage, OrderService
 
+    # Pode gerenciar orçamentos
+    can :manage, Budget, company_id: user.company_id
+
     # Permissão para atribuir técnico a OS
     can :unassigned, OrderService
 
@@ -71,7 +74,7 @@ class Ability
 
     # Pode visualizar apenas OSs atribuídas a ele
     can :read, OrderService do |order_service|
-      order_service.users.include?(user) && !order_service.rascunho? && !order_service.rejeitada?
+      order_service.users.include?(user)
     end
 
     # Pode atualizar status das OSs atribuídas

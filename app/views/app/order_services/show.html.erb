@@ -137,21 +137,10 @@
         <p>Nenhum item cadastrado para esta ordem de serviço.</p>
         <% end %>
 
-        <% back_path = (@order_service.rascunho? || @order_service.rejeitada?) ? app_budgets_path : app_order_services_path %>
-        <% back_label = (@order_service.rascunho? || @order_service.rejeitada?) ? "Voltar para Orçamentos" : "Voltar" %>
-
         <div class="mt-3 d-flex justify-content-between align-items-center">
           <div>
-            <%= link_to back_label, back_path, class: "btn btn-secondary" %>
+            <%= link_to "Voltar", app_order_services_path, class: "btn btn-secondary" %>
             <%= link_to "Editar", edit_app_order_service_path(@order_service), class: "btn btn-primary" %>
-            <% if current_user.gestor? && (@order_service.rascunho? || @order_service.rejeitada?) %>
-              <%= button_to "Enviar para aprovação",
-                            send_for_approval_app_order_service_path(@order_service),
-                            method: :post,
-                            form_class: "d-inline-block",
-                            class: "btn btn-outline-success ms-2",
-                            form: { data: { os_action_confirm: "true", confirm_message: "Deseja enviar esta OS para aprovação do cliente?" } } %>
-            <% end %>
             <% unless current_user.tecnico? %>
               <%= link_to "Abrir ticket desta OS",
                           new_app_support_ticket_path(order_service_id: @order_service.id),

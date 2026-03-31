@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_03_31_103000) do
+ActiveRecord::Schema[7.1].define(version: 2026_03_31_190000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -92,6 +92,30 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_31_103000) do
     t.index ["occurred_at"], name: "index_audit_events_on_occurred_at"
     t.index ["request_id"], name: "index_audit_events_on_request_id"
     t.index ["resource_type", "resource_id", "occurred_at"], name: "idx_audit_events_resource_occurred_at"
+  end
+
+  create_table "budgets", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "client_id", null: false
+    t.uuid "order_service_id"
+    t.integer "code", null: false
+    t.string "title", null: false
+    t.text "description"
+    t.integer "status", default: 0, null: false
+    t.decimal "total_value", precision: 12, scale: 2, default: "0.0", null: false
+    t.date "valid_until"
+    t.datetime "approval_sent_at"
+    t.datetime "approved_at"
+    t.datetime "rejected_at"
+    t.text "rejection_reason"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["client_id"], name: "index_budgets_on_client_id"
+    t.index ["company_id", "code"], name: "index_budgets_on_company_id_and_code", unique: true
+    t.index ["company_id", "status"], name: "index_budgets_on_company_id_and_status"
+    t.index ["company_id"], name: "index_budgets_on_company_id"
+    t.index ["created_at"], name: "index_budgets_on_created_at"
+    t.index ["order_service_id"], name: "index_budgets_on_order_service_id"
   end
 
   create_table "clients", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -410,6 +434,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_31_103000) do
   add_foreign_key "assignments", "order_services"
   add_foreign_key "assignments", "users"
   add_foreign_key "audit_events", "companies"
+  add_foreign_key "budgets", "clients"
+  add_foreign_key "budgets", "companies"
+  add_foreign_key "budgets", "order_services"
   add_foreign_key "clients", "companies"
   add_foreign_key "companies", "plans"
   add_foreign_key "companies", "users", column: "responsible_id"
