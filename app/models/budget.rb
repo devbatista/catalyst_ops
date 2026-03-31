@@ -1,4 +1,6 @@
 class Budget < ApplicationRecord
+  include Auditable
+
   belongs_to :company
   belongs_to :client
   belongs_to :order_service, optional: true
@@ -99,6 +101,75 @@ class Budget < ApplicationRecord
 
   private
 
+  def auditable_created_action
+    "budget.created"
+  end
+
+  def auditable_updated_actions
+    changes = previous_changes.except("updated_at")
+    return [] if changes.blank?
+
+    actions = []
+
+    if changes.key?("status")
+      before_status, after_status = changes["status"]
+      before_name = status_name_from_change(before_status)
+      after_name = status_name_from_change(after_status)
+
+      status_action =
+        case after_name
+        when "enviado"
+          "budget.sent_for_approval"
+        when "aprovado"
+          "budget.approved"
+        when "rejeitado"
+          "budget.rejected"
+        else
+          "budget.status.changed"
+        end
+
+      actions << status_action unless before_name == after_name
+    end
+
+    non_status_changes = changes.except("status")
+    actions << "budget.updated" if non_status_changes.present?
+    actions
+  end
+
+  def auditable_deleted_action
+    nil
+  end
+
+  def auditable_metadata(event_name, action:)
+    data = {
+      event: event_name.to_s,
+      model: self.class.name,
+      budget_id: id,
+      code: code,
+      title: title,
+      status: status,
+      total_value: total_value.to_s,
+      valid_until: valid_until&.to_s,
+      client_id: client_id,
+      company_id: company_id,
+      order_service_id: order_service_id,
+      action_source: action
+    }
+
+    return data unless event_name == :updated
+
+    changes = previous_changes.except("updated_at")
+    data[:changes] = changes if changes.present?
+
+    if changes["status"].present?
+      before_status, after_status = changes["status"]
+      data[:status_before] = status_name_from_change(before_status)
+      data[:status_after] = status_name_from_change(after_status)
+    end
+
+    data
+  end
+
   def set_company_from_client
     self.company_id ||= client&.company_id
   end
@@ -131,5 +202,11 @@ class Budget < ApplicationRecord
     return unless has_blank_items
 
     errors.add(:base, "Não é possível deixar itens de serviço em branco.")
+  end
+
+  def status_name_from_change(value)
+    return value if self.class.statuses.key?(value.to_s)
+
+    self.class.statuses.key(value.to_i) || value.to_s
   end
 end

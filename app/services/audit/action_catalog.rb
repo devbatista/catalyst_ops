@@ -42,6 +42,15 @@ module Audit
       order_service.attachment.removed
     ].freeze
 
+    BUDGETS = %w[
+      budget.created
+      budget.updated
+      budget.status.changed
+      budget.sent_for_approval
+      budget.approved
+      budget.rejected
+    ].freeze
+
     COUPONS = %w[
       coupon.created
       coupon.updated
@@ -85,6 +94,7 @@ module Audit
       users: USERS,
       clients: CLIENTS,
       order_services: ORDER_SERVICES,
+      budgets: BUDGETS,
       coupons: COUPONS,
       subscriptions: SUBSCRIPTIONS,
       webhooks: WEBHOOKS,

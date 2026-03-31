@@ -1,5 +1,5 @@
 class AuditEvent < ApplicationRecord
-  SOURCES = %w[app admin login webhook job system].freeze
+  SOURCES = %w[app admin login cliente webhook job system].freeze
 
   belongs_to :company, optional: true
 

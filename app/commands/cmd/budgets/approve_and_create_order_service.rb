@@ -13,21 +13,23 @@ module Cmd
         budget.with_lock do
           return budget.order_service if budget.order_service.present?
 
-          order_service = create_order_service!
-
           budget.update!(
             status: :aprovado,
             approved_at: Time.current,
             rejected_at: nil,
-            rejection_reason: nil,
-            order_service: order_service
+            rejection_reason: nil
           )
+
+          order_service = create_order_service!
+          budget.update_columns(order_service_id: order_service.id, updated_at: Time.current)
 
           created_order_service = true
           created = order_service
         end
 
         if created_order_service && created.present?
+          ensure_order_service_created_audit!(created)
+
           BudgetMailer.notify_manager_order_service_created(
             budget,
             created,
@@ -80,6 +82,29 @@ module Cmd
 
       def order_service_observations
         "OS criada automaticamente após aprovação do orçamento ##{budget.code} por #{approver_role}."
+      end
+
+      def ensure_order_service_created_audit!(order_service)
+        return if order_service.blank?
+        return if order_service_created_audit_exists?(order_service)
+
+        Audit::Log.call(
+          action: "order_service.created",
+          resource: order_service,
+          metadata: order_service.auditable_metadata(:created, action: "order_service.created")
+        )
+      end
+
+      def order_service_created_audit_exists?(order_service)
+        scope = AuditEvent.where(
+          action: "order_service.created",
+          resource_type: "OrderService",
+          resource_id: order_service.id.to_s
+        )
+
+        return scope.exists? if Current.request_id.blank?
+
+        scope.where(request_id: Current.request_id).exists?
       end
     end
   end
