@@ -5,6 +5,7 @@ class Company < ApplicationRecord
   has_many :users, dependent: :nullify
   has_many :clients, dependent: :destroy
   has_many :order_services
+  has_many :budgets, dependent: :destroy
   has_many :technicians, -> { active.where(role: :tecnico).or(active.where(can_be_technician: true)) }, class_name: "User"
   has_many :subscriptions, dependent: :destroy
   has_many :support_tickets, dependent: :destroy

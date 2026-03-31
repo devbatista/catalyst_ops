@@ -3,8 +3,14 @@ module OrderServicesHelper
     case order_service.status.to_s
     when "rascunho"
       "pendente"
-    when "rejeitada"
+    when "rejeitada", "rejeitado"
       "rejeitado"
+    when "enviado"
+      "enviado"
+    when "aprovado"
+      "aprovado"
+    when "cancelado"
+      "cancelado"
     else
       order_service.status.humanize
     end

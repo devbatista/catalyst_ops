@@ -12,15 +12,13 @@ class App::OrderServicesController < ApplicationController
   def index
     @order_services = case current_user.role
     when "admin"
-      @order_services.where.not(status: [:rascunho, :rejeitada])
-                     .includes(:client, :users)
+      @order_services.includes(:client, :users)
     when "gestor"
-      @order_services.where.not(status: [:rascunho, :rejeitada])
-                     .joins(:client)
+      @order_services.joins(:client)
                      .where(clients: { company_id: current_user.company_id })
                      .includes(:client, :users)
     when "tecnico"
-      current_user.order_services.where.not(status: [:rascunho, :rejeitada]).includes(:client)
+      current_user.order_services.includes(:client)
     end.order(created_at: :desc).page(params[:page]).per(params[:per] || 10)
 
     if params[:code].present?
@@ -28,7 +26,7 @@ class App::OrderServicesController < ApplicationController
     end
 
     if params[:status].present?
-      allowed_statuses = OrderService.statuses.keys - %w[rascunho rejeitada]
+      allowed_statuses = OrderService.statuses.keys
       @order_services = @order_services.where(status: params[:status]) if allowed_statuses.include?(params[:status])
     end
   end
@@ -64,7 +62,7 @@ class App::OrderServicesController < ApplicationController
   end
 
   def create
-    @order_service.status = :rascunho
+    @order_service.status = :pendente
 
     if @order_service.save
       redirect_to app_order_service_url(@order_service), notice: "Ordem de serviço criada com sucesso."
@@ -139,8 +137,8 @@ class App::OrderServicesController < ApplicationController
       return redirect_to app_order_service_url(@order_service), alert: "Somente gestor pode enviar para aprovação."
     end
 
-    unless @order_service.rascunho? || @order_service.rejeitada?
-      return redirect_to app_order_service_url(@order_service), alert: "Apenas OS em rascunho ou rejeitada podem ser enviadas para aprovação."
+    unless @order_service.pendente?
+      return redirect_to app_order_service_url(@order_service), alert: "Apenas OS pendentes podem ser enviadas para aprovação."
     end
 
     if @order_service.approval_sent_at.present? && @order_service.approval_sent_at > 5.minutes.ago
@@ -148,10 +146,8 @@ class App::OrderServicesController < ApplicationController
                          alert: "Aguarde alguns minutos antes de reenviar para aprovação."
     end
 
-    was_rejected = @order_service.rejeitada?
     @order_service.send_approval_request_emails!(sender_email: current_user.email)
-    message = was_rejected ? "Orçamento reenviado para aprovação com sucesso." : "Solicitação de aprovação enviada ao cliente com sucesso."
-    redirect_to app_order_service_url(@order_service), notice: message
+    redirect_to app_order_service_url(@order_service), notice: "Solicitação de aprovação enviada ao cliente com sucesso."
   end
 
   def generate_pdf
@@ -211,7 +207,7 @@ class App::OrderServicesController < ApplicationController
 
   def should_set_status_as_scheduled?(permitted_params)
     return false unless current_user.gestor?
-    return false unless @order_service.rascunho? || @order_service.pendente? || @order_service.atrasada?
+    return false unless @order_service.pendente? || @order_service.atrasada?
 
     scheduled_at_present_after_update?(permitted_params) && technicians_present_after_update?(permitted_params)
   end

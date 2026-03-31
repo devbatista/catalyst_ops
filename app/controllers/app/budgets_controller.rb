@@ -5,7 +5,7 @@ class App::BudgetsController < ApplicationController
   def index
     @clients = clients_scope.order(:name)
     @budgets = filtered_budgets
-      .includes(:client, :users)
+      .includes(:client, :order_service)
       .order(created_at: :desc)
       .page(params[:page])
       .per((params[:per] || 10).to_i)
@@ -20,12 +20,11 @@ class App::BudgetsController < ApplicationController
   end
 
   def authorize_budget_access!
-    authorize! :read, OrderService
+    authorize! :read, Budget
   end
 
   def base_scope
-    scope = current_user.admin? ? OrderService.all : current_user.company.order_services
-    scope.where(status: [:rascunho, :rejeitada])
+    current_user.admin? ? Budget.all : current_user.company.budgets
   end
 
   def clients_scope
@@ -38,7 +37,7 @@ class App::BudgetsController < ApplicationController
     if params[:q].present?
       term = "%#{params[:q].strip}%"
       scope = scope.left_joins(:client).where(
-        "order_services.title ILIKE :term OR order_services.description ILIKE :term OR clients.name ILIKE :term",
+        "budgets.title ILIKE :term OR budgets.description ILIKE :term OR clients.name ILIKE :term",
         term: term
       )
     end
@@ -47,11 +46,11 @@ class App::BudgetsController < ApplicationController
 
     case params[:approval_state]
     when "nao_enviado"
-      scope = scope.where(approval_sent_at: nil)
+      scope = scope.where(approval_sent_at: nil).where(status: :rascunho)
     when "enviado"
-      scope = scope.where.not(approval_sent_at: nil).where(status: :rascunho)
+      scope = scope.where(status: :enviado)
     when "rejeitado"
-      scope = scope.where(status: :rejeitada)
+      scope = scope.where(status: :rejeitado)
     end
 
     scope

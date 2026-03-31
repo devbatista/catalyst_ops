@@ -8,6 +8,7 @@ class OrderService < ApplicationRecord
   has_many :assignments, dependent: :destroy
   has_many :users, through: :assignments, after_remove: :audit_user_unassigned
   has_many :service_items, dependent: :destroy
+  has_one :budget, dependent: :nullify
 
   accepts_nested_attributes_for :service_items, allow_destroy: true
   accepts_nested_attributes_for :assignments, allow_destroy: true
@@ -15,7 +16,6 @@ class OrderService < ApplicationRecord
   has_many_attached :attachments
 
   enum status: {
-    rascunho: 0,
     pendente: 1,
     agendada: 2,
     em_andamento: 3,
@@ -23,8 +23,7 @@ class OrderService < ApplicationRecord
     finalizada: 5,
     cancelada: 6,
     atrasada: 7,
-    rejeitada: 8,
-  }, _default: :rascunho
+  }, _default: :pendente
 
   STATUS_ACTIONS = {
     agendada: "Agendar",
@@ -32,8 +31,7 @@ class OrderService < ApplicationRecord
     concluida: "Concluir",
     finalizada: "Finalizar",
     cancelada: "Cancelar",
-    atrasada: "Reagendar",
-    rejeitada: "Rejeitar"
+    atrasada: "Reagendar"
   }.freeze
 
   validates :title, presence: true, length: { minimum: 5, maximum: 100 }
@@ -118,7 +116,6 @@ class OrderService < ApplicationRecord
   end
 
   def progress_percentage
-    return 0 if rascunho? || rejeitada?
     return 0 if pendente?
     return 25 if agendada?
     return 50 if em_andamento?
@@ -129,7 +126,6 @@ class OrderService < ApplicationRecord
 
   def status_color
     case status
-    when "rascunho" then "secondary"
     when "pendente" then "secondary"
     when "agendada" then "warning"
     when "atrasada" then "dark"
@@ -137,13 +133,11 @@ class OrderService < ApplicationRecord
     when "concluida" then "success"
     when "finalizada" then "primary"
     when "cancelada" then "danger"
-    when "rejeitada" then "danger"
     end
   end
 
   def next_possible_statuses
     case status
-    when "rascunho" then []
     when "pendente" then ["cancelada"]
     when "agendada" then ["em_andamento", "cancelada"]
     when "atrasada" then ["em_andamento", "cancelada"]
@@ -151,7 +145,6 @@ class OrderService < ApplicationRecord
     when "concluida" then ["finalizada"]
     when "finalizada" then []
     when "cancelada" then []
-    when "rejeitada" then []
     else []
     end
   end
@@ -173,7 +166,7 @@ class OrderService < ApplicationRecord
   def send_approval_request_emails!(sender_email:, expires_in: 1.week)
     sent_at = Time.current
     update_columns(
-      status: self.class.statuses[:rascunho],
+      status: self.class.statuses[:pendente],
       approval_sent_at: sent_at,
       approved_at: nil,
       rejected_at: nil,
@@ -194,13 +187,12 @@ class OrderService < ApplicationRecord
   end
 
   def approve_by_client!
-    unless rascunho? || rejeitada?
+    unless pendente?
       errors.add(:status, "não permite aprovação neste estado")
       return false
     end
 
     update!(
-      status: :pendente,
       approved_at: Time.current,
       rejected_at: nil,
       rejection_reason: nil
@@ -208,7 +200,7 @@ class OrderService < ApplicationRecord
   end
 
   def reject_by_client!(rejection_reason:)
-    unless rascunho? || rejeitada?
+    unless pendente?
       errors.add(:status, "não permite rejeição neste estado")
       return false
     end
@@ -220,7 +212,7 @@ class OrderService < ApplicationRecord
     end
 
     update!(
-      status: :rejeitada,
+      status: :cancelada,
       rejected_at: Time.current,
       approved_at: nil,
       rejection_reason: reason
@@ -465,7 +457,7 @@ class OrderService < ApplicationRecord
   end
 
   def datetimes_fields_are_required_if_technicians_are_present
-    return if rascunho? || rejeitada? || cancelada?
+    return if pendente? || cancelada?
 
     if users.any? && scheduled_at.blank? && expected_end_at.blank?
       errors.add(:scheduled_at, "é obrigatório quando um ou mais técnicos são atribuídos") if scheduled_at.blank?
