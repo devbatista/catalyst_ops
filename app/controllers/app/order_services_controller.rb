@@ -12,9 +12,11 @@ class App::OrderServicesController < ApplicationController
   def index
     @order_services = case current_user.role
     when "admin"
-      @order_services.includes(:client, :users)
+      @order_services.where.not(status: [:rascunho, :rejeitada])
+                     .includes(:client, :users)
     when "gestor"
-      @order_services.joins(:client)
+      @order_services.where.not(status: [:rascunho, :rejeitada])
+                     .joins(:client)
                      .where(clients: { company_id: current_user.company_id })
                      .includes(:client, :users)
     when "tecnico"
@@ -26,7 +28,8 @@ class App::OrderServicesController < ApplicationController
     end
 
     if params[:status].present?
-      @order_services = @order_services.where(status: params[:status])
+      allowed_statuses = OrderService.statuses.keys - %w[rascunho rejeitada]
+      @order_services = @order_services.where(status: params[:status]) if allowed_statuses.include?(params[:status])
     end
   end
 
