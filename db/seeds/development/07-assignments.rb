@@ -1,7 +1,9 @@
 puts 'Atribuindo técnicos às OSs e atualizando status para "agendada"'
 
-# Pega 75% das OS criadas no arquivo anterior para tentar agendar.
-orders_to_schedule = ORDER_SERVICES.sample((ORDER_SERVICES.size * 0.75).to_i)
+# Tenta agendar apenas OS pendentes para não sobrescrever cenários já definidos
+# (ex.: canceladas no seed anterior).
+pending_orders = ORDER_SERVICES.select(&:pendente?)
+orders_to_schedule = pending_orders.sample((pending_orders.size * 0.75).to_i)
 
 orders_to_schedule.each do |os|
   # Seleciona técnicos da mesma empresa da OS.
