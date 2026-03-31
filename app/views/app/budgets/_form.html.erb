@@ -1,0 +1,91 @@
+<div class="js-wait">
+  <%= form_with model: [:app, @budget], local: true do |f| %>
+    <div class="row g-3">
+      <div class="row mb-3 mt-3">
+        <div class="col-md-6">
+          <%= f.label :client_id, "Cliente", class: "form-label" %>
+          <%= f.select :client_id,
+                       options_from_collection_for_select(@clients, :id, :name, @budget.client_id),
+                       { prompt: "Selecione o cliente" },
+                       class: "form-select" %>
+        </div>
+
+        <div class="col-md-3">
+          <%= f.label :valid_until, "Validade", class: "form-label" %>
+          <%= f.date_field :valid_until, class: "form-control" %>
+        </div>
+
+        <div class="col-md-3">
+          <%= f.label :total_value, "Valor total", class: "form-label" %>
+          <%= f.text_field :total_value, class: "form-control", disabled: true %>
+          <small class="text-muted">Calculado pelos itens.</small>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-12">
+          <%= f.label :title, "Título", class: "form-label" %>
+          <%= f.text_field :title, class: "form-control", placeholder: "Ex.: Instalação elétrica residencial" %>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-12">
+          <%= f.label :description, "Descrição", class: "form-label" %>
+          <%= f.text_area :description, rows: 3, class: "form-control", placeholder: "Detalhes do orçamento..." %>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-12">
+          <h5>Itens de Serviço</h5>
+          <div id="service-items-list">
+            <% @budget.service_items.each do |item| %>
+              <div class="input-group mb-2">
+                <%= f.fields_for :service_items, item do |item_fields| %>
+                  <%= item_fields.text_field :description, class: "form-control", placeholder: "Nome do item" %>
+                  <%= item_fields.text_field :quantity, class: "form-control", placeholder: "Quantidade" %>
+                  <%= item_fields.text_field :unit_price,
+                                             class: "form-control",
+                                             placeholder: "Valor unitário",
+                                             data: { money_mask: "brl" } %>
+                  <%= item_fields.hidden_field :_destroy, class: "service-item-destroy-flag" %>
+                  <button type="button" class="btn btn-danger remove-item">Remover</button>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+          <button type="button" class="btn btn-outline-primary" id="add-service-item">Adicionar item</button>
+        </div>
+      </div>
+
+      <div id="service-item-template" style="display:none;">
+        <div class="input-group mb-2 service-item-row">
+          <input type="text"
+                 name="budget[service_items_attributes][NEW_INDEX][description]"
+                 class="form-control"
+                 placeholder="Nome do item" />
+          <input type="text"
+                 name="budget[service_items_attributes][NEW_INDEX][quantity]"
+                 class="form-control"
+                 placeholder="Quantidade" />
+          <input type="text"
+                 name="budget[service_items_attributes][NEW_INDEX][unit_price]"
+                 class="form-control"
+                 placeholder="Valor unitário"
+                 data-money-mask="brl" />
+          <button type="button" class="btn btn-danger remove-item">Remover</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12 mt-3">
+          <%= f.submit (@budget.persisted? ? "Atualizar" : "Salvar"), class: "btn btn-primary px-4" %>
+          <%= link_to "Voltar", app_budgets_path, class: "btn btn-light px-4" %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<%= javascript_include_tag "app/budget_form" %>

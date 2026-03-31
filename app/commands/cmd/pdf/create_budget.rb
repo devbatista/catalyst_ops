@@ -1,10 +1,10 @@
 module Cmd
   module Pdf
     class CreateBudget
-      def initialize(order_service)
-        @order_service = order_service
-        @company = @order_service.company
-        @client = @order_service.client
+      def initialize(record)
+        @record = record
+        @company = @record.company
+        @client = @record.client
       end
 
       def generate_pdf_data
@@ -30,7 +30,7 @@ module Cmd
               valign: :center
             },
             {
-              content: "<b>OS ##{@order_service.code}</b>",
+              content: "<b>ORC ##{@record.code}</b>",
               inline_format: true,
               background_color: header_bg,
               text_color: "FFFFFF",
@@ -61,8 +61,8 @@ module Cmd
 
         # Meta info
         info_data = [
-          [ "Título", @order_service.title.to_s, "Código da OS", @order_service.code.to_s ],
-          [ "Criada em", format_date(@order_service.created_at), "Documento", @client&.formatted_document.to_s ],
+          [ "Título", @record.title.to_s, "Código", @record.code.to_s ],
+          [ "Criada em", format_date(@record.created_at), "Documento", @client&.formatted_document.to_s ],
           [ "E-mail do cliente", @client&.email.to_s, "Telefone", @client&.formatted_phone.to_s ]
         ]
 
@@ -80,22 +80,22 @@ module Cmd
         pdf.move_down(10)
 
         pdf.fill_color(text)
-        pdf.font_size(11) { pdf.text("Descrição: #{@order_service.description}", style: :bold) }
+        pdf.font_size(11) { pdf.text("Descrição: #{@record.description}", style: :bold) }
         pdf.move_down(6)
         pdf.table(
-          [[@order_service.description.to_s]],
+          [[@record.description.to_s]],
           width: page_width,
           cell_style: { size: 10, padding: [8, 10, 8, 10], border_color: border, background_color: "FFFFFF" }
         )
         pdf.move_down(12)
 
         pdf.fill_color(muted)
-        pdf.font_size(12) { pdf.text("ITENS DA ORDEM DE SERVIÇO", style: :bold) }
+        pdf.font_size(12) { pdf.text("ITENS DO ORÇAMENTO", style: :bold) }
         pdf.fill_color(text)
         pdf.move_down(4)
 
         item_rows = [[ "Descrição", "Qtd.", "Valor unitário", "Total" ]]
-        @order_service.service_items.order(:created_at).each do |item|
+        @record.service_items.order(:created_at).each do |item|
           item_rows << [
             item.description.to_s,
             item.quantity.to_s,
@@ -128,7 +128,7 @@ module Cmd
         end
         pdf.move_down(10)
         pdf.table(
-          [[{ content: "Total: #{brl(@order_service.total_value)}", align: :right, font_style: :bold }]],
+          [[{ content: "Total: #{brl(total_value)}", align: :right, font_style: :bold }]],
           width: page_width,
           cell_style: { size: 16, padding: [8, 10, 8, 10], border_color: border, background_color: "F8FAFC" }
         )
@@ -150,6 +150,12 @@ module Cmd
         return "-" if value.blank?
 
         I18n.l(value.to_date, format: "%d/%m/%Y")
+      end
+
+      def total_value
+        return @record.total_value if @record.respond_to?(:total_value) && @record.total_value.present?
+
+        @record.service_items.to_a.sum { |item| item.quantity.to_d * item.unit_price.to_d }
       end
     end
   end

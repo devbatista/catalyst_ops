@@ -138,7 +138,7 @@
                 <%= link_to "Editar", edit_app_client_path(@client), class: "btn btn-primary" %>
               </div>
               <% if current_user.can_create_orders? %>
-                <%= link_to "Novo Orçamento", new_app_order_service_path(client_id: @client.id), class: "btn btn-success ms-auto" %>
+                <%= link_to "Novo Orçamento", new_app_budget_path(client_id: @client.id), class: "btn btn-success ms-auto" %>
               <% end %>
             </div>
           </div>

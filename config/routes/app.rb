@@ -1,16 +1,23 @@
 constraints subdomain: "app" do
   root to: "app/dashboard#index", as: :app_dashboard
+  get "order_services/new", to: "errors#show", defaults: { code: "404" }
 
   resource :terms_of_use, only: [:show, :update], controller: "app/terms_of_use", as: :app_terms_of_use
 
   resources :clients, module: "app", as: :app_clients
-  resources :budgets, only: [:index], module: "app", as: :app_budgets
-  resources :order_services, module: "app", as: :app_order_services do
+  resources :budgets, only: [:index, :new, :create, :show, :edit, :update], module: "app", as: :app_budgets do
+    member do
+      post :send_for_approval
+      patch :approve
+      patch :reject
+      get :generate_pdf
+    end
+  end
+  resources :order_services, except: [:new, :create], module: "app", as: :app_order_services do
     get :unassigned, on: :collection
     get :overdue, on: :collection
     resources :service_items, module: "order_services", as: :app_service_items
     member do
-      post :send_for_approval
       patch :update_status
       get :generate_pdf
       delete :purge_attachment

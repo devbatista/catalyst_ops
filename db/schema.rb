@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_03_31_190000) do
+ActiveRecord::Schema[7.1].define(version: 2026_03_31_201000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -294,9 +294,11 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_31_190000) do
     t.text "description"
     t.integer "quantity"
     t.decimal "unit_price"
-    t.uuid "order_service_id", null: false
+    t.uuid "order_service_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "budget_id"
+    t.index ["budget_id"], name: "index_service_items_on_budget_id"
     t.index ["order_service_id"], name: "index_service_items_on_order_service_id"
   end
 
@@ -448,6 +450,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_31_190000) do
   add_foreign_key "order_services", "companies"
   add_foreign_key "reports", "companies"
   add_foreign_key "reports", "users"
+  add_foreign_key "service_items", "budgets"
   add_foreign_key "service_items", "order_services"
   add_foreign_key "subscription_reconciliation_events", "companies"
   add_foreign_key "subscription_reconciliation_events", "subscriptions"
