@@ -59,7 +59,9 @@ class App::OrderServicesController < ApplicationController
                                           .per(params[:per] || 10)
   end
 
-  def new; end
+  def new
+    prefill_client_from_params
+  end
 
   def create
     @order_service.status = :rascunho
@@ -210,6 +212,13 @@ class App::OrderServicesController < ApplicationController
     @clients = current_user.clients.order(:name)
     @technicians = current_user.company.users.active.where("role = ? OR can_be_technician = ?", User.roles[:tecnico], true)
     @order_service&.service_items ||= []
+  end
+
+  def prefill_client_from_params
+    return if params[:client_id].blank?
+    return unless current_user.clients.exists?(id: params[:client_id])
+
+    @order_service.client_id = params[:client_id]
   end
 
   def set_attachment_on_update

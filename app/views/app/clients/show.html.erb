@@ -85,9 +85,14 @@
             <% end %>
             <% end %>
             <% end %>
-            <div class="mt-3">
-              <%= link_to "Voltar", app_clients_path, class: "btn btn-secondary" %>
-              <%= link_to "Editar", edit_app_client_path(@client), class: "btn btn-primary" %>
+            <div class="mt-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+              <div class="d-flex gap-2">
+                <%= link_to "Voltar", app_clients_path, class: "btn btn-secondary" %>
+                <%= link_to "Editar", edit_app_client_path(@client), class: "btn btn-primary" %>
+              </div>
+              <% if current_user.can_create_orders? %>
+                <%= link_to "Novo Orçamento", new_app_order_service_path(client_id: @client.id), class: "btn btn-success ms-auto" %>
+              <% end %>
             </div>
           </div>
         </div>
