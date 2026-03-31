@@ -40,6 +40,7 @@ constraints subdomain: "app" do
   end
 
   get "calendar/events", to: "app/calendar#events"
+  get "calendar/technicians", to: "app/calendar#technicians"
 
   resources :support, only: [:index], module: "app", as: :app_support do
     collection do
