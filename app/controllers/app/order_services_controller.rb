@@ -79,7 +79,7 @@ class App::OrderServicesController < ApplicationController
   def edit; end
 
   def update
-    if @order_service.update(order_service_params)
+    if @order_service.update(order_service_params_with_auto_schedule_status)
       if @attachments.present?
         add_attachs
       else
@@ -199,6 +199,36 @@ class App::OrderServicesController < ApplicationController
         :observations,
         attachments: []
       )
+    end
+  end
+
+  def order_service_params_with_auto_schedule_status
+    permitted_params = order_service_params
+    return permitted_params unless should_set_status_as_scheduled?(permitted_params)
+
+    permitted_params.merge(status: :agendada)
+  end
+
+  def should_set_status_as_scheduled?(permitted_params)
+    return false unless current_user.gestor?
+    return false unless @order_service.rascunho? || @order_service.pendente? || @order_service.atrasada?
+
+    scheduled_at_present_after_update?(permitted_params) && technicians_present_after_update?(permitted_params)
+  end
+
+  def scheduled_at_present_after_update?(permitted_params)
+    if permitted_params.key?(:scheduled_at)
+      permitted_params[:scheduled_at].present?
+    else
+      @order_service.scheduled_at.present?
+    end
+  end
+
+  def technicians_present_after_update?(permitted_params)
+    if permitted_params.key?(:user_ids)
+      Array(permitted_params[:user_ids]).reject(&:blank?).any?
+    else
+      @order_service.user_ids.any?
     end
   end
 
