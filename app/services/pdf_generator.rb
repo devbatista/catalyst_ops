@@ -28,8 +28,8 @@ class PdfGenerator
     self
   end
 
-  def table(data, opts = {})
-    @pdf.table(data, opts)
+  def table(data, opts = {}, &block)
+    @pdf.table(data, opts, &block)
     self
   end
 

@@ -70,7 +70,7 @@ class OrderServiceMailer < ApplicationMailer
       content: pdf_data
     }
 
-    mail(to: manager_email, subject: "Cópia da OS ##{@order_service.code} para envio ao cliente")
+    mail(to: manager_email, subject: "Cópia do Orçamento ##{@order_service.code} para envio ao cliente")
   end
 
   def notify_client_on_approval(order_service)

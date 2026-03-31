@@ -53,8 +53,8 @@ module Cmd
 
         # Cards Cliente / Empresa
         cards = [[
-          { content: "Cliente\n#{@client&.name}", background_color: soft_bg, border_color: border, size: 10, padding: [10, 12, 10, 12] },
-          { content: "Empresa\n#{@company&.name}", background_color: soft_bg, border_color: border, size: 10, padding: [10, 12, 10, 12] }
+          { content: "<font size='9' color='6B7280'>Cliente</font>\n<b>#{@client&.name}</b>", inline_format: true, background_color: soft_bg, border_color: border, size: 10, padding: [10, 12, 10, 12] },
+          { content: "<font size='9' color='6B7280'>Empresa</font>\n<b>#{@company&.name}</b>", inline_format: true, background_color: soft_bg, border_color: border, size: 10, padding: [10, 12, 10, 12] }
         ]]
         pdf.table(cards, width: page_width, cell_style: { inline_format: true }, column_widths: [page_width / 2, page_width / 2])
         pdf.move_down(14)
@@ -71,12 +71,23 @@ module Cmd
           width: page_width,
           cell_style: { size: 10, padding: [6, 8, 6, 8], border_color: border },
           column_widths: [page_width * 0.2, page_width * 0.3, page_width * 0.2, page_width * 0.3]
-        )
+        ) do |table|
+          table.columns(0).font_style = :bold
+          table.columns(2).font_style = :bold
+          table.columns(0).background_color = "F8FAFC"
+          table.columns(2).background_color = "F8FAFC"
+        end
         pdf.move_down(10)
 
         pdf.fill_color(text)
         pdf.font_size(11) { pdf.text("Descrição: #{@order_service.description}", style: :bold) }
-        pdf.move_down(14)
+        pdf.move_down(6)
+        pdf.table(
+          [[@order_service.description.to_s]],
+          width: page_width,
+          cell_style: { size: 10, padding: [8, 10, 8, 10], border_color: border, background_color: "FFFFFF" }
+        )
+        pdf.move_down(12)
 
         pdf.fill_color(muted)
         pdf.font_size(12) { pdf.text("ITENS DA ORDEM DE SERVIÇO", style: :bold) }
@@ -101,12 +112,26 @@ module Cmd
           item_rows,
           header: true,
           width: page_width,
-          cell_style: { size: 10, padding: [6, 8, 6, 8], border_color: border, inline_format: true },
+          cell_style: { size: 10, padding: [8, 10, 8, 10], border_color: border, inline_format: true },
           row_colors: [ "FFFFFF", soft_bg ],
           column_widths: [page_width * 0.42, page_width * 0.12, page_width * 0.23, page_width * 0.23]
-        )
+        ) do |table|
+          table.row(0).font_style = :bold
+          table.row(0).background_color = "E9EDF2"
+          table.row(0).text_color = "1F2937"
+          table.row(0).borders = [:top, :bottom, :left, :right]
+
+          table.columns(1..3).align = :right
+          table.rows(1..-1).columns(0).align = :left
+
+          table.cells.border_width = 1
+        end
         pdf.move_down(10)
-        pdf.font_size(16) { pdf.text("Total: #{brl(@order_service.total_value)}", align: :right, style: :bold) }
+        pdf.table(
+          [[{ content: "Total: #{brl(@order_service.total_value)}", align: :right, font_style: :bold }]],
+          width: page_width,
+          cell_style: { size: 16, padding: [8, 10, 8, 10], border_color: border, background_color: "F8FAFC" }
+        )
         pdf.render
       end
 
