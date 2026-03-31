@@ -9,206 +9,230 @@ module Cmd
       end
 
       def generate_pdf_data
-        blue = "5191cd"
         pdf = PdfGenerator.new
+        accent = "3B82F6"
+        border = "D9DDE3"
+        soft_bg = "F3F5F7"
+        text = "111827"
+        page_width = pdf.bounds.width
 
-        pdf.stroke_rectangle(
-          [pdf.bounds.left, pdf.bounds.top],
-          pdf.bounds.width,
-          pdf.bounds.height
-        )
-
-        # Faixa laranja com título centralizado
-        pdf.fill_color(blue)
-        pdf.fill_rectangle([0, pdf.cursor], pdf.bounds.width, 35)
-        pdf.move_down(7)
-        pdf.font_size(26) do
-          pdf.fill_color("FFFFFF")
-          pdf.text("Ordem de Serviço #{@order_service.code}", align: :center, style: :bold)
-        end
-        pdf.fill_color("000000")
-        pdf.move_down(5)
-
-        # Tabela com logo, empresa e cliente (3 colunas)
-        header_data = [
-          [
-            { content: "Insira sua logo aqui", align: :center, valign: :center },
-            { content: "#{@company.name}
-                        #{@company.formatted_document} || #{@company.formatted_phone}
-                        #{@company.email}
-                        #{@company.full_address}", align: :center, valign: :center },
-          ],
-        ]
         pdf.table(
-          header_data,
-          cell_style: {
-            borders: [:bottom],
-            border_width: 1,
-            border_color: "000000",
-            padding: [0, 8, 10, 8],
-            size: 11,
-          },
-          width: pdf.bounds.width,
+          [[
+            {
+              content: "<b>Ordem de Serviço</b>\n<font size='2'> </font>\n<font size='10' color='C8CDD3'>Detalhes completos da execução</font>",
+              inline_format: true,
+              background_color: accent,
+              text_color: "FFFFFF",
+              border_color: accent,
+              size: 16,
+              padding: [12, 14, 12, 14],
+              valign: :center
+            },
+            {
+              content: "<b>OS ##{@order_service.code}</b>",
+              inline_format: true,
+              background_color: accent,
+              text_color: "FFFFFF",
+              border_color: accent,
+              align: :center,
+              valign: :center,
+              size: 11,
+              padding: [12, 10, 12, 10]
+            }
+          ]],
+          width: page_width,
+          column_widths: [ page_width * 0.8, page_width * 0.2 ],
+          cell_style: { borders: [:top, :bottom, :left, :right] }
         )
+        pdf.move_down(12)
 
-        # Tabela com dados do cliente (abaixo da linha)
-        client_data = [
-          [
-            { content: "Cliente:", align: :left, borders: [] },
-            { content: @client.name, borders: [] },
-            { content: "Documento:", align: :left, borders: [] },
-            { content: @client.formatted_document, borders: [] },
-          ],
-          [
-            { content: "Endereço:", align: :left, borders: [] },
-            { content: @address.street, borders: [] },
-            { content: "Nº:", align: :left, borders: [] },
-            { content: @address.number, borders: [] },
-          ],
-          [
-            { content: "Bairro:", align: :left, borders: [] },
-            { content: @address.neighborhood, borders: [] },
-            { content: "CEP:", align: :left, borders: [] },
-            { content: @address.zip_code, borders: [] },
-          ],
-          [
-            { content: "Telefone:", align: :left, borders: [] },
-            { content: @client.formatted_phone, borders: [] },
-            { content: "Email:", align: :left, borders: [] },
-            { content: @client.email, borders: [] },
-          ],
-        ]
         pdf.table(
-          client_data,
-          cell_style: {
-            borders: [],
-            size: 11,
-            padding: [4, 8, 4, 8],
-          },
-          width: pdf.bounds.width,
+          [[
+            {
+              content: "<b>Dados da Empresa</b>",
+              inline_format: true,
+              background_color: accent,
+              text_color: "FFFFFF",
+              border_color: accent,
+              align: :center,
+              size: 10,
+              padding: [5, 8, 5, 8]
+            }
+          ]],
+          width: page_width,
+          cell_style: { borders: [:top, :bottom, :left, :right] }
         )
-
-        # Faixa laranja "Descrição do Serviço"
-        pdf.fill_color(blue)
-        pdf.fill_rectangle([0, pdf.cursor], pdf.bounds.width, 20)
-        pdf.move_down(3)
-        pdf.fill_color("FFFFFF")
-        pdf.text("Descrição do Serviço:", align: :center, style: :bold)
-        pdf.fill_color("000000")
-        pdf.move_down(3)
-
-        # Área em branco para descrição (tabela para garantir altura)
         pdf.table(
-          [[@order_service.description]],
-          cell_style: {
-            height: 80,
-            borders: [],
-          },
-          width: pdf.bounds.width,
+          [[
+            "<b>Empresa:</b> #{safe(@company&.name)}\n" \
+            "<b>Documento:</b> #{safe(@company&.formatted_document)}\n" \
+            "<b>Telefone:</b> #{safe(@company&.formatted_phone)}\n" \
+            "<b>Email:</b> #{safe(@company&.email)}\n" \
+            "<b>Endereço:</b> #{safe(@company&.full_address)}"
+          ]],
+          width: page_width,
+          cell_style: { inline_format: true, size: 10, padding: [8, 10, 8, 10], border_color: border, background_color: "FFFFFF" }
         )
-
-        # Faixa laranja "Itens de serviço"
-        pdf.fill_color(blue)
-        pdf.fill_rectangle([0, pdf.cursor], pdf.bounds.width, 20)
-        pdf.move_down(3)
-        pdf.fill_color("FFFFFF")
-        pdf.text("Itens de serviço:", align: :center, style: :bold)
-        pdf.fill_color("000000")
         pdf.move_down(10)
 
-        # Tabela de produtos (linhas em branco)
-        data_items = [
-          ["Qtd", "Item", "Valor"],
+        pdf.table(
+          [[
+            {
+              content: "<b>Dados do Cliente</b>",
+              inline_format: true,
+              background_color: accent,
+              text_color: "FFFFFF",
+              border_color: accent,
+              align: :center,
+              size: 10,
+              padding: [5, 8, 5, 8]
+            }
+          ]],
+          width: page_width,
+          cell_style: { borders: [:top, :bottom, :left, :right] }
+        )
+
+        info_data = [
+          ["Cliente", safe(@client&.name), "Documento", safe(@client&.formatted_document)],
+          ["Título", safe(@order_service.title), "Status", @order_service.status.to_s.humanize],
+          ["Criada em", format_datetime(@order_service.created_at), "Agendada para", format_datetime(@order_service.scheduled_at)],
+          ["Previsão de término", format_datetime(@order_service.expected_end_at), "Telefone", safe(@client&.formatted_phone)],
+          ["E-mail", safe(@client&.email), "Código da OS", @order_service.code.to_s],
+          ["Endereço", client_full_address, "Bairro / CEP", client_district_and_zip]
         ]
 
-        # Adiciona cada item da ordem de serviço
-        @order_service.service_items.each do |item|
-          data_items << [
-            item.quantity,
-            item.description,
-            "R$ #{"%.2f" % item.unit_price}",
+        pdf.table(
+          info_data,
+          width: page_width,
+          cell_style: { size: 10, padding: [6, 8, 6, 8], border_color: border },
+          column_widths: [page_width * 0.2, page_width * 0.3, page_width * 0.2, page_width * 0.3]
+        ) do |table|
+          table.columns(0).font_style = :bold
+          table.columns(2).font_style = :bold
+          table.columns(0).background_color = soft_bg
+          table.columns(2).background_color = soft_bg
+        end
+        pdf.move_down(10)
+
+        pdf.table(
+          [[
+            {
+              content: "<b>Descrição do Serviço</b>",
+              inline_format: true,
+              background_color: accent,
+              text_color: "FFFFFF",
+              border_color: accent,
+              align: :center,
+              size: 10,
+              padding: [5, 8, 5, 8]
+            }
+          ]],
+          width: page_width,
+          cell_style: { borders: [:top, :bottom, :left, :right] }
+        )
+        pdf.table(
+          [[safe(@order_service.description)]],
+          width: page_width,
+          cell_style: { size: 10, padding: [10, 10, 10, 10], border_color: border, background_color: "FFFFFF" }
+        )
+        pdf.move_down(12)
+
+        pdf.table(
+          [[
+            {
+              content: "<b>Itens de Serviço</b>",
+              inline_format: true,
+              background_color: accent,
+              text_color: "FFFFFF",
+              border_color: accent,
+              align: :center,
+              size: 10,
+              padding: [5, 8, 5, 8]
+            }
+          ]],
+          width: page_width,
+          cell_style: { borders: [:top, :bottom, :left, :right] }
+        )
+
+        item_rows = [[ "Descrição", "Qtd.", "Valor unitário", "Total" ]]
+        @order_service.service_items.order(:created_at).each do |item|
+          unit_price = item.unit_price.to_d
+          quantity = item.quantity.to_d
+          item_rows << [
+            safe(item.description),
+            item.quantity.to_s,
+            brl(unit_price),
+            brl(quantity * unit_price)
           ]
         end
 
-        # Se quiser garantir pelo menos 5 linhas (completar com linhas em branco)
-        while data_items.size < 6
-          data_items << ["", "", ""]
-        end
+        item_rows << [ "Sem itens cadastrados", "-", "-", "-" ] if item_rows.size == 1
 
-        pdf.table(data_items, header: true, width: pdf.bounds.width, cell_style: { size: 11, height: 28 })
-
-        pdf.move_down(10)
-
-        # Faixa laranja "Observações"
-        pdf.fill_color(blue)
-        pdf.fill_rectangle([0, pdf.cursor], pdf.bounds.width, 20)
-        pdf.move_down(3)
-        pdf.fill_color("FFFFFF")
-        pdf.text("Observações:", align: :center, style: :bold)
-        pdf.fill_color("000000")
-        pdf.move_down(3)
-
-        # Área para observações (tabela para garantir altura e alinhamento)
         pdf.table(
-          [[@order_service.observations.presence || " "]],
-          cell_style: {
-            height: 80,
-            borders: [],
-          },
-          width: pdf.bounds.width,
+          item_rows,
+          header: true,
+          width: page_width,
+          cell_style: { size: 10, padding: [8, 10, 8, 10], border_color: border, inline_format: true },
+          row_colors: [ "FFFFFF", soft_bg ],
+          column_widths: [page_width * 0.42, page_width * 0.12, page_width * 0.23, page_width * 0.23]
+        ) do |table|
+          table.row(0).font_style = :bold
+          table.row(0).background_color = "E9EDF2"
+          table.row(0).text_color = "1F2937"
+          table.columns(1..3).align = :right
+          table.rows(1..-1).columns(0).align = :left
+          table.cells.border_width = 1
+        end
+        pdf.move_down(10)
+        pdf.table(
+          [[{ content: "Total: #{brl(@order_service.total_value)}", align: :right, font_style: :bold }]],
+          width: page_width,
+          cell_style: { size: 16, padding: [8, 10, 8, 10], border_color: border, background_color: "F8FAFC" }
         )
 
-        pdf.move_down(10)
-
-        pdf.stroke_horizontal_line(pdf.bounds.left, pdf.bounds.right, at: pdf.cursor)
-
-        # Rodapé com desconto e total (tabela para alinhar)
-        rodape_data = [
-          [
-            { content: "Desconto:", borders: [] },
-            { content: "", borders: [] },
-            { content: "Total: #{@order_service.formatted_total_value}", align: :right, borders: [] },
-          ],
-        ]
-        pdf.table(rodape_data, cell_style: { borders: [] }, width: pdf.bounds.width)
-        pdf.move_down(5)
-
-        # Faixa laranja garantia
-        pdf.fill_color(blue)
-        pdf.fill_rectangle([0, pdf.cursor], pdf.bounds.width, 20)
-        pdf.move_down(3)
-        pdf.fill_color("FFFFFF")
-        pdf.text("Este serviço prestado possui garantia de X dias após a entrega.", align: :center)
-        pdf.fill_color("000000")
-        pdf.move_down(20)
-
-        padding = 24
-        pdf.bounding_box([pdf.bounds.left + padding, 80], width: pdf.bounds.width - 2 * padding, height: 80) do
-          y = pdf.cursor - 30
-          line_width = (pdf.bounds.width - 2 * padding) / 2.5
-          gap = 10 # distância vertical entre linha e texto
-
-          # Linha para Cliente (esquerda)
-          pdf.stroke_horizontal_line(pdf.bounds.left, pdf.bounds.left + line_width, at: y)
-          # Linha para Responsável (direita)
-          pdf.stroke_horizontal_line(pdf.bounds.right - line_width, pdf.bounds.right, at: y)
-
-          # Texto abaixo das linhas, centralizado em relação à linha
-          pdf.text_box(
-            "Cliente",
-            at: [pdf.bounds.left, y - gap],
-            width: line_width,
-            height: 20,
-            align: :center,
-            size: 14,
+        if @order_service.observations.present?
+          pdf.move_down(12)
+          pdf.table(
+            [[
+              {
+                content: "<b>Observações</b>",
+                inline_format: true,
+                background_color: accent,
+                text_color: "FFFFFF",
+                border_color: accent,
+                align: :center,
+                size: 10,
+                padding: [5, 8, 5, 8]
+              }
+            ]],
+            width: page_width,
+            cell_style: { borders: [:top, :bottom, :left, :right] }
           )
-          pdf.text_box(
-            "Responsável",
-            at: [pdf.bounds.right - line_width, y - gap],
-            width: line_width,
-            height: 20,
-            align: :center,
-            size: 14,
+          pdf.table(
+            [[safe(@order_service.observations)]],
+            width: page_width,
+            cell_style: { size: 10, padding: [8, 10, 8, 10], border_color: border, background_color: "FFFFFF" }
+          )
+        end
+
+        signature_width = (page_width - 40) / 2.0
+        signature_area_height = 28
+        signature_bottom_padding = 8
+        signature_top = pdf.bounds.bottom + signature_area_height + signature_bottom_padding
+
+        pdf.bounding_box([pdf.bounds.left, signature_top], width: page_width, height: signature_area_height) do
+          y = pdf.cursor
+          pdf.stroke_horizontal_line(pdf.bounds.left, pdf.bounds.left + signature_width, at: y)
+          pdf.stroke_horizontal_line(pdf.bounds.right - signature_width, pdf.bounds.right, at: y)
+          pdf.move_down(6)
+          pdf.table(
+            [[
+              { content: "Cliente", align: :center, borders: [] },
+              { content: "Responsável", align: :center, borders: [] }
+            ]],
+            width: page_width,
+            column_widths: [page_width / 2.0, page_width / 2.0],
+            cell_style: { size: 10, border_color: border, padding: [0, 0, 0, 0] }
           )
         end
 
@@ -221,6 +245,41 @@ module Cmd
           io: StringIO.new(pdf_data),
           filename: "ordem_servico_#{@order_service.id}.pdf",
           content_type: "application/pdf",
+        )
+      end
+
+      private
+
+      def safe(value)
+        value.to_s.strip.presence || "-"
+      end
+
+      def format_datetime(value)
+        return "-" if value.blank?
+
+        I18n.l(value, format: :short)
+      end
+
+      def client_full_address
+        street = safe(@address&.street)
+        number = safe(@address&.number)
+        city = safe(@address&.city)
+        state = safe(@address&.state)
+        "#{street}, #{number} - #{city}/#{state}"
+      end
+
+      def client_district_and_zip
+        neighborhood = safe(@address&.neighborhood)
+        zip = safe(@address&.zip_code)
+        "#{neighborhood} / #{zip}"
+      end
+
+      def brl(value)
+        ActionController::Base.helpers.number_to_currency(
+          value,
+          unit: "R$ ",
+          separator: ",",
+          delimiter: "."
         )
       end
     end
