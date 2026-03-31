@@ -6,7 +6,7 @@ class Cliente::BudgetApprovalsController < ApplicationController
   layout "public"
 
   before_action :set_budget
-  before_action :allow_decided_page_only_once!, only: :show
+  before_action :clear_legacy_decision_session
 
   def show; end
 
@@ -47,17 +47,7 @@ class Cliente::BudgetApprovalsController < ApplicationController
     render plain: "Link inválido ou expirado.", status: :not_found
   end
 
-  def allow_decided_page_only_once!
-    return unless @budget.approved_at.present? || @budget.rejected_at.present?
-
-    seen_tokens = session[:cliente_budget_decision_seen_tokens] ||= {}
-    token = params[:token].to_s
-
-    if seen_tokens[token]
-      render plain: "Este orçamento já foi respondido e este link não está mais disponível.", status: :gone
-      return
-    end
-
-    seen_tokens[token] = true
+  def clear_legacy_decision_session
+    session.delete(:cliente_budget_decision_seen_tokens)
   end
 end
