@@ -9,9 +9,22 @@ class App::ClientsController < ApplicationController
   end
 
   def show
+    @order_service_statuses = OrderService.statuses.keys
     @order_services = @client.order_services
                              .includes(:users)
                              .order(created_at: :desc)
+
+    if params[:os_q].present?
+      @order_services = @order_services.where("order_services.title ILIKE ?", "%#{params[:os_q].strip}%")
+    end
+
+    if params[:os_code].present?
+      @order_services = @order_services.where(code: params[:os_code].strip)
+    end
+
+    if params[:os_status].present? && @order_service_statuses.include?(params[:os_status])
+      @order_services = @order_services.where(status: params[:os_status])
+    end
   end
 
   def new
