@@ -4,6 +4,7 @@ constraints subdomain: "app" do
   resource :terms_of_use, only: [:show, :update], controller: "app/terms_of_use", as: :app_terms_of_use
 
   resources :clients, module: "app", as: :app_clients
+  resources :budgets, only: [:index], module: "app", as: :app_budgets
   resources :order_services, module: "app", as: :app_order_services do
     get :unassigned, on: :collection
     get :overdue, on: :collection

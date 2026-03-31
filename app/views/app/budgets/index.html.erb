@@ -1,0 +1,128 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="mb-0 text-uppercase">Orçamentos</h4>
+          <%= link_to raw('<i class="bx bx-plus"></i> Novo Orçamento'),
+              new_app_order_service_path,
+              class: "btn btn-outline-primary" %>
+        </div>
+
+        <% flash.each do |type, message| %>
+          <% bootstrap_class = { notice: "alert-success", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
+          <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert">
+            <%= message %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        <% end %>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="row align-items-center mb-4">
+              <div class="col-12 col-md-8 d-flex flex-column flex-md-row align-items-stretch gap-2">
+                <div class="showing-entries-group flex-shrink-0">
+                  <span class="showing-entries-label">Mostrar</span>
+                  <form method="get" class="showing-entries-form">
+                    <input type="hidden" name="q" value="<%= params[:q] %>">
+                    <input type="hidden" name="client_id" value="<%= params[:client_id] %>">
+                    <input type="hidden" name="approval_state" value="<%= params[:approval_state] %>">
+                    <select name="per" class="form-select form-select-sm showing-entries-select" onchange="this.form.submit()">
+                      <% [10, 20, 30].each do |n| %>
+                        <option value="<%= n %>" <%= params[:per].to_i == n ? 'selected' : '' %>><%= n %></option>
+                      <% end %>
+                    </select>
+                  </form>
+                  <span class="showing-entries-text">registros</span>
+                </div>
+
+                <form method="get" class="flex-grow-1" style="min-width: 0;">
+                  <div class="d-flex flex-column flex-md-row gap-2">
+                    <div class="input-group input-search-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">
+                          <i class="bx bx-search"></i>
+                        </span>
+                      </div>
+                      <input type="text" name="q" value="<%= params[:q] %>" class="form-control input-search" placeholder="Título, descrição ou cliente..." aria-label="Search">
+                    </div>
+
+                    <select name="client_id" class="form-select">
+                      <option value="">Todos os clientes</option>
+                      <% @clients.each do |client| %>
+                        <option value="<%= client.id %>" <%= params[:client_id] == client.id ? 'selected' : '' %>><%= client.name %></option>
+                      <% end %>
+                    </select>
+
+                    <select name="approval_state" class="form-select">
+                      <option value="" <%= params[:approval_state].blank? ? 'selected' : '' %>>Todas as situações</option>
+                      <option value="nao_enviado" <%= params[:approval_state] == "nao_enviado" ? 'selected' : '' %>>Não enviado</option>
+                      <option value="enviado" <%= params[:approval_state] == "enviado" ? 'selected' : '' %>>Enviado</option>
+                      <option value="rejeitado" <%= params[:approval_state] == "rejeitado" ? 'selected' : '' %>>Rejeitado</option>
+                    </select>
+
+                    <input type="hidden" name="per" value="<%= params[:per] %>">
+                  </div>
+                </form>
+              </div>
+
+              <div class="col-12 col-md-4 d-flex justify-content-md-end mt-3 mt-md-0">
+                <%= link_to "Limpar filtros", app_budgets_path, class: "btn btn-outline-secondary w-100 w-md-auto" %>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table mb-0 table-hover">
+                <thead>
+                  <tr>
+                    <th>Código</th>
+                    <th>Cliente</th>
+                    <th>Título</th>
+                    <th>Total</th>
+                    <th>Criado em</th>
+                    <th>Último envio</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @budgets.each do |budget| %>
+                    <tr>
+                      <td>#<%= budget.code %></td>
+                      <td><%= budget.client&.name %></td>
+                      <td><%= budget.title %></td>
+                      <td><%= budget.formatted_total_value %></td>
+                      <td><%= l(budget.created_at, format: :short) %></td>
+                      <td><%= l(budget.approval_sent_at, format: :short) if budget.approval_sent_at.present? %></td>
+                      <td><span class="badge bg-light text-dark border"><%= budget_status_label(budget) %></span></td>
+                      <td class="text-nowrap">
+                        <%= link_to "Ver", app_order_service_path(budget), class: "btn btn-sm btn-primary" %>
+                        <%= link_to "Editar", edit_app_order_service_path(budget), class: "btn btn-sm btn-warning" %>
+                        <% if budget.rascunho? || budget.rejeitada? %>
+                          <%= button_to "Enviar",
+                              send_for_approval_app_order_service_path(budget),
+                              method: :post,
+                              form_class: "d-inline-block",
+                              class: "btn btn-sm btn-outline-success" %>
+                        <% end %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <div class="text-muted">
+                Mostrando <%= @budgets.size %> de <%= @budgets.total_count %> registros
+              </div>
+              <nav aria-label="Page navigation">
+                <%= custom_paginate(@budgets) %>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
