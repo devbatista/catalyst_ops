@@ -1,10 +1,10 @@
 require 'faker'
 
-puts 'Garantindo itens nas OS (sem duplicar itens já vindos de orçamento)'
+puts 'Adicionando os itens'
 
 ORDER_SERVICES.each do |os|
-  next if os.concluida? || os.service_items.exists?
-
+  next if os.concluida?
+  
   rand(3..6).times do
     ServiceItem.create!(
       description: "#{Faker::Commerce.material} para #{Faker::Commerce.product_name}",
