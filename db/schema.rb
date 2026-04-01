@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_03_31_201000) do
+ActiveRecord::Schema[7.1].define(version: 2026_04_01_143000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -346,6 +346,12 @@ ActiveRecord::Schema[7.1].define(version: 2026_03_31_201000) do
     t.date "expired_date"
     t.datetime "expiration_warning_sent_at"
     t.string "external_payment_id"
+    t.boolean "cancel_at_period_end", default: false, null: false
+    t.datetime "cancel_requested_at"
+    t.date "cancel_effective_on"
+    t.string "cancel_reason"
+    t.index ["cancel_at_period_end"], name: "index_subscriptions_on_cancel_at_period_end"
+    t.index ["cancel_effective_on"], name: "index_subscriptions_on_cancel_effective_on"
     t.index ["company_id", "status"], name: "index_subscriptions_on_company_id_and_status"
     t.index ["company_id"], name: "index_subscriptions_on_company_id"
     t.index ["expiration_warning_sent_at"], name: "index_subscriptions_on_expiration_warning_sent_at"

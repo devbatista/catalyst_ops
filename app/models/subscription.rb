@@ -29,10 +29,14 @@ class Subscription < ApplicationRecord
       .where('end_date <= ?', Date.current - 5.days)
   }
   scope :overdue_for_expiration, -> { where(status: :active).where('end_date <= ?', Date.current - 10.days) }
+  scope :scheduled_for_cancellation_due, -> {
+    where(status: :active, cancel_at_period_end: true).where('cancel_effective_on <= ?', Date.current)
+  }
   
   scope :ready_to_cycle, -> { 
     joins(:company)
       .where(status: :active)
+      .where(cancel_at_period_end: false)
       .where(end_date: Date.current + 7.days)
       .where.not(companies: {
         payment_method: 'credit_card',
@@ -65,18 +69,79 @@ class Subscription < ApplicationRecord
             start_date: started_at,
             end_date: period_end,
             canceled_date: nil,
+            cancel_at_period_end: false,
+            cancel_requested_at: nil,
+            cancel_effective_on: nil,
+            cancel_reason: nil,
             expired_date: nil,
             expiration_warning_sent_at: nil)
   end
 
   def cancel!
     update!(status: :cancelled,
-            canceled_date: Time.current)
+            canceled_date: Time.current,
+            cancel_at_period_end: false)
   end
 
   def expire!
     update!(status: :expired,
             expired_date: Time.current)
+  end
+
+  def schedule_cancellation!(reason: nil)
+    unless active?
+      errors.add(:base, "Apenas assinaturas ativas podem ser agendadas para cancelamento.")
+      raise ActiveRecord::RecordInvalid, self
+    end
+
+    if cancel_at_period_end?
+      errors.add(:base, "A assinatura já está agendada para cancelamento.")
+      raise ActiveRecord::RecordInvalid, self
+    end
+
+    effective_on = end_date.presence || Date.current
+
+    update!(
+      cancel_at_period_end: true,
+      cancel_requested_at: Time.current,
+      cancel_effective_on: effective_on,
+      cancel_reason: reason
+    )
+  end
+
+  def resume_cancellation!
+    unless active?
+      errors.add(:base, "Apenas assinaturas ativas podem reativar renovação.")
+      raise ActiveRecord::RecordInvalid, self
+    end
+
+    unless cancel_at_period_end?
+      errors.add(:base, "Não existe cancelamento agendado para reativar.")
+      raise ActiveRecord::RecordInvalid, self
+    end
+
+    update!(
+      cancel_at_period_end: false,
+      cancel_requested_at: nil,
+      cancel_effective_on: nil,
+      cancel_reason: nil
+    )
+  end
+
+  def cancel_due?(reference_date: Date.current)
+    cancel_at_period_end? && cancel_effective_on.present? && cancel_effective_on <= reference_date
+  end
+
+  def finalize_scheduled_cancellation!(reference_date: Date.current)
+    return false unless cancel_due?(reference_date: reference_date)
+
+    update!(
+      status: :cancelled,
+      canceled_date: Time.current,
+      cancel_at_period_end: false,
+      cancel_requested_at: nil,
+      cancel_effective_on: nil,
+    )
   end
   
   private
@@ -89,6 +154,8 @@ class Subscription < ApplicationRecord
     actions = []
 
     actions << "subscription.status.changed" if previous_changes.key?("status")
+    actions << "subscription.cancellation.scheduled" if cancellation_scheduled?
+    actions << "subscription.cancellation.resumed" if cancellation_resumed?
 
     if previous_changes.key?("external_payment_id")
       before_payment_id, after_payment_id = previous_changes["external_payment_id"]
@@ -131,10 +198,30 @@ class Subscription < ApplicationRecord
           data[:external_payment_id_before] = before_payment
           data[:external_payment_id_after] = after_payment
         end
+      when "subscription.cancellation.scheduled", "subscription.cancellation.resumed"
+        if previous_changes["cancel_at_period_end"].present?
+          before_value, after_value = previous_changes["cancel_at_period_end"]
+          data[:cancel_at_period_end_before] = before_value
+          data[:cancel_at_period_end_after] = after_value
+        end
+
+        data[:cancel_requested_at] = cancel_requested_at
+        data[:cancel_effective_on] = cancel_effective_on
+        data[:cancel_reason] = cancel_reason
       end
     end
 
     data
+  end
+
+  def cancellation_scheduled?
+    before_value, after_value = previous_changes["cancel_at_period_end"]
+    before_value == false && after_value == true
+  end
+
+  def cancellation_resumed?
+    before_value, after_value = previous_changes["cancel_at_period_end"]
+    before_value == true && after_value == false && active?
   end
 
   def sync_company_access

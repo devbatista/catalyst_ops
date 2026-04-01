@@ -1,0 +1,16 @@
+Olá, <%= @responsible_name %>.
+
+Foi solicitada a descontinuação da assinatura da empresa <%= @company.name %> em <%= l(@requested_on, format: :short) %>.
+
+<% if @effective_on.present? %>
+O cancelamento efetivo está agendado para <%= l(@effective_on, format: :short) %>.
+
+<% end %>
+<% if @plan.present? %>
+Plano atual: <%= @plan.name %>.
+
+<% end %>
+<% if @cancel_reason.present? %>
+Motivo informado: <%= @cancel_reason %>.
+
+<% end %>

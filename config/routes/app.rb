@@ -42,6 +42,8 @@ constraints subdomain: "app" do
     collection do
       patch :update_profile
       patch :update_company
+      patch :cancel_subscription
+      patch :resume_subscription
       post :promote_manager
     end
   end
