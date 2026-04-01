@@ -1,0 +1,12 @@
+<p>Olá, <%= @responsible_name %>.</p>
+
+<p>
+  A assinatura da empresa <strong><%= @company.name %></strong> foi cancelada com sucesso em
+  <strong><%= l(@cancelled_on, format: :short) %></strong>.
+</p>
+
+<% if @plan.present? %>
+  <p>Plano cancelado: <strong><%= @plan.name %></strong>.</p>
+<% end %>
+
+<p>Se precisar, acesse Configuracoes > Assinatura para revisar os dados.</p>

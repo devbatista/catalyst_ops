@@ -63,6 +63,8 @@ module Audit
       subscription.created
       subscription.updated
       subscription.status.changed
+      subscription.cancellation.scheduled
+      subscription.cancellation.resumed
       subscription.payment.generated
       subscription.payment.pending
       subscription.payment.approved

@@ -29,6 +29,13 @@ Sidekiq.configure_server do |config|
         "description" => "Expira assinaturas vencidas há 10 dias ou mais",
         "timezone" => "America/Sao_Paulo"
       },
+      "FinalizeScheduledCancellationsJob" => {
+        "cron" => "15 11 * * *", # Diariamente às 11h15
+        "class" => "Subscriptions::FinalizeScheduledCancellationsJob",
+        "queue" => "default",
+        "description" => "Finaliza cancelamentos agendados para o fim do período da assinatura",
+        "timezone" => "America/Sao_Paulo"
+      },
       "ReconcileSubscriptionsJob" => {
         "cron" => "0 12 * * *", # Diariamente às 12h00
         "class" => "Subscriptions::ReconcileSubscriptionsJob",

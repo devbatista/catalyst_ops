@@ -109,6 +109,7 @@ class Ability
     can :read, :knowledge_base
 
     can :read, :dashboard
+
   end
 
   def guest_abilities

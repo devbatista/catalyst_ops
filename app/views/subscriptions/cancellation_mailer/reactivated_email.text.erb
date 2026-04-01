@@ -1,0 +1,8 @@
+Olá, <%= @responsible_name %>.
+
+A renovação automática da assinatura da empresa <%= @company.name %> foi reativada em <%= l(@reactivated_on, format: :short) %>.
+
+<% if @plan.present? %>
+Plano atual: <%= @plan.name %>.
+
+<% end %>
