@@ -146,7 +146,7 @@ class Client < ApplicationRecord
 
     if previous_changes["deleted_at"].present?
       deleted_before, deleted_after = previous_changes["deleted_at"]
-      return [ "client.deleted" ] if deleted_before.nil? && deleted_after.present?
+      return [] if deleted_before.nil? && deleted_after.present?
       return [ "client.restored" ] if deleted_before.present? && deleted_after.nil?
     end
 
@@ -154,7 +154,7 @@ class Client < ApplicationRecord
   end
 
   def auditable_deleted_action
-    nil
+    "client.deleted"
   end
 
   def auditable_metadata(event_name, action:)
