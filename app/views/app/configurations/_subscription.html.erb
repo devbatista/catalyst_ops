@@ -47,6 +47,41 @@
         <div class="col-md-4 text-secondary"><strong>Tipo de suporte:</strong></div>
         <div class="col-md-8"><%= subscription.plan.support_level %></div>
       </div>
+
+      <% upgrade_options = subscription.upgradeable_plans %>
+      <% if upgrade_options.any? %>
+        <hr class="my-4">
+        <h6 class="mb-3">Upgrade de plano</h6>
+        <p class="text-muted mb-3">
+          Você pode fazer upgrade do plano atual para opções superiores.
+          O sistema gera a cobrança proporcional (pró-rata) no ciclo atual e o novo plano só é ativado após a confirmação do pagamento.
+        </p>
+
+        <% if subscription.pending_upgrade_data.present? %>
+          <div class="alert alert-info mb-0">
+            Existe um upgrade pendente aguardando confirmação de pagamento.
+          </div>
+        <% else %>
+          <%= form_with url: upgrade_plan_app_configurations_path, method: :patch, local: true, class: "row g-2 align-items-end" do %>
+            <div class="col-12 col-md-8">
+              <label class="form-label fw-semibold">Novo plano</label>
+              <select name="plan_id" class="form-select" required>
+                <option value="">Selecione</option>
+                <% upgrade_options.each do |plan| %>
+                  <option value="<%= plan.id %>">
+                    <%= plan.name %> - <%= number_to_currency(plan.transaction_amount, unit: "R$") %>
+                  </option>
+                <% end %>
+              </select>
+            </div>
+            <div class="col-12 col-md-4">
+              <button type="submit" class="btn btn-primary w-100">
+                Confirmar upgrade
+              </button>
+            </div>
+          <% end %>
+        <% end %>
+      <% end %>
     <% else %>
       <div class="alert alert-warning mb-0">
         Nenhuma assinatura ativa encontrada para sua empresa.

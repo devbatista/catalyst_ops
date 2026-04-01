@@ -42,6 +42,7 @@ constraints subdomain: "app" do
     collection do
       patch :update_profile
       patch :update_company
+      patch :upgrade_plan
       post :promote_manager
     end
   end
