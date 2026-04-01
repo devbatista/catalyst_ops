@@ -14,7 +14,7 @@ Este guia cobre as funcionalidades do perfil **gestor** no ambiente `app`.
 ## Ordens de Serviço
 - [Como ver a lista e filtrar Ordens de Serviço](ordens_de_servico/como_filtrar_e_buscar_os.md)
 - [Como ver os detalhes de uma Ordem de Serviço](ordens_de_servico/como_ver_detalhes_os.md)
-- [Como criar uma Ordem de Serviço](ordens_de_servico/como_criar_os.md)
+- [Como criar uma Ordem de Serviço (via orçamento aprovado)](ordens_de_servico/como_criar_os.md)
 - [Como editar uma Ordem de Serviço](ordens_de_servico/como_editar_os.md)
 - [Como agendar um atendimento](ordens_de_servico/como_agendar_os.md)
 - [Como reagendar um atendimento](ordens_de_servico/como_reagendar_os.md)
@@ -29,6 +29,12 @@ Este guia cobre as funcionalidades do perfil **gestor** no ambiente `app`.
 - [Como anexar arquivos na OS](ordens_de_servico/como_anexar_arquivos.md)
 - [Como remover um anexo da OS](ordens_de_servico/como_remover_anexo.md)
 - [Como gerar PDF da OS](ordens_de_servico/como_gerar_pdf.md)
+
+## Orçamentos
+- [Como criar um orçamento](orcamentos/como_criar_orcamento.md)
+- [Como enviar orçamento para aprovação](orcamentos/como_enviar_orcamento_para_aprovacao.md)
+- [Como aprovar ou rejeitar orçamento (gestor)](orcamentos/como_aprovar_ou_rejeitar_orcamento.md)
+- [Como tratar orçamento rejeitado](orcamentos/como_tratar_orcamento_rejeitado.md)
 
 ## Clientes
 - [Como cadastrar um cliente](clientes/como_cadastrar_cliente.md)
