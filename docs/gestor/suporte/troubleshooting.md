@@ -1,9 +1,19 @@
 # Problemas comuns (Troubleshooting)
 
 ## Não consigo criar uma OS
-- Verifique se você está com perfil **gestor**
-- Confirme se o **cliente** está cadastrado
-- Preencha **título** e **descrição** com informações mínimas
+- A criação direta de OS foi desativada.
+- Crie primeiro um **Orçamento** e aprove para gerar a OS automaticamente.
+- Confirme se o cliente está cadastrado e se o orçamento possui itens.
+
+## Não consigo enviar orçamento para aprovação
+- Verifique se o orçamento está em **Rascunho**.
+- Confirme se há itens de serviço válidos.
+- Revise se a validade foi preenchida corretamente.
+
+## Orçamento rejeitado e sem botões de ação
+- Esse comportamento é esperado na tela de detalhes.
+- Edite e salve o orçamento para ele voltar para estado pendente.
+- Depois, reenviar para aprovação.
 
 ## Não consigo agendar
 - Data/hora não pode estar no passado
