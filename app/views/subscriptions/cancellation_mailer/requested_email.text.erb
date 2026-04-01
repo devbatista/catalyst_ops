@@ -10,3 +10,7 @@ O cancelamento efetivo está agendado para <%= l(@effective_on, format: :short) 
 Plano atual: <%= @plan.name %>.
 
 <% end %>
+<% if @cancel_reason.present? %>
+Motivo informado: <%= @cancel_reason %>.
+
+<% end %>

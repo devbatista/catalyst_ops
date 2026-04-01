@@ -66,11 +66,15 @@
           Você pode solicitar o cancelamento e continuar com acesso até o fim do período vigente.
         </p>
 
-        <%= button_to "Cancelar assinatura no fim do período",
-          cancel_subscription_app_configurations_path,
-          method: :patch,
-          class: "btn btn-outline-danger",
-          data: { confirm: "Deseja cancelar a assinatura ao fim do período vigente?" } %>
+        <%= form_with url: cancel_subscription_app_configurations_path, method: :patch, local: true do %>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Motivo do cancelamento (opcional)</label>
+            <textarea name="cancel_reason" rows="2" class="form-control" placeholder="Ex.: reestruturação interna, pausa de operação, etc."></textarea>
+          </div>
+          <button type="submit" class="btn btn-outline-danger" data-confirm="Deseja cancelar a assinatura ao fim do período vigente?">
+            Cancelar assinatura no fim do período
+          </button>
+        <% end %>
       <% end %>
     <% else %>
       <div class="alert alert-warning mb-0">

@@ -16,3 +16,7 @@
 <% if @plan.present? %>
   <p>Plano atual: <strong><%= @plan.name %></strong>.</p>
 <% end %>
+
+<% if @cancel_reason.present? %>
+  <p>Motivo informado: <strong><%= @cancel_reason %></strong>.</p>
+<% end %>

@@ -6,6 +6,7 @@ class Subscriptions::CancellationMailer < ApplicationMailer
     @responsible_name = @company.responsible&.name.presence || @company.name
     @requested_on = @subscription.cancel_requested_at || Time.current
     @effective_on = @subscription.cancel_effective_on
+    @cancel_reason = @subscription.cancel_reason
 
     mail(
       to: recipient_email,

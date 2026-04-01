@@ -141,7 +141,6 @@ class Subscription < ApplicationRecord
       cancel_at_period_end: false,
       cancel_requested_at: nil,
       cancel_effective_on: nil,
-      cancel_reason: nil
     )
   end
   
