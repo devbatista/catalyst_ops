@@ -85,6 +85,13 @@ module Cmd
         when "approved", "authorized"
           activate_subscription(approved_at || Time.current)
         when "cancelled", "canceled", "paused", "rejected"
+          handled = @subscription.mark_pending_upgrade_as!(
+            payment_id: @gateway_identifier,
+            status: "payment_cancelled",
+            reason: normalized
+          )
+          return if handled
+
           @subscription.cancel! unless @subscription.cancelled?
         when "pending", "in_process"
           @subscription.update!(status: :pending) unless @subscription.pending? || @subscription.active?
@@ -92,6 +99,10 @@ module Cmd
       end
 
       def activate_subscription(started_at)
+        if @subscription.apply_pending_upgrade_if_payment_confirmed!(payment_id: @gateway_identifier)
+          return
+        end
+
         return if @subscription.active?
 
         @subscription.activate_for!(started_at: started_at)

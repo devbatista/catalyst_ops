@@ -58,11 +58,18 @@ module MercadoPago
 
       case payment["status"]
       when "approved"
-        subscription.activate!
+        applied = subscription.apply_pending_upgrade_if_payment_confirmed!(payment_id: external_payment_id)
+        subscription.activate! unless applied || subscription.active?
       when "pending"
-        subscription.update!(status: :pending)
+        handled = subscription.mark_pending_upgrade_as!(payment_id: external_payment_id, status: "pending_payment")
+        subscription.update!(status: :pending) unless handled || subscription.active?
       when "cancelled"
-        subscription.cancel!
+        handled = subscription.mark_pending_upgrade_as!(
+          payment_id: external_payment_id,
+          status: "payment_cancelled",
+          reason: payment["status_detail"]
+        )
+        subscription.cancel! unless handled || subscription.active?
       end
 
       Result.new(true, "Pagamento #{payment_id} processado com status #{payment['status']}")
