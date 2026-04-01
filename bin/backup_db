@@ -6,6 +6,7 @@ APP_DIR="${APP_DIR:-/opt/catalyst_ops}"
 BACKUP_DIR="${BACKUP_DIR:-$APP_DIR/backups/postgres}"
 RETENTION_DAYS="${BACKUP_RETENTION_DAYS:-7}"
 COMPOSE_FILE="${COMPOSE_FILE:-$APP_DIR/docker-compose.yml}"
+TARGET_DB="${TARGET_DB:-${POSTGRES_DB:-catalyst_ops_production}}"
 
 if ! [[ "$RETENTION_DAYS" =~ ^[0-9]+$ ]] || [ "$RETENTION_DAYS" -lt 1 ]; then
   echo "[backup_db] BACKUP_RETENTION_DAYS invalido: $RETENTION_DAYS"
@@ -21,20 +22,26 @@ if [ ! -f "$COMPOSE_FILE" ]; then
 fi
 
 TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
-DB_NAME="${POSTGRES_DB:-catalyst_ops_production}"
-TMP_FILE="$BACKUP_DIR/${DB_NAME}_${TIMESTAMP}.dump.tmp"
-FINAL_FILE="$BACKUP_DIR/${DB_NAME}_${TIMESTAMP}.dump"
+TMP_FILE="$BACKUP_DIR/${TARGET_DB}_${TIMESTAMP}.dump.tmp"
+FINAL_FILE="$BACKUP_DIR/${TARGET_DB}_${TIMESTAMP}.dump"
 
 echo "[backup_db] Iniciando backup: $FINAL_FILE"
+echo "[backup_db] Banco alvo: $TARGET_DB"
 
-docker compose exec -T db sh -lc '
+docker compose exec -T -e TARGET_DB="$TARGET_DB" db sh -lc '
   set -e
   : "${POSTGRES_USER:?POSTGRES_USER nao definido no container db}"
   : "${POSTGRES_PASSWORD:?POSTGRES_PASSWORD nao definido no container db}"
-  : "${POSTGRES_DB:?POSTGRES_DB nao definido no container db}"
+  : "${TARGET_DB:?TARGET_DB nao definido para backup}"
   export PGPASSWORD="$POSTGRES_PASSWORD"
-  pg_dump -h 127.0.0.1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -F c -Z 9 -f -
+  pg_dump -h 127.0.0.1 -U "$POSTGRES_USER" -d "$TARGET_DB" -F c -Z 9
 ' > "$TMP_FILE"
+
+if [ ! -s "$TMP_FILE" ]; then
+  rm -f "$TMP_FILE"
+  echo "[backup_db] Falha: dump vazio gerado para o banco $TARGET_DB."
+  exit 1
+fi
 
 mv "$TMP_FILE" "$FINAL_FILE"
 
