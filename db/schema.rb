@@ -10,10 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_04_02_100500) do
+ActiveRecord::Schema[7.1].define(version: 2026_04_02_114500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
+  enable_extension "vector"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name", null: false
@@ -214,17 +215,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_02_100500) do
     t.index ["valid_until"], name: "index_coupons_on_valid_until"
   end
 
-  create_table "knowledge_base_articles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "title"
-    t.text "content"
-    t.string "category"
-    t.string "slug"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "audience", default: "gestor", null: false
-    t.index ["audience"], name: "index_knowledge_base_articles_on_audience"
-    t.index ["slug"], name: "index_knowledge_base_articles_on_slug", unique: true
-  end
+# Could not dump table "knowledge_base_articles" because of following StandardError
+#   Unknown type 'vector(1536)' for column 'embedding'
 
   create_table "order_services", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "title"
