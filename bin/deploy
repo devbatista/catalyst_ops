@@ -73,6 +73,8 @@ RESTART_SIDEKIQ=false
 RESTART_NGINX=false
 RUN_MIGRATIONS=false
 CHECK_PENDING_MIGRATIONS=true
+RECREATE_DB=${RECREATE_DB:-false}
+VERIFY_VECTOR=${VERIFY_VECTOR:-true}
 
 for file in "${CHANGED_FILES[@]}"; do
   if matches_any "$file" \
@@ -92,6 +94,12 @@ for file in "${CHANGED_FILES[@]}"; do
     REBUILD_IMAGE=true
     RESTART_WEB=true
     RESTART_SIDEKIQ=true
+  fi
+
+  if matches_any "$file" \
+    "docker-compose.yml" \
+    "docker-compose.override.yml"; then
+    RECREATE_DB=true
   fi
 
   if matches_any "$file" "db/migrate/*" "db/schema.rb"; then
@@ -139,13 +147,24 @@ echo " - RESTART_SIDEKIQ=$RESTART_SIDEKIQ"
 echo " - RESTART_NGINX=$RESTART_NGINX"
 echo " - RUN_MIGRATIONS=$RUN_MIGRATIONS"
 echo " - CHECK_PENDING_MIGRATIONS=$CHECK_PENDING_MIGRATIONS"
+echo " - RECREATE_DB=$RECREATE_DB"
+echo " - VERIFY_VECTOR=$VERIFY_VECTOR"
 
 if [[ "$REBUILD_IMAGE" == "true" ]]; then
   docker compose build web
 fi
 
+if [[ "$RECREATE_DB" == "true" ]]; then
+  docker compose up -d db --force-recreate
+fi
+
 if [[ "$RUN_MIGRATIONS" == "true" || "$CHECK_PENDING_MIGRATIONS" == "true" ]]; then
   docker compose run --rm web bundle exec rails db:migrate
+fi
+
+if [[ "$VERIFY_VECTOR" == "true" ]]; then
+  docker compose exec -T db sh -lc \
+    "psql -U \"\$POSTGRES_USER\" -d \"\$POSTGRES_DB\" -c \"SELECT extname, extversion FROM pg_extension WHERE extname='vector';\""
 fi
 
 if [[ "$RESTART_WEB" == "true" && "$REBUILD_IMAGE" == "true" ]]; then
