@@ -2,7 +2,7 @@
   <%= form_with model: [:app, @budget], local: true do |f| %>
     <div class="row g-3">
       <div class="row mb-3 mt-3">
-        <div class="col-md-6">
+        <div class="col-md-4">
           <%= f.label :client_id, "Cliente", class: "form-label" %>
           <%= f.select :client_id,
                        options_from_collection_for_select(@clients, :id, :name, @budget.client_id),
@@ -13,6 +13,11 @@
         <div class="col-md-3">
           <%= f.label :valid_until, "Validade", class: "form-label" %>
           <%= f.date_field :valid_until, class: "form-control" %>
+        </div>
+
+        <div class="col-md-2">
+          <%= f.label :estimated_delivery_days, "Prazo entrega (dias)", class: "form-label" %>
+          <%= f.number_field :estimated_delivery_days, class: "form-control", min: 1, step: 1 %>
         </div>
 
         <div class="col-md-3">

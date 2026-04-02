@@ -155,7 +155,7 @@ class App::BudgetsController < ApplicationController
 
   def budget_params
     params.require(:budget).permit(
-      :title, :description, :client_id, :total_value, :valid_until,
+      :title, :description, :client_id, :total_value, :valid_until, :estimated_delivery_days,
       service_items_attributes: [:id, :description, :quantity, :unit_price, :_destroy]
     )
   end

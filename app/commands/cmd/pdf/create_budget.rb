@@ -63,7 +63,8 @@ module Cmd
         info_data = [
           [ "Título", @record.title.to_s, "Código", @record.code.to_s ],
           [ "Criada em", format_date(@record.created_at), "Documento", @client&.formatted_document.to_s ],
-          [ "E-mail do cliente", @client&.email.to_s, "Telefone", @client&.formatted_phone.to_s ]
+          [ "E-mail do cliente", @client&.email.to_s, "Telefone", @client&.formatted_phone.to_s ],
+          [ "Prazo de entrega", estimated_delivery_text, "Validade", format_date(@record.valid_until) ]
         ]
 
         pdf.table(
@@ -156,6 +157,13 @@ module Cmd
         return @record.total_value if @record.respond_to?(:total_value) && @record.total_value.present?
 
         @record.service_items.to_a.sum { |item| item.quantity.to_d * item.unit_price.to_d }
+      end
+
+      def estimated_delivery_text
+        days = @record.respond_to?(:estimated_delivery_days) ? @record.estimated_delivery_days : nil
+        return "-" if days.blank?
+
+        "#{days} dias"
       end
     end
   end

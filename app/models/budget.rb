@@ -21,6 +21,9 @@ class Budget < ApplicationRecord
   validates :status, presence: true
   validates :total_value, numericality: { greater_than_or_equal_to: 0 }
   validates :order_service_id, uniqueness: true, allow_nil: true
+  validates :estimated_delivery_days,
+            numericality: { only_integer: true, greater_than: 0 },
+            allow_nil: true
 
   validate :company_must_match_client
   validate :service_items_cannot_be_blank
@@ -150,6 +153,7 @@ class Budget < ApplicationRecord
       status: status,
       total_value: total_value.to_s,
       valid_until: valid_until&.to_s,
+      estimated_delivery_days: estimated_delivery_days,
       client_id: client_id,
       company_id: company_id,
       order_service_id: order_service_id,
