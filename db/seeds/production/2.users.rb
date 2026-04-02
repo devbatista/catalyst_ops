@@ -1,3 +1,5 @@
+puts "Criando o usuário admin..."
+
 User.find_or_create_by!(email: 'admin@catalystops.com.br') do |user|
   user.name = 'Rafael Batista'
   user.password = 'ShowdeBola#10'
@@ -5,3 +7,6 @@ User.find_or_create_by!(email: 'admin@catalystops.com.br') do |user|
   user.role = :admin
   user.active = true
 end
+
+puts "Usuário admin criado..."
+puts "###################################"

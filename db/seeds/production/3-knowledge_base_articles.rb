@@ -1,5 +1,7 @@
 require "redcarpet"
 
+puts "Criando os artigos da base de conhecimento..."
+
 markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML)
 
 KnowledgeBaseArticle.delete_all
@@ -23,3 +25,6 @@ KnowledgeBaseArticle.delete_all
     )
   end
 end
+
+puts "Artigos da base de conhecimento criados..."
+puts "###################################"
