@@ -81,15 +81,7 @@ module Cmd
       end
 
       def order_service_observations
-        parts = [
-          "OS criada automaticamente após aprovação do orçamento ##{budget.code} por #{approver_role}."
-        ]
-
-        if budget.estimated_delivery_days.present?
-          parts << "Prazo de entrega estimado no orçamento: #{budget.estimated_delivery_days} dias."
-        end
-
-        parts.join(" ")
+        "OS criada automaticamente após aprovação do orçamento ##{budget.code} por #{approver_role}."
       end
 
       def ensure_order_service_created_audit!(order_service)

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_04_01_143000) do
+ActiveRecord::Schema[7.1].define(version: 2026_04_02_100500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -110,6 +110,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_01_143000) do
     t.text "rejection_reason"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "estimated_delivery_days"
     t.index ["client_id"], name: "index_budgets_on_client_id"
     t.index ["company_id", "code"], name: "index_budgets_on_company_id_and_code", unique: true
     t.index ["company_id", "status"], name: "index_budgets_on_company_id_and_status"
