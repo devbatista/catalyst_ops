@@ -38,6 +38,9 @@
         <% if @budget.valid_until.present? %>
           <p class="mb-1"><strong>Prazo de resposta:</strong> <%= l(@budget.valid_until, format: "%d/%m/%Y") %></p>
         <% end %>
+        <% if @budget.estimated_delivery_days.present? %>
+          <p class="mb-1"><strong>Prazo de entrega estimado:</strong> <%= @budget.estimated_delivery_days %> dias</p>
+        <% end %>
       </div>
 
       <div class="mb-4">

@@ -31,13 +31,17 @@
         </div>
 
         <div class="row mb-3">
-          <div class="col-md-6">
+          <div class="col-md-4">
             <strong>Título:</strong>
             <p><%= @budget.title %></p>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-4">
             <strong>Validade:</strong>
             <p><%= @budget.valid_until.present? ? l(@budget.valid_until) : "-" %></p>
+          </div>
+          <div class="col-md-4">
+            <strong>Prazo de entrega:</strong>
+            <p><%= @budget.estimated_delivery_days.present? ? "#{@budget.estimated_delivery_days} dias" : "-" %></p>
           </div>
         </div>
 
