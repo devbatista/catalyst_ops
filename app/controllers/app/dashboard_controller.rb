@@ -15,6 +15,7 @@ class App::DashboardController < ApplicationController
       # --- Coleções Base ---
       company = current_user.company
       @order_services = company.order_services
+      @budgets = company.budgets
       company_clients = company.clients
       company_technicians = company.technicians
 
@@ -23,8 +24,11 @@ class App::DashboardController < ApplicationController
       @technicians_count = company_technicians.count
       @order_services_by_status = @order_services.group(:status).count
       @recent_orders = @order_services.order(created_at: :desc).limit(6)
+      @budgets_by_status = @budgets.group(:status).count
+      @recent_budgets = @budgets.includes(:client).order(created_at: :desc).limit(6)
       # KPI de faturamento total para o card principal
       @total_revenue = sum_order_services_items(@order_services)
+      @budgets_total_value = @budgets.sum(:total_value)
 
       # --- NOVOS CÁLCULOS PARA VARIAÇÃO SEMANAL ---
 
@@ -45,8 +49,13 @@ class App::DashboardController < ApplicationController
       @new_clients_current_week = company_clients.where(created_at: Time.now.all_week).count
       @new_clients_last_week = company_clients.where(created_at: 1.week.ago.all_week).count
 
-      # 5. Query para ações pendentes
+      # 5. Variação de novos Orçamentos
+      @new_budgets_current_week = @budgets.where(created_at: Time.now.all_week).count
+      @new_budgets_last_week = @budgets.where(created_at: 1.week.ago.all_week).count
+
+      # 6. Query para ações pendentes
       @pending_approval_orders = @order_services.concluida.order(created_at: :asc).limit(6)
+      @pending_approval_budgets = @budgets.enviado.order(approval_sent_at: :asc, created_at: :asc).limit(6)
     when "tecnico"
       load_technician_dashboard
     end
@@ -114,16 +123,23 @@ class App::DashboardController < ApplicationController
     @new_clients_last_week = 0
     @new_technicians_current_week = 0
     @new_technicians_last_week = 0
+    @new_budgets_current_week = 0
+    @new_budgets_last_week = 0
 
     # Coleções (Arrays/Hashes)
     @order_services_by_status = {}
+    @budgets_by_status = {}
     @pending_approval_orders = []
+    @pending_approval_budgets = []
     @recent_orders = []
+    @recent_budgets = []
+    @budgets = []
     @upcoming_schedule = []
     @current_assignments = []
     @today_schedule = []
     @today_schedule_count = 0
     @in_progress_count = 0
     @overdue_count = 0
+    @budgets_total_value = 0
   end
 end
