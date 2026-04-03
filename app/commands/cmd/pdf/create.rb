@@ -184,11 +184,25 @@ module Cmd
           table.cells.border_width = 1
         end
         pdf.move_down(10)
+        totals_data = [
+          [{ content: "Subtotal: #{brl(@order_service.subtotal_value)}", align: :right }],
+          [{ content: "Desconto: #{brl(@order_service.discount_amount)}", align: :right }],
+          [{ content: "Total: #{brl(@order_service.total_value)}", align: :right, font_style: :bold }]
+        ]
         pdf.table(
-          [[{ content: "Total: #{brl(@order_service.total_value)}", align: :right, font_style: :bold }]],
+          totals_data,
           width: page_width,
-          cell_style: { size: 16, padding: [8, 10, 8, 10], border_color: border, background_color: "F8FAFC" }
+          cell_style: { size: 12, padding: [6, 10, 6, 10], border_color: border, background_color: "F8FAFC" }
         )
+
+        if @order_service.discount_applied? && @order_service.discount_reason.present?
+          pdf.move_down(8)
+          pdf.table(
+            [[{ content: "Motivo do desconto: #{safe(@order_service.discount_reason)}", align: :left }]],
+            width: page_width,
+            cell_style: { size: 10, padding: [6, 10, 6, 10], border_color: border, background_color: "FFFFFF" }
+          )
+        end
 
         if @order_service.observations.present?
           pdf.move_down(12)

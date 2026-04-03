@@ -154,6 +154,9 @@ class App::OrderServicesController < ApplicationController
         :expected_end_at,
         :signed_by_client,
         :observations,
+        :discount_type,
+        :discount_value,
+        :discount_reason,
         attachments: [],
         user_ids: [],
         service_items_attributes: [

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_04_02_114500) do
+ActiveRecord::Schema[7.1].define(version: 2026_04_02_131500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -237,6 +237,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_02_114500) do
     t.datetime "approved_at"
     t.datetime "rejected_at"
     t.text "rejection_reason"
+    t.string "discount_type", default: "none", null: false
+    t.decimal "discount_value", precision: 10, scale: 2, default: "0.0", null: false
+    t.text "discount_reason"
     t.index ["client_id"], name: "index_order_services_on_client_id"
     t.index ["company_id", "code"], name: "index_order_services_on_company_id_and_code", unique: true
     t.index ["company_id", "status", "created_at"], name: "index_order_services_on_company_status_created_at"
