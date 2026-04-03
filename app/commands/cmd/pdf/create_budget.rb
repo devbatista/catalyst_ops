@@ -81,7 +81,7 @@ module Cmd
         pdf.move_down(10)
 
         pdf.fill_color(text)
-        pdf.font_size(11) { pdf.text("Descrição: #{@record.description}", style: :bold) }
+        pdf.font_size(11) { pdf.text("Descrição:", style: :bold) }
         pdf.move_down(6)
         pdf.table(
           [[@record.description.to_s]],
