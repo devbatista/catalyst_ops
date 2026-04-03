@@ -1,30 +1,35 @@
 class Mobile::V1::OrderServicesController < Mobile::V1::BaseController
   def index
-    scope = current_mobile_user.company.order_services.includes(:client, :users)
+    scope = mobile_company.order_services.includes(:client, :users)
     scope = scope.where(status: params[:status]) if valid_status_filter?
 
-    page = [params[:page].to_i, 1].max
-    per = params[:per].to_i
-    per = 20 if per <= 0
-    per = 100 if per > 100
-
+    page, per = pagination_params
     order_services = scope.order(created_at: :desc).page(page).per(per)
-
-    render json: {
-      data: order_services.map { |os| order_service_index_payload(os) },
-      meta: {
-        current_page: order_services.current_page,
-        total_pages: order_services.total_pages,
-        total_count: order_services.total_count,
-        per_page: order_services.limit_value
+    mobile_audit(
+      action: "mobile.api.order_services.listed",
+      metadata: {
+        status: params[:status],
+        page: page,
+        per: per,
+        count: order_services.size
       }
-    }, status: :ok
+    )
+
+    render_paginated(
+      data: order_services.map { |order_service| order_service_index_payload(order_service) },
+      collection: order_services
+    )
   end
 
   def show
-    order_service = current_mobile_user.company.order_services
+    order_service = mobile_company.order_services
                                .includes(:client, :users, :service_items)
                                .find(params[:id])
+    mobile_audit(
+      action: "mobile.api.order_services.viewed",
+      resource: order_service,
+      metadata: { order_service_id: order_service.id }
+    )
 
     render json: { data: order_service_show_payload(order_service) }, status: :ok
   end

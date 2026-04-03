@@ -1,30 +1,35 @@
 class Mobile::V1::BudgetsController < Mobile::V1::BaseController
   def index
-    scope = current_mobile_user.company.budgets.includes(:client, :order_service)
+    scope = mobile_company.budgets.includes(:client, :order_service)
     scope = scope.where(status: params[:status]) if valid_status_filter?
 
-    page = [params[:page].to_i, 1].max
-    per = params[:per].to_i
-    per = 20 if per <= 0
-    per = 100 if per > 100
-
+    page, per = pagination_params
     budgets = scope.order(created_at: :desc).page(page).per(per)
-
-    render json: {
-      data: budgets.map { |budget| budget_index_payload(budget) },
-      meta: {
-        current_page: budgets.current_page,
-        total_pages: budgets.total_pages,
-        total_count: budgets.total_count,
-        per_page: budgets.limit_value
+    mobile_audit(
+      action: "mobile.api.budgets.listed",
+      metadata: {
+        status: params[:status],
+        page: page,
+        per: per,
+        count: budgets.size
       }
-    }, status: :ok
+    )
+
+    render_paginated(
+      data: budgets.map { |budget| budget_index_payload(budget) },
+      collection: budgets
+    )
   end
 
   def show
-    budget = current_mobile_user.company.budgets
+    budget = mobile_company.budgets
                       .includes(:client, :order_service, :service_items)
                       .find(params[:id])
+    mobile_audit(
+      action: "mobile.api.budgets.viewed",
+      resource: budget,
+      metadata: { budget_id: budget.id }
+    )
 
     render json: { data: budget_show_payload(budget) }, status: :ok
   end
