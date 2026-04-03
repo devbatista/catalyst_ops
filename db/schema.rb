@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_04_02_131500) do
+ActiveRecord::Schema[7.1].define(version: 2026_04_03_111500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -217,6 +217,20 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_02_131500) do
 
 # Could not dump table "knowledge_base_articles" because of following StandardError
 #   Unknown type 'vector(1536)' for column 'embedding'
+
+  create_table "mobile_api_sessions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.string "token_digest", null: false
+    t.datetime "expires_at", null: false
+    t.datetime "last_used_at"
+    t.datetime "revoked_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expires_at"], name: "index_mobile_api_sessions_on_expires_at"
+    t.index ["token_digest"], name: "index_mobile_api_sessions_on_token_digest", unique: true
+    t.index ["user_id", "revoked_at"], name: "index_mobile_api_sessions_on_user_id_and_revoked_at"
+    t.index ["user_id"], name: "index_mobile_api_sessions_on_user_id"
+  end
 
   create_table "order_services", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "title"
@@ -448,6 +462,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_02_131500) do
   add_foreign_key "coupon_redemptions", "companies"
   add_foreign_key "coupon_redemptions", "coupons"
   add_foreign_key "coupon_redemptions", "subscriptions"
+  add_foreign_key "mobile_api_sessions", "users"
   add_foreign_key "order_services", "clients"
   add_foreign_key "order_services", "companies"
   add_foreign_key "reports", "companies"
