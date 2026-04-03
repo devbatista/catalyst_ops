@@ -34,6 +34,6 @@ class App::FinancialController < ApplicationController
   private
 
   def order_services_total(scope)
-    scope.joins(:service_items).sum("COALESCE(service_items.quantity, 0) * COALESCE(service_items.unit_price, 0)")
+    scope.to_a.sum(&:total_value)
   end
 end

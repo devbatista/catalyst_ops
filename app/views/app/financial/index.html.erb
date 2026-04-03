@@ -54,7 +54,7 @@
               <div>
                 <p class="mb-0 text-secondary">Volume Total</p>
                 <h4 class="my-1 text-primary"><%= currency_br(@overall_total) %></h4>
-                <p class="mb-0 font-13 text-secondary">Itens lançados nas OS</p>
+                <p class="mb-0 font-13 text-secondary">Soma líquida das OS</p>
               </div>
               <div class="widgets-icons-2 rounded-circle bg-gradient-blues text-white ms-auto">
                 <i class='bx bx-wallet'></i>
@@ -87,7 +87,7 @@
         <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
           <div>
             <h6 class="mb-0">Ordens de Serviço por Situação Financeira</h6>
-            <small class="text-muted">Baseado no status da ordem de serviço e no total dos itens cadastrados.</small>
+            <small class="text-muted">Baseado no status da ordem de serviço e no valor final (com desconto, quando houver).</small>
           </div>
 
           <%= form_with url: app_financial_index_path, method: :get, local: true, class: "d-flex gap-2" do %>
@@ -116,7 +116,7 @@
                 <th>Cliente</th>
                 <th>Status</th>
                 <th>Data de referência</th>
-                <th>Valor dos itens</th>
+                <th>Valor final</th>
                 <th></th>
               </tr>
             </thead>

@@ -6,6 +6,7 @@ class BudgetMailer < ApplicationMailer
     @company_name = budget.company&.name.to_s
     @approval_url = budget_approval_url(token: token, subdomain: "cliente")
     @approval_expires_at = budget.approval_expires_at
+    @budget_valid_until = budget.approval_expires_at.to_date
 
     mail(to: @client.email, subject: "Aprovação do Orçamento ##{@budget.code}")
   end

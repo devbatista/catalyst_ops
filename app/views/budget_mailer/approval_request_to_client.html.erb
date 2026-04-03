@@ -20,6 +20,11 @@
 </p>
 
 <p>
+  Validade do orçamento:
+  <strong><%= l(@budget_valid_until, format: "%d/%m/%Y") %></strong>.
+</p>
+
+<p>
   Este link expira em
   <strong><%= l(@approval_expires_at.to_date, format: "%d/%m/%Y") %></strong>.
 </p>

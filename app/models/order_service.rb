@@ -33,6 +33,7 @@ class OrderService < ApplicationRecord
     cancelada: "Cancelar",
     atrasada: "Reagendar"
   }.freeze
+  DISCOUNT_TYPES = %w[none percent fixed].freeze
 
   validates :title, presence: true, length: { minimum: 5, maximum: 100 }
   validates :description, presence: true, length: { minimum: 5, maximum: 1000 }
@@ -41,6 +42,8 @@ class OrderService < ApplicationRecord
   validates :client_id, presence: true
   validates :code, presence: true, uniqueness: { scope: :company_id }
   validates :expected_end_at, presence: true, if: -> { scheduled_at.present? }
+  validates :discount_type, inclusion: { in: DISCOUNT_TYPES }
+  validates :discount_value, numericality: { greater_than_or_equal_to: 0 }
 
   validate :scheduled_at_cannot_be_in_the_past, on: [:create, :update]
   validate :expected_end_at_cannot_be_in_the_past, on: [:create, :update]
@@ -50,6 +53,8 @@ class OrderService < ApplicationRecord
   validate :datetimes_fields_are_required_if_technicians_are_present
   validate :service_items_cannot_be_blank
   validate :plan_order_service_limit, on: :create
+  validate :discount_value_must_be_valid_for_type
+  validate :discount_reason_required_when_discount_applied
 
   scope :by_status, ->(status) { where(status: status) }
   scope :by_client, ->(client_id) { where(client_id: client_id) }
@@ -65,6 +70,7 @@ class OrderService < ApplicationRecord
 
   before_validation :set_company_from_client, on: :create
   before_validation :set_sequencial_code, on: :create
+  before_validation :normalize_discount_fields
 
   after_validation :promote_assignment_errors
 
@@ -76,8 +82,30 @@ class OrderService < ApplicationRecord
   after_update :notify_in_progress, if: -> { saved_change_to_status?(to: "em_andamento") }
   after_update :notify_overdue, if: -> { saved_change_to_status?(to: "atrasada") }
 
-  def total_value
+  def subtotal_value
     service_items.sum(&:total_price)
+  end
+
+  def discount_applied?
+    discount_amount.positive?
+  end
+
+  def discount_amount
+    base_value = subtotal_value.to_d
+    return 0.to_d if base_value <= 0
+
+    case discount_type
+    when "percent"
+      ((base_value * discount_value.to_d) / 100).round(2)
+    when "fixed"
+      [discount_value.to_d, base_value].min
+    else
+      0.to_d
+    end
+  end
+
+  def total_value
+    [subtotal_value.to_d - discount_amount, 0.to_d].max
   end
 
   def formatted_total_value
@@ -184,6 +212,11 @@ class OrderService < ApplicationRecord
       code: code,
       title: title,
       status: status,
+      subtotal_value: subtotal_value.to_s,
+      discount_type: discount_type,
+      discount_value: discount_value.to_s,
+      discount_amount: discount_amount.to_s,
+      total_value: total_value.to_s,
       client_id: client_id,
       company_id: company_id,
       action_source: action
@@ -397,5 +430,34 @@ class OrderService < ApplicationRecord
     unless company.can_create_order?
       errors.add(:base, "Limite de ordens de serviço atingido para o plano atual da empresa.")
     end
+  end
+
+  def normalize_discount_fields
+    self.discount_type = discount_type.to_s.presence || "none"
+
+    if discount_type == "none"
+      self.discount_value = 0
+      self.discount_reason = nil
+    end
+  end
+
+  def discount_value_must_be_valid_for_type
+    return if discount_type == "none"
+
+    value = discount_value.to_d
+    if discount_type == "percent" && value > 100
+      errors.add(:discount_value, "não pode ser maior que 100%")
+    end
+
+    if discount_type == "fixed" && value > subtotal_value.to_d
+      errors.add(:discount_value, "não pode ser maior que o subtotal da OS")
+    end
+  end
+
+  def discount_reason_required_when_discount_applied
+    return unless discount_type != "none" && discount_value.to_d.positive?
+    return if discount_reason.to_s.strip.present?
+
+    errors.add(:discount_reason, "deve ser informado quando houver desconto")
   end
 end
