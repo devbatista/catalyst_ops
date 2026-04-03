@@ -35,9 +35,7 @@
         <p class="mb-1"><strong>Título:</strong> <%= @budget.title %></p>
         <p class="mb-1"><strong>Descrição:</strong> <%= @budget.description %></p>
         <p class="mb-1"><strong>Criado em:</strong> <%= l(@budget.created_at.to_date, format: "%d/%m/%Y") %></p>
-        <% if @budget.valid_until.present? %>
-          <p class="mb-1"><strong>Prazo de resposta:</strong> <%= l(@budget.valid_until, format: "%d/%m/%Y") %></p>
-        <% end %>
+        <p class="mb-1"><strong>Prazo de resposta:</strong> <%= l(@budget.approval_expires_at.to_date, format: "%d/%m/%Y") %></p>
         <% if @budget.estimated_delivery_days.present? %>
           <p class="mb-1"><strong>Prazo de entrega estimado:</strong> <%= @budget.estimated_delivery_days %> dias</p>
         <% end %>

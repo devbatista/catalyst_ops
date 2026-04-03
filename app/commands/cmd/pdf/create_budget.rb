@@ -64,7 +64,7 @@ module Cmd
           [ "Título", @record.title.to_s, "Código", @record.code.to_s ],
           [ "Criada em", format_date(@record.created_at), "Documento", @client&.formatted_document.to_s ],
           [ "E-mail do cliente", @client&.email.to_s, "Telefone", @client&.formatted_phone.to_s ],
-          [ "Prazo de entrega", estimated_delivery_text, "Validade", format_date(@record.valid_until) ]
+          [ "Prazo de entrega", estimated_delivery_text, "Validade", format_date(budget_valid_until) ]
         ]
 
         pdf.table(
@@ -164,6 +164,12 @@ module Cmd
         return "-" if days.blank?
 
         "#{days} dias"
+      end
+
+      def budget_valid_until
+        return @record.approval_expires_at if @record.respond_to?(:approval_expires_at)
+
+        @record.respond_to?(:valid_until) ? @record.valid_until : nil
       end
     end
   end
