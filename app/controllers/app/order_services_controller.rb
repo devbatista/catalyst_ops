@@ -4,6 +4,7 @@ class App::OrderServicesController < ApplicationController
   before_action :set_other_resources, only: [:edit, :update, :schedule]
   before_action :set_attachment_on_update, only: [:update]
   before_action :can_add_order_service, only: [:create]
+  before_action :ensure_direct_order_service_creation_enabled, only: [:new, :create]
   before_action :ensure_technician_only_updates_allowed_fields, only: [:update]
   before_action :restrict_status_update_for_technician, only: [:update_status]
   before_action :restrict_overdue_reschedule_for_technician, only: [:schedule, :perform_schedule]
@@ -58,8 +59,21 @@ class App::OrderServicesController < ApplicationController
   end
 
   def create
-    redirect_to new_app_budget_path(client_id: params.dig(:order_service, :client_id)),
-                alert: "A criação manual de OS foi desativada. Crie um orçamento."
+    @order_service.created_without_budget = true
+
+    if @order_service.update(order_service_params_with_auto_schedule_status)
+      redirect_to app_order_service_url(@order_service), notice: "Ordem de serviço criada com sucesso."
+    else
+      set_other_resources
+      flash.now[:alert] = @order_service.errors.full_messages.to_sentence
+      render :new, status: :unprocessable_entity
+    end
+  end
+
+  def new
+    @order_service.created_without_budget = true
+    set_other_resources
+    prefill_client_from_params
   end
 
   def edit; end
@@ -154,6 +168,8 @@ class App::OrderServicesController < ApplicationController
         :expected_end_at,
         :signed_by_client,
         :observations,
+        :budget_waiver_reason,
+        :budget_waiver_authorized_by,
         :discount_type,
         :discount_value,
         :discount_reason,
@@ -256,6 +272,13 @@ class App::OrderServicesController < ApplicationController
     unless current_user.company.can_create_order?
       redirect_to app_order_services_path, alert: "Limite de ordens de serviço atingido para o seu plano atual."
     end
+  end
+
+  def ensure_direct_order_service_creation_enabled
+    return if current_user.company.allow_order_service_without_budget?
+
+    redirect_to new_app_budget_path(client_id: params.dig(:order_service, :client_id)),
+                alert: "Sua empresa não permite criar OS sem orçamento. Crie um orçamento primeiro."
   end
 
   def ensure_technician_only_updates_allowed_fields

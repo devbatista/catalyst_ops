@@ -1,6 +1,5 @@
 constraints subdomain: "app" do
   root to: "app/dashboard#index", as: :app_dashboard
-  get "order_services/new", to: "errors#show", defaults: { code: "404" }
 
   resource :terms_of_use, only: [:show, :update], controller: "app/terms_of_use", as: :app_terms_of_use
 
@@ -13,7 +12,7 @@ constraints subdomain: "app" do
       get :generate_pdf
     end
   end
-  resources :order_services, except: [:new, :create], module: "app", as: :app_order_services do
+  resources :order_services, module: "app", as: :app_order_services do
     get :unassigned, on: :collection
     get :overdue, on: :collection
     resources :service_items, module: "order_services", as: :app_service_items

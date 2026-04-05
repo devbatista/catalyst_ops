@@ -57,7 +57,14 @@
                 </form>
               </div>
 
-              <div class="col-12 col-md-4"></div>
+              <div class="col-12 col-md-4 d-flex flex-column flex-md-row justify-content-md-end gap-2 mt-3 mt-md-0">
+                <% if current_user.gestor? %>
+                  <% if current_user.company.allow_order_service_without_budget? %>
+                    <%= link_to raw('<i class="bx bx-plus"></i> Nova OS'), new_app_order_service_path,
+                        class: "btn btn-outline-primary btn-add-new w-100 w-md-auto" %>
+                  <% end %>
+                <% end %>
+              </div>
             </div>
             <div class="table-responsive">
               <table class="table mb-0 table-hover">

@@ -76,10 +76,16 @@ class App::ConfigurationsController < ApplicationController
   end
 
   def company_params
-    params.require(:company).permit(
+    permitted = params.require(:company).permit(
       :name, :document, :email, :phone, :street, :number, :complement,
       :neighborhood, :city, :state, :zip_code
     )
+
+    if current_user.id == current_user.company&.responsible_id
+      permitted[:allow_order_service_without_budget] = params[:company][:allow_order_service_without_budget]
+    end
+
+    permitted
   end
 
   def set_subscription_for_management

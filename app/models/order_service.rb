@@ -67,6 +67,7 @@ class OrderService < ApplicationRecord
   scope :assigned, -> { joins(:assignments).distinct }
   scope :finished, -> { where(status: :finalizada) }
   scope :finished_this_month, -> { finished.where(updated_at: Time.current.all_month) }
+  scope :created_without_budget, -> { where(created_without_budget: true) }
 
   before_validation :set_company_from_client, on: :create
   before_validation :set_sequencial_code, on: :create
@@ -216,6 +217,9 @@ class OrderService < ApplicationRecord
       discount_type: discount_type,
       discount_value: discount_value.to_s,
       discount_amount: discount_amount.to_s,
+      created_without_budget: created_without_budget,
+      budget_waiver_reason: budget_waiver_reason,
+      budget_waiver_authorized_by: budget_waiver_authorized_by,
       total_value: total_value.to_s,
       client_id: client_id,
       company_id: company_id,
