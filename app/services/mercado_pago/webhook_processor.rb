@@ -59,10 +59,28 @@ module MercadoPago
       case payment["status"].to_s
       when "approved"
         subscription.activate!
+        log_subscription_payment_event!(
+          action: "subscription.payment.approved",
+          subscription: subscription,
+          payment_id: external_payment_id,
+          payment_status: payment["status"]
+        )
       when "pending", "in_process"
         subscription.update!(status: :pending)
+        log_subscription_payment_event!(
+          action: "subscription.payment.pending",
+          subscription: subscription,
+          payment_id: external_payment_id,
+          payment_status: payment["status"]
+        )
       when "cancelled", "canceled", "failed", "rejected", "expired"
         subscription.cancel!
+        log_subscription_payment_event!(
+          action: "subscription.payment.failed",
+          subscription: subscription,
+          payment_id: external_payment_id,
+          payment_status: payment["status"]
+        )
       else
         Rails.logger.info("[MercadoPago::WebhookProcessor] Payment #{payment_id} sem transicao para status #{payment['status']}")
       end
@@ -138,6 +156,21 @@ module MercadoPago
       Time.zone.parse(value)
     rescue ArgumentError
       nil
+    end
+
+    def log_subscription_payment_event!(action:, subscription:, payment_id:, payment_status:)
+      Audit::Log.call(
+        action: action,
+        resource: subscription,
+        metadata: {
+          event: action.to_s.split(".").last,
+          subscription_id: subscription.id,
+          company_id: subscription.company_id,
+          external_payment_id: payment_id,
+          payment_status: payment_status,
+          action_source: "mercado_pago.webhook_processor"
+        }
+      )
     end
   end
 end
