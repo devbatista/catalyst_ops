@@ -56,13 +56,15 @@ module MercadoPago
         raw_payload: payment
       )
 
-      case payment["status"]
+      case payment["status"].to_s
       when "approved"
         subscription.activate!
-      when "pending"
+      when "pending", "in_process"
         subscription.update!(status: :pending)
-      when "cancelled"
+      when "cancelled", "canceled", "failed", "rejected", "expired"
         subscription.cancel!
+      else
+        Rails.logger.info("[MercadoPago::WebhookProcessor] Payment #{payment_id} sem transicao para status #{payment['status']}")
       end
 
       Result.new(true, "Pagamento #{payment_id} processado com status #{payment['status']}")
