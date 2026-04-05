@@ -138,8 +138,6 @@ module MercadoPago
         "accredited"
       when "cancelled"
         "by_collector"
-      when "rejected"
-        "cc_rejected_other_reason"
       when "pending", "in_process"
         "pending_contingency"
       else
