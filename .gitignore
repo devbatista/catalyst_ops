@@ -37,12 +37,7 @@
 # Ignore master key for decrypting credentials and more.
 /config/master.key
 
-/project.md
-/TESTES_RSPEC_CHECKLIST.md
-/CHECKLIST_PENDENCIAS.md
-/SMOKE_TESTS_RELEASE.md
-/SMOKE_TESTS_RELEASE_REVIEW.md
-/GO_NO_GO_PRODUCAO_CHECKLIST.md
+/checklists
 
 /bin/rails_bkp
 
