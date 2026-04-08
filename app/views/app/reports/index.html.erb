@@ -1,16 +1,253 @@
+<% content_for :head do %>
+  <style>
+    .reports-filters-card .form-label {
+      font-size: 0.78rem;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: #6c757d;
+      margin-bottom: 0.25rem;
+    }
+
+    .reports-kpi-title {
+      font-size: 0.85rem;
+      color: #6c757d;
+      margin-bottom: 0.2rem;
+    }
+
+    .reports-kpi-value {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 0;
+      line-height: 1.2;
+    }
+
+    .reports-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .reports-chart-wrapper {
+      position: relative;
+      min-height: 280px;
+    }
+
+    @media (max-width: 767px) {
+      .reports-chart-wrapper {
+        min-height: 240px;
+      }
+    }
+  </style>
+<% end %>
+
 <div class="page-wrapper">
-  <div class="page-content d-flex flex-column align-items-center justify-content-center" style="min-height: 60vh;">
-    <h2 class="mb-4"><i class="bx bx-file"></i> Relatórios</h2>
-
-    <div class="alert alert-info text-center" style="max-width: 520px;">
-      <p class="mb-2">
-        Em breve você terá acesso à nossa central de relatórios!
-      </p>
-
-      <p class="mb-0">
-        Enquanto isso, qualquer relatório pode ser solicitado por e-mail:
-        <a href="mailto:contato@catalystops.com.br">contato@catalystops.com.br</a>.
-      </p>
+  <div class="page-content">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
+      <div>
+        <h4 class="mb-1 text-uppercase">Relatórios</h4>
+        <p class="mb-0 text-secondary">Acompanhe volume, eficiência e SLA das ordens de serviço.</p>
+      </div>
+      <div class="d-flex flex-wrap gap-2">
+        <button class="btn btn-outline-primary" type="button" disabled title="Em breve">
+          <i class="bx bx-download"></i> Exportar CSV/XLSX/PDF
+        </button>
+        <button class="btn btn-outline-secondary" type="button" disabled title="Em breve">
+          <i class="bx bx-bookmark"></i> Salvar visão
+        </button>
+        <button class="btn btn-outline-dark" type="button" disabled title="Em breve">
+          <i class="bx bx-share-alt"></i> Compartilhar
+        </button>
+      </div>
     </div>
+
+    <div class="card reports-filters-card mb-3">
+      <div class="card-body">
+        <%= form_with url: app_reports_path, method: :get, local: true do %>
+          <div class="row g-3 align-items-end">
+            <div class="col-12 col-md-3">
+              <label class="form-label">Data inicial</label>
+              <%= date_field_tag :start_date, @start_date, class: "form-control" %>
+            </div>
+            <div class="col-12 col-md-3">
+              <label class="form-label">Data final</label>
+              <%= date_field_tag :end_date, @end_date, class: "form-control" %>
+            </div>
+            <div class="col-12 col-md-2">
+              <label class="form-label">Status</label>
+              <%= select_tag :status,
+                    options_for_select(@status_options.map { |status| [status.humanize, status] }, params[:status]),
+                    include_blank: "Todos",
+                    class: "form-select" %>
+            </div>
+            <div class="col-12 col-md-2">
+              <label class="form-label">Técnico</label>
+              <%= select_tag :technician_id,
+                    options_from_collection_for_select(@technician_options, :id, :name, params[:technician_id]),
+                    include_blank: "Todos",
+                    class: "form-select" %>
+            </div>
+            <div class="col-12 col-md-2 d-flex gap-2">
+              <button class="btn btn-primary w-100" type="submit">Aplicar</button>
+              <%= link_to "Limpar", app_reports_path, class: "btn btn-light border w-100" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-3 mb-3">
+      <div class="col">
+        <div class="card radius-10 border-start border-0 border-4 border-info h-100">
+          <div class="card-body">
+            <p class="reports-kpi-title">Total no período</p>
+            <p class="reports-kpi-value text-info"><%= @total_orders_count %></p>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card radius-10 border-start border-0 border-4 border-success h-100">
+          <div class="card-body">
+            <p class="reports-kpi-title">Concluídas</p>
+            <p class="reports-kpi-value text-success"><%= @completed_orders_count %></p>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card radius-10 border-start border-0 border-4 border-warning h-100">
+          <div class="card-body">
+            <p class="reports-kpi-title">Pendentes</p>
+            <p class="reports-kpi-value text-warning"><%= @pending_orders_count %></p>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card radius-10 border-start border-0 border-4 border-primary h-100">
+          <div class="card-body">
+            <p class="reports-kpi-title">SLA no prazo</p>
+            <p class="reports-kpi-value text-primary"><%= number_to_percentage(@sla_rate, precision: 1) %></p>
+            <small class="text-secondary">Tempo médio: <%= @average_resolution_hours %>h</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="reports-charts-data"
+         data-volume-labels="<%= @volume_chart_labels.to_json %>"
+         data-volume-values="<%= @volume_chart_values.to_json %>"
+         data-status-labels="<%= @status_chart_labels.to_json %>"
+         data-status-values="<%= @status_chart_values.to_json %>"
+         data-status-colors="<%= @status_chart_colors.to_json %>"></div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-12 col-lg-8 d-flex">
+        <div class="card w-100">
+          <div class="card-header reports-card-header">
+            <h6 class="mb-0">Volume por dia</h6>
+            <small class="text-secondary"><%= l(@start_date) %> a <%= l(@end_date) %></small>
+          </div>
+          <div class="card-body">
+            <div class="reports-chart-wrapper">
+              <canvas id="reports-volume-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-4 d-flex">
+        <div class="card w-100">
+          <div class="card-header reports-card-header">
+            <h6 class="mb-0">Distribuição por status</h6>
+          </div>
+          <div class="card-body">
+            <div class="reports-chart-wrapper">
+              <canvas id="reports-status-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header reports-card-header">
+        <h6 class="mb-0">Detalhamento de ordens</h6>
+        <small class="text-secondary">Mostrando <%= @report_orders.size %> de <%= @report_orders.total_count %> registros</small>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Cliente</th>
+                <th>Status</th>
+                <th>Técnico(s)</th>
+                <th>Abertura</th>
+                <th>Fechamento</th>
+                <th>Tempo</th>
+                <th>SLA</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if @report_orders.any? %>
+                <% @report_orders.each do |order| %>
+                  <tr>
+                    <td>#<%= order.code %></td>
+                    <td><%= order.client&.name || "-" %></td>
+                    <td><span class="badge bg-<%= report_status_badge_class(order.status) %>"><%= order.status.humanize %></span></td>
+                    <td><%= order.users.map(&:name).join(", ").presence || "-" %></td>
+                    <td><%= l(order.created_at, format: :short) %></td>
+                    <td><%= order.finished_at.present? ? l(order.finished_at, format: :short) : "-" %></td>
+                    <td><%= report_resolution_hours(order) %></td>
+                    <td><%= report_sla_badge(order) %></td>
+                  </tr>
+                <% end %>
+              <% else %>
+                <tr>
+                  <td colspan="8" class="text-center text-secondary">Nenhuma ordem de serviço encontrada com os filtros atuais.</td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+        <div class="d-flex justify-content-end mt-3">
+          <%= custom_paginate(@report_orders) %>
+        </div>
+      </div>
+    </div>
+
+    <% if @generated_reports.any? %>
+      <div class="card mt-3">
+        <div class="card-header">
+          <h6 class="mb-0">Relatórios gerados recentemente</h6>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Título</th>
+                  <th>Tipo</th>
+                  <th>Status</th>
+                  <th>Gerado em</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @generated_reports.each do |report| %>
+                  <tr>
+                    <td><%= report.title %></td>
+                    <td><%= report.report_type_human %></td>
+                    <td><span class="badge bg-light text-dark border"><%= report.status_human %></span></td>
+                    <td><%= report.generated_at.present? ? l(report.generated_at, format: :short) : "-" %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    <% end %>
   </div>
 </div>

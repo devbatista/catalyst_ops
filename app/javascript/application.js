@@ -201,6 +201,147 @@ function setActiveMenuItem() {
   }
 }
 
+function destroyChartIfExists(key) {
+  window.catalystCharts = window.catalystCharts || {};
+  if (window.catalystCharts[key]) {
+    window.catalystCharts[key].destroy();
+    delete window.catalystCharts[key];
+  }
+}
+
+function initializeDashboardStatusChart() {
+  const chartCanvas = document.getElementById('chart2');
+  if (!chartCanvas) return;
+
+  const statusListItems = document.querySelectorAll('#os-status-list li');
+  const labels = [];
+  const data = [];
+  const backgroundColors = [];
+
+  const colorMap = {
+    'primary': '#0d6efd',
+    'secondary': '#6c757d',
+    'success': '#198754',
+    'danger': '#dc3545',
+    'warning': '#ffc107',
+    'info': '#0dcaf0',
+    'dark': '#343a40',
+    'light': '#f8f9fa'
+  };
+
+  statusListItems.forEach(item => {
+    labels.push(item.dataset.status);
+    data.push(parseInt(item.dataset.count, 10));
+    const colorKey = item.dataset.colorKey.replace('bg-', '');
+    backgroundColors.push(colorMap[colorKey] || '#6c757d');
+  });
+
+  destroyChartIfExists('dashboardStatus');
+
+  const ctx = chartCanvas.getContext('2d');
+  window.catalystCharts.dashboardStatus = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        backgroundColor: backgroundColors,
+        data: data,
+        borderWidth: 0
+      }]
+    },
+    options: {
+      maintainAspectRatio: false,
+      responsive: true,
+      plugins: {
+        legend: {
+          display: false
+        }
+      },
+      cutout: '70%'
+    }
+  });
+}
+
+function initializeReportsCharts() {
+  const reportsDataElement = document.getElementById('reports-charts-data');
+  const volumeCanvas = document.getElementById('reports-volume-chart');
+  const statusCanvas = document.getElementById('reports-status-chart');
+
+  if (!reportsDataElement || !volumeCanvas || !statusCanvas) return;
+
+  const volumeLabels = JSON.parse(reportsDataElement.dataset.volumeLabels || '[]');
+  const volumeValues = JSON.parse(reportsDataElement.dataset.volumeValues || '[]');
+  const statusLabels = JSON.parse(reportsDataElement.dataset.statusLabels || '[]');
+  const statusValues = JSON.parse(reportsDataElement.dataset.statusValues || '[]');
+  const statusColors = JSON.parse(reportsDataElement.dataset.statusColors || '[]');
+
+  destroyChartIfExists('reportsVolume');
+  destroyChartIfExists('reportsStatus');
+
+  window.catalystCharts.reportsVolume = new Chart(volumeCanvas.getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: volumeLabels,
+      datasets: [{
+        label: 'OS por dia',
+        data: volumeValues,
+        borderColor: '#0d6efd',
+        backgroundColor: 'rgba(13, 110, 253, 0.14)',
+        tension: 0.35,
+        fill: true,
+        pointRadius: 2
+      }]
+    },
+    options: {
+      maintainAspectRatio: false,
+      responsive: true,
+      plugins: {
+        legend: {
+          display: false
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            precision: 0
+          }
+        }
+      }
+    }
+  });
+
+  window.catalystCharts.reportsStatus = new Chart(statusCanvas.getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: statusLabels,
+      datasets: [{
+        label: 'OS por status',
+        data: statusValues,
+        backgroundColor: statusColors,
+        borderRadius: 8
+      }]
+    },
+    options: {
+      maintainAspectRatio: false,
+      responsive: true,
+      plugins: {
+        legend: {
+          display: false
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            precision: 0
+          }
+        }
+      }
+    }
+  });
+}
+
 function initializePage() {
   $('.app-container, .header-message-list, .header-notifications-list').each(function () {
     const ps = PerfectScrollbar.getInstance(this);
@@ -223,54 +364,8 @@ function initializePage() {
     });
   }
 
-  const chartCanvas = document.getElementById('chart2');
-  if (chartCanvas) {
-    const statusListItems = document.querySelectorAll('#os-status-list li');
-    const labels = [];
-    const data = [];
-    const backgroundColors = [];
-
-    const colorMap = {
-      'primary': '#0d6efd',
-      'secondary': '#6c757d',
-      'success': '#198754',
-      'danger': '#dc3545',
-      'warning': '#ffc107',
-      'info': '#0dcaf0',
-      'dark': '#343a40',
-      'light': '#f8f9fa'
-    };
-
-    statusListItems.forEach(item => {
-      labels.push(item.dataset.status);
-      data.push(parseInt(item.dataset.count, 10));
-      const colorKey = item.dataset.colorKey.replace('bg-', '');
-      backgroundColors.push(colorMap[colorKey] || '#6c757d');
-    });
-
-    const ctx = chartCanvas.getContext('2d');
-    new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: labels,
-        datasets: [{
-          backgroundColor: backgroundColors,
-          data: data,
-          borderWidth: 0
-        }]
-      },
-      options: {
-        maintainAspectRatio: false,
-        responsive: true,
-        plugins: {
-          legend: {
-            display: false
-          }
-        },
-        cutout: '70%'
-      }
-    });
-  }
+  initializeDashboardStatusChart();
+  initializeReportsCharts();
 
   setActiveMenuItem();
 
