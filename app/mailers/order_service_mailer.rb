@@ -40,6 +40,7 @@ class OrderServiceMailer < ApplicationMailer
   def notify_technician_on_finished(order_service, user)
     @order_service = order_service
     @user = user
+    @technician = user
     mail(to: @user.email, subject: "A ordem de serviço ##{@order_service.code} foi finalizada!")
   end
 
