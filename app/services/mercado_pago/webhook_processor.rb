@@ -73,7 +73,7 @@ module MercadoPago
           payment_id: external_payment_id,
           payment_status: payment["status"]
         )
-      when "cancelled", "canceled", "failed", "rejected", "expired"
+      when "cancelled", "canceled", "failed", "rejected", "expired", "refunded", "charged_back", "charge_back"
         subscription.cancel!
         log_subscription_payment_event!(
           action: "subscription.payment.failed",

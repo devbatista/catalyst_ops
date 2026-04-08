@@ -88,7 +88,7 @@ module MercadoPago
           "approved"
         when "pending", "in_process"
           "pending"
-        when "cancelled", "canceled", "expired", "failed", "failure", "rejected"
+        when "cancelled", "canceled", "expired", "failed", "failure", "rejected", "refunded", "charged_back", "charge_back"
           "cancelled"
         else
           "approved"
