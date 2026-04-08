@@ -11,7 +11,10 @@ class App::SupportTicketsController < ApplicationController
   end
 
   def show
-    @support_ticket = current_user.company.support_tickets.find(params[:id])
+    @support_ticket = current_user.company.support_tickets
+                                  .with_attached_attachments
+                                  .includes(support_messages: [attachments_attachments: :blob])
+                                  .find(params[:id])
     @support_messages = @support_ticket.support_messages.order(created_at: :asc)
   end
 
