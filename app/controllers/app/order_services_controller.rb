@@ -80,6 +80,7 @@ class App::OrderServicesController < ApplicationController
 
   def update
     if @order_service.update(order_service_params_with_auto_schedule_status)
+      set_simultaneous_conflicts_warning
       purge_marked_attachments
       if @attachments.present?
         add_attachs
@@ -103,6 +104,7 @@ class App::OrderServicesController < ApplicationController
   def perform_schedule
     begin
       if @order_service.update(schedule_params)
+        set_simultaneous_conflicts_warning
         redirect_to app_order_service_path(@order_service), notice: 'Ordem de Serviço agendada com sucesso.'
       else
         set_other_resources
@@ -191,7 +193,7 @@ class App::OrderServicesController < ApplicationController
   end
 
   def order_service_params_with_auto_schedule_status
-    permitted_params = order_service_params
+    permitted_params = order_service_params.except(:remove_attachment_ids)
     return permitted_params unless should_set_status_as_scheduled?(permitted_params)
 
     permitted_params.merge(status: :agendada)
@@ -321,6 +323,43 @@ class App::OrderServicesController < ApplicationController
     expected_updated = expected_raw.present? && @order_service.expected_end_at != Time.zone.parse(expected_raw)
 
     scheduled_updated || expected_updated
+  end
+
+  def set_simultaneous_conflicts_warning
+    conflicts = simultaneous_assignment_conflicts
+    return if conflicts.empty?
+
+    details = conflicts.map do |conflict|
+      "Técnico #{conflict[:technician_name]} também está na OS ##{conflict[:order_service_code]} "\
+      "(#{I18n.l(conflict[:scheduled_at], format: :short)} - #{I18n.l(conflict[:expected_end_at], format: :short)})"
+    end
+
+    flash[:warning] = "Atenção: conflito de agenda detectado. #{details.join(' | ')}"
+  end
+
+  def simultaneous_assignment_conflicts
+    return [] unless @order_service.company&.allow_simultaneous_order_services?
+    return [] if @order_service.scheduled_at.blank? || @order_service.expected_end_at.blank?
+
+    @order_service.users.includes(assignments: :order_service).flat_map do |technician|
+      technician.assignments
+                .joins(:order_service)
+                .where.not(order_services: { status: [:concluida, :cancelada] })
+                .where.not(order_service_id: @order_service.id)
+                .where(
+                  "(order_services.scheduled_at, order_services.expected_end_at) OVERLAPS (?, ?)",
+                  @order_service.scheduled_at - 1.hour,
+                  @order_service.expected_end_at + 1.hour
+                )
+                .map do |assignment|
+                  {
+                    technician_name: technician.name,
+                    order_service_code: assignment.order_service.code,
+                    scheduled_at: assignment.order_service.scheduled_at,
+                    expected_end_at: assignment.order_service.expected_end_at
+                  }
+                end
+    end.uniq
   end
 
   def restrict_status_update_for_technician

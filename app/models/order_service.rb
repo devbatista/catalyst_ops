@@ -408,6 +408,8 @@ class OrderService < ApplicationRecord
       next if assignment.valid?
 
       assignment.errors.each do |error|
+        next if allow_simultaneous_order_services? && error.attribute == :user && error.message.include?("já possui outra OS agendada para este período")
+
         if error.attribute == :base && error.message.include?("data de agendamento")
           errors.add(:scheduled_at, "é obrigatório ao atribuir um técnico.")
         else
@@ -428,6 +430,10 @@ class OrderService < ApplicationRecord
 
   def requires_schedule_fields?
     agendada? || em_andamento? || concluida? || finalizada? || atrasada?
+  end
+
+  def allow_simultaneous_order_services?
+    company&.allow_simultaneous_order_services? == true
   end
 
   def plan_order_service_limit

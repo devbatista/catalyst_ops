@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_04_05_103000) do
+ActiveRecord::Schema[7.1].define(version: 2026_04_08_201000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -164,8 +164,10 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_05_103000) do
     t.text "terms_accepted_user_agent"
     t.uuid "terms_accepted_by_user_id"
     t.boolean "allow_order_service_without_budget", default: false, null: false
+    t.boolean "allow_simultaneous_order_services", default: false, null: false
     t.index ["active"], name: "index_companies_on_active"
     t.index ["allow_order_service_without_budget"], name: "index_companies_on_allow_os_without_budget"
+    t.index ["allow_simultaneous_order_services"], name: "index_companies_on_allow_simultaneous_os"
     t.index ["city", "state"], name: "index_companies_on_city_and_state"
     t.index ["document"], name: "index_companies_on_document", unique: true
     t.index ["email"], name: "index_companies_on_email", unique: true

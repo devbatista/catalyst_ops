@@ -83,6 +83,7 @@ class App::ConfigurationsController < ApplicationController
 
     if current_user.id == current_user.company&.responsible_id
       permitted[:allow_order_service_without_budget] = params[:company][:allow_order_service_without_budget]
+      permitted[:allow_simultaneous_order_services] = params[:company][:allow_simultaneous_order_services]
     end
 
     permitted

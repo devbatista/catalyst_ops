@@ -55,6 +55,18 @@
       <% end %>
     </div>
   </div>
+  <div class="row mb-4 align-items-center">
+    <div class="col-sm-3"><h6 class="mb-0 text-secondary">Permitir OS simultâneas</h6></div>
+    <div class="col-sm-9">
+      <div class="form-check">
+        <%= f.check_box :allow_simultaneous_order_services, class: "form-check-input", disabled: !company_responsible? %>
+        <%= f.label :allow_simultaneous_order_services, "A empresa pode atribuir o mesmo técnico em OS com horários sobrepostos", class: "form-check-label" %>
+      </div>
+      <% unless company_responsible? %>
+        <small class="text-muted">Somente o responsável da empresa pode alterar essa configuração.</small>
+      <% end %>
+    </div>
+  </div>
   <div class="row">
     <div class="col-sm-3 d-none d-sm-block"></div>
     <div class="col-sm-9">

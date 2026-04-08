@@ -6,7 +6,7 @@
     </div>
 
     <% flash.each do |type, message| %>
-      <% bootstrap_class = { notice: "alert-success", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
+      <% bootstrap_class = { notice: "alert-success", warning: "alert-warning", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
       <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert">
         <%= message %>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
