@@ -4,12 +4,6 @@ if (window.Rails && typeof window.Rails.start === "function") {
 
 import "controllers"
 
-import "jquery"
-
-import "select2"
-import "metisMenu"
-import PerfectScrollbar from "perfect-scrollbar"
-
 import "register/signups"
 
 function formatCurrencyBR(rawValue) {
@@ -269,8 +263,14 @@ function initializeReportsCharts() {
 
   if (!reportsDataElement || !volumeCanvas || !statusCanvas) return;
 
-  const volumeLabels = JSON.parse(reportsDataElement.dataset.volumeLabels || '[]');
-  const volumeValues = JSON.parse(reportsDataElement.dataset.volumeValues || '[]');
+  const trendTitle = reportsDataElement.dataset.trendTitle || 'Evolução';
+  const trendPrimaryLabel = reportsDataElement.dataset.trendPrimaryLabel || 'Total';
+  const trendSecondaryLabel = reportsDataElement.dataset.trendSecondaryLabel || 'Sucesso';
+  const trendLabels = JSON.parse(reportsDataElement.dataset.trendLabels || '[]');
+  const trendPrimaryValues = JSON.parse(reportsDataElement.dataset.trendPrimaryValues || '[]');
+  const trendSecondaryValues = JSON.parse(reportsDataElement.dataset.trendSecondaryValues || '[]');
+  const trendTertiaryLabel = reportsDataElement.dataset.trendTertiaryLabel || '';
+  const trendTertiaryValues = JSON.parse(reportsDataElement.dataset.trendTertiaryValues || '[]');
   const statusLabels = JSON.parse(reportsDataElement.dataset.statusLabels || '[]');
   const statusValues = JSON.parse(reportsDataElement.dataset.statusValues || '[]');
   const statusColors = JSON.parse(reportsDataElement.dataset.statusColors || '[]');
@@ -278,30 +278,62 @@ function initializeReportsCharts() {
   destroyChartIfExists('reportsVolume');
   destroyChartIfExists('reportsStatus');
 
+  const trendDatasets = [
+    {
+      label: trendPrimaryLabel,
+      data: trendPrimaryValues,
+      backgroundColor: 'rgba(13, 110, 253, 0.35)',
+      borderColor: '#0d6efd',
+      borderWidth: 1,
+      borderRadius: 6,
+      yAxisID: 'yCount'
+    },
+    {
+      label: trendSecondaryLabel,
+      data: trendSecondaryValues,
+      backgroundColor: 'rgba(25, 135, 84, 0.45)',
+      borderColor: '#198754',
+      borderWidth: 1,
+      borderRadius: 6,
+      yAxisID: 'yCount'
+    }
+  ];
+
+  const hasTertiaryData = trendTertiaryLabel && trendTertiaryValues.some((value) => Number(value) > 0);
+  if (hasTertiaryData) {
+    trendDatasets.push({
+      label: trendTertiaryLabel,
+      data: trendTertiaryValues,
+      backgroundColor: 'rgba(220, 53, 69, 0.45)',
+      borderColor: '#dc3545',
+      borderWidth: 1,
+      borderRadius: 6,
+      yAxisID: 'yCount'
+    });
+  }
+
   window.catalystCharts.reportsVolume = new Chart(volumeCanvas.getContext('2d'), {
-    type: 'line',
+    type: 'bar',
     data: {
-      labels: volumeLabels,
-      datasets: [{
-        label: 'OS por dia',
-        data: volumeValues,
-        borderColor: '#0d6efd',
-        backgroundColor: 'rgba(13, 110, 253, 0.14)',
-        tension: 0.35,
-        fill: true,
-        pointRadius: 2
-      }]
+      labels: trendLabels,
+      datasets: trendDatasets
     },
     options: {
       maintainAspectRatio: false,
       responsive: true,
       plugins: {
+        title: {
+          display: false,
+          text: trendTitle
+        },
         legend: {
-          display: false
+          display: true
         }
       },
       scales: {
-        y: {
+        yCount: {
+          type: 'linear',
+          position: 'left',
           beginAtZero: true,
           ticks: {
             precision: 0
@@ -316,7 +348,7 @@ function initializeReportsCharts() {
     data: {
       labels: statusLabels,
       datasets: [{
-        label: 'OS por status',
+        label: 'Registros por status',
         data: statusValues,
         backgroundColor: statusColors,
         borderRadius: 8
@@ -343,11 +375,17 @@ function initializeReportsCharts() {
 }
 
 function initializePage() {
-  $('.app-container, .header-message-list, .header-notifications-list').each(function () {
-    const ps = PerfectScrollbar.getInstance(this);
-    if (ps) ps.destroy();
-    new PerfectScrollbar(this);
-  });
+  const $ = window.jQuery;
+  const PerfectScrollbarLib = window.PerfectScrollbar;
+  if (!$) return;
+
+  if (PerfectScrollbarLib) {
+    $('.app-container, .header-message-list, .header-notifications-list').each(function () {
+      const ps = PerfectScrollbarLib.getInstance(this);
+      if (ps) ps.destroy();
+      new PerfectScrollbarLib(this);
+    });
+  }
 
   const menuEl = $('#menu');
   if (menuEl.length > 0 && $.fn.metisMenu) {
@@ -372,7 +410,16 @@ function initializePage() {
   $('.js-wait').show();
 }
 
-$(document).ready(function () {
+window.addEventListener("load", function () {
+  const $ = window.jQuery;
+  if ($ && typeof $.fn?.ready === "function") {
+    $(document).ready(function () {
+      initializePage();
+      initializeCurrencyMasks();
+    });
+    return;
+  }
+
   initializePage();
   initializeCurrencyMasks();
 });

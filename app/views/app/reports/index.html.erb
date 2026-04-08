@@ -45,10 +45,20 @@
 
 <div class="page-wrapper">
   <div class="page-content">
+    <% flash.each do |type, message| %>
+      <% bootstrap_class = { notice: "alert-success", alert: "alert-warning", error: "alert-danger" }[type.to_sym] || "alert-info" %>
+      <div class="alert <%= bootstrap_class %> alert-dismissible fade show mb-3" role="alert">
+        <%= message %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    <% end %>
+
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
       <div>
         <h4 class="mb-1 text-uppercase">Relatórios</h4>
-        <p class="mb-0 text-secondary">Acompanhe volume, eficiência e SLA das ordens de serviço.</p>
+        <p class="mb-0 text-secondary">
+          <%= @report_source == "budgets" ? "Acompanhe conversão, aprovação e valor médio dos orçamentos." : "Acompanhe volume, eficiência e SLA das ordens de serviço." %>
+        </p>
       </div>
       <div class="d-flex flex-wrap gap-2">
         <button class="btn btn-outline-primary" type="button" disabled title="Em breve">
@@ -76,67 +86,140 @@
               <%= date_field_tag :end_date, @end_date, class: "form-control" %>
             </div>
             <div class="col-12 col-md-2">
+              <label class="form-label">Base</label>
+              <%= select_tag :report_source,
+                    options_for_select([["Ordens de Serviço", "order_services"], ["Orçamentos", "budgets"]], @report_source),
+                    class: "form-select" %>
+            </div>
+            <div class="col-12 col-md-2">
+              <label class="form-label">Agrupar por</label>
+              <%= select_tag :group_by,
+                    options_for_select([["Dia", "day"], ["Semana", "week"], ["Mês", "month"]], @group_by),
+                    class: "form-select" %>
+            </div>
+            <div class="col-12 col-md-2">
               <label class="form-label">Status</label>
               <%= select_tag :status,
                     options_for_select(@status_options.map { |status| [status.humanize, status] }, params[:status]),
                     include_blank: "Todos",
                     class: "form-select" %>
             </div>
-            <div class="col-12 col-md-2">
-              <label class="form-label">Técnico</label>
-              <%= select_tag :technician_id,
-                    options_from_collection_for_select(@technician_options, :id, :name, params[:technician_id]),
-                    include_blank: "Todos",
-                    class: "form-select" %>
-            </div>
+            <% if @report_source == "order_services" %>
+              <div class="col-12 col-md-2">
+                <label class="form-label">Técnico</label>
+                <%= select_tag :technician_id,
+                      options_from_collection_for_select(@technician_options, :id, :name, params[:technician_id]),
+                      include_blank: "Todos",
+                      class: "form-select" %>
+              </div>
+            <% end %>
             <div class="col-12 col-md-2 d-flex gap-2">
               <button class="btn btn-primary w-100" type="submit">Aplicar</button>
               <%= link_to "Limpar", app_reports_path, class: "btn btn-light border w-100" %>
             </div>
           </div>
+          <div class="mt-2">
+            <small class="text-secondary">Período máximo para consultas/exportações: 6 meses.</small>
+          </div>
         <% end %>
       </div>
     </div>
 
-    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-3 mb-3">
-      <div class="col">
-        <div class="card radius-10 border-start border-0 border-4 border-info h-100">
-          <div class="card-body">
-            <p class="reports-kpi-title">Total no período</p>
-            <p class="reports-kpi-value text-info"><%= @total_orders_count %></p>
+    <% if @report_source == "budgets" %>
+      <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-3 mb-3">
+        <div class="col">
+          <div class="card radius-10 border-start border-0 border-4 border-info h-100">
+            <div class="card-body">
+              <p class="reports-kpi-title">Total no período</p>
+              <p class="reports-kpi-value text-info"><%= @total_budgets_count %></p>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card radius-10 border-start border-0 border-4 border-success h-100">
+            <div class="card-body">
+              <p class="reports-kpi-title">Aprovados</p>
+              <p class="reports-kpi-value text-success"><%= @approved_budgets_count %></p>
+              <small class="text-secondary">
+                <%= number_to_percentage((@approved_budgets_count.to_f / [@total_budgets_count, 1].max) * 100, precision: 1) %> do total
+              </small>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card radius-10 border-start border-0 border-4 border-warning h-100">
+            <div class="card-body">
+              <p class="reports-kpi-title">Em aberto</p>
+              <p class="reports-kpi-value text-warning"><%= @open_budgets_count %></p>
+              <small class="text-secondary"><%= @rejected_budgets_count %> rejeitados/cancelados</small>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card radius-10 border-start border-0 border-4 border-primary h-100">
+            <div class="card-body">
+              <p class="reports-kpi-title">Taxa de aprovação</p>
+              <p class="reports-kpi-value text-primary"><%= number_to_percentage(@approval_rate, precision: 1) %></p>
+              <small class="text-secondary">
+                Base: <%= @approval_eligible_budgets_count %> decididos • Ticket médio: <%= number_to_currency(@average_budget_value, unit: "R$ ", separator: ",", delimiter: ".") %>
+              </small>
+            </div>
           </div>
         </div>
       </div>
-      <div class="col">
-        <div class="card radius-10 border-start border-0 border-4 border-success h-100">
-          <div class="card-body">
-            <p class="reports-kpi-title">Concluídas</p>
-            <p class="reports-kpi-value text-success"><%= @completed_orders_count %></p>
+    <% else %>
+      <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-3 mb-3">
+        <div class="col">
+          <div class="card radius-10 border-start border-0 border-4 border-info h-100">
+            <div class="card-body">
+              <p class="reports-kpi-title">Total no período</p>
+              <p class="reports-kpi-value text-info"><%= @total_orders_count %></p>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card radius-10 border-start border-0 border-4 border-success h-100">
+            <div class="card-body">
+              <p class="reports-kpi-title">Finalizadas</p>
+              <p class="reports-kpi-value text-success"><%= @completed_orders_count %></p>
+              <small class="text-secondary">
+                <%= number_to_percentage((@completed_orders_count.to_f / [@total_orders_count, 1].max) * 100, precision: 1) %> do total
+              </small>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card radius-10 border-start border-0 border-4 border-warning h-100">
+            <div class="card-body">
+              <p class="reports-kpi-title">Em aberto</p>
+              <p class="reports-kpi-value text-warning"><%= @open_orders_count %></p>
+              <small class="text-secondary"><%= @canceled_orders_count %> canceladas no período</small>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card radius-10 border-start border-0 border-4 border-primary h-100">
+            <div class="card-body">
+              <p class="reports-kpi-title">SLA no prazo</p>
+              <p class="reports-kpi-value text-primary"><%= number_to_percentage(@sla_rate, precision: 1) %></p>
+              <small class="text-secondary">
+                <%= @sla_on_time_orders_count %>/<%= @sla_eligible_orders_count %> dentro do prazo • Tempo médio: <%= @average_resolution_hours %>h
+              </small>
+            </div>
           </div>
         </div>
       </div>
-      <div class="col">
-        <div class="card radius-10 border-start border-0 border-4 border-warning h-100">
-          <div class="card-body">
-            <p class="reports-kpi-title">Pendentes</p>
-            <p class="reports-kpi-value text-warning"><%= @pending_orders_count %></p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card radius-10 border-start border-0 border-4 border-primary h-100">
-          <div class="card-body">
-            <p class="reports-kpi-title">SLA no prazo</p>
-            <p class="reports-kpi-value text-primary"><%= number_to_percentage(@sla_rate, precision: 1) %></p>
-            <small class="text-secondary">Tempo médio: <%= @average_resolution_hours %>h</small>
-          </div>
-        </div>
-      </div>
-    </div>
+    <% end %>
 
     <div id="reports-charts-data"
-         data-volume-labels="<%= @volume_chart_labels.to_json %>"
-         data-volume-values="<%= @volume_chart_values.to_json %>"
+         data-trend-title="<%= @trend_chart_title %>"
+         data-trend-primary-label="<%= @trend_primary_label %>"
+         data-trend-secondary-label="<%= @trend_secondary_label %>"
+         data-trend-labels="<%= @trend_chart_labels.to_json %>"
+         data-trend-primary-values="<%= @trend_primary_values.to_json %>"
+         data-trend-secondary-values="<%= @trend_secondary_values.to_json %>"
+         data-trend-tertiary-label="<%= @trend_tertiary_label %>"
+         data-trend-tertiary-values="<%= @trend_tertiary_values.to_json %>"
          data-status-labels="<%= @status_chart_labels.to_json %>"
          data-status-values="<%= @status_chart_values.to_json %>"
          data-status-colors="<%= @status_chart_colors.to_json %>"></div>
@@ -145,7 +228,7 @@
       <div class="col-12 col-lg-8 d-flex">
         <div class="card w-100">
           <div class="card-header reports-card-header">
-            <h6 class="mb-0">Volume por dia</h6>
+            <h6 class="mb-0"><%= @trend_chart_title %></h6>
             <small class="text-secondary"><%= l(@start_date) %> a <%= l(@end_date) %></small>
           </div>
           <div class="card-body">
@@ -172,48 +255,85 @@
 
     <div class="card">
       <div class="card-header reports-card-header">
-        <h6 class="mb-0">Detalhamento de ordens</h6>
-        <small class="text-secondary">Mostrando <%= @report_orders.size %> de <%= @report_orders.total_count %> registros</small>
+        <h6 class="mb-0">Detalhamento de <%= @report_source == "budgets" ? "orçamentos" : "ordens" %></h6>
+        <% if @report_source == "budgets" %>
+          <small class="text-secondary">Mostrando <%= @report_budgets.size %> de <%= @report_budgets.total_count %> registros</small>
+        <% else %>
+          <small class="text-secondary">Mostrando <%= @report_orders.size %> de <%= @report_orders.total_count %> registros</small>
+        <% end %>
       </div>
       <div class="card-body">
         <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead>
-              <tr>
-                <th>Código</th>
-                <th>Cliente</th>
-                <th>Status</th>
-                <th>Técnico(s)</th>
-                <th>Abertura</th>
-                <th>Fechamento</th>
-                <th>Tempo</th>
-                <th>SLA</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% if @report_orders.any? %>
-                <% @report_orders.each do |order| %>
+          <% if @report_source == "budgets" %>
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Cliente</th>
+                  <th>Status</th>
+                  <th>Criação</th>
+                  <th>Envio aprovação</th>
+                  <th>Valor total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if @report_budgets.any? %>
+                  <% @report_budgets.each do |budget| %>
+                    <tr>
+                      <td>#<%= budget.code %></td>
+                      <td><%= budget.client&.name || "-" %></td>
+                      <td><span class="badge bg-light text-dark border"><%= budget.status.humanize %></span></td>
+                      <td><%= l(budget.created_at, format: :short) %></td>
+                      <td><%= budget.approval_sent_at.present? ? l(budget.approval_sent_at, format: :short) : "-" %></td>
+                      <td><%= budget.formatted_total_value %></td>
+                    </tr>
+                  <% end %>
+                <% else %>
                   <tr>
-                    <td>#<%= order.code %></td>
-                    <td><%= order.client&.name || "-" %></td>
-                    <td><span class="badge bg-<%= report_status_badge_class(order.status) %>"><%= order.status.humanize %></span></td>
-                    <td><%= order.users.map(&:name).join(", ").presence || "-" %></td>
-                    <td><%= l(order.created_at, format: :short) %></td>
-                    <td><%= order.finished_at.present? ? l(order.finished_at, format: :short) : "-" %></td>
-                    <td><%= report_resolution_hours(order) %></td>
-                    <td><%= report_sla_badge(order) %></td>
+                    <td colspan="6" class="text-center text-secondary">Nenhum orçamento encontrado com os filtros atuais.</td>
                   </tr>
                 <% end %>
-              <% else %>
+              </tbody>
+            </table>
+          <% else %>
+            <table class="table table-hover align-middle mb-0">
+              <thead>
                 <tr>
-                  <td colspan="8" class="text-center text-secondary">Nenhuma ordem de serviço encontrada com os filtros atuais.</td>
+                  <th>Código</th>
+                  <th>Cliente</th>
+                  <th>Status</th>
+                  <th>Técnico(s)</th>
+                  <th>Abertura</th>
+                  <th>Fechamento</th>
+                  <th>Tempo</th>
+                  <th>SLA</th>
                 </tr>
-              <% end %>
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                <% if @report_orders.any? %>
+                  <% @report_orders.each do |order| %>
+                    <tr>
+                      <td>#<%= order.code %></td>
+                      <td><%= order.client&.name || "-" %></td>
+                      <td><span class="badge bg-<%= report_status_badge_class(order.status) %>"><%= order.status.humanize %></span></td>
+                      <td><%= order.users.map(&:name).join(", ").presence || "-" %></td>
+                      <td><%= l(order.created_at, format: :short) %></td>
+                      <td><%= order.finished_at.present? ? l(order.finished_at, format: :short) : "-" %></td>
+                      <td><%= report_resolution_hours(order) %></td>
+                      <td><%= report_sla_badge(order) %></td>
+                    </tr>
+                  <% end %>
+                <% else %>
+                  <tr>
+                    <td colspan="8" class="text-center text-secondary">Nenhuma ordem de serviço encontrada com os filtros atuais.</td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          <% end %>
         </div>
         <div class="d-flex justify-content-end mt-3">
-          <%= custom_paginate(@report_orders) %>
+          <%= custom_paginate(@report_source == "budgets" ? @report_budgets : @report_orders) %>
         </div>
       </div>
     </div>
