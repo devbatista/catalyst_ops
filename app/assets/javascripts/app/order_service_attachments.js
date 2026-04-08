@@ -1,34 +1,31 @@
-document.addEventListener('click', async function (e) {
-  const deleteLink = e.target.closest('a.js-delete-attachment');
-  if (!deleteLink) return;
+document.addEventListener('click', function (e) {
+  const deleteButton = e.target.closest('.js-mark-remove-attachment');
+  if (!deleteButton) return;
 
   e.preventDefault();
 
-  const confirmMsg = deleteLink.dataset.confirm;
+  const confirmMsg = deleteButton.dataset.confirm;
   if (confirmMsg && !confirm(confirmMsg)) return;
 
-  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+  const attachmentId = deleteButton.dataset.attachmentId;
+  if (!attachmentId) return;
 
-  try {
-    const resp = await fetch(deleteLink.href, {
-      method: 'DELETE',
-      headers: {
-        'X-CSRF-Token': csrfToken || '',
-        'Accept': 'text/html'
-      },
-      credentials: 'same-origin'
-    });
+  const form = deleteButton.closest('form');
+  const hiddenContainer = form?.querySelector('#remove-attachment-inputs');
+  if (!hiddenContainer) return;
 
-    if (resp.ok) {
-      // Recarrega só a lista de anexos via AJAX
-      const orderServiceId = deleteLink.closest('ul').dataset.orderServiceId;
-      const listResp = await fetch(`/order_services/${orderServiceId}/attachments`);
-      const html = await listResp.text();
-      document.getElementById('attachments-list').innerHTML = html;
-    } else {
-      window.location.reload();
-    }
-  } catch (_err) {
-    window.location.reload();
+  const alreadyMarked = hiddenContainer.querySelector(
+    `input[name="order_service[remove_attachment_ids][]"][value="${attachmentId}"]`
+  );
+
+  if (!alreadyMarked) {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'order_service[remove_attachment_ids][]';
+    input.value = attachmentId;
+    hiddenContainer.appendChild(input);
   }
+
+  const item = deleteButton.closest('li');
+  if (item) item.remove();
 });
