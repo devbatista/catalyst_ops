@@ -32,6 +32,12 @@
         <%= current_user.company.allow_order_service_without_budget? ? "Permitido" : "Bloqueado" %>
       </div>
     </div>
+    <div class="row mt-2 mb-0">
+      <div class="col-md-3 text-secondary"><strong>OS simultâneas:</strong></div>
+      <div class="col-md-9">
+        <%= current_user.company.allow_simultaneous_order_services? ? "Permitido" : "Bloqueado" %>
+      </div>
+    </div>
   </div>
 </div>
 
