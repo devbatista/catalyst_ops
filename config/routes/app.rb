@@ -19,6 +19,7 @@ constraints subdomain: "app" do
     member do
       patch :update_status
       get :generate_pdf
+      post :send_pdf_to_client
       delete :purge_attachment
       get :attachments
       get :schedule

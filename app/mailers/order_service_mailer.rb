@@ -50,4 +50,18 @@ class OrderServiceMailer < ApplicationMailer
     mail(to: @gestor.email, subject: "A ordem de serviço ##{@order_service.code} está em andamento!")
   end
 
+  def send_pdf_to_client(order_service, sender)
+    @order_service = order_service
+    @client = @order_service.client
+    @sender = sender
+
+    pdf_data = Cmd::Pdf::Create.new(@order_service).generate_pdf_data
+    attachments["ordem_servico_#{@order_service.code}.pdf"] = {
+      mime_type: "application/pdf",
+      content: pdf_data
+    }
+
+    mail(to: @client.email, subject: "PDF da Ordem de Serviço ##{@order_service.code}")
+  end
+
 end

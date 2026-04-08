@@ -145,6 +145,23 @@ class App::OrderServicesController < ApplicationController
               disposition: "attachment"
   end
 
+  def send_pdf_to_client
+    unless current_user.gestor?
+      return redirect_to app_order_service_url(@order_service), alert: "Somente gestores podem enviar o PDF da OS para o cliente."
+    end
+
+    unless @order_service.concluida? || @order_service.finalizada?
+      return redirect_to app_order_service_url(@order_service), alert: "O envio do PDF está disponível apenas para OS concluída ou finalizada."
+    end
+
+    if @order_service.client&.email.blank?
+      return redirect_to app_order_service_url(@order_service), alert: "O cliente não possui e-mail cadastrado."
+    end
+
+    OrderServiceMailer.send_pdf_to_client(@order_service, current_user).deliver_later
+    redirect_to app_order_service_url(@order_service), notice: "PDF enviado para o cliente com sucesso."
+  end
+
   def attachments
     @order_service = OrderService.find(params[:id])
     render partial: "app/order_services/attachments", locals: { order_service: @order_service }
