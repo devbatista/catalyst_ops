@@ -84,7 +84,7 @@ module Cmd
         case normalized
         when "approved", "authorized"
           activate_subscription(approved_at || Time.current)
-        when "cancelled", "canceled", "paused", "rejected"
+        when "cancelled", "canceled", "paused", "rejected", "refunded", "charged_back", "charge_back"
           @subscription.cancel! unless @subscription.cancelled?
         when "pending", "in_process"
           @subscription.update!(status: :pending) unless @subscription.pending? || @subscription.active?
@@ -152,7 +152,7 @@ module Cmd
         case gateway_status.to_s.downcase
         when "approved", "authorized"
           "active"
-        when "cancelled", "canceled", "paused", "rejected"
+        when "cancelled", "canceled", "paused", "rejected", "refunded", "charged_back", "charge_back"
           "cancelled"
         when "pending", "in_process"
           "pending"
