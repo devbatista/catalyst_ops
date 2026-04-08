@@ -80,6 +80,7 @@ class App::OrderServicesController < ApplicationController
 
   def update
     if @order_service.update(order_service_params_with_auto_schedule_status)
+      purge_marked_attachments
       if @attachments.present?
         add_attachs
       else
@@ -173,6 +174,7 @@ class App::OrderServicesController < ApplicationController
         :discount_type,
         :discount_value,
         :discount_reason,
+        remove_attachment_ids: [],
         attachments: [],
         user_ids: [],
         service_items_attributes: [
@@ -182,6 +184,7 @@ class App::OrderServicesController < ApplicationController
     else
       params.require(:order_service).permit(
         :observations,
+        remove_attachment_ids: [],
         attachments: []
       )
     end
@@ -292,12 +295,20 @@ class App::OrderServicesController < ApplicationController
 
     updated_datetimes = changed_attr_datetimes?
 
-    @order_service.assign_attributes(submitted.permit!)
+    assignable_submitted = submitted.to_unsafe_h.except("remove_attachment_ids")
+    @order_service.assign_attributes(assignable_submitted)
     changed = @order_service.changed - allowed_params - datetime_params
 
     if changed.any? || updated_datetimes
       redirect_to app_order_service_url, alert: "Você só tem permissão para alterar observações e anexos."
     end
+  end
+
+  def purge_marked_attachments
+    attachment_ids = Array(params.dig(:order_service, :remove_attachment_ids)).reject(&:blank?).uniq
+    return if attachment_ids.empty?
+
+    @order_service.attachments.where(id: attachment_ids).find_each(&:purge)
   end
 
   def changed_attr_datetimes?
