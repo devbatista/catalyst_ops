@@ -30,6 +30,7 @@ constraints subdomain: "app" do
   resources :attachments, only: [:index, :show, :destroy], module: "app", as: :app_attachments
   resources :reports, only: [:index, :show], module: "app", as: :app_reports do
     collection do
+      post :export
       get :service_orders
       post :service_orders
     end

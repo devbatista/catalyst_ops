@@ -433,6 +433,7 @@ DEPENDENCIES
   rails (~> 7.1.5, >= 7.1.5.1)
   redcarpet
   rspec-rails (~> 6.1)
+  rubyzip (~> 2.4)
   selenium-webdriver
   shoulda-matchers (~> 5.3)
   sidekiq (~> 7.2)

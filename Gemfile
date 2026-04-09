@@ -21,6 +21,7 @@ gem "stimulus-rails"
 # JSON
 gem "jbuilder"
 gem "csv"
+gem "rubyzip", "~> 2.4"
 
 # Boot optimization
 gem "bootsnap", require: false

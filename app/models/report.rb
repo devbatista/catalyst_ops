@@ -13,6 +13,7 @@ class Report < ApplicationRecord
     clients: "clients",
     technicians: "technicians",
     service_orders: "service_orders",
+    budgets: "budgets",
   }, _prefix: true
 
   DEFINITIONS = {
@@ -30,14 +31,19 @@ class Report < ApplicationRecord
       name: "Ordens de Serviço por Período",
       description: "Visualize e filtre ordens de serviço em tempo real.",
       category: "Operacional"
+    },
+    budgets: {
+      name: "Orçamentos por Período",
+      description: "Visualize e filtre orçamentos em tempo real.",
+      category: "Comercial"
     }
   }.with_indifferent_access.freeze
 
   validates :title, presence: true, length: { minimum: 5, maximum: 100 }
   validates :report_type, presence: true
   validates :status, presence: true, inclusion: { in: statuses.keys }
-  validates :generated_at, presence: true, if: -> { finished? }
-  validates :file, presence: true, if: -> { finished? }
+  validates :generated_at, presence: true, if: -> { status_finished? }
+  validates :file, presence: true, if: -> { status_finished? }
   validates :error_message, length: { maximum: 1000 }, allow_blank: true
 
   serialize :filters, JSON
