@@ -61,9 +61,45 @@
         </p>
       </div>
       <div class="d-flex flex-wrap gap-2">
-        <button class="btn btn-outline-primary" type="button" disabled title="Em breve">
-          <i class="bx bx-download"></i> Exportar CSV/XLSX/PDF
-        </button>
+        <%= form_with url: export_app_reports_path, method: :post, local: true, class: "d-inline" do %>
+          <%= hidden_field_tag :report_source, @report_source %>
+          <%= hidden_field_tag :group_by, @group_by %>
+          <%= hidden_field_tag :start_date, @start_date %>
+          <%= hidden_field_tag :end_date, @end_date %>
+          <%= hidden_field_tag :status, params[:status] %>
+          <%= hidden_field_tag :technician_id, params[:technician_id] %>
+          <%= hidden_field_tag :export_format, "csv" %>
+          <button class="btn btn-outline-primary" type="submit">
+            <i class="bx bx-download"></i> Exportar CSV
+          </button>
+        <% end %>
+
+        <%= form_with url: export_app_reports_path, method: :post, local: true, class: "d-inline" do %>
+          <%= hidden_field_tag :report_source, @report_source %>
+          <%= hidden_field_tag :group_by, @group_by %>
+          <%= hidden_field_tag :start_date, @start_date %>
+          <%= hidden_field_tag :end_date, @end_date %>
+          <%= hidden_field_tag :status, params[:status] %>
+          <%= hidden_field_tag :technician_id, params[:technician_id] %>
+          <%= hidden_field_tag :export_format, "xlsx" %>
+          <button class="btn btn-outline-primary" type="submit">
+            <i class="bx bx-download"></i> Exportar XLSX
+          </button>
+        <% end %>
+
+        <%= form_with url: export_app_reports_path, method: :post, local: true, class: "d-inline" do %>
+          <%= hidden_field_tag :report_source, @report_source %>
+          <%= hidden_field_tag :group_by, @group_by %>
+          <%= hidden_field_tag :start_date, @start_date %>
+          <%= hidden_field_tag :end_date, @end_date %>
+          <%= hidden_field_tag :status, params[:status] %>
+          <%= hidden_field_tag :technician_id, params[:technician_id] %>
+          <%= hidden_field_tag :export_format, "pdf" %>
+          <button class="btn btn-outline-primary" type="submit">
+            <i class="bx bx-download"></i> Exportar PDF
+          </button>
+        <% end %>
+
         <button class="btn btn-outline-secondary" type="button" disabled title="Em breve">
           <i class="bx bx-bookmark"></i> Salvar visão
         </button>
@@ -352,6 +388,7 @@
                   <th>Tipo</th>
                   <th>Status</th>
                   <th>Gerado em</th>
+                  <th>Ações</th>
                 </tr>
               </thead>
               <tbody>
@@ -361,6 +398,13 @@
                     <td><%= report.report_type_human %></td>
                     <td><span class="badge bg-light text-dark border"><%= report.status_human %></span></td>
                     <td><%= report.generated_at.present? ? l(report.generated_at, format: :short) : "-" %></td>
+                    <td>
+                      <% if report.status_finished? && report.file.present? %>
+                        <%= link_to "Baixar", app_report_path(report), class: "btn btn-sm btn-outline-primary" %>
+                      <% else %>
+                        <span class="text-secondary small">Aguardando</span>
+                      <% end %>
+                    </td>
                   </tr>
                 <% end %>
               </tbody>

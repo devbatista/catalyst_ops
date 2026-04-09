@@ -37,7 +37,66 @@ class App::ReportsController < ApplicationController
   end
 
   def show
-    redirect_to @report.file.url, allow_other_host: true
+    unless @report.status_finished? && @report.file.present? && File.exist?(@report.file)
+      return redirect_to app_reports_path, alert: "Arquivo do relatório ainda não está disponível para download."
+    end
+
+    Audit::Log.call(
+      action: "report.downloaded",
+      actor: current_user,
+      company: @report.company,
+      resource: @report,
+      metadata: {
+        report_id: @report.id,
+        report_type: @report.report_type,
+        status: @report.status,
+        file: @report.file
+      }
+    )
+
+    send_file(
+      @report.file,
+      filename: File.basename(@report.file),
+      disposition: "attachment",
+      type: export_content_type_for(@report.file)
+    )
+  end
+
+  def export
+    authorize! :manage, Report
+
+    report_source = REPORT_SOURCES.include?(params[:report_source]) ? params[:report_source] : "order_services"
+    export_format = %w[csv xlsx pdf].include?(params[:export_format].to_s.downcase) ? params[:export_format].to_s.downcase : "csv"
+    company = current_user.company || Company.find_by(id: params[:company_id])
+    return redirect_to app_reports_path, alert: "Empresa não encontrada para gerar o relatório." if company.blank?
+
+    report = Report.create!(
+      title: report_title_for(report_source, export_format),
+      report_type: report_source == "budgets" ? :budgets : :service_orders,
+      user: current_user,
+      company: company,
+      status: :pending,
+      filters: export_filters(report_source, export_format)
+    )
+
+    Audit::Log.call(
+      action: "report.export.requested",
+      actor: current_user,
+      company: company,
+      resource: report,
+      metadata: {
+        report_id: report.id,
+        report_type: report.report_type,
+        export_format: export_format,
+        filters: report.filters
+      }
+    )
+
+    Reports::GenerateExportJob.perform_later(report.id)
+
+    redirect_to app_reports_path(export_filters(report_source)), notice: "Exportação iniciada. O arquivo aparecerá em 'Relatórios gerados recentemente'."
+  rescue ActiveRecord::RecordInvalid => e
+    redirect_to app_reports_path(export_filters(report_source)), alert: e.record.errors.full_messages.to_sentence
   end
 
   def service_orders
@@ -60,6 +119,35 @@ class App::ReportsController < ApplicationController
   end
 
   private
+
+  def export_filters(report_source = @report_source, export_format = nil)
+    {
+      report_source: report_source,
+      group_by: valid_group_by,
+      start_date: valid_start_date,
+      end_date: valid_end_date,
+      status: params[:status].presence,
+      technician_id: params[:technician_id].presence,
+      export_format: export_format
+    }.compact
+  end
+
+  def valid_group_by
+    GROUP_BY_OPTIONS.include?(params[:group_by]) ? params[:group_by] : "day"
+  end
+
+  def valid_start_date
+    parse_report_date(params[:start_date])&.iso8601
+  end
+
+  def valid_end_date
+    parse_report_date(params[:end_date])&.iso8601
+  end
+
+  def report_title_for(report_source, export_format)
+    base = report_source == "budgets" ? "Relatório de Orçamentos" : "Relatório de Ordens de Serviço"
+    "#{base} (#{export_format.upcase})"
+  end
 
   def build_order_services_report
     created_scope = filtered_order_services_scope(date_column: :created_at)
@@ -420,6 +508,19 @@ class App::ReportsController < ApplicationController
     Date.parse(raw_date)
   rescue ArgumentError
     nil
+  end
+
+  def export_content_type_for(path)
+    case File.extname(path).downcase
+    when ".csv"
+      "text/csv; charset=utf-8"
+    when ".xlsx"
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    when ".pdf"
+      "application/pdf"
+    else
+      "application/octet-stream"
+    end
   end
 
   def enforce_max_period!

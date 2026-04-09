@@ -51,6 +51,14 @@ module Audit
       budget.rejected
     ].freeze
 
+    REPORTS = %w[
+      report.export.requested
+      report.export.processing
+      report.export.completed
+      report.export.failed
+      report.downloaded
+    ].freeze
+
     COUPONS = %w[
       coupon.created
       coupon.updated
@@ -97,6 +105,7 @@ module Audit
       clients: CLIENTS,
       order_services: ORDER_SERVICES,
       budgets: BUDGETS,
+      reports: REPORTS,
       coupons: COUPONS,
       subscriptions: SUBSCRIPTIONS,
       webhooks: WEBHOOKS,
