@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_04_08_201000) do
+ActiveRecord::Schema[7.1].define(version: 2026_04_09_193000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -236,6 +236,21 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_08_201000) do
     t.index ["user_id"], name: "index_mobile_api_sessions_on_user_id"
   end
 
+  create_table "order_service_received_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "order_service_id", null: false
+    t.string "name", null: false
+    t.string "brand"
+    t.string "model"
+    t.string "serial_number"
+    t.integer "quantity"
+    t.text "condition_notes"
+    t.text "reported_issue"
+    t.text "accessories"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_service_id"], name: "index_order_service_received_items_on_order_service_id"
+  end
+
   create_table "order_services", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "title"
     t.text "description"
@@ -261,6 +276,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_08_201000) do
     t.boolean "created_without_budget", default: false, null: false
     t.text "budget_waiver_reason"
     t.string "budget_waiver_authorized_by"
+    t.decimal "estimated_labor_value", precision: 12, scale: 2, default: "0.0", null: false
+    t.decimal "final_labor_value", precision: 12, scale: 2, default: "0.0", null: false
     t.index ["client_id"], name: "index_order_services_on_client_id"
     t.index ["company_id", "code"], name: "index_order_services_on_company_id_and_code", unique: true
     t.index ["company_id", "status", "created_at"], name: "index_order_services_on_company_status_created_at"
@@ -471,6 +488,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_08_201000) do
   add_foreign_key "coupon_redemptions", "coupons"
   add_foreign_key "coupon_redemptions", "subscriptions"
   add_foreign_key "mobile_api_sessions", "users"
+  add_foreign_key "order_service_received_items", "order_services"
   add_foreign_key "order_services", "clients"
   add_foreign_key "order_services", "companies"
   add_foreign_key "reports", "companies"

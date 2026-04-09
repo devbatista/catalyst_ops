@@ -31,6 +31,7 @@ Este guia cobre as funcionalidades do perfil **gestor** no ambiente `app`.
 - [Como anexar arquivos na OS](ordens_de_servico/como_anexar_arquivos.md)
 - [Como remover um anexo da OS](ordens_de_servico/como_remover_anexo.md)
 - [Como gerar PDF da OS](ordens_de_servico/como_gerar_pdf.md)
+- [Como gerenciar comprovantes de produto (recebimento e devolução)](ordens_de_servico/como_gerenciar_comprovantes_de_produto.md)
 
 ## Orçamentos
 - [Como criar um orçamento](orcamentos/como_criar_orcamento.md)

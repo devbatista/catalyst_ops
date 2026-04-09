@@ -8,10 +8,12 @@ class OrderService < ApplicationRecord
   has_many :assignments, dependent: :destroy
   has_many :users, through: :assignments, after_remove: :audit_user_unassigned
   has_many :service_items, dependent: :destroy
+  has_many :received_items, class_name: "OrderServiceReceivedItem", dependent: :destroy, inverse_of: :order_service
   has_one :budget, dependent: :nullify
 
   accepts_nested_attributes_for :service_items, allow_destroy: true
   accepts_nested_attributes_for :assignments, allow_destroy: true
+  accepts_nested_attributes_for :received_items, allow_destroy: true, reject_if: :all_blank
 
   has_many_attached :attachments
 

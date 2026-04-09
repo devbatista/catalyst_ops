@@ -55,12 +55,27 @@ class PdfGenerator
     self
   end
 
+  def stroke_color(color)
+    @pdf.stroke_color color
+    self
+  end
+
+  def stroke_horizontal_rule
+    @pdf.stroke_horizontal_rule
+    self
+  end
+
   def bounding_box(*args, &block)
     @pdf.bounding_box(*args, &block)
   end
 
   def stroke_rectangle(*args)
     @pdf.stroke_rectangle(*args)
+    self
+  end
+
+  def start_new_page
+    @pdf.start_new_page
     self
   end
 end

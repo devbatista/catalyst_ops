@@ -4,6 +4,16 @@
       <h4 class="mb-0 text-uppercase">Detalhes da Ordem de Serviço</h4>
       <div class="d-flex gap-2">
         <%= link_to "Gerar PDF", generate_pdf_app_order_service_path(@order_service), class: "btn btn-outline-secondary", target: "_blank" %>
+        <% if current_user.gestor? %>
+          <%= link_to "Recebimento de produto",
+                      receipt_app_order_service_path(@order_service),
+                      class: "btn btn-outline-secondary" %>
+        <% end %>
+        <% if current_user.gestor? && (@order_service.concluida? || @order_service.finalizada? || @order_service.cancelada?) %>
+          <%= link_to "Devolução de produto",
+                      return_receipt_app_order_service_path(@order_service),
+                      class: "btn btn-outline-secondary" %>
+        <% end %>
         <% if current_user.gestor? && (@order_service.concluida? || @order_service.finalizada?) %>
           <%= button_to "Enviar PDF ao cliente",
                         send_pdf_to_client_app_order_service_path(@order_service),

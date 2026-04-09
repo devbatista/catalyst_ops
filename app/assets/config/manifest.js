@@ -26,5 +26,6 @@
 //= link app/budget_form.js
 //= link app/order_service_attachments.js
 //= link app/order_service_show_actions.js
+//= link app/order_service_received_items.js
 //= link app/knowledge_base_modal.js
 //= link cliente/budget_approvals.js
