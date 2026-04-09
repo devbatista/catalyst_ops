@@ -142,6 +142,19 @@ class Register::SignupsController < ApplicationController
         ip_address: request.remote_ip,
         user_agent: request.user_agent
       )
+      Audit::Log.call(
+        action: "terms.accepted",
+        actor: user,
+        company: company,
+        resource: company,
+        metadata: {
+          version: company.terms_version_accepted,
+          accepted_at: company.terms_accepted_at,
+          accepted_ip: company.terms_accepted_ip,
+          accepted_by_user_id: company.terms_accepted_by_user_id,
+          flow: "signup"
+        }
+      )
       company.subscriptions.create!(subscription_params) || raise(ActiveRecord::Rollback, "Erro ao criar assinatura para a empresa.")
 
       return Result.new(true, nil)

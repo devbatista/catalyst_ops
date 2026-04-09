@@ -94,6 +94,10 @@ module Audit
       webhook.failed
     ].freeze
 
+    TERMS = %w[
+      terms.accepted
+    ].freeze
+
     SYSTEM = %w[
       job.started
       job.completed
@@ -113,6 +117,7 @@ module Audit
       coupons: COUPONS,
       subscriptions: SUBSCRIPTIONS,
       webhooks: WEBHOOKS,
+      terms: TERMS,
       system: SYSTEM
     }.freeze
 
