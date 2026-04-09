@@ -20,6 +20,7 @@ gem "stimulus-rails"
 
 # JSON
 gem "jbuilder"
+gem "csv"
 
 # Boot optimization
 gem "bootsnap", require: false
