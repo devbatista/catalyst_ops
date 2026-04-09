@@ -39,12 +39,43 @@ scheduled_orders.each do |os|
   )
 end
 
-cancelled_orders = (ORDER_SERVICES - scheduled_orders).sample((ORDER_SERVICES.size * 0.2).to_i)
+finalized_candidates = ORDER_SERVICES - scheduled_orders
+finalized_orders = finalized_candidates.sample((ORDER_SERVICES.size * 0.35).to_i)
+finalized_orders.each do |os|
+  # Primeiro salva em estado válido para respeitar validações de agenda.
+  base_time = Faker::Time.forward(days: 8, period: :morning)
+  os.update!(
+    status: :finalizada,
+    scheduled_at: base_time,
+    expected_end_at: base_time + rand(2..6).hours
+  )
+
+  # Depois retroage datas para criar histórico útil nos relatórios.
+  historical_scheduled_at = Faker::Time.backward(days: 90, period: :morning)
+  historical_started_at = historical_scheduled_at + rand(10..90).minutes
+  historical_finished_at = historical_started_at + rand(60..240).minutes
+
+  os.update_columns(
+    scheduled_at: historical_scheduled_at,
+    expected_end_at: historical_scheduled_at + rand(2..6).hours,
+    started_at: historical_started_at,
+    finished_at: historical_finished_at,
+    updated_at: historical_finished_at
+  )
+end
+
+cancelled_orders = (ORDER_SERVICES - scheduled_orders - finalized_orders).sample((ORDER_SERVICES.size * 0.2).to_i)
 cancelled_orders.each do |os|
-  os.update!(status: :cancelada)
+  scheduled_time = Faker::Time.backward(days: 60, period: :morning)
+  os.update!(
+    status: :cancelada,
+    scheduled_at: scheduled_time,
+    expected_end_at: scheduled_time + rand(1..5).hours
+  )
 end
 
 puts "OS criadas automaticamente a partir de orçamento: #{ORDER_SERVICES.size}"
 puts "OS agendadas: #{scheduled_orders.size}"
+puts "OS finalizadas: #{finalized_orders.size}"
 puts "OS canceladas: #{cancelled_orders.size}"
 puts "###################################"
