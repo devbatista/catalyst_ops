@@ -20,6 +20,13 @@ constraints subdomain: "app" do
       patch :update_status
       get :generate_pdf
       post :send_pdf_to_client
+      get :generate_receipt_pdf
+      post :send_receipt_to_client
+      get :receipt
+      patch :update_receipt_data
+      get :return_receipt
+      get :generate_return_receipt_pdf
+      post :send_return_receipt_to_client
       delete :purge_attachment
       get :attachments
       get :schedule

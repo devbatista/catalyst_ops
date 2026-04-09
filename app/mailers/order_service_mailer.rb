@@ -65,4 +65,32 @@ class OrderServiceMailer < ApplicationMailer
     mail(to: @client.email, subject: "PDF da Ordem de Serviço ##{@order_service.code}")
   end
 
+  def send_receipt_to_client(order_service, sender)
+    @order_service = order_service
+    @client = @order_service.client
+    @sender = sender
+
+    receipt_builder = Cmd::Pdf::CreateOrderServiceReceipt.new(@order_service, kind: :recebimento, generated_by: @sender)
+    attachments[receipt_builder.filename] = {
+      mime_type: "application/pdf",
+      content: receipt_builder.generate_pdf_data
+    }
+
+    mail(to: @client.email, subject: "Comprovante de recebimento - OS ##{@order_service.code}")
+  end
+
+  def send_return_receipt_to_client(order_service, sender)
+    @order_service = order_service
+    @client = @order_service.client
+    @sender = sender
+
+    receipt_builder = Cmd::Pdf::CreateOrderServiceReceipt.new(@order_service, kind: :devolucao, generated_by: @sender)
+    attachments[receipt_builder.filename] = {
+      mime_type: "application/pdf",
+      content: receipt_builder.generate_pdf_data
+    }
+
+    mail(to: @client.email, subject: "Comprovante de devolução - OS ##{@order_service.code}")
+  end
+
 end

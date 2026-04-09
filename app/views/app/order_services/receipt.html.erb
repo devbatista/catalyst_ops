@@ -1,0 +1,172 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3 justify-content-between">
+      <h4 class="mb-0 text-uppercase">Comprovante de Recebimento</h4>
+      <div class="d-flex gap-2">
+        <%= link_to "Voltar para OS", app_order_service_path(@order_service), class: "btn btn-light border" %>
+      </div>
+    </div>
+
+    <% flash.each do |type, message| %>
+      <% bootstrap_class = { notice: "alert-success", warning: "alert-warning", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
+      <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert">
+        <%= message %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    <% end %>
+
+    <div class="card">
+      <div class="card-body">
+        <div class="alert alert-light border mb-3">
+          <strong>Controle de envio:</strong>
+          <span class="ms-2">
+            Último emitido em:
+            <strong><%= @receipt_generated_at.present? ? l(@receipt_generated_at, format: :short) : "-" %></strong>
+          </span>
+          <span class="ms-3">
+            Último enviado em:
+            <strong><%= @receipt_sent_at.present? ? l(@receipt_sent_at, format: :short) : "-" %></strong>
+          </span>
+        </div>
+
+        <div class="mb-3">
+          <strong>OS:</strong> #<%= @order_service.code %> - <%= @order_service.title %><br>
+          <strong>Cliente:</strong> <%= @order_service.client&.name %>
+        </div>
+
+        <%= form_with model: @order_service,
+                      url: update_receipt_data_app_order_service_path(@order_service),
+                      method: :patch,
+                      local: true,
+                      html: { id: "receipt-data-form", class: "m-0" } do |f| %>
+          <div class="border rounded-3 p-3 p-md-4 mb-3">
+            <h6 class="text-uppercase text-muted mb-3">Itens Recebidos do Cliente</h6>
+            <div id="received-items-list">
+              <% @order_service.received_items.each do |item| %>
+                <div class="border rounded-2 p-3 mb-2 received-item-row">
+                  <%= f.fields_for :received_items, item do |item_fields| %>
+                    <div class="row g-2">
+                      <div class="col-md-3">
+                        <%= item_fields.text_field :name, class: "form-control", placeholder: "Item (ex.: Notebook)" %>
+                      </div>
+                      <div class="col-md-2">
+                        <%= item_fields.text_field :brand, class: "form-control", placeholder: "Marca" %>
+                      </div>
+                      <div class="col-md-2">
+                        <%= item_fields.text_field :model, class: "form-control", placeholder: "Modelo" %>
+                      </div>
+                      <div class="col-md-2">
+                        <%= item_fields.text_field :serial_number, class: "form-control", placeholder: "Nº de série" %>
+                      </div>
+                      <div class="col-md-1">
+                        <%= item_fields.number_field :quantity, class: "form-control", placeholder: "Qtd" %>
+                      </div>
+                      <div class="col-md-2">
+                        <button type="button" class="btn btn-danger w-100 remove-received-item">Remover</button>
+                      </div>
+                      <div class="col-md-6">
+                        <%= item_fields.text_field :condition_notes, class: "form-control", placeholder: "Estado do item (ex.: carcaça riscada)" %>
+                      </div>
+                      <div class="col-md-6">
+                        <%= item_fields.text_field :reported_issue, class: "form-control", placeholder: "Defeito relatado" %>
+                      </div>
+                      <div class="col-md-12">
+                        <%= item_fields.text_field :accessories, class: "form-control", placeholder: "Acessórios entregues (fonte, mochila, mouse...)" %>
+                      </div>
+                    </div>
+                    <%= item_fields.hidden_field :_destroy, class: "received-item-destroy-flag" %>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+
+            <div id="received-item-template" style="display:none;">
+              <div class="border rounded-2 p-3 mb-2 received-item-row">
+                <div class="row g-2">
+                  <div class="col-md-3">
+                    <input type="text"
+                           name="order_service[received_items_attributes][NEW_INDEX][name]"
+                           class="form-control"
+                           placeholder="Item (ex.: Notebook)" />
+                  </div>
+                  <div class="col-md-2">
+                    <input type="text"
+                           name="order_service[received_items_attributes][NEW_INDEX][brand]"
+                           class="form-control"
+                           placeholder="Marca" />
+                  </div>
+                  <div class="col-md-2">
+                    <input type="text"
+                           name="order_service[received_items_attributes][NEW_INDEX][model]"
+                           class="form-control"
+                           placeholder="Modelo" />
+                  </div>
+                  <div class="col-md-2">
+                    <input type="text"
+                           name="order_service[received_items_attributes][NEW_INDEX][serial_number]"
+                           class="form-control"
+                           placeholder="Nº de série" />
+                  </div>
+                  <div class="col-md-1">
+                    <input type="number"
+                           name="order_service[received_items_attributes][NEW_INDEX][quantity]"
+                           class="form-control"
+                           placeholder="Qtd" />
+                  </div>
+                  <div class="col-md-2">
+                    <button type="button" class="btn btn-danger w-100 remove-received-item">Remover</button>
+                  </div>
+                  <div class="col-md-6">
+                    <input type="text"
+                           name="order_service[received_items_attributes][NEW_INDEX][condition_notes]"
+                           class="form-control"
+                           placeholder="Estado do item (ex.: carcaça riscada)" />
+                  </div>
+                  <div class="col-md-6">
+                    <input type="text"
+                           name="order_service[received_items_attributes][NEW_INDEX][reported_issue]"
+                           class="form-control"
+                           placeholder="Defeito relatado" />
+                  </div>
+                  <div class="col-md-12">
+                    <input type="text"
+                           name="order_service[received_items_attributes][NEW_INDEX][accessories]"
+                           class="form-control"
+                           placeholder="Acessórios entregues (fonte, mochila, mouse...)" />
+                  </div>
+                </div>
+                <input type="hidden"
+                       name="order_service[received_items_attributes][NEW_INDEX][_destroy]"
+                       class="received-item-destroy-flag"
+                       value="0" />
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="add-received-item">
+              Adicionar item recebido
+            </button>
+          </div>
+
+        <% end %>
+
+        <div class="d-flex gap-2 flex-wrap align-items-center">
+          <%= button_tag "Salvar dados do comprovante",
+                         type: "submit",
+                         form: "receipt-data-form",
+                         class: "btn btn-primary" %>
+          <%= link_to "Gerar PDF de recebimento de produto",
+                      generate_receipt_pdf_app_order_service_path(@order_service),
+                      class: "btn btn-outline-secondary",
+                      target: "_blank" %>
+          <%= button_to "Enviar recebimento de produto",
+                        send_receipt_to_client_app_order_service_path(@order_service),
+                        method: :post,
+                        form_class: "m-0 d-inline-block",
+                        class: "btn btn-outline-primary" %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%= javascript_include_tag "app/order_service_received_items" %>

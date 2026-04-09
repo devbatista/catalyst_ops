@@ -10,40 +10,44 @@ module Cmd
 
       def generate_pdf_data
         pdf = PdfGenerator.new
-        accent = "3B82F6"
-        border = "D9DDE3"
-        soft_bg = "F3F5F7"
-        text = "111827"
+        accent = "1F6FEB"
+        accent_soft = "EAF2FF"
+        border = "D6DEE8"
+        soft_bg = "F7FAFD"
+        text_primary = "0F172A"
+        text_muted = "64748B"
         page_width = pdf.bounds.width
 
         pdf.table(
           [[
             {
-              content: "<b>Ordem de Serviço</b>\n<font size='2'> </font>\n<font size='10' color='C8CDD3'>Detalhes completos da execução</font>",
+              content: "<b>Ordem de Serviço</b>\n<font size='10' color='DCE8FF'>Detalhes completos da execução</font>",
               inline_format: true,
               background_color: accent,
               text_color: "FFFFFF",
               border_color: accent,
-              size: 16,
-              padding: [12, 14, 12, 14],
+              size: 15,
+              padding: [10, 14, 10, 14],
               valign: :center
             },
             {
-              content: "<b>OS ##{@order_service.code}</b>",
+              content: "<font size='9'>OS ##{@order_service.code}</font>\n<b>#{format_datetime(Time.current)}</b>",
               inline_format: true,
               background_color: accent,
               text_color: "FFFFFF",
               border_color: accent,
-              align: :center,
+              align: :right,
               valign: :center,
-              size: 11,
-              padding: [12, 10, 12, 10]
+              size: 10,
+              padding: [10, 12, 10, 10]
             }
           ]],
           width: page_width,
-          column_widths: [ page_width * 0.8, page_width * 0.2 ],
+          column_widths: [ page_width * 0.72, page_width * 0.28 ],
           cell_style: { borders: [:top, :bottom, :left, :right] }
         )
+        pdf.move_down(6)
+        pdf.text "Documento gerado automaticamente para conferência da execução.", size: 9, color: text_muted
         pdf.move_down(12)
 
         pdf.table(
@@ -71,7 +75,7 @@ module Cmd
             "<b>Endereço:</b> #{safe(@company&.full_address)}"
           ]],
           width: page_width,
-          cell_style: { inline_format: true, size: 10, padding: [8, 10, 8, 10], border_color: border, background_color: "FFFFFF" }
+          cell_style: { inline_format: true, size: 10, padding: [8, 10, 8, 10], border_color: border, background_color: "FFFFFF", text_color: text_primary }
         )
         pdf.move_down(10)
 
@@ -104,13 +108,13 @@ module Cmd
         pdf.table(
           info_data,
           width: page_width,
-          cell_style: { size: 10, padding: [6, 8, 6, 8], border_color: border },
+          cell_style: { size: 10, padding: [6, 8, 6, 8], border_color: border, text_color: text_primary },
           column_widths: [page_width * 0.2, page_width * 0.3, page_width * 0.2, page_width * 0.3]
         ) do |table|
           table.columns(0).font_style = :bold
           table.columns(2).font_style = :bold
-          table.columns(0).background_color = soft_bg
-          table.columns(2).background_color = soft_bg
+          table.columns(0).background_color = accent_soft
+          table.columns(2).background_color = accent_soft
         end
         pdf.move_down(10)
 
@@ -172,13 +176,13 @@ module Cmd
           item_rows,
           header: true,
           width: page_width,
-          cell_style: { size: 10, padding: [8, 10, 8, 10], border_color: border, inline_format: true },
+          cell_style: { size: 10, padding: [8, 10, 8, 10], border_color: border, inline_format: true, text_color: text_primary },
           row_colors: [ "FFFFFF", soft_bg ],
           column_widths: [page_width * 0.42, page_width * 0.12, page_width * 0.23, page_width * 0.23]
         ) do |table|
           table.row(0).font_style = :bold
-          table.row(0).background_color = "E9EDF2"
-          table.row(0).text_color = "1F2937"
+          table.row(0).background_color = accent_soft
+          table.row(0).text_color = "1D4ED8"
           table.columns(1..3).align = :right
           table.rows(1..-1).columns(0).align = :left
           table.cells.border_width = 1
@@ -192,7 +196,7 @@ module Cmd
         pdf.table(
           totals_data,
           width: page_width,
-          cell_style: { size: 12, padding: [6, 10, 6, 10], border_color: border, background_color: "F8FAFC" }
+          cell_style: { size: 12, padding: [6, 10, 6, 10], border_color: border, background_color: soft_bg, text_color: text_primary }
         )
 
         if @order_service.discount_applied? && @order_service.discount_reason.present?
@@ -225,30 +229,17 @@ module Cmd
           pdf.table(
             [[safe(@order_service.observations)]],
             width: page_width,
-            cell_style: { size: 10, padding: [8, 10, 8, 10], border_color: border, background_color: "FFFFFF" }
+            cell_style: { size: 10, padding: [8, 10, 8, 10], border_color: border, background_color: "FFFFFF", text_color: text_primary }
           )
         end
 
-        signature_width = (page_width - 40) / 2.0
-        signature_area_height = 28
-        signature_bottom_padding = 8
-        signature_top = pdf.bounds.bottom + signature_area_height + signature_bottom_padding
-
-        pdf.bounding_box([pdf.bounds.left, signature_top], width: page_width, height: signature_area_height) do
-          y = pdf.cursor
-          pdf.stroke_horizontal_line(pdf.bounds.left, pdf.bounds.left + signature_width, at: y)
-          pdf.stroke_horizontal_line(pdf.bounds.right - signature_width, pdf.bounds.right, at: y)
-          pdf.move_down(6)
-          pdf.table(
-            [[
-              { content: "Cliente", align: :center, borders: [] },
-              { content: "Responsável", align: :center, borders: [] }
-            ]],
-            width: page_width,
-            column_widths: [page_width / 2.0, page_width / 2.0],
-            cell_style: { size: 10, border_color: border, padding: [0, 0, 0, 0] }
-          )
-        end
+        pdf.move_down(10)
+        pdf.stroke_color border
+        pdf.stroke_horizontal_rule
+        pdf.move_down(6)
+        pdf.fill_color text_muted
+        pdf.text "Catalyst Ops • Ordem de Serviço ##{@order_service.code}", size: 8, align: :center
+        pdf.fill_color "000000"
 
         pdf.render
       end

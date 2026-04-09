@@ -40,6 +40,10 @@ module Audit
       order_service.cancelled
       order_service.attachment.added
       order_service.attachment.removed
+      order_service.receipt.generated
+      order_service.receipt.sent
+      order_service.return_receipt.generated
+      order_service.return_receipt.sent
     ].freeze
 
     BUDGETS = %w[
