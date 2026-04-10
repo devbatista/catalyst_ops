@@ -14,7 +14,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_09_193000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
-  enable_extension "vector"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name", null: false
@@ -219,21 +218,16 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_09_193000) do
     t.index ["valid_until"], name: "index_coupons_on_valid_until"
   end
 
-# Could not dump table "knowledge_base_articles" because of following StandardError
-#   Unknown type 'vector(1536)' for column 'embedding'
-
-  create_table "mobile_api_sessions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "user_id", null: false
-    t.string "token_digest", null: false
-    t.datetime "expires_at", null: false
-    t.datetime "last_used_at"
-    t.datetime "revoked_at"
+  create_table "knowledge_base_articles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "title"
+    t.text "content"
+    t.string "category"
+    t.string "slug"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["expires_at"], name: "index_mobile_api_sessions_on_expires_at"
-    t.index ["token_digest"], name: "index_mobile_api_sessions_on_token_digest", unique: true
-    t.index ["user_id", "revoked_at"], name: "index_mobile_api_sessions_on_user_id_and_revoked_at"
-    t.index ["user_id"], name: "index_mobile_api_sessions_on_user_id"
+    t.string "audience", default: "gestor", null: false
+    t.index ["audience"], name: "index_knowledge_base_articles_on_audience"
+    t.index ["slug"], name: "index_knowledge_base_articles_on_slug", unique: true
   end
 
   create_table "order_service_received_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -276,8 +270,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_09_193000) do
     t.boolean "created_without_budget", default: false, null: false
     t.text "budget_waiver_reason"
     t.string "budget_waiver_authorized_by"
-    t.decimal "estimated_labor_value", precision: 12, scale: 2, default: "0.0", null: false
-    t.decimal "final_labor_value", precision: 12, scale: 2, default: "0.0", null: false
     t.index ["client_id"], name: "index_order_services_on_client_id"
     t.index ["company_id", "code"], name: "index_order_services_on_company_id_and_code", unique: true
     t.index ["company_id", "status", "created_at"], name: "index_order_services_on_company_status_created_at"
@@ -487,7 +479,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_09_193000) do
   add_foreign_key "coupon_redemptions", "companies"
   add_foreign_key "coupon_redemptions", "coupons"
   add_foreign_key "coupon_redemptions", "subscriptions"
-  add_foreign_key "mobile_api_sessions", "users"
   add_foreign_key "order_service_received_items", "order_services"
   add_foreign_key "order_services", "clients"
   add_foreign_key "order_services", "companies"
