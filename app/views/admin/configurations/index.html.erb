@@ -114,36 +114,6 @@
                 <div class="col-12 col-xl-6">
                   <div class="card border admin-config-panel h-100">
                     <div class="card-body">
-                      <h6 class="mb-3">Saúde Sidekiq</h6>
-                      <div class="table-responsive">
-                        <table class="table table-sm align-middle mb-0">
-                          <tbody>
-                            <tr>
-                              <th>Fila default</th>
-                              <td><code><%= @sidekiq_metrics[:queue_default] %></code></td>
-                            </tr>
-                            <tr>
-                              <th>Fila mailers</th>
-                              <td><code><%= @sidekiq_metrics[:queue_mailers] %></code></td>
-                            </tr>
-                            <tr>
-                              <th>Retries</th>
-                              <td><code><%= @sidekiq_metrics[:retries] %></code></td>
-                            </tr>
-                            <tr>
-                              <th>Dead set</th>
-                              <td><code><%= @sidekiq_metrics[:dead] %></code></td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="col-12 col-xl-6">
-                  <div class="card border admin-config-panel h-100">
-                    <div class="card-body">
                       <h6 class="mb-3">Integrações</h6>
                       <div class="table-responsive">
                         <table class="table table-sm align-middle mb-0">

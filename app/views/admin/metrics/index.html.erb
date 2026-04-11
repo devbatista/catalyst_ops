@@ -1,0 +1,159 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+      <div>
+        <h4 class="mb-1 text-uppercase">Métricas</h4>
+        <p class="text-muted mb-0">Monitoramento de erros e saúde operacional.</p>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <%= form_with url: admin_metrics_path, method: :get, local: true, class: "d-flex align-items-center gap-2" do %>
+          <label class="small text-muted mb-0" for="period">Período</label>
+          <%= select_tag :period,
+                         options_for_select(@period_options.map { |k| [k, k] }, @selected_period_key),
+                         class: "form-select form-select-sm",
+                         id: "period" %>
+          <%= submit_tag "Aplicar", class: "btn btn-sm btn-outline-primary" %>
+        <% end %>
+        <%= button_to "Testar Sentry",
+                      test_sentry_admin_metrics_path(period: @selected_period_key),
+                      method: :post,
+                      class: "btn btn-sm btn-primary",
+                      form: { class: "d-inline" } %>
+      </div>
+    </div>
+
+    <div class="small text-muted mb-3">
+      Janela analisada: <code><%= @selected_period_key %></code>
+      (<%= l(@period_start, format: :short) %> até <%= l(@period_end, format: :short) %>)
+      • Última atualização: <%= l(@last_refreshed_at, format: :short) %>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-12 col-md-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <div class="text-muted small mb-1">Sentry</div>
+            <div class="fw-semibold">
+              <span class="badge <%= @sentry_status[:enabled] ? "bg-success" : "bg-warning text-dark" %>">
+                <%= @sentry_status[:enabled] ? "configurado" : "não configurado" %>
+              </span>
+              <span class="badge <%= @sentry_status[:active_in_environment] ? "bg-success" : "bg-secondary" %>">
+                <%= @sentry_status[:active_in_environment] ? "ativo no ambiente" : "inativo no ambiente" %>
+              </span>
+            </div>
+            <div class="small text-muted mt-2">Ambiente: <code><%= @sentry_status[:environment] %></code></div>
+            <% if @sentry_status[:missing_required_vars].any? %>
+              <div class="small text-warning mt-1">
+                Faltando: <code><%= @sentry_status[:missing_required_vars].join(", ") %></code>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <div class="text-muted small mb-1">Falhas de job (<%= @selected_period_key %>)</div>
+            <div class="fs-4 fw-semibold"><%= @error_indicators[:job_failed] %></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <div class="text-muted small mb-1">Falhas de webhook (<%= @selected_period_key %>)</div>
+            <div class="fs-4 fw-semibold"><%= @error_indicators[:webhook_failed] %></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <div class="text-muted small mb-1">Falhas de export (<%= @selected_period_key %>)</div>
+            <div class="fs-4 fw-semibold"><%= @error_indicators[:report_failed] %></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-12 col-xl-6">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <h6 class="mb-3">Saúde Sidekiq</h6>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle mb-0">
+                <tbody>
+                  <tr>
+                    <th>Processos ativos</th>
+                    <td><code><%= @sidekiq_indicators[:processes] %></code></td>
+                  </tr>
+                  <tr>
+                    <th>Fila default</th>
+                    <td><code><%= @sidekiq_indicators[:queue_default] %></code></td>
+                  </tr>
+                  <tr>
+                    <th>Retries</th>
+                    <td><code><%= @sidekiq_indicators[:retries] %></code></td>
+                  </tr>
+                  <tr>
+                    <th>Dead set</th>
+                    <td><code><%= @sidekiq_indicators[:dead] %></code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-xl-6">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <h6 class="mb-3">Configuração de monitoramento</h6>
+            <p class="text-muted small mb-2">Variáveis esperadas:</p>
+            <ul class="small mb-3">
+              <li><code>SENTRY_DSN</code></li>
+              <li><code>SENTRY_ENVIRONMENT</code> (opcional)</li>
+              <li><code>SENTRY_TRACES_SAMPLE_RATE</code> (opcional)</li>
+            </ul>
+            <p class="small mb-3">
+              Sample rate atual: <code><%= @sentry_status[:traces_sample_rate] %></code>
+            </p>
+            <p class="small mb-3">
+              Release atual: <code><%= @sentry_status[:release].presence || "não definida" %></code>
+            </p>
+            <% if @sentry_status[:project_url].present? %>
+              <p class="small mb-3">
+                Projeto Sentry:
+                <%= link_to @sentry_status[:project_url], @sentry_status[:project_url], target: "_blank", rel: "noopener", class: "text-decoration-none" %>
+              </p>
+            <% end %>
+            <div class="d-flex flex-wrap gap-2">
+              <% @quick_links.each do |item| %>
+                <%= link_to item[:label], item[:path], class: "btn btn-sm btn-outline-primary" %>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <h6 class="mb-3">Alertas recomendados (Sentry)</h6>
+            <ul class="small mb-0">
+              <li>Erro novo em produção com frequência acima de 5 ocorrências em 10 minutos.</li>
+              <li>Falha em job crítico com aumento brusco em 15 minutos.</li>
+              <li>Falha de exportação de relatório acima do padrão diário.</li>
+              <li>Falha de webhook com impacto em assinaturas/pagamentos.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
   before_action :block_inactive_company_access, if: :app_subdomain?
   before_action :ensure_terms_accepted!, if: :app_subdomain?
   before_action :configure_permitted_parameters, if: :devise_controller?
+  before_action :set_sentry_context
   around_action :with_current_context
 
   check_authorization unless: :devise_controller?
@@ -70,6 +71,41 @@ class ApplicationController < ActionController::Base
   def configure_permitted_parameters
     devise_parameter_sanitizer.permit(:sign_up, keys: [:name, :role])
     devise_parameter_sanitizer.permit(:account_update, keys: [:name, :role])
+  end
+
+  def set_sentry_context
+    return unless defined?(Sentry)
+
+    Sentry.set_tags(
+      subdomain: request.subdomain,
+      controller: controller_name,
+      action: action_name
+    )
+
+    Sentry.set_extras(
+      request_id: request.request_id,
+      ip_address: request.remote_ip,
+      user_agent: request.user_agent
+    )
+
+    return unless current_user.present?
+
+    Sentry.set_user(
+      id: current_user.id.to_s,
+      email: current_user.email
+    )
+
+    if current_user.respond_to?(:company) && current_user.company.present?
+      Sentry.set_context(
+        "company",
+        {
+          id: current_user.company.id.to_s,
+          name: current_user.company.name
+        }
+      )
+    end
+  rescue StandardError
+    nil
   end
 
   def audit_source

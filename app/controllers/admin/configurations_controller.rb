@@ -50,7 +50,6 @@ class Admin::ConfigurationsController < AdminController
     @platform_settings = build_platform_settings
     @system_overview = build_system_overview
     @service_status = build_service_status
-    @sidekiq_metrics = build_sidekiq_metrics
     @integration_status = build_integration_status
     @security_settings = build_security_settings
     @quick_links = build_quick_links
@@ -83,15 +82,6 @@ class Admin::ConfigurationsController < AdminController
     ]
   end
 
-  def build_sidekiq_metrics
-    {
-      queue_default: safe_sidekiq_metric { Sidekiq::Queue.new("default").size },
-      queue_mailers: safe_sidekiq_metric { Sidekiq::Queue.new("mailers").size },
-      retries: safe_sidekiq_metric { Sidekiq::RetrySet.new.size },
-      dead: safe_sidekiq_metric { Sidekiq::DeadSet.new.size }
-    }
-  end
-
   def build_integration_status
     [
       { name: "Mercado Pago", value: ENV["MP_PRODUCTION_ACCESS_TOKEN"].present? ? "configurado" : "não configurado" },
@@ -114,6 +104,7 @@ class Admin::ConfigurationsController < AdminController
       { label: "Planos", path: admin_plans_path },
       { label: "Cupons", path: admin_coupons_path },
       { label: "Tickets", path: admin_tickets_path },
+      { label: "Métricas", path: admin_metrics_path },
       { label: "Base de Conhecimento", path: admin_knowledge_base_index_path }
     ]
   end
