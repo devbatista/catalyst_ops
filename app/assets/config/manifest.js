@@ -22,6 +22,7 @@
 //= link utils/formatters.js
 //= link utils/validators.js
 //= link admin/tickets.js
+//= link admin/coupons.js
 //= link app/support_tickets.js
 //= link app/budget_form.js
 //= link app/order_service_attachments.js

@@ -23,3 +23,4 @@ pin "app/company_form"
 pin "app/support_tickets"
 
 pin "admin/tickets"
+pin "admin/coupons"
