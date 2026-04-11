@@ -24,3 +24,4 @@ pin "app/support_tickets"
 
 pin "admin/tickets"
 pin "admin/coupons"
+pin "admin/knowledge_base_articles"
