@@ -128,6 +128,10 @@
                       <td>
                         <%= link_to 'Ver', admin_coupon_path(coupon), class: "btn btn-sm btn-primary" %>
                         <%= link_to 'Editar', edit_admin_coupon_path(coupon), class: "btn btn-sm btn-warning ms-2" %>
+                        <%= link_to "Excluir",
+                                    admin_coupon_path(coupon),
+                                    class: "btn btn-sm btn-danger ms-2 js-delete-coupon",
+                                    data: { confirm: "Tem certeza que deseja excluir este cupom?" } %>
                       </td>
                     </tr>
                   <% end %>
@@ -149,3 +153,5 @@
     </div>
   </div>
 </div>
+
+<%= javascript_import_module_tag "admin/coupons" %>
