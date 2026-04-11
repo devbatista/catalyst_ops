@@ -71,6 +71,12 @@ module Audit
       coupon.rejected
     ].freeze
 
+    PLANS = %w[
+      plan.created
+      plan.updated
+      plan.deleted
+    ].freeze
+
     SUBSCRIPTIONS = %w[
       subscription.created
       subscription.updated
@@ -115,6 +121,7 @@ module Audit
       budgets: BUDGETS,
       reports: REPORTS,
       coupons: COUPONS,
+      plans: PLANS,
       subscriptions: SUBSCRIPTIONS,
       webhooks: WEBHOOKS,
       terms: TERMS,
