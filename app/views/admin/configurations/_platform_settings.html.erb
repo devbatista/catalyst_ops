@@ -1,0 +1,12 @@
+<div class="table-responsive">
+  <table class="table table-sm align-middle mb-0">
+    <tbody>
+      <% @platform_settings.each do |setting| %>
+        <tr>
+          <th class="text-nowrap"><%= setting[:key] %></th>
+          <td><code><%= setting[:value] %></code></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

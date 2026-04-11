@@ -1,0 +1,261 @@
+<div class="page-wrapper configurations-page">
+  <div class="page-content">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+      <div>
+        <h4 class="mb-1 text-uppercase">Configurações</h4>
+        <p class="text-muted mb-0">Gerencie perfil de administrador e parâmetros da plataforma.</p>
+      </div>
+    </div>
+
+    <% flash.each do |type, message| %>
+      <% bootstrap_class = { notice: "alert-success", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
+      <div class="alert <%= bootstrap_class %> alert-dismissible fade show shadow-sm" role="alert">
+        <%= message %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    <% end %>
+
+    <div class="card border-0 shadow-sm overflow-hidden">
+      <div class="row g-0">
+        <nav class="col-12 col-lg-3 col-xl-2 border-end admin-config-sections">
+          <div class="p-3 p-lg-4">
+            <div class="text-uppercase small fw-semibold text-muted mb-3">Seções</div>
+            <ul class="list-unstyled nav nav-pills flex-column gap-2" id="adminConfigTabs" role="tablist">
+              <li>
+                <a class="nav-link active d-flex align-items-center gap-2" id="tab-perfil" data-bs-toggle="pill" href="#perfil" role="tab" aria-controls="perfil" aria-selected="true">
+                  <i class="bx bx-user"></i>
+                  <span>Perfil</span>
+                </a>
+              </li>
+              <li>
+                <a class="nav-link d-flex align-items-center gap-2" id="tab-plataforma" data-bs-toggle="pill" href="#plataforma" role="tab" aria-controls="plataforma" aria-selected="false">
+                  <i class="bx bx-cog"></i>
+                  <span>Plataforma</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+
+        <div class="col-12 col-lg-9 col-xl-10">
+          <div class="tab-content p-3 p-lg-4" id="adminConfigTabsContent">
+            <div class="tab-pane fade show active" id="perfil" role="tabpanel" aria-labelledby="tab-perfil">
+              <%= render "profile_form" %>
+            </div>
+
+            <div class="tab-pane fade" id="plataforma" role="tabpanel" aria-labelledby="tab-plataforma">
+              <p class="text-muted small mb-3">Visão informativa de saúde, integrações e parâmetros operacionais ativos.</p>
+
+              <div class="row g-3 mb-1">
+                <div class="col-12 col-md-6 col-xl-4">
+                  <div class="card border h-100 admin-config-panel">
+                    <div class="card-body">
+                      <div class="text-muted small mb-1">Empresas</div>
+                      <div class="fs-5 fw-semibold"><%= @system_overview[:companies_total] %></div>
+                      <div class="small text-muted">Ativas: <%= @system_overview[:companies_active] %></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-xl-4">
+                  <div class="card border h-100 admin-config-panel">
+                    <div class="card-body">
+                      <div class="text-muted small mb-1">Usuários ativos</div>
+                      <div class="fs-5 fw-semibold"><%= @system_overview[:users_active] %></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-xl-4">
+                  <div class="card border h-100 admin-config-panel">
+                    <div class="card-body">
+                      <div class="text-muted small mb-1">Assinaturas ativas</div>
+                      <div class="fs-5 fw-semibold"><%= @system_overview[:subscriptions_active] %></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-xl-4">
+                  <div class="card border h-100 admin-config-panel">
+                    <div class="card-body">
+                      <div class="text-muted small mb-1">OS em aberto</div>
+                      <div class="fs-5 fw-semibold"><%= @system_overview[:order_services_open] %></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row g-3 mt-1">
+                <div class="col-12 col-xl-6">
+                  <div class="card border admin-config-panel h-100">
+                    <div class="card-body">
+                      <h6 class="mb-3">Status de Serviços</h6>
+                      <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                          <tbody>
+                            <% @service_status.each do |item| %>
+                              <tr>
+                                <th class="text-nowrap"><%= item[:name] %></th>
+                                <td>
+                                  <span class="badge <%= item[:status] == 'online' ? 'bg-success' : 'bg-danger' %>">
+                                    <%= item[:status] %>
+                                  </span>
+                                </td>
+                                <td class="text-muted small"><%= item[:detail] %></td>
+                              </tr>
+                            <% end %>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 col-xl-6">
+                  <div class="card border admin-config-panel h-100">
+                    <div class="card-body">
+                      <h6 class="mb-3">Saúde Sidekiq</h6>
+                      <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                          <tbody>
+                            <tr>
+                              <th>Fila default</th>
+                              <td><code><%= @sidekiq_metrics[:queue_default] %></code></td>
+                            </tr>
+                            <tr>
+                              <th>Fila mailers</th>
+                              <td><code><%= @sidekiq_metrics[:queue_mailers] %></code></td>
+                            </tr>
+                            <tr>
+                              <th>Retries</th>
+                              <td><code><%= @sidekiq_metrics[:retries] %></code></td>
+                            </tr>
+                            <tr>
+                              <th>Dead set</th>
+                              <td><code><%= @sidekiq_metrics[:dead] %></code></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 col-xl-6">
+                  <div class="card border admin-config-panel h-100">
+                    <div class="card-body">
+                      <h6 class="mb-3">Integrações</h6>
+                      <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                          <tbody>
+                            <% @integration_status.each do |item| %>
+                              <tr>
+                                <th><%= item[:name] %></th>
+                                <td><code><%= item[:value] %></code></td>
+                              </tr>
+                            <% end %>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 col-xl-6">
+                  <div class="card border admin-config-panel h-100">
+                    <div class="card-body">
+                      <h6 class="mb-3">Segurança e Ambiente</h6>
+                      <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                          <tbody>
+                            <% @security_settings.each do |item| %>
+                              <tr>
+                                <th><%= item[:key] %></th>
+                                <td><code><%= item[:value] %></code></td>
+                              </tr>
+                            <% end %>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 col-xl-6">
+                  <div class="card border admin-config-panel h-100">
+                    <div class="card-body">
+                      <h6 class="mb-3">Parâmetros da Plataforma</h6>
+                      <%= render "platform_settings" %>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 col-xl-6">
+                  <div class="card border admin-config-panel h-100">
+                    <div class="card-body">
+                      <h6 class="mb-3">Atalhos rápidos</h6>
+                      <div class="d-flex flex-wrap gap-2">
+                        <% @quick_links.each do |item| %>
+                          <%= link_to item[:label], item[:path], class: "btn btn-sm btn-outline-primary" %>
+                        <% end %>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%= javascript_import_module_tag "app/profile_form" %>
+
+<style>
+  .configurations-page .admin-config-sections {
+    background: rgba(15, 23, 42, 0.65);
+    border-color: rgba(148, 163, 184, 0.25) !important;
+  }
+
+  .configurations-page .admin-config-sections .text-muted {
+    color: #94a3b8 !important;
+  }
+
+  .configurations-page .nav-pills .nav-link {
+    color: #cbd5e1 !important;
+    border: 1px solid transparent;
+    border-radius: 0.75rem;
+    font-weight: 500;
+    opacity: 1 !important;
+  }
+
+  .configurations-page .nav-pills .nav-link:hover {
+    background-color: rgba(59, 130, 246, 0.18);
+    border-color: rgba(59, 130, 246, 0.35);
+    color: #e2e8f0 !important;
+  }
+
+  .configurations-page .nav-pills .nav-link.active {
+    background-color: #0d6efd;
+    color: #fff;
+    border-color: #0d6efd;
+    box-shadow: 0 6px 16px rgba(13, 110, 253, 0.25);
+  }
+
+  .configurations-page .tab-pane table th,
+  .configurations-page .tab-pane table td {
+    border-color: rgba(148, 163, 184, 0.2);
+  }
+
+  .configurations-page .tab-pane table th {
+    color: #e2e8f0;
+    font-weight: 600;
+  }
+
+  .configurations-page .admin-config-panel {
+    background: rgba(15, 23, 42, 0.35);
+    border-color: rgba(148, 163, 184, 0.2) !important;
+  }
+</style>
