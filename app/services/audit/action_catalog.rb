@@ -109,6 +109,7 @@ module Audit
       job.completed
       job.failed
       job.retry_scheduled
+      system.monitoring.test_triggered
       system.deploy.executed
       system.migration.executed
     ].freeze

@@ -533,6 +533,7 @@ Regras atuais:
 - Override de desenvolvimento: [`docker-compose.override.yml`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docker-compose.override.yml)
 - Exemplo de ambiente: [`.env_example`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/.env_example)
 - Runbook de deploy/rollback: [`docs/operacao/runbook_deploy_rollback_producao.md`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docs/operacao/runbook_deploy_rollback_producao.md)
+- Monitoramento de erros (Sentry): [`docs/operacao/monitoramento_erros_sentry.md`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docs/operacao/monitoramento_erros_sentry.md)
 - Seeds: [`db/seeds.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/db/seeds.rb)
 - Mailer de OS: [`app/mailers/order_service_mailer.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/app/mailers/order_service_mailer.rb)
 - Model de OS: [`app/models/order_service.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/app/models/order_service.rb)
