@@ -53,6 +53,7 @@ class Admin::PlansController < AdminController
       :back_url,
       :max_technicians,
       :max_orders,
+      :max_budgets,
       :support_level
     )
   end

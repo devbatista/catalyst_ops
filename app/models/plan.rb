@@ -47,6 +47,7 @@ class Plan < ApplicationRecord
       transaction_amount: transaction_amount,
       max_technicians: max_technicians,
       max_orders: max_orders,
+      max_budgets: max_budgets,
       support_level: support_level,
       action_source: action
     }

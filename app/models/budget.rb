@@ -27,6 +27,7 @@ class Budget < ApplicationRecord
 
   validate :company_must_match_client
   validate :service_items_cannot_be_blank
+  validate :plan_budget_limit, on: :create
 
   before_validation :set_company_from_client, on: :create
   before_validation :set_sequential_code, on: :create
@@ -206,6 +207,13 @@ class Budget < ApplicationRecord
     return unless has_blank_items
 
     errors.add(:base, "Não é possível deixar itens de serviço em branco.")
+  end
+
+  def plan_budget_limit
+    return if company.blank?
+    return if company.can_create_budget?
+
+    errors.add(:base, "Limite de orçamentos atingido para o plano atual da empresa.")
   end
 
   def status_name_from_change(value)

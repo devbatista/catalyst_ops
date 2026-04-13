@@ -10,6 +10,7 @@ Plan.find_or_create_by!(external_reference: "BASICO") do |plan|
   plan.transaction_amount = 99.0
   plan.max_technicians = 1
   plan.max_orders = 15
+  plan.max_budgets = 15
   plan.support_level = "email"
 end
 
@@ -23,6 +24,7 @@ Plan.find_or_create_by!(external_reference: "PROFISSIONAL") do |plan|
   plan.transaction_amount = 199.0
   plan.max_technicians = 6
   plan.max_orders = 60
+  plan.max_budgets = 60
   plan.support_level = "prioritario"
 end
 
@@ -36,6 +38,7 @@ Plan.find_or_create_by!(external_reference: "ENTERPRISE") do |plan|
   plan.transaction_amount = 399.0
   plan.max_technicians = nil
   plan.max_orders = 200
+  plan.max_budgets = 200
   plan.support_level = "dedicado"
 end
 

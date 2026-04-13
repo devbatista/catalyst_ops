@@ -152,6 +152,10 @@ class Company < ApplicationRecord
     current_subscription.plan&.max_orders
   end
 
+  def max_budgets
+    current_subscription.plan&.max_budgets
+  end
+
   def support_level
     current_subscription.plan&.support_level
   end
@@ -165,6 +169,11 @@ class Company < ApplicationRecord
   def can_create_order?
     return true unless max_orders.present?
     order_services.where('created_at >= ?', Time.current.beginning_of_month).count < max_orders
+  end
+
+  def can_create_budget?
+    return true unless max_budgets.present?
+    budgets.where('created_at >= ?', Time.current.beginning_of_month).count < max_budgets
   end
 
   private

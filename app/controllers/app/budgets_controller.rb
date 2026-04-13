@@ -3,6 +3,7 @@ class App::BudgetsController < ApplicationController
   before_action :authorize_budget_access!
   before_action :set_budget, only: [:show, :edit, :update, :send_for_approval, :approve, :reject, :generate_pdf]
   before_action :authorize_budget_management!, only: [:new, :create, :edit, :update, :send_for_approval, :approve, :reject, :generate_pdf]
+  before_action :can_add_budget, only: [:new, :create]
   before_action :ensure_budget_editable!, only: [:edit, :update]
 
   def index
@@ -118,6 +119,13 @@ class App::BudgetsController < ApplicationController
     return if @budget.editable?
 
     redirect_to app_budgets_path, alert: "Este orçamento não pode mais ser alterado."
+  end
+
+  def can_add_budget
+    return if current_user.admin?
+    return if current_user.company.can_create_budget?
+
+    redirect_to app_budgets_path, alert: "Limite de orçamentos atingido para o seu plano atual."
   end
 
   def base_scope
