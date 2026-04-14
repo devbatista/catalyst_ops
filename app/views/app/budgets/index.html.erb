@@ -32,7 +32,7 @@
                     <input type="hidden" name="approval_state" value="<%= params[:approval_state] %>">
                     <select name="per" class="form-select form-select-sm showing-entries-select" onchange="this.form.submit()">
                       <% [10, 20, 30].each do |n| %>
-                        <option value="<%= n %>" <%= params[:per].to_i == n ? 'selected' : '' %>><%= n %></option>
+                        <option value="<%= n %>" <%= (params[:per].presence || "10").to_i == n ? 'selected' : '' %>><%= n %></option>
                       <% end %>
                     </select>
                   </form>
@@ -50,21 +50,21 @@
                       <input type="text" name="q" value="<%= params[:q] %>" class="form-control input-search" placeholder="Título, descrição ou cliente..." aria-label="Search">
                     </div>
 
-                    <select name="client_id" class="form-select">
+                    <select name="client_id" class="form-select" onchange="this.form.submit()">
                       <option value="">Todos os clientes</option>
                       <% @clients.each do |client| %>
-                        <option value="<%= client.id %>" <%= params[:client_id] == client.id ? 'selected' : '' %>><%= client.name %></option>
+                        <option value="<%= client.id %>" <%= params[:client_id] == client.id.to_s ? 'selected' : '' %>><%= client.name %></option>
                       <% end %>
                     </select>
 
-                    <select name="approval_state" class="form-select">
+                    <select name="approval_state" class="form-select" onchange="this.form.submit()">
                       <option value="" <%= params[:approval_state].blank? ? 'selected' : '' %>>Todas as situações</option>
                       <option value="nao_enviado" <%= params[:approval_state] == "nao_enviado" ? 'selected' : '' %>>Não enviado</option>
                       <option value="enviado" <%= params[:approval_state] == "enviado" ? 'selected' : '' %>>Enviado</option>
                       <option value="rejeitado" <%= params[:approval_state] == "rejeitado" ? 'selected' : '' %>>Rejeitado</option>
                     </select>
 
-                    <input type="hidden" name="per" value="<%= params[:per] %>">
+                    <input type="hidden" name="per" value="<%= params[:per].presence || 10 %>">
                   </div>
                 </form>
               </div>
