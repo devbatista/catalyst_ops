@@ -1,0 +1,40 @@
+<%
+  tour_steps = [
+    {
+      key: "created_technician",
+      selector: "#onboarding-tour-technicians-menu",
+      title: "Cadastre os técnicos",
+      description: "Aqui você cadastra os técnicos que vão receber as ordens de serviço."
+    },
+    {
+      key: "created_customer",
+      selector: "#onboarding-tour-clients-menu",
+      title: "Cadastre os clientes",
+      description: "Nesta área você registra os clientes e mantém o histórico centralizado."
+    },
+    {
+      key: "created_first_work_order",
+      selector: "#onboarding-tour-order-services-menu",
+      title: "Crie a primeira OS",
+      description: "Use Ordens de Serviço para abrir, acompanhar e concluir atendimentos."
+    },
+    {
+      key: "moved_work_order_status",
+      selector: "#onboarding-tour-order-services-menu",
+      title: "Atualize os status",
+      description: "Depois de criar a OS, atualize os status para manter a operação rastreável."
+    },
+    {
+      key: "viewed_reports",
+      selector: "#onboarding-tour-reports-menu",
+      title: "Acompanhe os relatórios",
+      description: "Aqui você visualiza indicadores de volume, produtividade e desempenho."
+    }
+  ]
+%>
+<div
+  data-controller="onboarding-tour"
+  data-onboarding-tour-endpoint-value="<%= app_onboarding_progress_path %>"
+  data-onboarding-tour-steps-value="<%= json_escape(tour_steps.to_json) %>"
+  data-onboarding-tour-auto-start-value="<%= params[:onboarding_tour].to_s == '1' %>"
+></div>

@@ -27,6 +27,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   <link href="<%= asset_path('css/app.css') %>" rel="stylesheet">
   <link href="<%= asset_path('css/icons.css') %>" rel="stylesheet">
+  <%= stylesheet_link_tag "https://cdn.jsdelivr.net/npm/intro.js/minified/introjs.min.css" %>
   <!-- Theme Style CSS -->
   <link rel="stylesheet" href="<%= asset_path('css/dark-theme.css') %>" />
   <link rel="stylesheet" href="<%= asset_path('css/semi-dark.css') %>" />
@@ -46,6 +47,9 @@
   <div class="wrapper">
     <%= render 'layouts/partials/sidebar' %>
     <%= render 'layouts/partials/navbar' %>
+    <% if request.subdomain == "app" && current_user.present? && !current_user.tecnico? %>
+      <%= render "app/dashboard/onboarding_tour" %>
+    <% end %>
 
     <%= yield %>
   </div>
