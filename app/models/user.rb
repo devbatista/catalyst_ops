@@ -25,6 +25,7 @@ class User < ApplicationRecord
   has_many :reports, dependent: :destroy
   has_many :support_tickets, dependent: :nullify
   has_many :assigned_support_tickets, class_name: "SupportTicket", foreign_key: :assigned_to_id, dependent: :nullify
+  has_one :user_onboarding_progress, dependent: :destroy
 
   scope :tecnicos, -> { where(role: :tecnico).or(where(can_be_technician: true)) }
   scope :gestores, -> { where(role: :gestor) }
