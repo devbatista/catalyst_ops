@@ -1,0 +1,43 @@
+<div
+  data-controller="onboarding-welcome"
+  data-onboarding-welcome-auto-show-value="<%= @show_onboarding_welcome_modal %>"
+  data-onboarding-welcome-start-path-value="<%= @onboarding_start_path %>"
+>
+  <div
+    class="modal fade"
+    tabindex="-1"
+    aria-hidden="true"
+    data-onboarding-welcome-target="modal"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Bem-vindo ao CatalystOps</h5>
+        </div>
+        <div class="modal-body">
+          <p class="mb-0">Em 2 minutos você configura o básico e já começa a operar.</p>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-outline-secondary"
+            data-action="onboarding-welcome#dismiss"
+            data-onboarding-welcome-target="dismissButton"
+          >
+            Pular
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            data-action="onboarding-welcome#start"
+            data-onboarding-welcome-target="startButton"
+          >
+            Começar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
