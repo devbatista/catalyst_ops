@@ -9,6 +9,9 @@ export default class extends Controller {
 
   connect() {
     this.intro = null
+    this.persistableStepKeys = []
+    this.onWelcomeStarted = this.onWelcomeStarted.bind(this)
+    window.addEventListener("onboarding-welcome:started", this.onWelcomeStarted)
 
     if (!this.autoStartValue) return
 
@@ -18,10 +21,18 @@ export default class extends Controller {
   }
 
   disconnect() {
+    window.removeEventListener("onboarding-welcome:started", this.onWelcomeStarted)
+
     if (!this.intro) return
 
     this.intro.exit()
     this.intro = null
+  }
+
+  onWelcomeStarted() {
+    this.startTour().catch((error) => {
+      console.warn("[OnboardingTour] failed to start from welcome", error)
+    })
   }
 
   async startTour() {
@@ -30,6 +41,7 @@ export default class extends Controller {
     await this.resumeIfRequested()
 
     const progress = await this.fetchProgress()
+    this.persistableStepKeys = Array.isArray(progress?.step_keys) ? progress.step_keys : []
     const builtSteps = this.buildSteps()
     if (builtSteps.length === 0) return
 
@@ -49,7 +61,10 @@ export default class extends Controller {
       const stepKey = targetElement?.dataset?.onboardingTourStepKey
       if (!stepKey) return
 
-      this.persistLastSeen(stepKey)
+      const persistStepKey = targetElement?.dataset?.onboardingTourPersistStepKey || stepKey
+      if (this.persistableStepKeys.includes(persistStepKey)) {
+        this.persistLastSeen(persistStepKey)
+      }
       this.enforceSkipButtonLayout()
     })
 
@@ -102,6 +117,9 @@ export default class extends Controller {
         if (!element) return null
 
         element.dataset.onboardingTourStepKey = step.key
+        if (step.persist_step_key) {
+          element.dataset.onboardingTourPersistStepKey = step.persist_step_key
+        }
 
         return {
           element,
@@ -116,7 +134,11 @@ export default class extends Controller {
   findResumeIndex(lastSeenStep, steps) {
     if (!lastSeenStep) return 0
 
-    const idx = steps.findIndex((step) => step.element?.dataset?.onboardingTourStepKey === lastSeenStep)
+    const idx = steps.findIndex((step) => {
+      const visibleStepKey = step.element?.dataset?.onboardingTourStepKey
+      const persistStepKey = step.element?.dataset?.onboardingTourPersistStepKey
+      return visibleStepKey === lastSeenStep || persistStepKey === lastSeenStep
+    })
     if (idx < 0) return 0
 
     return Math.min(idx + 1, Math.max(steps.length - 1, 0))

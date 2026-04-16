@@ -2,10 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["modal", "startButton", "dismissButton"]
-  static values = {
-    autoShow: Boolean,
-    startPath: String
-  }
+  static values = { autoShow: Boolean }
 
   connect() {
     this.modalInstance = null
@@ -43,15 +40,8 @@ export default class extends Controller {
 
     await this.sendOperation("resume")
     this.hideModal()
-
-    this.dispatch("started")
-
-    if (this.hasStartPathValue && this.startPathValue) {
-      const url = new URL(this.startPathValue, window.location.origin)
-      url.searchParams.set("onboarding_tour", "1")
-      window.location.href = url.toString()
-      return
-    }
+    // Wait for the modal animation/backdrop teardown, then start the dashboard tour in place.
+    window.setTimeout(() => this.dispatch("started"), 220)
 
     this.setButtonsDisabled(false)
   }

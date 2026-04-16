@@ -5985,3 +5985,33 @@ payment-methods { align-items: stretch; }
     padding: 4px 8px !important;
   }
 }
+
+/* Onboarding welcome modal (Dashboard) */
+.onboarding-welcome-modal-dialog {
+  max-width: 520px;
+}
+
+.onboarding-welcome-modal-content {
+  border: 1px solid #d8e1ed;
+  border-radius: 16px;
+  background: #f8faff;
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.18);
+}
+
+.onboarding-welcome-modal-header,
+.onboarding-welcome-modal-footer {
+  border-color: #dfe6f0;
+}
+
+.onboarding-welcome-modal-title {
+  color: #1f2937;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.onboarding-welcome-modal-subtitle {
+  color: #4b5563;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  font-weight: 600;
+}
