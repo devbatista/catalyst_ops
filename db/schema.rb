@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_04_12_110000) do
+ActiveRecord::Schema[7.1].define(version: 2026_04_16_113000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -424,6 +424,18 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_12_110000) do
     t.index ["user_id"], name: "index_support_tickets_on_user_id"
   end
 
+  create_table "user_onboarding_progresses", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.jsonb "completed_steps", default: {}, null: false
+    t.string "last_seen_step"
+    t.datetime "dismissed_at"
+    t.datetime "finished_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["finished_at"], name: "index_user_onboarding_progresses_on_finished_at"
+    t.index ["user_id"], name: "index_user_onboarding_progresses_on_user_id", unique: true
+  end
+
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -496,5 +508,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_12_110000) do
   add_foreign_key "support_tickets", "order_services"
   add_foreign_key "support_tickets", "users"
   add_foreign_key "support_tickets", "users", column: "assigned_to_id"
+  add_foreign_key "user_onboarding_progresses", "users"
   add_foreign_key "users", "companies"
 end
