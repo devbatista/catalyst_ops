@@ -156,6 +156,8 @@ class App::DashboardController < ApplicationController
     @onboarding_progress = current_user.user_onboarding_progress
     @show_onboarding_welcome_modal = onboarding_welcome_eligible?
     @onboarding_start_path = next_onboarding_step_path
+    @show_onboarding_checklist = !current_user.tecnico?
+    @onboarding_checklist_steps = onboarding_checklist_steps
   end
 
   def onboarding_welcome_eligible?
@@ -176,5 +178,15 @@ class App::DashboardController < ApplicationController
 
     route_name = ONBOARDING_STEP_PATHS[next_step] || :app_dashboard_path
     send(route_name)
+  end
+
+  def onboarding_checklist_steps
+    [
+      { key: "created_technician", label: "Cadastrar técnico", path: app_technicians_path },
+      { key: "created_customer", label: "Cadastrar cliente", path: app_clients_path },
+      { key: "created_first_work_order", label: "Criar primeira ordem de serviço", path: app_order_services_path },
+      { key: "moved_work_order_status", label: "Atualizar status da ordem de serviço", path: app_order_services_path },
+      { key: "viewed_reports", label: "Visualizar relatórios", path: app_reports_path }
+    ]
   end
 end

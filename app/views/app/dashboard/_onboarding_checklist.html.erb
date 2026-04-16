@@ -1,0 +1,47 @@
+<div class="row mb-3">
+  <div class="col-12">
+    <div
+      class="card radius-10 border-start border-0 border-4 border-primary"
+      data-controller="onboarding-checklist"
+      data-onboarding-checklist-endpoint-value="<%= app_onboarding_progress_path %>"
+      data-onboarding-checklist-steps-value="<%= json_escape(@onboarding_checklist_steps.to_json) %>"
+      data-onboarding-checklist-refresh-ms-value="20000"
+    >
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <h6 class="mb-0" data-onboarding-checklist-target="titleLabel">Primeiros passos</h6>
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-light text-dark border" data-onboarding-checklist-target="progressLabel">0/5</span>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-secondary"
+            data-onboarding-checklist-target="toggleButton"
+            data-action="onboarding-checklist#toggleDetails"
+          >
+            Ocultar
+          </button>
+        </div>
+      </div>
+
+      <div class="card-body" data-onboarding-checklist-target="details">
+        <div class="progress mb-3" role="progressbar" aria-label="Progresso onboarding" aria-valuemin="0" aria-valuemax="100">
+          <div
+            class="progress-bar bg-primary"
+            data-onboarding-checklist-target="progressBar"
+            style="width: 0%"
+            aria-valuenow="0"
+          ></div>
+        </div>
+
+        <ul class="list-group list-group-flush" data-onboarding-checklist-target="stepsList"></ul>
+      </div>
+
+      <div class="card-body pt-0 d-none" data-onboarding-checklist-target="summary">
+        <div class="alert alert-success mb-0" role="alert">
+          Tudo pronto. Seu onboarding inicial está concluído.
+        </div>
+      </div>
+
+      <div class="card-footer d-none" data-onboarding-checklist-target="errorBox"></div>
+    </div>
+  </div>
+</div>
