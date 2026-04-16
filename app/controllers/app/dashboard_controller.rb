@@ -1,12 +1,4 @@
 class App::DashboardController < ApplicationController
-  ONBOARDING_STEP_PATHS = {
-    "created_technician" => :app_technicians_path,
-    "created_customer" => :app_clients_path,
-    "created_first_work_order" => :app_order_services_path,
-    "moved_work_order_status" => :app_order_services_path,
-    "viewed_reports" => :app_reports_path
-  }.freeze
-
   def index
     authorize! :read, :dashboard
 
@@ -155,7 +147,6 @@ class App::DashboardController < ApplicationController
   def set_onboarding_welcome_modal
     @onboarding_progress = current_user.user_onboarding_progress
     @show_onboarding_welcome_modal = onboarding_welcome_eligible?
-    @onboarding_start_path = next_onboarding_step_path
     @show_onboarding_checklist = !current_user.tecnico?
     @onboarding_checklist_steps = onboarding_checklist_steps
   end
@@ -165,26 +156,18 @@ class App::DashboardController < ApplicationController
     return true if @onboarding_progress.nil?
     return false if @onboarding_progress.dismissed_at.present?
     return false if @onboarding_progress.finished_at.present?
+    return false if @onboarding_progress.last_seen_step.present?
+    return false if @onboarding_progress.completed_steps_count.positive?
 
     !@onboarding_progress.finished_all_steps?
-  end
-
-  def next_onboarding_step_path
-    completed_steps = @onboarding_progress&.completed_steps || {}
-
-    next_step = UserOnboardingProgress::STEP_KEYS.find do |step_key|
-      completed_steps.fetch(step_key, false) != true
-    end
-
-    route_name = ONBOARDING_STEP_PATHS[next_step] || :app_dashboard_path
-    send(route_name)
   end
 
   def onboarding_checklist_steps
     [
       { key: "created_technician", label: "Cadastrar técnico", path: app_technicians_path },
       { key: "created_customer", label: "Cadastrar cliente", path: app_clients_path },
-      { key: "created_first_work_order", label: "Criar primeira ordem de serviço", path: app_order_services_path },
+      { key: "created_budget", label: "Criar primeiro orçamento", path: app_budgets_path },
+      { key: "created_first_work_order", label: "Aprovar orçamento para gerar a primeira OS", path: app_budgets_path },
       { key: "moved_work_order_status", label: "Atualizar status da ordem de serviço", path: app_order_services_path },
       { key: "viewed_reports", label: "Visualizar relatórios", path: app_reports_path }
     ]

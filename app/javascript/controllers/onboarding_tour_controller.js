@@ -9,6 +9,9 @@ export default class extends Controller {
 
   connect() {
     this.intro = null
+    this.persistableStepKeys = []
+    this.onWelcomeStarted = this.onWelcomeStarted.bind(this)
+    window.addEventListener("onboarding-welcome:started", this.onWelcomeStarted)
 
     if (!this.autoStartValue) return
 
@@ -18,10 +21,18 @@ export default class extends Controller {
   }
 
   disconnect() {
+    window.removeEventListener("onboarding-welcome:started", this.onWelcomeStarted)
+
     if (!this.intro) return
 
     this.intro.exit()
     this.intro = null
+  }
+
+  onWelcomeStarted() {
+    this.startTour().catch((error) => {
+      console.warn("[OnboardingTour] failed to start from welcome", error)
+    })
   }
 
   async startTour() {
@@ -30,6 +41,7 @@ export default class extends Controller {
     await this.resumeIfRequested()
 
     const progress = await this.fetchProgress()
+    this.persistableStepKeys = Array.isArray(progress?.step_keys) ? progress.step_keys : []
     const builtSteps = this.buildSteps()
     if (builtSteps.length === 0) return
 
@@ -49,17 +61,24 @@ export default class extends Controller {
       const stepKey = targetElement?.dataset?.onboardingTourStepKey
       if (!stepKey) return
 
-      this.persistLastSeen(stepKey)
+      const persistStepKey = targetElement?.dataset?.onboardingTourPersistStepKey || stepKey
+      if (this.persistableStepKeys.includes(persistStepKey)) {
+        this.persistLastSeen(persistStepKey)
+      }
+      this.enforceSkipButtonLayout()
     })
 
+    this.intro.onafterchange(() => this.enforceSkipButtonLayout())
     this.intro.onexit(() => this.clearAutoStartParam())
     this.intro.oncomplete(() => this.clearAutoStartParam())
 
     const resumeIndex = this.findResumeIndex(progress?.last_seen_step, builtSteps)
     this.intro.start()
+    this.enforceSkipButtonLayout()
 
     if (resumeIndex > 0) {
       this.intro.goToStep(resumeIndex + 1)
+      this.enforceSkipButtonLayout()
     }
   }
 
@@ -98,6 +117,9 @@ export default class extends Controller {
         if (!element) return null
 
         element.dataset.onboardingTourStepKey = step.key
+        if (step.persist_step_key) {
+          element.dataset.onboardingTourPersistStepKey = step.persist_step_key
+        }
 
         return {
           element,
@@ -112,7 +134,11 @@ export default class extends Controller {
   findResumeIndex(lastSeenStep, steps) {
     if (!lastSeenStep) return 0
 
-    const idx = steps.findIndex((step) => step.element?.dataset?.onboardingTourStepKey === lastSeenStep)
+    const idx = steps.findIndex((step) => {
+      const visibleStepKey = step.element?.dataset?.onboardingTourStepKey
+      const persistStepKey = step.element?.dataset?.onboardingTourPersistStepKey
+      return visibleStepKey === lastSeenStep || persistStepKey === lastSeenStep
+    })
     if (idx < 0) return 0
 
     return Math.min(idx + 1, Math.max(steps.length - 1, 0))
@@ -150,5 +176,32 @@ export default class extends Controller {
     url.searchParams.delete("onboarding_tour")
     url.searchParams.delete("resume_onboarding")
     window.history.replaceState({}, "", url.toString())
+  }
+
+  enforceSkipButtonLayout() {
+    window.requestAnimationFrame(() => {
+      const tooltip = document.querySelector(".introjs-tooltip")
+      const skipButton = document.querySelector(".introjs-skipbutton")
+      const title = document.querySelector(".introjs-tooltip .introjs-tooltip-title")
+
+      if (!tooltip || !skipButton) return
+
+      tooltip.style.position = "relative"
+      skipButton.style.position = "absolute"
+      skipButton.style.top = "10px"
+      skipButton.style.right = "12px"
+      skipButton.style.left = "auto"
+      skipButton.style.width = "auto"
+      skipButton.style.height = "auto"
+      skipButton.style.lineHeight = "1.2"
+      skipButton.style.padding = "4px 9px"
+      skipButton.style.margin = "0"
+      skipButton.style.display = "inline-block"
+      skipButton.style.borderRadius = "999px"
+      skipButton.style.textDecoration = "none"
+      skipButton.style.zIndex = "20"
+
+      if (title) title.style.paddingRight = "72px"
+    })
   }
 }

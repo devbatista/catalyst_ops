@@ -1,34 +1,69 @@
 <%
   tour_steps = [
     {
-      key: "created_technician",
-      selector: "#onboarding-tour-technicians-menu",
-      title: "Cadastre os técnicos",
-      description: "Aqui você cadastra os técnicos que vão receber as ordens de serviço."
+      key: "dashboard_menu",
+      selector: "#onboarding-tour-dashboard-menu",
+      title: "Dashboard",
+      description: "Aqui você acompanha os principais números da operação: usuários, orçamentos, ordens e visão geral do dia."
     },
     {
-      key: "created_customer",
+      key: "clients_menu",
+      persist_step_key: "created_customer",
       selector: "#onboarding-tour-clients-menu",
-      title: "Cadastre os clientes",
-      description: "Nesta área você registra os clientes e mantém o histórico centralizado."
+      title: "Clientes",
+      description: "Nesta tela você consulta os clientes cadastrados e pode incluir, editar ou remover registros quando precisar."
     },
     {
-      key: "created_first_work_order",
+      key: "budgets_menu",
+      persist_step_key: "created_budget",
+      selector: "#onboarding-tour-budgets-menu",
+      title: "Orçamentos",
+      description: "Aqui você monta propostas, envia para aprovação e acompanha cada orçamento por status."
+    },
+    {
+      key: "technicians_menu",
+      persist_step_key: "created_technician",
+      selector: "#onboarding-tour-technicians-menu",
+      title: "Técnicos",
+      description: "Neste menu você gerencia a equipe técnica: cadastro, ajustes de dados e manutenção dos profissionais ativos."
+    },
+    {
+      key: "order_services_menu",
+      persist_step_key: "moved_work_order_status",
       selector: "#onboarding-tour-order-services-menu",
-      title: "Crie a primeira OS",
-      description: "Use Ordens de Serviço para abrir, acompanhar e concluir atendimentos."
+      title: "Ordens de Serviço",
+      description: "Área para controlar as OS: criação, agendamento, andamento e atualização de status da execução."
     },
     {
-      key: "moved_work_order_status",
-      selector: "#onboarding-tour-order-services-menu",
-      title: "Atualize os status",
-      description: "Depois de criar a OS, atualize os status para manter a operação rastreável."
-    },
-    {
-      key: "viewed_reports",
+      key: "reports_menu",
+      persist_step_key: "viewed_reports",
       selector: "#onboarding-tour-reports-menu",
-      title: "Acompanhe os relatórios",
-      description: "Aqui você visualiza indicadores de volume, produtividade e desempenho."
+      title: "Relatórios",
+      description: "Aqui você gera análises de desempenho, incluindo indicadores de orçamentos e ordens concluídas."
+    },
+    {
+      key: "financial_menu",
+      selector: "#onboarding-tour-financial-menu",
+      title: "Financeiro",
+      description: "Neste módulo você visualiza valores, totais e indicadores financeiros ligados a orçamentos e ordens."
+    },
+    {
+      key: "calendar_menu",
+      selector: "#onboarding-tour-calendar-menu",
+      title: "Calendário",
+      description: "Visão de agenda geral das ordens para facilitar organização diária, distribuição e planejamento da equipe."
+    },
+    {
+      key: "configurations_menu",
+      selector: "#onboarding-tour-configurations-menu",
+      title: "Configurações",
+      description: "Aqui você ajusta preferências da empresa e também dados do seu perfil para personalizar o sistema."
+    },
+    {
+      key: "support_menu",
+      selector: "#onboarding-tour-support-menu",
+      title: "Suporte",
+      description: "Canal para abrir chamados, consultar a base de conhecimento e resolver dúvidas sobre uso do sistema."
     }
   ]
 %>

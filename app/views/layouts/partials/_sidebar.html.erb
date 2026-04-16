@@ -23,7 +23,7 @@
     <% end %>
 
     <% if current_user.gestor? || current_user.admin? %>
-    <li class="list-group-item <%= active_menu_class(app_budgets_path) %>">
+    <li id="onboarding-tour-budgets-menu" class="list-group-item <%= active_menu_class(app_budgets_path) %>">
       <%= link_to app_budgets_path do %>
       <div class="parent-icon"><i class='bx bx-receipt'></i></div>
       <div class="menu-title">Orçamentos</div>
@@ -59,7 +59,7 @@
     <% end %>
 
     <% if can?(:read, :financial) %>
-    <li class="list-group-item <%= active_menu_class(app_financial_index_path) %>">
+    <li id="onboarding-tour-financial-menu" class="list-group-item <%= active_menu_class(app_financial_index_path) %>">
       <%= link_to app_financial_index_path do %>
       <div class="parent-icon"><i class='bx bx-line-chart'></i></div>
       <div class="menu-title">Financeiro</div>
@@ -68,7 +68,7 @@
     <% end %>
     
     <% if can?(:read, :calendar) %>
-    <li class="list-group-item <%= active_menu_class(app_calendar_index_path) %>">
+    <li id="onboarding-tour-calendar-menu" class="list-group-item <%= active_menu_class(app_calendar_index_path) %>">
       <%= link_to app_calendar_index_path do %>
       <div class="parent-icon"><i class='bx bx-calendar'></i></div>
       <div class="menu-title">Calendário</div>
@@ -76,7 +76,7 @@
     </li>
     <% end %>
 
-    <li class="list-group-item <%= active_menu_class(app_configurations_path) %>">
+    <li id="onboarding-tour-configurations-menu" class="list-group-item <%= active_menu_class(app_configurations_path) %>">
       <%= link_to app_configurations_path do %>
       <div class="parent-icon"><i class='bx bx-wrench'></i></div>
       <div class="menu-title">Configuração</div>
@@ -84,7 +84,7 @@
     </li>
 
     <% if can?(:read, :support) || can?(:read, :knowledge_base) %>
-    <li class="list-group-item <%= active_support_menu_class %>">
+    <li id="onboarding-tour-support-menu" class="list-group-item <%= active_support_menu_class %>">
       <%= link_to (can?(:read, :support) ? app_support_index_path(section: 'overview') : app_knowledge_base_index_path), class: "has-arrow" do %>
         <div class="parent-icon"><i class="bx bx-support"></i></div>
         <div class="menu-title">Suporte</div>

@@ -27,6 +27,7 @@ class App::BudgetsController < ApplicationController
     @budget = base_scope.new(budget_params)
 
     if @budget.save
+      mark_onboarding_step("created_budget")
       redirect_to app_budgets_path, notice: "Orçamento criado com sucesso."
     else
       @budget.service_items.build if @budget.service_items.empty?
@@ -73,6 +74,7 @@ class App::BudgetsController < ApplicationController
   def approve
     already_linked = @budget.order_service.present?
     @budget.approve_and_create_order_service!(approver_role: :gestor)
+    mark_onboarding_step("created_first_work_order")
     notice = already_linked ? "Orçamento já aprovado. OS vinculada mantida como pendente." : "Orçamento aprovado pelo gestor e OS criada como pendente."
     redirect_to app_budget_path(@budget), notice: notice
   rescue ActiveRecord::RecordInvalid => e
