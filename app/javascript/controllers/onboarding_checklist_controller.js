@@ -102,7 +102,6 @@ export default class extends Controller {
       this.detailsExpanded = false
       this.summaryTarget.classList.remove("d-none")
     } else {
-      this.detailsExpanded = true
       this.summaryTarget.classList.add("d-none")
     }
 

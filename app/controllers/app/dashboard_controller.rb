@@ -156,6 +156,8 @@ class App::DashboardController < ApplicationController
     return true if @onboarding_progress.nil?
     return false if @onboarding_progress.dismissed_at.present?
     return false if @onboarding_progress.finished_at.present?
+    return false if @onboarding_progress.last_seen_step.present?
+    return false if @onboarding_progress.completed_steps_count.positive?
 
     !@onboarding_progress.finished_all_steps?
   end
