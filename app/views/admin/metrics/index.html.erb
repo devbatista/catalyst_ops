@@ -80,6 +80,59 @@
     </div>
 
     <div class="row g-3">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <h6 class="mb-3">Ativação de Onboarding</h6>
+            <p class="text-muted small mb-3">
+              Cohort analisado: gestores/admins criados no período
+              (<code><%= @onboarding_indicators[:cohort_count] %></code> usuários).
+            </p>
+            <div class="row g-3">
+              <div class="col-12 col-md-6 col-xl-3">
+                <div class="border rounded p-3 h-100">
+                  <div class="text-muted small mb-1">Conclusão de onboarding</div>
+                  <div class="fw-semibold fs-5"><%= @onboarding_indicators[:completion_rate] %>%</div>
+                  <div class="small text-muted"><%= @onboarding_indicators[:completed_count] %> concluíram</div>
+                </div>
+              </div>
+
+              <div class="col-12 col-md-6 col-xl-3">
+                <div class="border rounded p-3 h-100">
+                  <div class="text-muted small mb-1">Dismiss do onboarding</div>
+                  <div class="fw-semibold fs-5"><%= @onboarding_indicators[:dismiss_rate] %>%</div>
+                  <div class="small text-muted"><%= @onboarding_indicators[:dismissed_count] %> dispensaram</div>
+                </div>
+              </div>
+
+              <div class="col-12 col-md-6 col-xl-3">
+                <div class="border rounded p-3 h-100">
+                  <div class="text-muted small mb-1">1ª OS em até 24h</div>
+                  <div class="fw-semibold fs-5"><%= @onboarding_indicators[:first_os_24h_rate] %>%</div>
+                  <div class="small text-muted"><%= @onboarding_indicators[:first_os_24h_count] %> atingiram</div>
+                </div>
+              </div>
+
+              <div class="col-12 col-md-6 col-xl-3">
+                <div class="border rounded p-3 h-100">
+                  <div class="text-muted small mb-1">Retenção D7</div>
+                  <div class="fw-semibold fs-5"><%= @onboarding_indicators[:retained_d7_rate] %>%</div>
+                  <div class="small text-muted"><%= @onboarding_indicators[:retained_d7_count] %> ativos no D7</div>
+                </div>
+              </div>
+            </div>
+
+            <hr class="my-3" />
+            <div class="small">
+              Tempo médio até 1ª OS:
+              <strong>
+                <%= @onboarding_indicators[:avg_time_to_first_os_hours].present? ? "#{@onboarding_indicators[:avg_time_to_first_os_hours]}h" : "sem dados" %>
+              </strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="col-12 col-xl-6">
         <div class="card border-0 shadow-sm h-100">
           <div class="card-body">
