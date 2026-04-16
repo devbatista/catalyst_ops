@@ -47,7 +47,9 @@ export default class extends Controller {
     this.dispatch("started")
 
     if (this.hasStartPathValue && this.startPathValue) {
-      window.location.href = this.startPathValue
+      const url = new URL(this.startPathValue, window.location.origin)
+      url.searchParams.set("onboarding_tour", "1")
+      window.location.href = url.toString()
       return
     }
 

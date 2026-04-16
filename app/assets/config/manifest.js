@@ -33,3 +33,4 @@
 //= link cliente/budget_approvals.js
 //= link controllers/onboarding_welcome_controller.js
 //= link controllers/onboarding_checklist_controller.js
+//= link controllers/onboarding_tour_controller.js

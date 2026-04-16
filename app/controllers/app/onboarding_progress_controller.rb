@@ -1,7 +1,7 @@
 class App::OnboardingProgressController < ApplicationController
   skip_authorization_check
 
-  ALLOWED_OPERATIONS = %w[complete_step dismiss resume finish].freeze
+  ALLOWED_OPERATIONS = %w[complete_step dismiss resume finish set_last_seen].freeze
 
   def show
     render json: response_payload
@@ -23,6 +23,10 @@ class App::OnboardingProgressController < ApplicationController
       onboarding_progress.resume!
     when "finish"
       onboarding_progress.finish!
+    when "set_last_seen"
+      return render_missing_step_key if params[:step_key].blank?
+
+      onboarding_progress.set_last_seen_step!(params[:step_key])
     end
 
     render json: response_payload
@@ -64,6 +68,6 @@ class App::OnboardingProgressController < ApplicationController
   end
 
   def render_missing_step_key
-    render json: { success: false, error: "step_key is required for operation complete_step" }, status: :unprocessable_entity
+    render json: { success: false, error: "step_key is required for this operation" }, status: :unprocessable_entity
   end
 end

@@ -57,6 +57,11 @@ class UserOnboardingProgress < ApplicationRecord
     update!(finished_at: Time.current)
   end
 
+  def set_last_seen_step!(step_key)
+    key = normalize_step_key(step_key)
+    update!(last_seen_step: key)
+  end
+
   def finished_all_steps?
     (STEP_KEYS - completed_step_keys).empty?
   end
