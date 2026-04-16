@@ -2,6 +2,7 @@ constraints subdomain: "app" do
   root to: "app/dashboard#index", as: :app_dashboard
 
   resource :terms_of_use, only: [:show, :update], controller: "app/terms_of_use", as: :app_terms_of_use
+  resource :onboarding_progress, only: [:show, :update], controller: "app/onboarding_progress", as: :app_onboarding_progress
 
   resources :clients, module: "app", as: :app_clients
   resources :budgets, only: [:index, :new, :create, :show, :edit, :update], module: "app", as: :app_budgets do
