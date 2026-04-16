@@ -33,6 +33,7 @@ class App::ClientsController < ApplicationController
 
   def create
     if @client.save
+      mark_onboarding_step("created_customer")
       redirect_to app_clients_url, notice: "Cliente criado com sucesso."
     else
       render :new, status: :unprocessable_entity

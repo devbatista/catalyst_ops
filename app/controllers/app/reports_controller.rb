@@ -15,6 +15,8 @@ class App::ReportsController < ApplicationController
   BUDGET_REJECTED_STATUSES = %w[rejeitado cancelado].freeze
   
   def index
+    mark_onboarding_step("viewed_reports")
+
     @reports = @reports.order(created_at: :desc)
     @generated_reports = @reports.limit(5)
 

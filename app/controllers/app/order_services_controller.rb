@@ -62,6 +62,7 @@ class App::OrderServicesController < ApplicationController
     @order_service.created_without_budget = true
 
     if @order_service.update(order_service_params_with_auto_schedule_status)
+      mark_onboarding_step("created_first_work_order")
       redirect_to app_order_service_url(@order_service), notice: "Ordem de serviço criada com sucesso."
     else
       set_other_resources
@@ -130,6 +131,7 @@ class App::OrderServicesController < ApplicationController
       redirect_to schedule_app_order_service_path(@order_service)
     else
       if @order_service.update(status: target_status)
+        mark_onboarding_step("moved_work_order_status")
         redirect_to app_order_service_url(@order_service), notice: "Status atualizado com sucesso."
       else
         redirect_to app_order_service_url(@order_service), alert: @order_service.errors.full_messages.join(', ')

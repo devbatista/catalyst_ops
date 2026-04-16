@@ -1,4 +1,6 @@
 class ApplicationController < ActionController::Base
+  include OnboardingTracking
+
   before_action :custom_authenticate_user!, unless: :register_subdomain?
   before_action :block_inactive_company_access, if: :app_subdomain?
   before_action :ensure_terms_accepted!, if: :app_subdomain?
