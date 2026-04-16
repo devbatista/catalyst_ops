@@ -62,7 +62,6 @@ class App::OrderServicesController < ApplicationController
     @order_service.created_without_budget = true
 
     if @order_service.update(order_service_params_with_auto_schedule_status)
-      mark_onboarding_step("created_first_work_order")
       redirect_to app_order_service_url(@order_service), notice: "Ordem de serviço criada com sucesso."
     else
       set_other_resources

@@ -2,7 +2,8 @@ class App::DashboardController < ApplicationController
   ONBOARDING_STEP_PATHS = {
     "created_technician" => :app_technicians_path,
     "created_customer" => :app_clients_path,
-    "created_first_work_order" => :app_order_services_path,
+    "created_budget" => :app_budgets_path,
+    "created_first_work_order" => :app_budgets_path,
     "moved_work_order_status" => :app_order_services_path,
     "viewed_reports" => :app_reports_path
   }.freeze
@@ -184,7 +185,8 @@ class App::DashboardController < ApplicationController
     [
       { key: "created_technician", label: "Cadastrar técnico", path: app_technicians_path },
       { key: "created_customer", label: "Cadastrar cliente", path: app_clients_path },
-      { key: "created_first_work_order", label: "Criar primeira ordem de serviço", path: app_order_services_path },
+      { key: "created_budget", label: "Criar primeiro orçamento", path: app_budgets_path },
+      { key: "created_first_work_order", label: "Aprovar orçamento para gerar a primeira OS", path: app_budgets_path },
       { key: "moved_work_order_status", label: "Atualizar status da ordem de serviço", path: app_order_services_path },
       { key: "viewed_reports", label: "Visualizar relatórios", path: app_reports_path }
     ]

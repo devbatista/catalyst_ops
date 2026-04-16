@@ -2,6 +2,7 @@ class UserOnboardingProgress < ApplicationRecord
   STEP_KEYS = %w[
     created_technician
     created_customer
+    created_budget
     created_first_work_order
     moved_work_order_status
     viewed_reports

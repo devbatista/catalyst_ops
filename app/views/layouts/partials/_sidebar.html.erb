@@ -23,7 +23,7 @@
     <% end %>
 
     <% if current_user.gestor? || current_user.admin? %>
-    <li class="list-group-item <%= active_menu_class(app_budgets_path) %>">
+    <li id="onboarding-tour-budgets-menu" class="list-group-item <%= active_menu_class(app_budgets_path) %>">
       <%= link_to app_budgets_path do %>
       <div class="parent-icon"><i class='bx bx-receipt'></i></div>
       <div class="menu-title">Orçamentos</div>

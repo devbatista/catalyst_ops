@@ -50,16 +50,20 @@ export default class extends Controller {
       if (!stepKey) return
 
       this.persistLastSeen(stepKey)
+      this.enforceSkipButtonLayout()
     })
 
+    this.intro.onafterchange(() => this.enforceSkipButtonLayout())
     this.intro.onexit(() => this.clearAutoStartParam())
     this.intro.oncomplete(() => this.clearAutoStartParam())
 
     const resumeIndex = this.findResumeIndex(progress?.last_seen_step, builtSteps)
     this.intro.start()
+    this.enforceSkipButtonLayout()
 
     if (resumeIndex > 0) {
       this.intro.goToStep(resumeIndex + 1)
+      this.enforceSkipButtonLayout()
     }
   }
 
@@ -150,5 +154,32 @@ export default class extends Controller {
     url.searchParams.delete("onboarding_tour")
     url.searchParams.delete("resume_onboarding")
     window.history.replaceState({}, "", url.toString())
+  }
+
+  enforceSkipButtonLayout() {
+    window.requestAnimationFrame(() => {
+      const tooltip = document.querySelector(".introjs-tooltip")
+      const skipButton = document.querySelector(".introjs-skipbutton")
+      const title = document.querySelector(".introjs-tooltip .introjs-tooltip-title")
+
+      if (!tooltip || !skipButton) return
+
+      tooltip.style.position = "relative"
+      skipButton.style.position = "absolute"
+      skipButton.style.top = "10px"
+      skipButton.style.right = "12px"
+      skipButton.style.left = "auto"
+      skipButton.style.width = "auto"
+      skipButton.style.height = "auto"
+      skipButton.style.lineHeight = "1.2"
+      skipButton.style.padding = "4px 9px"
+      skipButton.style.margin = "0"
+      skipButton.style.display = "inline-block"
+      skipButton.style.borderRadius = "999px"
+      skipButton.style.textDecoration = "none"
+      skipButton.style.zIndex = "20"
+
+      if (title) title.style.paddingRight = "72px"
+    })
   }
 }
