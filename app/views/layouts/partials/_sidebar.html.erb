@@ -122,6 +122,13 @@
             <% end %>
           </li>
         <% end %>
+        <% unless current_user.tecnico? %>
+          <li>
+            <%= link_to app_dashboard_path(onboarding_tour: 1, resume_onboarding: 1) do %>
+              <i class="bx bx-compass"></i> Ver tour novamente
+            <% end %>
+          </li>
+        <% end %>
         <% end %>
       </ul>
     </li>

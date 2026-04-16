@@ -27,6 +27,8 @@ export default class extends Controller {
   async startTour() {
     if (typeof window.introJs === "undefined") return
 
+    await this.resumeIfRequested()
+
     const progress = await this.fetchProgress()
     const builtSteps = this.buildSteps()
     if (builtSteps.length === 0) return
@@ -59,6 +61,13 @@ export default class extends Controller {
     if (resumeIndex > 0) {
       this.intro.goToStep(resumeIndex + 1)
     }
+  }
+
+  async resumeIfRequested() {
+    const url = new URL(window.location.href)
+    if (url.searchParams.get("resume_onboarding") !== "1") return
+
+    await this.sendOperation("resume")
   }
 
   async fetchProgress() {
@@ -110,9 +119,15 @@ export default class extends Controller {
   }
 
   async persistLastSeen(stepKey) {
-    if (!this.hasEndpointValue || !this.endpointValue || !stepKey) return
+    await this.sendOperation("set_last_seen", stepKey)
+  }
+
+  async sendOperation(operation, stepKey = null) {
+    if (!this.hasEndpointValue || !this.endpointValue) return
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content")
+    const body = { operation }
+    if (stepKey) body.step_key = stepKey
 
     try {
       await fetch(this.endpointValue, {
@@ -123,7 +138,7 @@ export default class extends Controller {
           "X-CSRF-Token": csrfToken || ""
         },
         credentials: "same-origin",
-        body: JSON.stringify({ operation: "set_last_seen", step_key: stepKey })
+        body: JSON.stringify(body)
       })
     } catch (_error) {
       // noop
@@ -133,6 +148,7 @@ export default class extends Controller {
   clearAutoStartParam() {
     const url = new URL(window.location.href)
     url.searchParams.delete("onboarding_tour")
+    url.searchParams.delete("resume_onboarding")
     window.history.replaceState({}, "", url.toString())
   }
 }
