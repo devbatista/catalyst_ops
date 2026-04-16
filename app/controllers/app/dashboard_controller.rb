@@ -1,8 +1,17 @@
 class App::DashboardController < ApplicationController
+  ONBOARDING_STEP_PATHS = {
+    "created_technician" => :app_technicians_path,
+    "created_customer" => :app_clients_path,
+    "created_first_work_order" => :app_order_services_path,
+    "moved_work_order_status" => :app_order_services_path,
+    "viewed_reports" => :app_reports_path
+  }.freeze
+
   def index
     authorize! :read, :dashboard
 
     initialize_default_dashboard_variables
+    set_onboarding_welcome_modal
 
     case current_user.role
     when "admin"
@@ -141,5 +150,31 @@ class App::DashboardController < ApplicationController
     @in_progress_count = 0
     @overdue_count = 0
     @budgets_total_value = 0
+  end
+
+  def set_onboarding_welcome_modal
+    @onboarding_progress = current_user.user_onboarding_progress
+    @show_onboarding_welcome_modal = onboarding_welcome_eligible?
+    @onboarding_start_path = next_onboarding_step_path
+  end
+
+  def onboarding_welcome_eligible?
+    return false if current_user.tecnico?
+    return true if @onboarding_progress.nil?
+    return false if @onboarding_progress.dismissed_at.present?
+    return false if @onboarding_progress.finished_at.present?
+
+    !@onboarding_progress.finished_all_steps?
+  end
+
+  def next_onboarding_step_path
+    completed_steps = @onboarding_progress&.completed_steps || {}
+
+    next_step = UserOnboardingProgress::STEP_KEYS.find do |step_key|
+      completed_steps.fetch(step_key, false) != true
+    end
+
+    route_name = ONBOARDING_STEP_PATHS[next_step] || :app_dashboard_path
+    send(route_name)
   end
 end

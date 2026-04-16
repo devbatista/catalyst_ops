@@ -1,5 +1,6 @@
 <div class="page-wrapper">
   <div class="page-content">
+    <%= render "onboarding_welcome_modal" %>
 
     <% flash.each do |type, message| %>
     <% bootstrap_class = { notice: "alert-success", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
