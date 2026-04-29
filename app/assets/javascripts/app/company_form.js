@@ -1,4 +1,4 @@
-import { formatPhone, formatCEP } from "../utils/formatters";
+import { formatPhone, formatCEP } from "utils/formatters";
 
 document.addEventListener("DOMContentLoaded", function () {
   // Máscara para telefone
