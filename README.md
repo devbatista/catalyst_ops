@@ -1,55 +1,55 @@
 # CatalystOps
 
-CatalystOps e uma plataforma SaaS para gestao de operacoes e servicos tecnicos,
+CatalystOps é uma plataforma SaaS para gestão de operações e serviços técnicos,
 desenvolvida em Ruby on Rails e preparada para rodar em Docker tanto em
-desenvolvimento quanto em producao.
+desenvolvimento quanto em produção.
 
-Este projeto foi estruturado para que o ambiente local seja o mais proximo
-possivel do ambiente real de execucao. A ideia do repositório e simples:
+Este projeto foi estruturado para que o ambiente local seja o mais próximo
+possível do ambiente real de execução. A ideia do repositório é simples:
 
-- Rails para a aplicacao web
-- PostgreSQL para persistencia
+- Rails para a aplicação web
+- PostgreSQL para persistência
 - Redis para fila e cache
 - Sidekiq para jobs em background
-- Nginx para roteamento por subdominio
+- Nginx para roteamento por subdomínio
 
 ## Objetivo do sistema
 
-O CatalystOps permite que empresas prestadoras de servicos tecnicos organizem:
+O CatalystOps permite que empresas prestadoras de serviços técnicos organizem:
 
 - clientes
-- ordens de servico
-- tecnicos e atribuicoes
+- ordens de serviço
+- técnicos e atribuições
 - agenda de atendimento
 - anexos
 - suporte interno
 - base de conhecimento
-- assinaturas e operacao SaaS
+- assinaturas e operação SaaS
 
 ## Stack principal
 
-| Componente | Funcao |
+| Componente | Função |
 | --- | --- |
-| Ruby on Rails | aplicacao principal |
+| Ruby on Rails | aplicação principal |
 | PostgreSQL 15 | banco de dados |
 | Redis 7 | fila e cache |
 | Sidekiq | processamento assíncrono |
-| Nginx | proxy reverso / subdominios |
-| Docker Compose | orquestracao local |
+| Nginx | proxy reverso / subdomínios |
+| Docker Compose | orquestração local |
 
 ## Estrutura geral do ambiente
 
-Os servicos sao definidos em [`docker-compose.yml`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docker-compose.yml) e, em desenvolvimento, complementados por [`docker-compose.override.yml`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docker-compose.override.yml).
+Os serviços são definidos em [`docker-compose.yml`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docker-compose.yml) e, em desenvolvimento, complementados por [`docker-compose.override.yml`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docker-compose.override.yml).
 
-Servicos principais:
+Serviços principais:
 
-| Servico | Container | Papel no ambiente |
+| Serviço | Container | Papel no ambiente |
 | --- | --- | --- |
 | `web` | `catalystops-app` | executa o Rails |
 | `sidekiq` | `catalystops-app` | processa jobs em background |
 | `db` | `postgres:15` | banco de dados |
 | `redis` | `redis:7` | fila do Sidekiq e cache |
-| `nginx` | `nginx:latest` | entrada HTTP/HTTPS e subdominios |
+| `nginx` | `nginx:latest` | entrada HTTP/HTTPS e subdomínios |
 
 Fluxo simplificado:
 
@@ -59,17 +59,17 @@ Fluxo simplificado:
 
 ## Requisitos
 
-Para rodar o projeto localmente, voce precisa ter:
+Para rodar o projeto localmente, você precisa ter:
 
 - Docker
 - Docker Compose
 - acesso ao arquivo `config/master.key` ou ao valor de `RAILS_MASTER_KEY`
 
-Voce nao precisa instalar Ruby, Rails, PostgreSQL nem Redis diretamente na sua maquina se for usar o fluxo padrao com Docker.
+Você não precisa instalar Ruby, Rails, PostgreSQL nem Redis diretamente na sua máquina se for usar o fluxo padrão com Docker.
 
-## Variaveis de ambiente
+## Variáveis de ambiente
 
-As configuracoes ficam em `.env`. Um exemplo base existe em [` .env_example `](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/.env_example).
+As configurações ficam em `.env`. Um exemplo base existe em [` .env_example `](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/.env_example).
 
 Crie o arquivo local com:
 
@@ -77,7 +77,7 @@ Crie o arquivo local com:
 cp .env_example .env
 ```
 
-Principais variaveis:
+Principais variáveis:
 
 ```env
 MP_TEST_ACCESS_TOKEN='TEST_ACCESS_TOKEN_EXAMPLE'
@@ -103,16 +103,16 @@ PRECOMPILE_ASSETS=0
 ASSETS_SECRET_KEY_BASE='your_assets_secret_key_base_here'
 ```
 
-Observacoes:
+Observações:
 
 - em desenvolvimento, use `RAILS_ENV=development`
 - para desenvolvimento, `PRECOMPILE_ASSETS=0` costuma ser suficiente
 - `RAILS_MASTER_KEY` precisa bater com as credenciais do projeto
 - `SECRET_KEY_BASE` pode ser gerada com `bin/rails secret`
 
-## Subdominios locais
+## Subdomínios locais
 
-O projeto utiliza subdominios para separar areas da aplicacao:
+O projeto utiliza subdomínios para separar áreas da aplicação:
 
 - `catalystops.local`
 - `app.catalystops.local`
@@ -142,7 +142,7 @@ Adicione:
 127.0.0.1 sidekiq.catalystops.local
 ```
 
-### Enderecos mais usados
+### Endereços mais usados
 
 Depois de subir o ambiente:
 
@@ -153,7 +153,7 @@ Depois de subir o ambiente:
 - `https://webhook.catalystops.local`
 - `https://sidekiq.catalystops.local`
 
-Opcionalmente, voce tambem pode acessar o Rails diretamente por:
+Opcionalmente, você também pode acessar o Rails diretamente por:
 
 - `http://localhost:3000`
 
@@ -195,9 +195,9 @@ docker compose logs -f web
 docker compose logs -f sidekiq
 ```
 
-## Montagem de codigo no desenvolvimento
+## Montagem de código no desenvolvimento
 
-O arquivo [`docker-compose.override.yml`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docker-compose.override.yml) monta o diretorio do projeto dentro dos containers `web` e `sidekiq`:
+O arquivo [`docker-compose.override.yml`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docker-compose.override.yml) monta o diretório do projeto dentro dos containers `web` e `sidekiq`:
 
 ```yaml
 services:
@@ -212,11 +212,11 @@ services:
       - ./storage:/rails/storage
 ```
 
-Na pratica, isso significa:
+Na prática, isso significa:
 
-- alteracoes em Ruby, views, JS e CSS refletem imediatamente no container
-- em geral, nao e necessario rebuild quando a mudanca e apenas de codigo
-- se voce alterar gems, e recomendavel rodar `bundle install` no container e reiniciar `web` e `sidekiq`
+- alterações em Ruby, views, JS e CSS refletem imediatamente no container
+- em geral, não é necessário rebuild quando a mudança é apenas de código
+- se você alterar gems, é recomendável rodar `bundle install` no container e reiniciar `web` e `sidekiq`
 
 Exemplo:
 
@@ -226,7 +226,7 @@ docker compose restart web
 docker compose restart sidekiq
 ```
 
-## Comandos uteis
+## Comandos úteis
 
 ### Logs
 
@@ -262,7 +262,7 @@ docker compose exec web bin/rails db:rollback
 docker compose exec web bin/rails test
 ```
 
-### Reiniciar servicos
+### Reiniciar serviços
 
 ```bash
 docker compose restart web
@@ -292,7 +292,7 @@ O arquivo [`db/seeds.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst
 1. tudo que estiver em `db/seeds/common`
 2. tudo que estiver em `db/seeds/<ambiente>`
 
-No ambiente `development`, a ordem atual e:
+No ambiente `development`, a ordem atual é:
 
 - [`db/seeds/common/0-prepare.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/db/seeds/common/0-prepare.rb)
 - [`db/seeds/common/1.plans.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/db/seeds/common/1.plans.rb)
@@ -306,27 +306,27 @@ No ambiente `development`, a ordem atual e:
 - [`db/seeds/development/9-support_tickets.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/db/seeds/development/9-support_tickets.rb)
 - [`db/seeds/development/9a-support_messages.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/db/seeds/development/9a-support_messages.rb)
 
-### Preparacao da base
+### Preparação da base
 
 O seed [`db/seeds/common/0-prepare.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/db/seeds/common/0-prepare.rb) limpa os dados antigos antes de recriar os registros. Essa limpeza usa `disable_referential_integrity` para evitar erro de chave estrangeira durante `delete_all`.
 
 Se o `db:seed` falhar, confira primeiro:
 
-- se o banco esta acessivel
-- se as migrations estao atualizadas
-- se o comando esta rodando dentro do container correto
+- se o banco está acessível
+- se as migrations estão atualizadas
+- se o comando está rodando dentro do container correto
 
 ## Background jobs com Sidekiq e Redis
 
-Redis e usado para:
+Redis é usado para:
 
 - fila do Sidekiq
 - cache, quando habilitado
 
 Para jobs funcionarem corretamente:
 
-- `redis` precisa estar em execucao
-- `sidekiq` precisa estar em execucao
+- `redis` precisa estar em execução
+- `sidekiq` precisa estar em execução
 - o `REDIS_URL` precisa apontar para o container `redis`
 
 Cheque rapidamente:
@@ -338,7 +338,7 @@ docker compose logs -f sidekiq
 
 ### Cron jobs carregados no startup do Sidekiq
 
-Os agendamentos recorrentes sao registrados no startup do Sidekiq via
+Os agendamentos recorrentes são registrados no startup do Sidekiq via
 [`config/initializers/sidekiq_schedules.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/config/initializers/sidekiq_schedules.rb),
 usando `Sidekiq::Cron::Job.load_from_hash!`.
 
@@ -348,24 +348,24 @@ Timezone configurado para os agendamentos:
 
 Cron jobs atuais:
 
-| Job | Cron | Frequencia | Objetivo |
+| Job | Cron | Frequência | Objetivo |
 | --- | --- | --- | --- |
-| `MarkOverdueOrderServicesJob` | `* * * * *` | a cada minuto | marca OS como atrasadas quando o horario agendado ja passou |
-| `Subscriptions::CycleSubscriptionsJob` | `0 10 * * *` | diariamente as 10:00 | cicla assinaturas aptas para renovacao |
-| `Subscriptions::NotifyOverdueSubscriptionsJob` | `0 9 * * *` | diariamente as 09:00 | notifica assinaturas vencidas ha 5 dias |
-| `Subscriptions::ExpireOverdueSubscriptionsJob` | `0 11 * * *` | diariamente as 11:00 | expira assinaturas vencidas ha 10 dias ou mais |
-| `Subscriptions::ReconcileSubscriptionsJob` | `0 12 * * *` | diariamente as 12:00 | reconcilia status local de assinaturas com o Mercado Pago |
+| `MarkOverdueOrderServicesJob` | `* * * * *` | a cada minuto | marca OS como atrasadas quando o horário agendado já passou |
+| `Subscriptions::CycleSubscriptionsJob` | `0 10 * * *` | diariamente às 10:00 | cicla assinaturas aptas para renovação |
+| `Subscriptions::NotifyOverdueSubscriptionsJob` | `0 9 * * *` | diariamente às 09:00 | notifica assinaturas vencidas há 5 dias |
+| `Subscriptions::ExpireOverdueSubscriptionsJob` | `0 11 * * *` | diariamente às 11:00 | expira assinaturas vencidas há 10 dias ou mais |
+| `Subscriptions::ReconcileSubscriptionsJob` | `0 12 * * *` | diariamente às 12:00 | reconcilia status local de assinaturas com o Mercado Pago |
 
-Observacoes:
+Observações:
 
-- esses cron jobs so ficam ativos com o processo `sidekiq` em execucao
-- a fila usada nesses agendamentos e `default`
-- a concorrencia base do Sidekiq esta em [`config/sidekiq.yml`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/config/sidekiq.yml)
+- esses cron jobs só ficam ativos com o processo `sidekiq` em execução
+- a fila usada nesses agendamentos é `default`
+- a concorrência base do Sidekiq está em [`config/sidekiq.yml`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/config/sidekiq.yml)
 - para validar se os agendamentos foram carregados, acompanhe os logs do container `sidekiq`
 
-### Janela de reconciliacao de assinaturas
+### Janela de reconciliação de assinaturas
 
-Os jobs de reconciliacao/reprocessamento usam janela para reduzir chamadas ao
+Os jobs de reconciliação/reprocessamento usam janela para reduzir chamadas ao
 gateway:
 
 - `Subscriptions::ReconcileSubscriptionsJob`
@@ -375,10 +375,10 @@ gateway:
   usa query operacional de pendentes sem webhook processado e env:
   `SUBSCRIPTIONS_PENDING_REPROCESS_WINDOW_DAYS`
 
-Padrao para ambas:
+Padrão para ambas:
 
-- ultimos `30` dias
-- se valor ausente/invalido (`0` ou negativo), fallback automatico para `30`
+- últimos `30` dias
+- se valor ausente/inválido (`0` ou negativo), fallback automático para `30`
 
 Exemplo:
 
@@ -389,17 +389,17 @@ SUBSCRIPTIONS_PENDING_REPROCESS_WINDOW_DAYS=30
 
 ## Fluxo de emails
 
-Os envios de email usam `deliver_later`, entao passam pelo Sidekiq.
+Os envios de email usam `deliver_later`, então passam pelo Sidekiq.
 
 Isso vale para fluxos como:
 
-- boas-vindas de usuario
-- notificacoes de ordens de servico
-- sugestoes enviadas pela area de suporte
+- boas-vindas de usuário
+- notificações de ordens de serviço
+- sugestões enviadas pela área de suporte
 
-### Ordem de Servico
+### Ordem de Serviço
 
-No model [`app/models/order_service.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/app/models/order_service.rb), existem callbacks que enfileiram emails em diferentes mudancas de estado:
+No model [`app/models/order_service.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/app/models/order_service.rb), existem callbacks que enfileiram emails em diferentes mudanças de estado:
 
 - `after_create :notify_create`
 - `after_update :notify_complete`
@@ -426,26 +426,26 @@ Isso significa:
 - o mailer começou a ser executado
 - a view do email foi renderizada
 
-Isso ainda nao garante entrega final. Para considerar sucesso, o log precisa fechar sem erro, normalmente com `Performed ActionMailer::MailDeliveryJob` ou sem `WARN` e `ERROR` subsequentes para o mesmo job.
+Isso ainda não garante entrega final. Para considerar sucesso, o log precisa fechar sem erro, normalmente com `Performed ActionMailer::MailDeliveryJob` ou sem `WARN` e `ERROR` subsequentes para o mesmo job.
 
-Se houver atraso grande entre `enqueued_at` e `Performing`, normalmente existe backlog ou o `sidekiq` ficou parado durante algum periodo.
+Se houver atraso grande entre `enqueued_at` e `Performing`, normalmente existe backlog ou o `sidekiq` ficou parado durante algum período.
 
-## Estrutura de documentacao interna
+## Estrutura de documentação interna
 
-O projeto tambem possui documentacao funcional em [`docs/`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docs):
+O projeto também possui documentação funcional em [`docs/`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docs):
 
 - [`docs/gestor`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docs/gestor)
 - [`docs/tecnico`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docs/tecnico)
 
-Esses arquivos sao usados como base para artigos da base de conhecimento.
+Esses arquivos são usados como base para artigos da base de conhecimento.
 
 ## Troubleshooting
 
 ### `db:seed` falha com chave estrangeira
 
-Verifique se o seed de limpeza esta atualizado em [`db/seeds/common/0-prepare.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/db/seeds/common/0-prepare.rb) e se o comando foi rodado depois da correcao.
+Verifique se o seed de limpeza está atualizado em [`db/seeds/common/0-prepare.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/db/seeds/common/0-prepare.rb) e se o comando foi rodado depois da correção.
 
-### Sidekiq nao processa emails
+### Sidekiq não processa emails
 
 Confira:
 
@@ -453,11 +453,11 @@ Confira:
 - `docker compose logs -f sidekiq`
 - `docker compose logs -f redis`
 
-Se os jobs estiverem acumulados e depois forem processados de uma vez, isso normalmente indica indisponibilidade temporaria do `sidekiq`.
+Se os jobs estiverem acumulados e depois forem processados de uma vez, isso normalmente indica indisponibilidade temporária do `sidekiq`.
 
-### Mudanca de codigo nao refletiu
+### Mudança de código não refletiu
 
-Se foi mudanca de gem ou dependencia:
+Se foi mudança de gem ou dependência:
 
 ```bash
 docker compose exec web bundle install
@@ -465,13 +465,13 @@ docker compose restart web
 docker compose restart sidekiq
 ```
 
-Se foi mudanca simples de codigo Ruby ou view, normalmente basta recarregar a pagina.
+Se foi mudança simples de código Ruby ou view, normalmente basta recarregar a página.
 
 ### Erro local de Ruby ou Bundler fora do Docker
 
-Este projeto e Docker-first. Se voce rodar `bin/rails` diretamente na maquina hospedeira, pode encontrar divergencias de Ruby, Bundler ou plataforma do `Gemfile`.
+Este projeto é Docker-first. Se você rodar `bin/rails` diretamente na máquina hospedeira, pode encontrar divergências de Ruby, Bundler ou plataforma do `Gemfile`.
 
-O caminho recomendado e executar comandos Rails dentro do container `web`.
+O caminho recomendado é executar comandos Rails dentro do container `web`.
 
 ## Fluxo recomendado para desenvolvimento
 
@@ -481,9 +481,9 @@ O caminho recomendado e executar comandos Rails dentro do container `web`.
 4. acessar `app.catalystops.local`
 5. acompanhar `web` e `sidekiq` nos logs durante novos fluxos
 
-## Producao
+## Produção
 
-Para producao, o fluxo geral e:
+Para produção, o fluxo geral é:
 
 1. preparar `.env` com valores reais
 2. subir containers com build
@@ -494,7 +494,7 @@ Para producao, o fluxo geral e:
 
 ### Deploy automatizado (GitHub Actions + bin/deploy)
 
-O deploy de producao e acionado por workflow do GitHub Actions em
+O deploy de produção é acionado por workflow do GitHub Actions em
 [` .github/workflows/deploy.yml `](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/.github/workflows/deploy.yml),
 que executa [`bin/deploy`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/bin/deploy) no servidor via SSH.
 
@@ -504,30 +504,34 @@ Pontos importantes do `bin/deploy`:
 - decide quando precisa rebuild/restart de `web` e `sidekiq`
 - executa `docker compose run --rm web bundle exec rails db:migrate`
   para aplicar migrations pendentes
-- nao encerra cedo apenas por nao haver commit novo; ainda valida migrations
+- não encerra cedo apenas por não haver commit novo; ainda valida migrations
+- ao final de um deploy bem-sucedido, remove cache de build e imagens Docker
+  não usadas há mais de 7 dias (`DOCKER_PRUNE_UNTIL=168h`), sem remover volumes
 
-Observacao operacional:
+Observação operacional:
 
-- em producao, o container `web` usa codigo da imagem Docker
-- se houver alteracao que exige imagem nova (ex.: `db/migrate`, `app/*`,
+- em produção, o container `web` usa código da imagem Docker
+- se houver alteração que exige imagem nova (ex.: `db/migrate`, `app/*`,
   `config/*`, `lib/*`), o deploy precisa rebuild para o container enxergar o
-  novo codigo
+  novo código
+- a limpeza pode ser desabilitada com `PRUNE_DOCKER_AFTER_DEPLOY=false` ou
+  ajustada com `DOCKER_PRUNE_UNTIL=72h`, `DOCKER_PRUNE_UNTIL=336h`, etc.
 
-### Politica de PR e janela de merge
+### Política de PR e janela de merge
 
-Existe workflow de politica em
+Existe workflow de política em
 [` .github/workflows/policy-window.yml `](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/.github/workflows/policy-window.yml)
 para PRs da `main`.
 
 Regras atuais:
 
-- mudanca sensivel (ex.: `db/migrate/*`, `app/*`, `config/*`, `lib/*`,
-  `Dockerfile`, `Gemfile.lock`) so passa na janela OFF: `22:00-06:00` BRT
-- mudanca simples so passa na janela comercial: `09:00-18:00` BRT
+- mudança sensível (ex.: `db/migrate/*`, `app/*`, `config/*`, `lib/*`,
+  `Dockerfile`, `Gemfile.lock`) só passa na janela OFF: `22:00-06:00` BRT
+- mudança simples só passa na janela comercial: `09:00-18:00` BRT
 - se houver migration no PR, ele deve conter apenas `db/migrate/*` e
   opcionalmente `db/schema.rb`
 
-## Referencias rapidas
+## Referências rápidas
 
 - Compose principal: [`docker-compose.yml`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docker-compose.yml)
 - Override de desenvolvimento: [`docker-compose.override.yml`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docker-compose.override.yml)
@@ -538,12 +542,12 @@ Regras atuais:
 - Mailer de OS: [`app/mailers/order_service_mailer.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/app/mailers/order_service_mailer.rb)
 - Model de OS: [`app/models/order_service.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/app/models/order_service.rb)
 
-## Observacao final
+## Observação final
 
-Se algo nao funcionar como esperado:
+Se algo não funcionar como esperado:
 
 1. revise o `.env`
-2. confira se os containers estao saudaveis
+2. confira se os containers estão saudáveis
 3. valide migrations e seeds
 4. acompanhe logs de `web` e `sidekiq`
-5. consulte a documentacao em [`docs/`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docs)
+5. consulte a documentação em [`docs/`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docs)

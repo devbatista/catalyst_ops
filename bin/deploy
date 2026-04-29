@@ -52,6 +52,21 @@ matches_any() {
   return 1
 }
 
+prune_docker_artifacts() {
+  if [[ "${PRUNE_DOCKER_AFTER_DEPLOY:-true}" != "true" ]]; then
+    echo "Limpeza Docker pos-deploy desabilitada."
+    return
+  fi
+
+  local prune_until="${DOCKER_PRUNE_UNTIL:-168h}"
+
+  echo "Limpando cache de build Docker nao usado ha mais de ${prune_until}..."
+  docker builder prune --force --filter "until=${prune_until}"
+
+  echo "Limpando imagens Docker nao usadas ha mais de ${prune_until}..."
+  docker image prune --all --force --filter "until=${prune_until}"
+}
+
 write_env_file
 
 git fetch origin "$BRANCH"
@@ -76,6 +91,8 @@ RUN_MIGRATIONS=false
 CHECK_PENDING_MIGRATIONS=true
 RECREATE_DB=${RECREATE_DB:-false}
 VERIFY_VECTOR=${VERIFY_VECTOR:-true}
+PRUNE_DOCKER_AFTER_DEPLOY=${PRUNE_DOCKER_AFTER_DEPLOY:-true}
+DOCKER_PRUNE_UNTIL=${DOCKER_PRUNE_UNTIL:-168h}
 
 for file in "${CHANGED_FILES[@]}"; do
   if matches_any "$file" \
@@ -150,6 +167,8 @@ echo " - RUN_MIGRATIONS=$RUN_MIGRATIONS"
 echo " - CHECK_PENDING_MIGRATIONS=$CHECK_PENDING_MIGRATIONS"
 echo " - RECREATE_DB=$RECREATE_DB"
 echo " - VERIFY_VECTOR=$VERIFY_VECTOR"
+echo " - PRUNE_DOCKER_AFTER_DEPLOY=$PRUNE_DOCKER_AFTER_DEPLOY"
+echo " - DOCKER_PRUNE_UNTIL=$DOCKER_PRUNE_UNTIL"
 
 if [[ "$REBUILD_IMAGE" == "true" ]]; then
   docker compose build web
@@ -187,5 +206,7 @@ fi
 if [[ "$RESTART_NGINX" == "true" ]]; then
   docker compose restart nginx
 fi
+
+prune_docker_artifacts
 
 echo "Deploy concluido."
