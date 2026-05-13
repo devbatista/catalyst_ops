@@ -6,6 +6,8 @@ BUDGETS = []
 
 CLIENTS.each do |client|
   rand(4..8).times do
+    break unless client.company.can_create_budget?
+
     budget = Budget.create!(
       title: Faker::Commerce.product_name,
       description: Faker::Lorem.sentence(word_count: 10),

@@ -17,6 +17,8 @@ pt-BR:
       user:
         assignments: "Atribuições"
     errors:
+      messages:
+        record_invalid: "A validação falhou: %{errors}"
       models:
         user:
           attributes:
