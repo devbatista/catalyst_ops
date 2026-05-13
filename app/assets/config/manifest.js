@@ -12,6 +12,7 @@
 //= link controllers/stimulus.js
 //= link controllers/index.js
 //= link viacep.js
+//= link session_password_toggle.js
 //= link payment_method_toggle.js
 //= link card_tokenization.js
 //= link app/clients_form.js
