@@ -7,6 +7,19 @@ RSpec.describe User, type: :model do
     it { should validate_presence_of(:role) }
     it { should allow_value("email@dominio.com").for(:email) }
     it { should_not allow_value("email_invalido").for(:email) }
+
+    it "exige senha com letra maiúscula, minúscula, número e caractere especial" do
+      user = build(:user, password: "password123", password_confirmation: "password123")
+
+      expect(user).not_to be_valid
+      expect(user.errors[:password]).to include(User::PASSWORD_REQUIREMENTS_MESSAGE)
+    end
+
+    it "aceita senha forte" do
+      user = build(:user, password: "Password@123", password_confirmation: "Password@123")
+
+      expect(user).to be_valid
+    end
   end
 
   describe "associações" do

@@ -1,5 +1,9 @@
+require "securerandom"
+
 class User < ApplicationRecord
   include Auditable
+
+  PASSWORD_REQUIREMENTS_MESSAGE = "deve ter pelo menos 8 caracteres, incluindo letra maiúscula, letra minúscula, número e caractere especial"
 
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
@@ -16,6 +20,7 @@ class User < ApplicationRecord
   validates :active, inclusion: { in: [true, false] }
   
   validate :plan_technician_limit, on: :create
+  validate :password_complexity
 
   belongs_to :company, optional: true
 
@@ -130,8 +135,16 @@ class User < ApplicationRecord
 
   def set_default_password_for_tecnico
     if tecnico? && password.blank?
-      self.password = self.password_confirmation = "alterar123"
+      generated_password = "Aa1!#{SecureRandom.hex(12)}"
+      self.password = self.password_confirmation = generated_password
     end
+  end
+
+  def password_complexity
+    return if password.blank?
+    return if password.match?(/\A(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}\z/)
+
+    errors.add(:password, PASSWORD_REQUIREMENTS_MESSAGE)
   end
 
   def send_welcome_email_on_activation
