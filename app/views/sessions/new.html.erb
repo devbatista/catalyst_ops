@@ -97,7 +97,12 @@
                                               class: "form-control border-end-0", 
                                               id: "inputChoosePassword", 
                                               placeholder: "Coloque sua senha" %>
-                            <a href="javascript:;" class="input-group-text bg-transparent"><i class="bx bx-hide"></i></a>
+                            <button type="button"
+                                    class="input-group-text bg-transparent js-password-toggle"
+                                    aria-label="Mostrar senha"
+                                    aria-controls="inputChoosePassword">
+                              <i class="bx bx-hide" aria-hidden="true"></i>
+                            </button>
                           </div>
                         </div>
                         <div class="col-md-12">
@@ -121,28 +126,7 @@
         </div>
       </div>
       <!--end wrapper-->
-      <script>
-        document.addEventListener("DOMContentLoaded", function() {
-          var toggle = document.querySelector("#show_hide_password a");
-          var input = document.querySelector("#show_hide_password input");
-          var icon = document.querySelector("#show_hide_password i");
-
-          if (toggle && input && icon) {
-            toggle.addEventListener("click", function(event) {
-              event.preventDefault();
-              if (input.type === "text") {
-                input.type = "password";
-                icon.classList.add("bx-hide");
-                icon.classList.remove("bx-show");
-              } else if (input.type === "password") {
-                input.type = "text";
-                icon.classList.remove("bx-hide");
-                icon.classList.add("bx-show");
-              }
-            });
-          }
-        });
-      </script>
+      <%= javascript_include_tag "session_password_toggle", defer: true %>
       <!--app JS-->
     </body>
   </div>
