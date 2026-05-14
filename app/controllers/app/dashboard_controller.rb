@@ -152,7 +152,6 @@ class App::DashboardController < ApplicationController
   end
 
   def onboarding_welcome_eligible?
-    return false if current_user.tecnico?
     return true if @onboarding_progress.nil?
     return false if @onboarding_progress.dismissed_at.present?
     return false if @onboarding_progress.finished_at.present?

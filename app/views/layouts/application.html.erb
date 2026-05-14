@@ -47,7 +47,7 @@
   <div class="wrapper">
     <%= render 'layouts/partials/sidebar' %>
     <%= render 'layouts/partials/navbar' %>
-    <% if request.subdomain == "app" && current_user.present? && !current_user.tecnico? %>
+    <% if request.subdomain == "app" && current_user.present? %>
       <%= render "app/dashboard/onboarding_tour" %>
     <% end %>
 
