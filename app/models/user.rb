@@ -107,9 +107,12 @@ class User < ApplicationRecord
   end
 
   def send_welcome_email!(mark_as_sent: true)
+    return false if welcome_email_sent_at.present?
+
     token = set_reset_password_token
     UserMailer.welcome_email(self, token).deliver_later
     update_column(:welcome_email_sent_at, Time.current) if mark_as_sent
+    true
   end
 
   def send_signup_confirmation_email!(expires_in: 48.hours, mark_as_sent: true)
@@ -164,7 +167,7 @@ class User < ApplicationRecord
 
   def send_welcome_email_for_technician
     Rails.logger.info "###### Enviando email de boas-vindas para o técnico #{email} ######"
-    send_welcome_email!(mark_as_sent: false)
+    send_welcome_email!
   end
 
   def auditable_created_action
