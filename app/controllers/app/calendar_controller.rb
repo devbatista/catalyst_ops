@@ -25,16 +25,22 @@ class App::CalendarController < ApplicationController
     end
 
     events = order_services.includes(:users).distinct.map do |os|
+      start_at = os.finalizada? ? (os.finished_at || os.scheduled_at) : os.scheduled_at
+      end_at = os.finalizada? ? (os.finished_at || os.expected_end_at || start_at) : os.expected_end_at
+      next if start_at.blank?
+
       {
         id: os.id,
         base_title: os.title,
         default_title: "#{os.title} - Técnicos: #{os.users.map(&:name).join(', ')}",
-        start: os.scheduled_at,
-        end: os.expected_end_at,
+        status: os.status,
+        status_label: os.status.humanize,
+        start: start_at,
+        end: end_at,
         technicians: os.users.map { |user| { id: user.id, name: user.name } },
         url: app_order_service_url(os, subdomain: "app"), allow_other_host: true
       }
-    end
+    end.compact
 
     render json: events
   end
