@@ -42,7 +42,7 @@ class Admin::ConfigurationsController < AdminController
   end
 
   def profile_params
-    params.require(:user).permit(:name, :email, :phone, :password, :password_confirmation)
+    params.require(:user).permit(:name, :phone, :password, :password_confirmation)
   end
 
   def load_configuration_dashboard

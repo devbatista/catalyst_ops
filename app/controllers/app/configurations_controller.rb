@@ -1,8 +1,8 @@
 class App::ConfigurationsController < ApplicationController
-  skip_authorization_check 
+  skip_authorization_check
   before_action :set_subscription_for_management, only: [:cancel_subscription, :resume_subscription]
   before_action :authorize_subscription_management, only: [:cancel_subscription, :resume_subscription]
-  
+
   def index; end
 
   def update_profile
@@ -72,12 +72,12 @@ class App::ConfigurationsController < ApplicationController
   private
 
   def profile_params
-    params.require(:user).permit(:name, :email, :phone, :password, :password_confirmation)
+    params.require(:user).permit(:name, :phone, :password, :password_confirmation)
   end
 
   def company_params
     permitted = params.require(:company).permit(
-      :name, :document, :email, :phone, :street, :number, :complement,
+      :name, :document, :phone, :street, :number, :complement,
       :neighborhood, :city, :state, :zip_code
     )
 
