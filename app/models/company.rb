@@ -12,12 +12,22 @@ class Company < ApplicationRecord
   has_many :coupon_redemptions, dependent: :restrict_with_exception
 
   has_one :current_subscription, -> { current }, class_name: "Subscription"
+  has_many :pdf_settings, class_name: "CompanyPdfSetting", dependent: :destroy
+  has_one :order_service_pdf_setting,
+          -> { where(document_type: "order_service") },
+          class_name: "CompanyPdfSetting",
+          inverse_of: :company
+  has_one :budget_pdf_setting,
+          -> { where(document_type: "budget") },
+          class_name: "CompanyPdfSetting",
+          inverse_of: :company
 
   belongs_to :responsible, class_name: "User", optional: true
   belongs_to :plan, optional: true
   belongs_to :terms_accepted_by_user, class_name: "User", optional: true
 
   PAYMENT_METHODS = %w[pix credit_card boleto].freeze
+  PDF_CUSTOMIZATION_PLAN_NAMES = %w[Profissional Enterprise].freeze
   
   before_validation :normalize_document
   before_validation { self.email = email.to_s.downcase.strip if email.present? }
@@ -128,6 +138,19 @@ class Company < ApplicationRecord
 
   def accepted_current_terms?
     terms_version_accepted == TermsOfUse.current_version && terms_accepted_at.present?
+  end
+
+  def pdf_setting_or_default(document_type = "order_service")
+    pdf_setting_for(document_type) || pdf_settings.build(document_type: document_type)
+  end
+
+  def pdf_setting_for(document_type)
+    pdf_settings.detect { |setting| setting.document_type == document_type.to_s } ||
+      pdf_settings.find_by(document_type: document_type)
+  end
+
+  def pdf_customization_available?
+    PDF_CUSTOMIZATION_PLAN_NAMES.include?((current_plan || plan)&.name)
   end
 
   def accept_current_terms!(user:, ip_address:, user_agent:)

@@ -51,6 +51,9 @@ constraints subdomain: "app" do
     collection do
       patch :update_profile
       patch :update_company
+      patch :update_pdf_settings
+      delete :remove_pdf_logo
+      get :preview_pdf_settings
       patch :cancel_subscription
       patch :resume_subscription
       post :promote_manager

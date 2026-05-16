@@ -1,5 +1,8 @@
 <div class="page-wrapper configurations-page">
   <div class="page-content">
+    <% active_tab = @active_config_tab.presence || params[:tab].presence || "perfil" %>
+    <% active_tab = "perfil" unless %w[perfil gestores empresa pdf assinatura].include?(active_tab) %>
+
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
       <div>
         <h4 class="mb-1 text-uppercase">Configurações</h4>
@@ -22,7 +25,7 @@
             <div class="text-uppercase small fw-semibold text-muted mb-3">Seções</div>
             <ul class="list-unstyled nav nav-pills flex-column gap-2" id="configTabs" role="tablist">
               <li>
-                <a class="nav-link active d-flex align-items-center gap-2" id="tab-perfil" data-bs-toggle="pill" href="#perfil" role="tab" aria-controls="perfil" aria-selected="true">
+                <a class="nav-link <%= "active" if active_tab == "perfil" %> d-flex align-items-center gap-2" id="tab-perfil" data-bs-toggle="pill" href="#perfil" role="tab" aria-controls="perfil" aria-selected="<%= active_tab == "perfil" %>">
                   <i class="bx bx-user"></i>
                   <span>Perfil</span>
                 </a>
@@ -30,7 +33,7 @@
 
               <% if can?(:manage, User) %>
                 <li>
-                  <a class="nav-link d-flex align-items-center gap-2" id="tab-gestores" data-bs-toggle="pill" href="#gestores" role="tab" aria-controls="gestores" aria-selected="false">
+                  <a class="nav-link <%= "active" if active_tab == "gestores" %> d-flex align-items-center gap-2" id="tab-gestores" data-bs-toggle="pill" href="#gestores" role="tab" aria-controls="gestores" aria-selected="<%= active_tab == "gestores" %>">
                     <i class="bx bx-group"></i>
                     <span>Gestores</span>
                   </a>
@@ -38,15 +41,22 @@
               <% end %>
 
               <li>
-                <a class="nav-link d-flex align-items-center gap-2" id="tab-empresa" data-bs-toggle="pill" href="#empresa" role="tab" aria-controls="empresa" aria-selected="false">
+                <a class="nav-link <%= "active" if active_tab == "empresa" %> d-flex align-items-center gap-2" id="tab-empresa" data-bs-toggle="pill" href="#empresa" role="tab" aria-controls="empresa" aria-selected="<%= active_tab == "empresa" %>">
                   <i class="bx bx-buildings"></i>
                   <span>Dados da Empresa</span>
                 </a>
               </li>
 
+              <li>
+                <a class="nav-link <%= "active" if active_tab == "pdf" %> d-flex align-items-center gap-2" id="tab-pdf" data-bs-toggle="pill" href="#pdf" role="tab" aria-controls="pdf" aria-selected="<%= active_tab == "pdf" %>">
+                  <i class="bx bxs-file-pdf"></i>
+                  <span>PDF</span>
+                </a>
+              </li>
+
               <% if can?(:manage, Subscription) %>
                 <li>
-                  <a class="nav-link d-flex align-items-center gap-2" id="tab-assinatura" data-bs-toggle="pill" href="#assinatura" role="tab" aria-controls="assinatura" aria-selected="false">
+                  <a class="nav-link <%= "active" if active_tab == "assinatura" %> d-flex align-items-center gap-2" id="tab-assinatura" data-bs-toggle="pill" href="#assinatura" role="tab" aria-controls="assinatura" aria-selected="<%= active_tab == "assinatura" %>">
                     <i class="bx bx-credit-card"></i>
                     <span>Assinatura</span>
                   </a>
@@ -58,22 +68,26 @@
 
         <div class="col-12 col-lg-9 col-xl-10">
           <div class="tab-content p-3 p-lg-4" id="configTabsContent">
-            <div class="tab-pane fade show active" id="perfil" role="tabpanel" aria-labelledby="tab-perfil">
+            <div class="tab-pane fade <%= "show active" if active_tab == "perfil" %>" id="perfil" role="tabpanel" aria-labelledby="tab-perfil">
               <%= render "profile_form", user: current_user %>
             </div>
 
-            <div class="tab-pane fade" id="gestores" role="tabpanel" aria-labelledby="tab-gestores">
+            <div class="tab-pane fade <%= "show active" if active_tab == "gestores" %>" id="gestores" role="tabpanel" aria-labelledby="tab-gestores">
               <% if can?(:manage, User) %>
                 <%= render "managers" %>
               <% end %>
             </div>
 
-            <div class="tab-pane fade" id="empresa" role="tabpanel" aria-labelledby="tab-empresa">
+            <div class="tab-pane fade <%= "show active" if active_tab == "empresa" %>" id="empresa" role="tabpanel" aria-labelledby="tab-empresa">
               <%= render "company_data" %>
             </div>
 
+            <div class="tab-pane fade <%= "show active" if active_tab == "pdf" %>" id="pdf" role="tabpanel" aria-labelledby="tab-pdf">
+              <%= render "pdf_settings", company: current_user.company %>
+            </div>
+
             <% if can?(:manage, Subscription) %>
-              <div class="tab-pane fade" id="assinatura" role="tabpanel" aria-labelledby="tab-assinatura">
+              <div class="tab-pane fade <%= "show active" if active_tab == "assinatura" %>" id="assinatura" role="tabpanel" aria-labelledby="tab-assinatura">
                 <%= render "subscription" %>
               </div>
             <% end %>

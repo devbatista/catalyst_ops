@@ -13,6 +13,11 @@ class PdfGenerator
     self
   end
 
+  def image(*args)
+    @pdf.image(*args)
+    self
+  end
+
   def font_size(size, &block)
     @pdf.font_size(size, &block)
     self
