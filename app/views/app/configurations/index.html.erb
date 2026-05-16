@@ -83,7 +83,7 @@
             </div>
 
             <div class="tab-pane fade <%= "show active" if active_tab == "pdf" %>" id="pdf" role="tabpanel" aria-labelledby="tab-pdf">
-              <%= render "pdf_settings", company: current_user.company, pdf_setting: current_user.company.pdf_setting_or_default %>
+              <%= render "pdf_settings", company: current_user.company %>
             </div>
 
             <% if can?(:manage, Subscription) %>

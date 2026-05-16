@@ -12,7 +12,15 @@ class Company < ApplicationRecord
   has_many :coupon_redemptions, dependent: :restrict_with_exception
 
   has_one :current_subscription, -> { current }, class_name: "Subscription"
-  has_one :pdf_setting, class_name: "CompanyPdfSetting", dependent: :destroy
+  has_many :pdf_settings, class_name: "CompanyPdfSetting", dependent: :destroy
+  has_one :order_service_pdf_setting,
+          -> { where(document_type: "order_service") },
+          class_name: "CompanyPdfSetting",
+          inverse_of: :company
+  has_one :budget_pdf_setting,
+          -> { where(document_type: "budget") },
+          class_name: "CompanyPdfSetting",
+          inverse_of: :company
 
   belongs_to :responsible, class_name: "User", optional: true
   belongs_to :plan, optional: true
@@ -132,8 +140,13 @@ class Company < ApplicationRecord
     terms_version_accepted == TermsOfUse.current_version && terms_accepted_at.present?
   end
 
-  def pdf_setting_or_default
-    pdf_setting || build_pdf_setting
+  def pdf_setting_or_default(document_type = "order_service")
+    pdf_setting_for(document_type) || pdf_settings.build(document_type: document_type)
+  end
+
+  def pdf_setting_for(document_type)
+    pdf_settings.detect { |setting| setting.document_type == document_type.to_s } ||
+      pdf_settings.find_by(document_type: document_type)
   end
 
   def pdf_customization_available?

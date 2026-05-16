@@ -1,0 +1,170 @@
+<div class="border rounded-3 p-3 p-lg-4">
+  <h6 class="mb-3"><%= title %></h6>
+
+  <%= form_with model: pdf_setting, url: update_pdf_settings_app_configurations_path, method: :patch, local: true do |f| %>
+    <%= f.hidden_field :document_type %>
+
+    <div class="row mb-4 align-items-center">
+      <div class="col-sm-3"><h6 class="mb-0 text-secondary">Personalizar PDF</h6></div>
+      <div class="col-sm-9">
+        <div class="form-check form-switch pdf-toggle-wrap">
+          <%= f.check_box :customization_enabled,
+                          class: "form-check-input pdf-customization-toggle",
+                          role: "switch",
+                          data: { target: "#{pdf_setting.document_type}_pdf_custom_fields" } %>
+          <%= f.label :customization_enabled, class: "form-check-label pdf-toggle-label" do %>
+            <span class="pdf-toggle-title">Personalizar PDF</span>
+            <span class="pdf-toggle-status"><%= pdf_setting.customization_enabled? ? "Ativo" : "Inativo" %></span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div id="<%= pdf_setting.document_type %>_pdf_custom_fields" class="pdf-custom-fields <%= "d-none" unless pdf_setting.customization_enabled? %>">
+      <div class="row mb-3 align-items-center">
+        <div class="col-sm-3"><h6 class="mb-0 text-secondary">Cor principal</h6></div>
+        <div class="col-sm-9">
+          <div class="d-flex align-items-center gap-2">
+            <%= f.color_field :accent_color, value: "##{pdf_setting.accent_color.presence || CompanyPdfSetting::DEFAULT_ACCENT_COLOR}", class: "form-control form-control-color" %>
+            <span class="text-muted small"><%= "##{pdf_setting.accent_color.presence || CompanyPdfSetting::DEFAULT_ACCENT_COLOR}" %></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-3 align-items-center">
+        <div class="col-sm-3"><h6 class="mb-0 text-secondary">Subtítulo</h6></div>
+        <div class="col-sm-9">
+          <%= f.text_field :header_subtitle, class: "form-control", maxlength: 80, placeholder: "Detalhes do documento" %>
+        </div>
+      </div>
+
+      <div class="row mb-3 align-items-center">
+        <div class="col-sm-3"><h6 class="mb-0 text-secondary">Nota do documento</h6></div>
+        <div class="col-sm-9">
+          <%= f.text_area :document_note, class: "form-control", rows: 2, maxlength: 160, placeholder: "Mensagem exibida neste PDF." %>
+        </div>
+      </div>
+
+      <div class="row mb-4 align-items-center">
+        <div class="col-sm-3"><h6 class="mb-0 text-secondary">Rodapé</h6></div>
+        <div class="col-sm-9">
+          <%= f.text_field :footer_text, class: "form-control", maxlength: 120, placeholder: "Nome da empresa • Documento gerado pelo Catalyst Ops" %>
+        </div>
+      </div>
+
+      <div class="row mb-4">
+        <div class="col-sm-3"><h6 class="mb-0 text-secondary">Seções exibidas</h6></div>
+        <div class="col-sm-9">
+          <div class="row g-2">
+            <div class="col-md-6">
+              <div class="form-check">
+                <%= f.check_box :show_company_data, class: "form-check-input" %>
+                <%= f.label :show_company_data, "Dados da empresa", class: "form-check-label" %>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-check">
+                <%= f.check_box :show_client_data, class: "form-check-input" %>
+                <%= f.label :show_client_data, "Dados do cliente", class: "form-check-label" %>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-check">
+                <%= f.check_box :show_service_description, class: "form-check-input" %>
+                <%= f.label :show_service_description, description_label, class: "form-check-label" %>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-check">
+                <%= f.check_box :show_service_items, class: "form-check-input" %>
+                <%= f.label :show_service_items, items_label, class: "form-check-label" %>
+              </div>
+            </div>
+
+            <% if show_observations_controls %>
+              <div class="col-md-6">
+                <div class="form-check">
+                  <%= f.check_box :show_observations, class: "form-check-input" %>
+                  <%= f.label :show_observations, "Observações", class: "form-check-label" %>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check">
+                  <%= f.check_box :show_discount_reason, class: "form-check-input" %>
+                  <%= f.label :show_discount_reason, "Motivo do desconto", class: "form-check-label" %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-3 d-none d-sm-block"></div>
+        <div class="col-sm-9">
+          <%= button_tag type: :submit, class: "btn btn-primary px-4 d-inline-flex align-items-center gap-2 shadow-sm" do %>
+            <i class="bx bx-save"></i>
+            <span>Salvar <%= title %></span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<style>
+  .pdf-toggle-wrap {
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    display: inline-flex;
+    gap: 0.85rem;
+    min-height: 48px;
+    padding: 0.65rem 0.9rem;
+  }
+
+  .pdf-toggle-wrap .form-check-input {
+    border-color: #cbd5e1;
+    box-shadow: none;
+    cursor: pointer;
+    height: 1.35rem;
+    margin: 0;
+    width: 2.55rem;
+  }
+
+  .pdf-toggle-wrap .form-check-input:checked {
+    background-color: #2563eb;
+    border-color: #2563eb;
+  }
+
+  .pdf-toggle-wrap .form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.18);
+  }
+
+  .pdf-toggle-label {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    line-height: 1.15;
+    margin: 0;
+  }
+
+  .pdf-toggle-title {
+    color: #0f172a;
+    font-size: 0.92rem;
+    font-weight: 600;
+  }
+
+  .pdf-toggle-status {
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+
+  .pdf-toggle-wrap:has(.form-check-input:checked) {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+  }
+</style>

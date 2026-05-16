@@ -13,7 +13,9 @@ RSpec.describe Cmd::Pdf::Create do
     it "generates a PDF with customized company settings" do
       order_service = build_order_service
       order_service.company.plan = build(:plan, :profissional)
-      order_service.company.build_pdf_setting(
+      order_service.company.pdf_settings.build(
+        document_type: "order_service",
+        customization_enabled: true,
         accent_color: "0F766E",
         header_subtitle: "Atendimento técnico",
         document_note: "Documento personalizado da empresa.",

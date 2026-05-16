@@ -33,11 +33,17 @@ class App::ConfigurationsController < ApplicationController
 
   def update_pdf_settings
     unless current_user.company.pdf_customization_available?
-      redirect_to app_configurations_path(tab: "pdf"), alert: "Personalização do PDF disponível apenas nos planos Profissional e Enterprise."
+      redirect_to app_configurations_path(tab: "pdf"), alert: "Personalização dos PDFs disponível apenas nos planos Profissional e Enterprise."
       return
     end
 
-    pdf_setting = current_user.company.pdf_setting_or_default
+    document_type = params.dig(:company_pdf_setting, :document_type).to_s
+    unless CompanyPdfSetting::DOCUMENT_TYPES.include?(document_type)
+      redirect_to app_configurations_path(tab: "pdf"), alert: "Tipo de PDF inválido."
+      return
+    end
+
+    pdf_setting = current_user.company.pdf_setting_or_default(document_type)
 
     if pdf_setting.update(pdf_setting_params)
       redirect_to app_configurations_path(tab: "pdf"), notice: "Configurações do PDF atualizadas com sucesso."
@@ -109,6 +115,8 @@ class App::ConfigurationsController < ApplicationController
   def pdf_setting_params
     params.require(:company_pdf_setting).permit(
       :accent_color,
+      :document_type,
+      :customization_enabled,
       :header_subtitle,
       :document_note,
       :footer_text,

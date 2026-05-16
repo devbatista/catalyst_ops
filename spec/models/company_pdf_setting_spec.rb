@@ -4,6 +4,8 @@ RSpec.describe CompanyPdfSetting, type: :model do
   subject(:setting) { build(:company_pdf_setting) }
 
   it { is_expected.to belong_to(:company) }
+  it { is_expected.to validate_presence_of(:document_type) }
+  it { is_expected.to validate_inclusion_of(:document_type).in_array(%w[order_service budget]) }
   it { is_expected.to validate_length_of(:header_subtitle).is_at_most(80) }
   it { is_expected.to validate_length_of(:document_note).is_at_most(160) }
   it { is_expected.to validate_length_of(:footer_text).is_at_most(120) }
@@ -24,10 +26,26 @@ RSpec.describe CompanyPdfSetting, type: :model do
     expect(setting.accent_color).to eq("1F6FEB")
   end
 
+  it "is disabled by default" do
+    expect(setting).not_to be_enabled
+  end
+
   it "rejects invalid accent colors" do
     setting.accent_color = "blue"
 
     expect(setting).not_to be_valid
     expect(setting.errors[:accent_color]).to include("deve ser uma cor hexadecimal valida")
+  end
+
+  it "identifies order service settings" do
+    expect(setting).to be_order_service
+    expect(setting).not_to be_budget
+  end
+
+  it "identifies budget settings" do
+    setting.document_type = "budget"
+
+    expect(setting).to be_budget
+    expect(setting).not_to be_order_service
   end
 end

@@ -9,22 +9,26 @@ module Cmd
 
       def generate_pdf_data
         pdf = PdfGenerator.new
-        header_bg = "21262E"
+        settings = pdf_settings
+        header_bg = settings&.accent_color.presence || "21262E"
         border = "D9DDE3"
         soft_bg = "F3F5F7"
         muted = "6B7280"
         text = "111827"
         page_width = pdf.bounds.width
+        header_subtitle = settings&.header_subtitle.presence || "Revise os dados antes de aprovar ou rejeitar."
+        document_note = settings&.document_note.presence
+        footer_text = settings&.footer_text.presence
 
         # Header dark bar (with better paddings and inset)
         pdf.bounding_box([pdf.bounds.left, pdf.cursor], width: page_width) do
           header_data = [[
             {
-              content: "<b>Orçamento</b>\n<font size='2'> </font>\n<font size='10' color='C8CDD3'>Revise os dados antes de aprovar ou rejeitar.</font>",
+              content: "<b>Orçamento</b>\n<font size='2'> </font>\n<font size='10' color='C8CDD3'>#{inline_safe(header_subtitle)}</font>",
               inline_format: true,
               background_color: header_bg,
               text_color: "FFFFFF",
-              border_color: "1C2128",
+              border_color: header_bg,
               size: 16,
               padding: [12, 14, 12, 14],
               valign: :center
@@ -52,12 +56,14 @@ module Cmd
         pdf.move_down(14)
 
         # Cards Cliente / Empresa
-        cards = [[
-          { content: "<font size='9' color='6B7280'>Cliente</font>\n<b>#{@client&.name}</b>", inline_format: true, background_color: soft_bg, border_color: border, size: 10, padding: [10, 12, 10, 12] },
-          { content: "<font size='9' color='6B7280'>Empresa</font>\n<b>#{@company&.name}</b>", inline_format: true, background_color: soft_bg, border_color: border, size: 10, padding: [10, 12, 10, 12] }
-        ]]
-        pdf.table(cards, width: page_width, cell_style: { inline_format: true }, column_widths: [page_width / 2, page_width / 2])
-        pdf.move_down(14)
+        cards = []
+        cards << { content: "<font size='9' color='6B7280'>Cliente</font>\n<b>#{inline_safe(@client&.name)}</b>", inline_format: true, background_color: soft_bg, border_color: border, size: 10, padding: [10, 12, 10, 12] } if show_client_data?
+        cards << { content: "<font size='9' color='6B7280'>Empresa</font>\n<b>#{inline_safe(@company&.name)}</b>", inline_format: true, background_color: soft_bg, border_color: border, size: 10, padding: [10, 12, 10, 12] } if show_company_data?
+
+        if cards.present?
+          pdf.table([cards], width: page_width, cell_style: { inline_format: true }, column_widths: Array.new(cards.size, page_width / cards.size))
+          pdf.move_down(14)
+        end
 
         # Meta info
         info_data = [
@@ -80,63 +86,115 @@ module Cmd
         end
         pdf.move_down(10)
 
-        pdf.fill_color(text)
-        pdf.font_size(11) { pdf.text("Descrição:", style: :bold) }
-        pdf.move_down(6)
-        pdf.table(
-          [[@record.description.to_s]],
-          width: page_width,
-          cell_style: { size: 10, padding: [8, 10, 8, 10], border_color: border, background_color: "FFFFFF" }
-        )
-        pdf.move_down(12)
-
-        pdf.fill_color(muted)
-        pdf.font_size(12) { pdf.text("ITENS DO ORÇAMENTO", style: :bold) }
-        pdf.fill_color(text)
-        pdf.move_down(4)
-
-        item_rows = [[ "Descrição", "Qtd.", "Valor unitário", "Total" ]]
-        @record.service_items.order(:created_at).each do |item|
-          item_rows << [
-            item.description.to_s,
-            item.quantity.to_s,
-            brl(item.unit_price),
-            brl(item.quantity.to_d * item.unit_price.to_d)
-          ]
+        if show_description?
+          pdf.fill_color(text)
+          pdf.font_size(11) { pdf.text("Descrição:", style: :bold) }
+          pdf.move_down(6)
+          pdf.table(
+            [[safe(@record.description)]],
+            width: page_width,
+            cell_style: { size: 10, padding: [8, 10, 8, 10], border_color: border, background_color: "FFFFFF" }
+          )
+          pdf.move_down(12)
         end
 
-        if item_rows.size == 1
-          item_rows << [ "Sem itens cadastrados", "-", "-", "-" ]
+        if show_items?
+          pdf.fill_color(muted)
+          pdf.font_size(12) { pdf.text("ITENS DO ORÇAMENTO", style: :bold) }
+          pdf.fill_color(text)
+          pdf.move_down(4)
+
+          item_rows = [[ "Descrição", "Qtd.", "Valor unitário", "Total" ]]
+          @record.service_items.order(:created_at).each do |item|
+            item_rows << [
+              safe(item.description),
+              item.quantity.to_s,
+              brl(item.unit_price),
+              brl(item.quantity.to_d * item.unit_price.to_d)
+            ]
+          end
+
+          if item_rows.size == 1
+            item_rows << [ "Sem itens cadastrados", "-", "-", "-" ]
+          end
+
+          pdf.table(
+            item_rows,
+            header: true,
+            width: page_width,
+            cell_style: { size: 10, padding: [8, 10, 8, 10], border_color: border, inline_format: true },
+            row_colors: [ "FFFFFF", soft_bg ],
+            column_widths: [page_width * 0.42, page_width * 0.12, page_width * 0.23, page_width * 0.23]
+          ) do |table|
+            table.row(0).font_style = :bold
+            table.row(0).background_color = "E9EDF2"
+            table.row(0).text_color = "1F2937"
+            table.row(0).borders = [:top, :bottom, :left, :right]
+
+            table.columns(1..3).align = :right
+            table.rows(1..-1).columns(0).align = :left
+
+            table.cells.border_width = 1
+          end
+          pdf.move_down(10)
         end
 
-        pdf.table(
-          item_rows,
-          header: true,
-          width: page_width,
-          cell_style: { size: 10, padding: [8, 10, 8, 10], border_color: border, inline_format: true },
-          row_colors: [ "FFFFFF", soft_bg ],
-          column_widths: [page_width * 0.42, page_width * 0.12, page_width * 0.23, page_width * 0.23]
-        ) do |table|
-          table.row(0).font_style = :bold
-          table.row(0).background_color = "E9EDF2"
-          table.row(0).text_color = "1F2937"
-          table.row(0).borders = [:top, :bottom, :left, :right]
-
-          table.columns(1..3).align = :right
-          table.rows(1..-1).columns(0).align = :left
-
-          table.cells.border_width = 1
+        if document_note.present?
+          pdf.text safe(document_note), size: 9, color: muted
+          pdf.move_down(8)
         end
-        pdf.move_down(10)
+
         pdf.table(
           [[{ content: "Total: #{brl(total_value)}", align: :right, font_style: :bold }]],
           width: page_width,
           cell_style: { size: 16, padding: [8, 10, 8, 10], border_color: border, background_color: "F8FAFC" }
         )
+
+        if footer_text.present?
+          pdf.move_down(10)
+          pdf.stroke_color border
+          pdf.stroke_horizontal_rule
+          pdf.move_down(6)
+          pdf.fill_color muted
+          pdf.text safe(footer_text), size: 8, align: :center
+          pdf.fill_color "000000"
+        end
+
         pdf.render
       end
 
       private
+
+      def pdf_settings
+        @pdf_settings ||= begin
+          setting = @company&.pdf_setting_for(:budget)
+          setting if @company&.pdf_customization_available? && setting&.enabled?
+        end
+      end
+
+      def show_company_data?
+        pdf_settings.blank? || pdf_settings.show_company_data?
+      end
+
+      def show_client_data?
+        pdf_settings.blank? || pdf_settings.show_client_data?
+      end
+
+      def show_description?
+        pdf_settings.blank? || pdf_settings.show_service_description?
+      end
+
+      def show_items?
+        pdf_settings.blank? || pdf_settings.show_service_items?
+      end
+
+      def safe(value)
+        value.to_s.strip.presence || "-"
+      end
+
+      def inline_safe(value)
+        ERB::Util.html_escape(safe(value))
+      end
 
       def brl(value)
         ActionController::Base.helpers.number_to_currency(

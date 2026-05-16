@@ -268,11 +268,10 @@ module Cmd
       private
 
       def pdf_settings
-        @pdf_settings ||= if @company&.pdf_customization_available?
-          @company.pdf_setting || CompanyPdfSetting.new
-        else
-          CompanyPdfSetting.new
-        end
+        @pdf_settings ||= begin
+          setting = @company&.pdf_setting_for(:order_service)
+          setting if @company&.pdf_customization_available? && setting&.enabled?
+        end || CompanyPdfSetting.new(document_type: "order_service")
       end
 
       def safe(value)
