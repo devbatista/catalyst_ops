@@ -1,0 +1,96 @@
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-white py-3">
+    <h5 class="card-title mb-0">Personalização do PDF</h5>
+  </div>
+  <div class="card-body p-4">
+    <% unless company.pdf_customization_available? %>
+      <div class="alert alert-warning mb-0">
+        A personalização do PDF está disponível apenas nos planos Profissional e Enterprise.
+      </div>
+    <% else %>
+      <%= form_with model: pdf_setting, url: update_pdf_settings_app_configurations_path, method: :patch, local: true do |f| %>
+        <div class="row mb-3 align-items-center">
+          <div class="col-sm-3"><h6 class="mb-0 text-secondary">Cor principal</h6></div>
+          <div class="col-sm-9">
+            <div class="d-flex align-items-center gap-2">
+              <%= f.color_field :accent_color, value: "##{pdf_setting.accent_color.presence || CompanyPdfSetting::DEFAULT_ACCENT_COLOR}", class: "form-control form-control-color" %>
+              <span class="text-muted small"><%= "##{pdf_setting.accent_color.presence || CompanyPdfSetting::DEFAULT_ACCENT_COLOR}" %></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-3 align-items-center">
+          <div class="col-sm-3"><h6 class="mb-0 text-secondary">Subtítulo</h6></div>
+          <div class="col-sm-9">
+            <%= f.text_field :header_subtitle, class: "form-control", maxlength: 80, placeholder: "Detalhes completos da execução" %>
+          </div>
+        </div>
+
+        <div class="row mb-3 align-items-center">
+          <div class="col-sm-3"><h6 class="mb-0 text-secondary">Nota do documento</h6></div>
+          <div class="col-sm-9">
+            <%= f.text_area :document_note, class: "form-control", rows: 2, maxlength: 160, placeholder: "Documento gerado automaticamente para conferência da execução." %>
+          </div>
+        </div>
+
+        <div class="row mb-4 align-items-center">
+          <div class="col-sm-3"><h6 class="mb-0 text-secondary">Rodapé</h6></div>
+          <div class="col-sm-9">
+            <%= f.text_field :footer_text, class: "form-control", maxlength: 120, placeholder: "Catalyst Ops • Ordem de Serviço #..." %>
+          </div>
+        </div>
+
+        <div class="row mb-4">
+          <div class="col-sm-3"><h6 class="mb-0 text-secondary">Seções exibidas</h6></div>
+          <div class="col-sm-9">
+            <div class="row g-2">
+              <div class="col-md-6">
+                <div class="form-check">
+                  <%= f.check_box :show_company_data, class: "form-check-input" %>
+                  <%= f.label :show_company_data, "Dados da empresa", class: "form-check-label" %>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check">
+                  <%= f.check_box :show_client_data, class: "form-check-input" %>
+                  <%= f.label :show_client_data, "Dados do cliente", class: "form-check-label" %>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check">
+                  <%= f.check_box :show_service_description, class: "form-check-input" %>
+                  <%= f.label :show_service_description, "Descrição do serviço", class: "form-check-label" %>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check">
+                  <%= f.check_box :show_service_items, class: "form-check-input" %>
+                  <%= f.label :show_service_items, "Itens de serviço", class: "form-check-label" %>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check">
+                  <%= f.check_box :show_observations, class: "form-check-input" %>
+                  <%= f.label :show_observations, "Observações", class: "form-check-label" %>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-check">
+                  <%= f.check_box :show_discount_reason, class: "form-check-input" %>
+                  <%= f.label :show_discount_reason, "Motivo do desconto", class: "form-check-label" %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-3 d-none d-sm-block"></div>
+          <div class="col-sm-9">
+            <%= f.submit "Salvar personalização", class: "btn btn-success px-4" %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

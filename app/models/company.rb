@@ -12,12 +12,14 @@ class Company < ApplicationRecord
   has_many :coupon_redemptions, dependent: :restrict_with_exception
 
   has_one :current_subscription, -> { current }, class_name: "Subscription"
+  has_one :pdf_setting, class_name: "CompanyPdfSetting", dependent: :destroy
 
   belongs_to :responsible, class_name: "User", optional: true
   belongs_to :plan, optional: true
   belongs_to :terms_accepted_by_user, class_name: "User", optional: true
 
   PAYMENT_METHODS = %w[pix credit_card boleto].freeze
+  PDF_CUSTOMIZATION_PLAN_NAMES = %w[Profissional Enterprise].freeze
   
   before_validation :normalize_document
   before_validation { self.email = email.to_s.downcase.strip if email.present? }
@@ -128,6 +130,14 @@ class Company < ApplicationRecord
 
   def accepted_current_terms?
     terms_version_accepted == TermsOfUse.current_version && terms_accepted_at.present?
+  end
+
+  def pdf_setting_or_default
+    pdf_setting || build_pdf_setting
+  end
+
+  def pdf_customization_available?
+    PDF_CUSTOMIZATION_PLAN_NAMES.include?((current_plan || plan)&.name)
   end
 
   def accept_current_terms!(user:, ip_address:, user_agent:)

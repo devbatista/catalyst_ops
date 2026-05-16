@@ -31,6 +31,23 @@ class App::ConfigurationsController < ApplicationController
     end
   end
 
+  def update_pdf_settings
+    unless current_user.company.pdf_customization_available?
+      redirect_to app_configurations_path(tab: "pdf"), alert: "Personalização do PDF disponível apenas nos planos Profissional e Enterprise."
+      return
+    end
+
+    pdf_setting = current_user.company.pdf_setting_or_default
+
+    if pdf_setting.update(pdf_setting_params)
+      redirect_to app_configurations_path(tab: "pdf"), notice: "Configurações do PDF atualizadas com sucesso."
+    else
+      @active_config_tab = "pdf"
+      flash.now[:alert] = pdf_setting.errors.full_messages.to_sentence
+      render :index, status: :unprocessable_entity
+    end
+  end
+
   def promote_manager
     company = current_user.company
     user = company.users.find_by(id: params[:user_id])
@@ -87,6 +104,21 @@ class App::ConfigurationsController < ApplicationController
     end
 
     permitted
+  end
+
+  def pdf_setting_params
+    params.require(:company_pdf_setting).permit(
+      :accent_color,
+      :header_subtitle,
+      :document_note,
+      :footer_text,
+      :show_company_data,
+      :show_client_data,
+      :show_service_description,
+      :show_service_items,
+      :show_observations,
+      :show_discount_reason
+    )
   end
 
   def set_subscription_for_management
