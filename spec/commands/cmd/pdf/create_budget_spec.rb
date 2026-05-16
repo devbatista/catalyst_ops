@@ -13,7 +13,7 @@ RSpec.describe Cmd::Pdf::CreateBudget do
     it "generates a budget PDF with customized company settings" do
       budget = build_budget
       budget.company.plan = build(:plan, :enterprise)
-      budget.company.pdf_settings.build(
+      setting = budget.company.pdf_settings.build(
         document_type: "budget",
         customization_enabled: true,
         accent_color: "0F766E",
@@ -25,6 +25,7 @@ RSpec.describe Cmd::Pdf::CreateBudget do
         show_service_description: false,
         show_service_items: false
       )
+      attach_logo(setting)
 
       pdf_data = described_class.new(budget).generate_pdf_data
 
@@ -39,5 +40,13 @@ RSpec.describe Cmd::Pdf::CreateBudget do
 
     budget.service_items.build(description: "Manutenção preventiva", quantity: 1, unit_price: 100)
     budget
+  end
+
+  def attach_logo(setting)
+    setting.logo.attach(
+      io: File.open(Rails.root.join("app/assets/images/logo-icon.png")),
+      filename: "logo-icon.png",
+      content_type: "image/png"
+    )
   end
 end

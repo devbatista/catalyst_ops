@@ -13,7 +13,7 @@ RSpec.describe Cmd::Pdf::Create do
     it "generates a PDF with customized company settings" do
       order_service = build_order_service
       order_service.company.plan = build(:plan, :profissional)
-      order_service.company.pdf_settings.build(
+      setting = order_service.company.pdf_settings.build(
         document_type: "order_service",
         customization_enabled: true,
         accent_color: "0F766E",
@@ -27,6 +27,7 @@ RSpec.describe Cmd::Pdf::Create do
         show_observations: false,
         show_discount_reason: false
       )
+      attach_logo(setting)
 
       pdf_data = described_class.new(order_service).generate_pdf_data
 
@@ -47,5 +48,13 @@ RSpec.describe Cmd::Pdf::Create do
 
     order_service.service_items.build(description: "Instalação", quantity: 1, unit_price: 100)
     order_service
+  end
+
+  def attach_logo(setting)
+    setting.logo.attach(
+      io: File.open(Rails.root.join("app/assets/images/logo-icon.png")),
+      filename: "logo-icon.png",
+      content_type: "image/png"
+    )
   end
 end

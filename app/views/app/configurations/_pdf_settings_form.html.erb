@@ -11,7 +11,11 @@
           <%= f.check_box :customization_enabled,
                           class: "form-check-input pdf-customization-toggle",
                           role: "switch",
-                          data: { target: "#{pdf_setting.document_type}_pdf_custom_fields" } %>
+                          data: {
+                            target: "#{pdf_setting.document_type}_pdf_custom_fields",
+                            url: update_pdf_settings_app_configurations_path,
+                            document_type: pdf_setting.document_type
+                          } %>
           <%= f.label :customization_enabled, class: "form-check-label pdf-toggle-label" do %>
             <span class="pdf-toggle-title">Personalizar PDF</span>
             <span class="pdf-toggle-status"><%= pdf_setting.customization_enabled? ? "Ativo" : "Inativo" %></span>
@@ -28,6 +32,49 @@
             <%= f.color_field :accent_color, value: "##{pdf_setting.accent_color.presence || CompanyPdfSetting::DEFAULT_ACCENT_COLOR}", class: "form-control form-control-color" %>
             <span class="text-muted small"><%= "##{pdf_setting.accent_color.presence || CompanyPdfSetting::DEFAULT_ACCENT_COLOR}" %></span>
           </div>
+        </div>
+      </div>
+
+      <div class="row mb-3 align-items-center">
+        <div class="col-sm-3"><h6 class="mb-0 text-secondary">Cor do texto</h6></div>
+        <div class="col-sm-9">
+          <div class="d-flex align-items-center gap-2">
+            <%= f.color_field :header_text_color,
+                              value: "##{pdf_setting.header_text_color.presence || "FFFFFF"}",
+                              class: "form-control form-control-color" %>
+            <span class="text-muted small"><%= "##{pdf_setting.header_text_color.presence || "FFFFFF"}" %></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-3 align-items-center">
+        <div class="col-sm-3"><h6 class="mb-0 text-secondary">Logo</h6></div>
+        <div class="col-sm-9">
+          <%= f.file_field :logo, class: "form-control", accept: "image/png,image/jpeg" %>
+          <% if pdf_setting.logo.attached? %>
+            <div class="pdf-logo-current mt-3">
+              <div class="pdf-logo-info">
+                <div class="pdf-logo-icon">
+                  <i class="bx bx-image"></i>
+                </div>
+                <div>
+                  <div class="pdf-logo-title">Logo atual</div>
+                  <div class="pdf-logo-name"><%= pdf_setting.logo.filename.to_s %></div>
+                </div>
+              </div>
+
+              <div>
+                <%= button_tag type: "button",
+                               class: "pdf-remove-logo-button",
+                               data: { url: remove_pdf_logo_app_configurations_path(document_type: pdf_setting.document_type) } do %>
+                  <i class="bx bx-trash"></i>
+                  <span>Remover</span>
+                <% end %>
+              </div>
+            </div>
+          <% else %>
+            <small class="text-muted d-block mt-2">PNG ou JPG até 2MB.</small>
+          <% end %>
         </div>
       </div>
 
@@ -102,10 +149,20 @@
       <div class="row">
         <div class="col-sm-3 d-none d-sm-block"></div>
         <div class="col-sm-9">
-          <%= button_tag type: :submit, class: "btn btn-primary px-4 d-inline-flex align-items-center gap-2 shadow-sm" do %>
-            <i class="bx bx-save"></i>
-            <span>Salvar <%= title %></span>
-          <% end %>
+          <div class="d-flex flex-wrap gap-2">
+            <%= button_tag type: :submit, class: "btn btn-primary px-4 d-inline-flex align-items-center gap-2 shadow-sm" do %>
+              <i class="bx bx-save"></i>
+              <span>Salvar <%= title %></span>
+            <% end %>
+
+            <%= link_to preview_pdf_settings_app_configurations_path(document_type: pdf_setting.document_type),
+                        class: "btn btn-outline-primary px-4 d-inline-flex align-items-center gap-2",
+                        target: "_blank",
+                        rel: "noopener" do %>
+              <i class="bx bx-show"></i>
+              <span>Visualizar PDF</span>
+            <% end %>
+          </div>
         </div>
       </div>
     </div>
@@ -166,5 +223,75 @@
   .pdf-toggle-wrap:has(.form-check-input:checked) {
     background: #eff6ff;
     border-color: #bfdbfe;
+  }
+
+  .pdf-logo-current {
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: space-between;
+    padding: 0.75rem;
+  }
+
+  .pdf-logo-info {
+    align-items: center;
+    display: flex;
+    gap: 0.7rem;
+    min-width: 0;
+  }
+
+  .pdf-logo-icon {
+    align-items: center;
+    background: #e0f2fe;
+    border-radius: 8px;
+    color: #0369a1;
+    display: inline-flex;
+    flex: 0 0 auto;
+    font-size: 1.1rem;
+    height: 36px;
+    justify-content: center;
+    width: 36px;
+  }
+
+  .pdf-logo-title {
+    color: #0f172a;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .pdf-logo-name {
+    color: #64748b;
+    font-size: 0.78rem;
+    max-width: 260px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .pdf-remove-logo-button {
+    align-items: center;
+    background: #fff;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    color: #b91c1c;
+    cursor: pointer;
+    display: inline-flex;
+    font-size: 0.84rem;
+    font-weight: 600;
+    gap: 0.35rem;
+    min-height: 34px;
+    margin: 0;
+    padding: 0.42rem 0.7rem;
+  }
+
+  .pdf-remove-logo-button:hover,
+  .pdf-remove-logo-button:focus {
+    background: #fee2e2;
+    border-color: #ef4444;
+    color: #991b1b;
   }
 </style>

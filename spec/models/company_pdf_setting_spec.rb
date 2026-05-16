@@ -18,6 +18,14 @@ RSpec.describe CompanyPdfSetting, type: :model do
     expect(setting.accent_color).to eq("ABCDEF")
   end
 
+  it "normalizes header text color before validation" do
+    setting.header_text_color = "#123abc"
+
+    setting.valid?
+
+    expect(setting.header_text_color).to eq("123ABC")
+  end
+
   it "uses the default accent color when blank" do
     setting.accent_color = ""
 

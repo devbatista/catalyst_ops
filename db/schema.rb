@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_05_16_102000) do
+ActiveRecord::Schema[7.1].define(version: 2026_05_16_103000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -194,6 +194,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_16_102000) do
     t.datetime "updated_at", null: false
     t.string "document_type", default: "order_service", null: false
     t.boolean "customization_enabled", default: false, null: false
+    t.string "header_text_color"
     t.index ["company_id", "document_type"], name: "index_company_pdf_settings_on_company_id_and_document_type", unique: true
   end
 

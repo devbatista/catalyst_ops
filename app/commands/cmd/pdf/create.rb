@@ -11,50 +11,72 @@ module Cmd
       def generate_pdf_data
         pdf = PdfGenerator.new
         settings = pdf_settings
-        accent = settings.accent_color.presence || CompanyPdfSetting::DEFAULT_ACCENT_COLOR
+        accent = settings&.accent_color.presence || default_accent_color
         accent_soft = "EAF2FF"
         border = "D6DEE8"
         soft_bg = "F7FAFD"
         text_primary = "0F172A"
         text_muted = "64748B"
         page_width = pdf.bounds.width
-        header_subtitle = settings.header_subtitle.presence || "Detalhes completos da execução"
-        document_note = settings.document_note.presence || "Documento gerado automaticamente para conferência da execução."
-        footer_text = settings.footer_text.presence || "Catalyst Ops • Ordem de Serviço ##{@order_service.code}"
+        light_header = light_color?(accent)
+        header_text_color = settings&.header_text_color.presence || (light_header ? text_primary : "FFFFFF")
+        header_subtitle_color = settings&.header_text_color.presence || (light_header ? text_muted : "DCE8FF")
+        header_border = light_header ? border : accent
+        header_subtitle = settings&.header_subtitle.presence || "Detalhes completos da execução"
+        document_note = settings&.document_note.presence || "Documento gerado automaticamente para conferência da execução."
+        footer_text = settings&.footer_text.presence || "Catalyst Ops • Ordem de Serviço ##{@order_service.code}"
+
+        header_row = [
+          {
+            content: "<b>Ordem de Serviço</b>\n<font size='10' color='#{header_subtitle_color}'>#{inline_safe(header_subtitle)}</font>",
+            inline_format: true,
+            background_color: accent,
+            text_color: header_text_color,
+            border_color: header_border,
+            size: 15,
+            padding: [10, 14, 10, 14],
+            valign: :center
+          },
+          {
+            content: "<font size='9'>OS ##{@order_service.code}</font>\n<b>#{format_datetime(Time.current)}</b>",
+            inline_format: true,
+            background_color: accent,
+            text_color: header_text_color,
+            border_color: header_border,
+            align: :right,
+            valign: :center,
+            size: 10,
+            padding: [10, 12, 10, 10]
+          }
+        ]
+        column_widths = [page_width * 0.72, page_width * 0.28]
+
+        if logo_image(settings)
+          header_row.unshift(
+            {
+              image: logo_image(settings),
+              fit: [page_width * 0.16, 42],
+              position: :center,
+              vposition: :center,
+              background_color: "FFFFFF",
+              border_color: header_border,
+              padding: [8, 10, 8, 10]
+            }
+          )
+          column_widths = [page_width * 0.18, page_width * 0.54, page_width * 0.28]
+        end
 
         pdf.table(
-          [[
-            {
-              content: "<b>Ordem de Serviço</b>\n<font size='10' color='DCE8FF'>#{inline_safe(header_subtitle)}</font>",
-              inline_format: true,
-              background_color: accent,
-              text_color: "FFFFFF",
-              border_color: accent,
-              size: 15,
-              padding: [10, 14, 10, 14],
-              valign: :center
-            },
-            {
-              content: "<font size='9'>OS ##{@order_service.code}</font>\n<b>#{format_datetime(Time.current)}</b>",
-              inline_format: true,
-              background_color: accent,
-              text_color: "FFFFFF",
-              border_color: accent,
-              align: :right,
-              valign: :center,
-              size: 10,
-              padding: [10, 12, 10, 10]
-            }
-          ]],
+          [header_row],
           width: page_width,
-          column_widths: [ page_width * 0.72, page_width * 0.28 ],
+          column_widths: column_widths,
           cell_style: { borders: [:top, :bottom, :left, :right] }
         )
         pdf.move_down(6)
         pdf.text safe(document_note), size: 9, color: text_muted
         pdf.move_down(12)
 
-        if settings.show_company_data?
+        if show_company_data?
           pdf.table(
             [[
               {
@@ -85,7 +107,7 @@ module Cmd
           pdf.move_down(10)
         end
 
-        if settings.show_client_data?
+        if show_client_data?
           pdf.table(
             [[
               {
@@ -126,7 +148,7 @@ module Cmd
           pdf.move_down(10)
         end
 
-        if settings.show_service_description?
+        if show_service_description?
           pdf.table(
             [[
               {
@@ -151,7 +173,7 @@ module Cmd
           pdf.move_down(12)
         end
 
-        if settings.show_service_items?
+        if show_service_items?
           pdf.table(
             [[
               {
@@ -211,7 +233,7 @@ module Cmd
           cell_style: { size: 12, padding: [6, 10, 6, 10], border_color: border, background_color: soft_bg, text_color: text_primary }
         )
 
-        if settings.show_discount_reason? && @order_service.discount_applied? && @order_service.discount_reason.present?
+        if show_discount_reason? && @order_service.discount_applied? && @order_service.discount_reason.present?
           pdf.move_down(8)
           pdf.table(
             [[{ content: "Motivo do desconto: #{safe(@order_service.discount_reason)}", align: :left }]],
@@ -220,7 +242,7 @@ module Cmd
           )
         end
 
-        if settings.show_observations? && @order_service.observations.present?
+        if show_observations? && @order_service.observations.present?
           pdf.move_down(12)
           pdf.table(
             [[
@@ -271,7 +293,35 @@ module Cmd
         @pdf_settings ||= begin
           setting = @company&.pdf_setting_for(:order_service)
           setting if @company&.pdf_customization_available? && setting&.enabled?
-        end || CompanyPdfSetting.new(document_type: "order_service")
+        end
+      end
+
+      def default_accent_color
+        "21262E"
+      end
+
+      def show_company_data?
+        pdf_settings.blank? || pdf_settings.show_company_data?
+      end
+
+      def show_client_data?
+        pdf_settings.blank? || pdf_settings.show_client_data?
+      end
+
+      def show_service_description?
+        pdf_settings.blank? || pdf_settings.show_service_description?
+      end
+
+      def show_service_items?
+        pdf_settings.blank? || pdf_settings.show_service_items?
+      end
+
+      def show_discount_reason?
+        pdf_settings.blank? || pdf_settings.show_discount_reason?
+      end
+
+      def show_observations?
+        pdf_settings.blank? || pdf_settings.show_observations?
       end
 
       def safe(value)
@@ -280,6 +330,26 @@ module Cmd
 
       def inline_safe(value)
         ERB::Util.html_escape(safe(value))
+      end
+
+      def logo_image(settings)
+        return unless settings
+        return unless settings.logo.attached?
+
+        @logo_image ||= StringIO.new(settings.logo.download)
+      rescue StandardError
+        nil
+      end
+
+      def light_color?(hex_color)
+        hex = hex_color.to_s.delete_prefix("#")
+        return false unless hex.match?(/\A[0-9A-Fa-f]{6}\z/)
+
+        red = hex[0..1].to_i(16)
+        green = hex[2..3].to_i(16)
+        blue = hex[4..5].to_i(16)
+        luminance = ((0.299 * red) + (0.587 * green) + (0.114 * blue)) / 255
+        luminance > 0.86
       end
 
       def format_datetime(value)

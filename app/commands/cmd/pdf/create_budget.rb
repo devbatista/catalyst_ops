@@ -16,19 +16,23 @@ module Cmd
         muted = "6B7280"
         text = "111827"
         page_width = pdf.bounds.width
+        light_header = light_color?(header_bg)
+        header_text_color = settings&.header_text_color.presence || (light_header ? text : "FFFFFF")
+        header_subtitle_color = settings&.header_text_color.presence || (light_header ? muted : "C8CDD3")
+        header_border = light_header ? border : header_bg
         header_subtitle = settings&.header_subtitle.presence || "Revise os dados antes de aprovar ou rejeitar."
         document_note = settings&.document_note.presence
         footer_text = settings&.footer_text.presence
 
         # Header dark bar (with better paddings and inset)
         pdf.bounding_box([pdf.bounds.left, pdf.cursor], width: page_width) do
-          header_data = [[
+          header_row = [
             {
-              content: "<b>Orçamento</b>\n<font size='2'> </font>\n<font size='10' color='C8CDD3'>#{inline_safe(header_subtitle)}</font>",
+              content: "<b>Orçamento</b>\n<font size='2'> </font>\n<font size='10' color='#{header_subtitle_color}'>#{inline_safe(header_subtitle)}</font>",
               inline_format: true,
               background_color: header_bg,
-              text_color: "FFFFFF",
-              border_color: header_bg,
+              text_color: header_text_color,
+              border_color: header_border,
               size: 16,
               padding: [12, 14, 12, 14],
               valign: :center
@@ -37,19 +41,35 @@ module Cmd
               content: "<b>ORC ##{@record.code}</b>",
               inline_format: true,
               background_color: header_bg,
-              text_color: "FFFFFF",
-              border_color: "1C2128",
+              text_color: header_text_color,
+              border_color: header_border,
               align: :center,
               valign: :center,
               size: 11,
               padding: [12, 10, 12, 10]
             }
-          ]]
+          ]
+          column_widths = [page_width * 0.8, page_width * 0.2]
+
+          if logo_image(settings)
+            header_row.unshift(
+              {
+                image: logo_image(settings),
+                fit: [page_width * 0.16, 42],
+                position: :center,
+                vposition: :center,
+                background_color: "FFFFFF",
+                border_color: header_border,
+                padding: [8, 10, 8, 10]
+              }
+            )
+            column_widths = [page_width * 0.18, page_width * 0.62, page_width * 0.2]
+          end
 
           pdf.table(
-            header_data,
+            [header_row],
             width: page_width,
-            column_widths: [ page_width * 0.8, page_width * 0.2 ],
+            column_widths: column_widths,
             cell_style: { borders: [:top, :bottom, :left, :right] }
           )
         end
@@ -194,6 +214,25 @@ module Cmd
 
       def inline_safe(value)
         ERB::Util.html_escape(safe(value))
+      end
+
+      def logo_image(settings)
+        return unless settings&.logo&.attached?
+
+        @logo_image ||= StringIO.new(settings.logo.download)
+      rescue StandardError
+        nil
+      end
+
+      def light_color?(hex_color)
+        hex = hex_color.to_s.delete_prefix("#")
+        return false unless hex.match?(/\A[0-9A-Fa-f]{6}\z/)
+
+        red = hex[0..1].to_i(16)
+        green = hex[2..3].to_i(16)
+        blue = hex[4..5].to_i(16)
+        luminance = ((0.299 * red) + (0.587 * green) + (0.114 * blue)) / 255
+        luminance > 0.86
       end
 
       def brl(value)

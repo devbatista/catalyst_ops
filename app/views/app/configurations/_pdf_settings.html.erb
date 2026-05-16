@@ -1,4 +1,4 @@
-<div class="card border-0 shadow-sm">
+<div class="card border-0 shadow-sm pdf-settings-panel" data-redirect-url="<%= app_configurations_path(tab: "pdf") %>">
   <div class="card-header bg-white py-3">
     <h5 class="card-title mb-0">Personalização dos PDFs</h5>
   </div>
@@ -31,16 +31,4 @@
   </div>
 </div>
 
-<script>
-  document.addEventListener("change", function(event) {
-    if (!event.target.classList.contains("pdf-customization-toggle")) return;
-
-    var target = document.getElementById(event.target.dataset.target);
-    if (!target) return;
-
-    target.classList.toggle("d-none", !event.target.checked);
-
-    var status = event.target.closest(".pdf-toggle-wrap").querySelector(".pdf-toggle-status");
-    if (status) status.textContent = event.target.checked ? "Ativo" : "Inativo";
-  });
-</script>
+<%= javascript_import_module_tag "app/pdf_settings" %>
