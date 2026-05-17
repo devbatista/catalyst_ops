@@ -264,6 +264,172 @@ RSpec.describe Subscription, type: :model do
     end
   end
 
+  describe "cancelamento agendado" do
+    describe "#schedule_cancellation!" do
+      it "agenda cancelamento no fim do período mantendo a assinatura ativa" do
+        subscription = create(:subscription, status: :active, end_date: Date.new(2026, 6, 10))
+
+        subscription.schedule_cancellation!(reason: "Não vou continuar")
+
+        aggregate_failures do
+          expect(subscription.reload).to be_active
+          expect(subscription.cancel_at_period_end).to be(true)
+          expect(subscription.cancel_requested_at).to be_present
+          expect(subscription.cancel_effective_on).to eq(Date.new(2026, 6, 10))
+          expect(subscription.cancel_reason).to eq("Não vou continuar")
+        end
+      end
+
+      it "usa a data atual quando a assinatura não tem data de fim" do
+        allow(Date).to receive(:current).and_return(Date.new(2026, 5, 17))
+        subscription = create(:subscription, status: :active, end_date: nil)
+
+        subscription.schedule_cancellation!
+
+        expect(subscription.reload.cancel_effective_on).to eq(Date.new(2026, 5, 17))
+      end
+
+      it "bloqueia assinatura que não está ativa" do
+        subscription = create(:subscription, status: :expired)
+
+        expect { subscription.schedule_cancellation! }
+          .to raise_error(ActiveRecord::RecordInvalid, /Apenas assinaturas ativas/)
+      end
+
+      it "bloqueia assinatura já agendada para cancelamento" do
+        subscription = create(:subscription, status: :active, cancel_at_period_end: true)
+
+        expect { subscription.schedule_cancellation! }
+          .to raise_error(ActiveRecord::RecordInvalid, /já está agendada/)
+      end
+    end
+
+    describe "#resume_cancellation!" do
+      it "remove o agendamento de cancelamento" do
+        subscription = create(
+          :subscription,
+          status: :active,
+          cancel_at_period_end: true,
+          cancel_requested_at: Time.zone.local(2026, 5, 17, 10, 0, 0),
+          cancel_effective_on: Date.new(2026, 6, 10),
+          cancel_reason: "Vou pausar"
+        )
+
+        subscription.resume_cancellation!
+
+        aggregate_failures do
+          expect(subscription.reload).to be_active
+          expect(subscription.cancel_at_period_end).to be(false)
+          expect(subscription.cancel_requested_at).to be_nil
+          expect(subscription.cancel_effective_on).to be_nil
+          expect(subscription.cancel_reason).to be_nil
+        end
+      end
+
+      it "bloqueia assinatura que não está ativa" do
+        subscription = create(:subscription, status: :cancelled, cancel_at_period_end: true)
+
+        expect { subscription.resume_cancellation! }
+          .to raise_error(ActiveRecord::RecordInvalid, /Apenas assinaturas ativas/)
+      end
+
+      it "bloqueia assinatura sem cancelamento agendado" do
+        subscription = create(:subscription, status: :active, cancel_at_period_end: false)
+
+        expect { subscription.resume_cancellation! }
+          .to raise_error(ActiveRecord::RecordInvalid, /Não existe cancelamento agendado/)
+      end
+    end
+
+    describe "#cancel_due?" do
+      it "retorna verdadeiro quando o cancelamento agendado já venceu" do
+        subscription = build(
+          :subscription,
+          cancel_at_period_end: true,
+          cancel_effective_on: Date.new(2026, 5, 17)
+        )
+
+        expect(subscription.cancel_due?(reference_date: Date.new(2026, 5, 18))).to be(true)
+      end
+
+      it "retorna falso quando não existe agendamento" do
+        subscription = build(
+          :subscription,
+          cancel_at_period_end: false,
+          cancel_effective_on: Date.new(2026, 5, 17)
+        )
+
+        expect(subscription.cancel_due?(reference_date: Date.new(2026, 5, 18))).to be(false)
+      end
+
+      it "retorna falso quando a data efetiva ainda não chegou" do
+        subscription = build(
+          :subscription,
+          cancel_at_period_end: true,
+          cancel_effective_on: Date.new(2026, 5, 20)
+        )
+
+        expect(subscription.cancel_due?(reference_date: Date.new(2026, 5, 18))).to be(false)
+      end
+    end
+
+    describe "#finalize_scheduled_cancellation!" do
+      it "cancela a assinatura quando o agendamento está vencido" do
+        subscription = create(
+          :subscription,
+          status: :active,
+          cancel_at_period_end: true,
+          cancel_requested_at: Time.zone.local(2026, 5, 1, 10, 0, 0),
+          cancel_effective_on: Date.new(2026, 5, 17)
+        )
+
+        result = subscription.finalize_scheduled_cancellation!(reference_date: Date.new(2026, 5, 18))
+
+        aggregate_failures do
+          expect(result).to be(true)
+          expect(subscription.reload).to be_cancelled
+          expect(subscription.canceled_date).to be_present
+          expect(subscription.cancel_at_period_end).to be(false)
+          expect(subscription.cancel_requested_at).to be_nil
+          expect(subscription.cancel_effective_on).to be_nil
+        end
+      end
+
+      it "não altera a assinatura quando o agendamento ainda não está vencido" do
+        subscription = create(
+          :subscription,
+          status: :active,
+          cancel_at_period_end: true,
+          cancel_effective_on: Date.new(2026, 5, 20)
+        )
+
+        expect(subscription.finalize_scheduled_cancellation!(reference_date: Date.new(2026, 5, 18))).to be(false)
+        expect(subscription.reload).to be_active
+      end
+    end
+
+    describe ".ready_to_cycle" do
+      it "não retorna assinaturas agendadas para cancelamento" do
+        allow(Date).to receive(:current).and_return(Date.new(2026, 5, 17))
+        ready_subscription = create(
+          :subscription,
+          status: :active,
+          end_date: Date.new(2026, 5, 24),
+          cancel_at_period_end: false
+        )
+        scheduled_subscription = create(
+          :subscription,
+          status: :active,
+          end_date: Date.new(2026, 5, 24),
+          cancel_at_period_end: true
+        )
+
+        expect(described_class.where(id: [ready_subscription.id, scheduled_subscription.id]).ready_to_cycle)
+          .to contain_exactly(ready_subscription)
+      end
+    end
+  end
+
   describe "sincronização de acesso da empresa" do
     it "ativa a empresa quando a assinatura permite acesso" do
       company = create(:company, active: false)
