@@ -88,6 +88,31 @@ class Subscription < ApplicationRecord
             expired_date: Time.current)
   end
 
+  def upgrade_to_plan!(target_plan, effective_on: end_date.presence || Date.current)
+    target_rank = plan_upgrade_rank(target_plan)
+    current_rank = plan_upgrade_rank(plan)
+
+    if target_plan.blank? || target_rank.nil?
+      errors.add(:base, "Plano de destino inválido para upgrade.")
+      raise ActiveRecord::RecordInvalid, self
+    end
+
+    if current_rank.present? && target_rank <= current_rank
+      errors.add(:base, "Não é permitido downgrade ou troca para o mesmo plano neste fluxo de upgrade.")
+      raise ActiveRecord::RecordInvalid, self
+    end
+
+    transaction do
+      update!(
+        preapproval_plan_id: target_plan.external_id,
+        reason: target_plan.reason,
+        transaction_amount: target_plan.transaction_amount,
+        raw_payload: raw_payload_with_plan_upgrade(target_plan, effective_on)
+      )
+      company.update!(plan: target_plan)
+    end
+  end
+
   def schedule_cancellation!(reason: nil)
     unless active?
       errors.add(:base, "Apenas assinaturas ativas podem ser agendadas para cancelamento.")
@@ -145,6 +170,27 @@ class Subscription < ApplicationRecord
   end
   
   private
+
+  PLAN_UPGRADE_RANKS = {
+    "Basico" => 1,
+    "Profissional" => 2,
+    "Enterprise" => 3
+  }.freeze
+
+  def plan_upgrade_rank(plan_record)
+    PLAN_UPGRADE_RANKS[plan_record&.name]
+  end
+
+  def raw_payload_with_plan_upgrade(target_plan, effective_on)
+    payload = (raw_payload || {}).deep_dup
+    payload["plan_upgrade"] = {
+      "from" => plan&.name,
+      "to" => target_plan.name,
+      "billing_mode" => "next_cycle",
+      "effective_on" => effective_on.to_date.iso8601
+    }
+    payload
+  end
 
   def auditable_created_action
     "subscription.created"
