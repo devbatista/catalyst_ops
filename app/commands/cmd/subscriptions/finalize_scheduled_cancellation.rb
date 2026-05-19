@@ -21,7 +21,7 @@ module Cmd
             @subscription.finalize_scheduled_cancellation!
           end
 
-          Subscriptions::CancellationMailer.with(subscription: @subscription).cancelled_email.deliver_later
+          ::Subscriptions::CancellationMailer.with(subscription: @subscription).cancelled_email.deliver_later
 
           Result.new(true, @subscription, nil)
         rescue StandardError => e
