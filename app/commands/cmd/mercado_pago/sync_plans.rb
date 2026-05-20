@@ -10,7 +10,7 @@ module Cmd
         delete_plans(plans_data)
 
         plans_data.each do |plan_data|
-          plan = Plan.find_or_initialize_by(external_id: plan_data["id"])
+          plan = find_plan(plan_data)
           plan.update!(plan_params(plan_data))
         end
       end
@@ -19,10 +19,20 @@ module Cmd
         plans_data ||= @client.fetch_plans
         fetched_ids = plans_data.map { |p| p["id"] }.compact
 
-        Plan.where.not(external_id: fetched_ids).delete_all
+        Plan
+          .where.not(external_id: fetched_ids)
+          .where.not(id: Company.where.not(plan_id: nil).select(:plan_id))
+          .where.not(external_id: Subscription.select(:preapproval_plan_id))
+          .delete_all
       end
 
       private
+
+      def find_plan(plan_data)
+        Plan.find_by(external_id: plan_data["id"]) ||
+          Plan.find_by(external_reference: plan_data["external_reference"]) ||
+          Plan.new
+      end
 
       def plan_params(plan_data)
         raw_reason = plan_data["reason"].to_s

@@ -66,12 +66,31 @@ RSpec.describe "Commands auxiliares" do
       end
     end
 
-    def plan_payload(id)
+    it "atualiza plano existente pela referência externa quando o id muda" do
+      external_reference = "PROFISSIONAL_#{SecureRandom.hex(4)}"
+      existing_plan = create(:plan, external_id: "old_plan_sync", external_reference: external_reference)
+      company = create(:company, plan: existing_plan)
+      client = instance_double(MercadoPago::Client, fetch_plans: [plan_payload("plan_sync", external_reference: external_reference)])
+
+      described_class.new(client: client).call
+
+      aggregate_failures do
+        expect(company.reload.plan).to eq(existing_plan)
+        expect(existing_plan.reload).to have_attributes(
+          external_id: "plan_sync",
+          external_reference: external_reference,
+          reason: "c-profissional"
+        )
+        expect(Plan.where(external_reference: external_reference).count).to eq(1)
+      end
+    end
+
+    def plan_payload(id, external_reference: "PROFISSIONAL")
       {
         "id" => id,
         "reason" => "c-profissional",
         "status" => "active",
-        "external_reference" => "PROFISSIONAL",
+        "external_reference" => external_reference,
         "auto_recurring" => {
           "frequency" => 1,
           "frequency_type" => "months",
