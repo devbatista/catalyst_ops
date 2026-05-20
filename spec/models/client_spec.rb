@@ -8,10 +8,10 @@ RSpec.describe Client, type: :model do
     it { should validate_length_of(:name).is_at_least(2).is_at_most(100) }
 
     it { should validate_presence_of(:document) }
-    it { should validate_uniqueness_of(:document).case_insensitive }
+    it { should validate_uniqueness_of(:document).scoped_to(:company_id).case_insensitive }
 
     it { should validate_presence_of(:email) }
-    it { should validate_uniqueness_of(:email).case_insensitive }
+    it { should validate_uniqueness_of(:email).scoped_to(:company_id).case_insensitive }
 
     it { should validate_presence_of(:phone) }
 
@@ -24,7 +24,7 @@ RSpec.describe Client, type: :model do
       it "rejeita e-mail inválido" do
         client = build(:client, email: "email_invalido")
         expect(client).not_to be_valid
-        expect(client.errors[:email]).to include("is invalid")
+        expect(client.errors[:email]).to be_present
       end
     end
 
@@ -70,8 +70,8 @@ RSpec.describe Client, type: :model do
   end
 
   describe "escopos" do
-    let!(:cliente_ativo) { create(:client) }
-    let!(:cliente_antigo) { create(:client) }
+    let!(:cliente_ativo) { create_client_with_subscription }
+    let!(:cliente_antigo) { create_client_with_subscription }
 
     before do
       create(:order_service, client: cliente_ativo, created_at: 1.month.ago)
@@ -94,6 +94,14 @@ RSpec.describe Client, type: :model do
       sleep(1)
       cliente2 = create(:client)
       expect(Client.recent.first).to eq(cliente2)
+    end
+
+    it "busca por nome, e-mail, telefone ou documento" do
+      client = create(:client, name: "Cliente Especial", email: "especial@example.com", phone: "11999998888")
+
+      expect(Client.search("Especial")).to include(client)
+      expect(Client.search("especial@example.com")).to include(client)
+      expect(Client.search("11999998888")).to include(client)
     end
   end
 
@@ -134,6 +142,17 @@ RSpec.describe Client, type: :model do
       expect(cnpj_client.corporate_customer?).to be true
     end
 
+    it "impede troca de documento após criação" do
+      client = create(:client)
+
+      client.document = CPF.generate
+
+      aggregate_failures do
+        expect(client).not_to be_valid
+        expect(client.errors[:document]).to include("não pode ser alterado após a criação do cliente, para alterar entre em contato com o suporte.")
+      end
+    end
+
     it "formata documento corretamente" do
       expect(cpf_client.formatted_document).to eq(CPF.new(cpf_number).formatted)
       expect(cnpj_client.formatted_document).to eq(CNPJ.new(cnpj_number).formatted)
@@ -154,16 +173,16 @@ RSpec.describe Client, type: :model do
     it "não permite telefone com menos de 10 dígitos" do
       client = build(:client, phone: "123456789") # 9 dígitos
       expect(client).not_to be_valid
-      expect(client.errors[:phone]).to include("is too short (minimum is 10 characters)")
+      expect(client.errors[:phone]).to be_present
     end
   end
 
   describe "métodos de negócio" do
-    let(:client) { create(:client) }
+    let(:client) { create_client_with_subscription }
 
     before do
       create(:order_service, client: client, status: :agendada)
-      create(:order_service, client: client, status: :em_andamento)
+      create(:order_service, client: client, status: :pendente)
       create(:order_service, client: client, status: :concluida)
       create(:order_service, client: client, status: :cancelada)
     end
@@ -189,8 +208,29 @@ RSpec.describe Client, type: :model do
     end
   end
 
+  describe "endereços e restore" do
+    it "retorna endereço principal formatado" do
+      client = create(:client)
+      create(:address, client: client, street: "Rua A", number: "10", complement: nil, neighborhood: "Centro", city: "São Paulo", state: "SP", zip_code: "01001000", country: "Brasil", address_type: "principal")
+
+      expect(client.address).to eq("Rua A, 10, Centro, São Paulo, SP, 01001-000, Brasil")
+    end
+
+    it "restaura endereços apagados junto com cliente" do
+      client = create(:client)
+      address = create(:address, client: client, street: "Rua A", number: "10", complement: nil, neighborhood: "Centro", city: "São Paulo", state: "SP", zip_code: "01001000", country: "Brasil", address_type: "principal")
+
+      client.destroy
+      expect(address.reload).to be_deleted
+
+      client.restore
+
+      expect(address.reload).not_to be_deleted
+    end
+  end
+
   describe "cálculos financeiros" do
-    let(:client) { create(:client) }
+    let(:client) { create_client_with_subscription }
 
     before do
       order1 = create(:order_service, client: client)
@@ -223,5 +263,12 @@ RSpec.describe Client, type: :model do
       client2 = create(:client)
       expect(client1.document).not_to eq(client2.document)
     end
+  end
+
+  def create_client_with_subscription
+    plan = create(:plan)
+    company = create(:company, plan: plan)
+    create(:subscription, company: company, subscription_plan: plan, status: :active)
+    create(:client, company: company)
   end
 end

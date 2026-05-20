@@ -3,7 +3,10 @@ class CreateUser::CreditCardPaymentJob < ApplicationJob
 
   def perform(company_id, cc_token)
     company = Company.find_by(id: company_id)
-    Rails.logger.error("Company with id #{company_id} not found.") and return unless company
+    unless company
+      Rails.logger.error("Company with id #{company_id} not found.")
+      return
+    end
 
     Cmd::MercadoPago::CreateCreditCardPayment.new(company, cc_token).call
   end
