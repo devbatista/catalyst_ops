@@ -1,14 +1,14 @@
 FactoryBot.define do
   factory :address do
-    street { "MyString" }
-    number { "MyString" }
-    complement { "MyString" }
-    neighborhood { "MyString" }
-    zip_code { "MyString" }
-    city { "MyString" }
-    state { "MyString" }
-    country { "MyString" }
-    address_type { "MyString" }
-    client { nil }
+    street { "Rua Exemplo" }
+    number { "123" }
+    complement { "Sala 1" }
+    neighborhood { "Centro" }
+    zip_code { "12345-678" }
+    city { "São Paulo" }
+    state { "SP" }
+    country { "Brasil" }
+    address_type { "principal" }
+    client
   end
 end

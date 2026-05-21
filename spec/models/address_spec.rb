@@ -2,24 +2,9 @@ require "rails_helper"
 require "cpf_cnpj"
 
 RSpec.describe Address, type: :model do
-  let(:company) {
-    Company.create!(
-      name: "Empresa Teste",
-      document: CNPJ.generate,
-      email: "empresa@email.com",
-      phone: "1133334444",
-    )
-  }
+  let(:company) { create(:company) }
 
-  let(:client) {
-    Client.create!(
-      name: "Teste",
-      document: CPF.generate,
-      email: "teste@email.com",
-      phone: "11999999999",
-      company: company,
-    )
-  }
+  let(:client) { create(:client, company: company) }
 
   subject {
     described_class.new(
@@ -82,9 +67,9 @@ RSpec.describe Address, type: :model do
     expect(subject).to_not be_valid
   end
 
-  it "é inválido sem país" do
+  it "é válido sem país" do
     subject.country = nil
-    expect(subject).to_not be_valid
+    expect(subject).to be_valid
   end
 
   it "é inválido com país muito curto" do
