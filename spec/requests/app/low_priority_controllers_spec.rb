@@ -97,7 +97,7 @@ RSpec.describe "Controllers App de prioridade baixa", type: :request do
     aggregate_failures do
       expect(response).to redirect_to(app_support_ticket_path(ticket))
       expect(SupportTicketNotifications).to have_received(:notify_message)
-      expect(SupportMessage.last.body).to eq("Mensagem enviada pelo app")
+      expect(ticket.support_messages.exists?(body: "Mensagem enviada pelo app")).to be(true)
     end
   end
 
