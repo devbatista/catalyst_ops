@@ -23,7 +23,7 @@ RSpec.describe User, type: :model do
   end
 
   describe "associações" do
-    it { should have_many(:assignments).dependent(:destroy) }
+    it { should have_many(:assignments).dependent(:restrict_with_error) }
     it { should have_many(:order_services).through(:assignments) }
   end
 
@@ -44,6 +44,10 @@ RSpec.describe User, type: :model do
   end
 
   describe "métodos de negócio" do
+    let(:plan) { create(:plan) }
+    let(:company) { create(:company, plan: plan) }
+    let!(:subscription) { create(:subscription, company: company, subscription_plan: plan, status: :active) }
+    let(:client) { create(:client, company: company) }
     let(:tecnico) { create(:user, role: :tecnico, name: "joão da silva") }
     let(:admin) { create(:user, role: :admin) }
     let(:gestor) { create(:user, role: :gestor) }
@@ -58,26 +62,28 @@ RSpec.describe User, type: :model do
     end
 
     it "#orders_count retorna o número de OS" do
-      os1 = create(:order_service, scheduled_at: 1.day.from_now)
-      os2 = create(:order_service, scheduled_at: 2.days.from_now)
+      os1 = create_order_service(scheduled_at: 1.day.from_now)
+      os2 = create_order_service(scheduled_at: 2.days.from_now)
       create(:assignment, user: tecnico, order_service: os1)
       create(:assignment, user: tecnico, order_service: os2)
       expect(tecnico.orders_count).to eq(2)
     end
 
     it "#pending_orders_count retorna o número de OS agendadas" do
-      os1 = create(:order_service, status: :agendada, scheduled_at: 1.day.from_now)
-      os2 = create(:order_service, status: :concluida, scheduled_at: 2.days.from_now)
+      os1 = create_order_service(status: :agendada, scheduled_at: 1.day.from_now)
+      os2 = create_order_service(scheduled_at: 2.days.from_now)
       create(:assignment, user: tecnico, order_service: os1)
       create(:assignment, user: tecnico, order_service: os2)
+      os2.update_column(:status, OrderService.statuses[:concluida])
       expect(tecnico.pending_orders_count).to eq(1)
     end
 
     it "#completed_orders_count retorna o número de OS concluídas" do
-      os1 = create(:order_service, status: :concluida)
-      os2 = create(:order_service, status: :agendada)
+      os1 = create_order_service(scheduled_at: 1.day.from_now)
+      os2 = create_order_service(status: :agendada, scheduled_at: 2.days.from_now)
       create(:assignment, user: tecnico, order_service: os1)
       create(:assignment, user: tecnico, order_service: os2)
+      os1.update_column(:status, OrderService.statuses[:concluida])
       expect(tecnico.completed_orders_count).to eq(1)
     end
 
@@ -95,6 +101,12 @@ RSpec.describe User, type: :model do
   end
 
   describe "callbacks" do
+    let(:mail_delivery) { instance_double(ActionMailer::MessageDelivery, deliver_later: true) }
+
+    before do
+      allow(UserMailer).to receive(:welcome_email).and_return(mail_delivery)
+    end
+
     it "normaliza o nome antes de validar" do
       user = build(:user, name: "  maria da silva  ")
       user.valid?
@@ -103,15 +115,15 @@ RSpec.describe User, type: :model do
 
     it "não envia e-mail de boas-vindas se não persistido" do
       user = build(:user)
-      expect(user).not_to receive(:send_welcome_email)
+      expect(user).not_to receive(:send_welcome_email!)
       user.valid?
     end
 
     it "envia e-mail de boas-vindas após criar (stub)" do
       user = build(:user)
-      allow(user).to receive(:send_welcome_email)
+      allow(user).to receive(:send_welcome_email!)
       user.save
-      expect(user).to have_received(:send_welcome_email)
+      expect(user).to have_received(:send_welcome_email!)
     end
   end
 
@@ -119,5 +131,19 @@ RSpec.describe User, type: :model do
     it "possui uma factory válida" do
       expect(build(:user)).to be_valid
     end
+  end
+
+  def create_order_service(attributes = {})
+    scheduled_at = attributes.fetch(:scheduled_at, 1.day.from_now)
+
+    create(
+      :order_service,
+      {
+        company: company,
+        client: client,
+        scheduled_at: scheduled_at,
+        expected_end_at: scheduled_at + 2.hours
+      }.merge(attributes)
+    )
   end
 end
