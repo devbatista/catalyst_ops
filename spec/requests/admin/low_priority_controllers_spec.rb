@@ -111,7 +111,7 @@ RSpec.describe "Controllers Admin de prioridade baixa", type: :request do
     aggregate_failures do
       expect(response).to redirect_to(admin_ticket_path(ticket))
       expect(SupportTicketNotifications).to have_received(:notify_message)
-      expect(SupportMessage.last.body).to eq("Mensagem enviada pelo admin")
+      expect(ticket.support_messages.exists?(body: "Mensagem enviada pelo admin")).to be(true)
     end
   end
 
