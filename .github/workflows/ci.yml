@@ -1,0 +1,199 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  rspec_models:
+    name: RSpec Models
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: catalyst_ops_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d catalyst_ops_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      RAILS_ENV: test
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/catalyst_ops_test
+      REDIS_URL: redis://localhost:6379/0
+      SECRET_KEY_BASE: test-secret-key-base
+      MP_TEST_ACCESS_TOKEN: test-token
+      MP_PRODUCTION_ACCESS_TOKEN: test-token
+      MP_PUBLIC_KEY: test-public-key
+      MP_WEBHOOK_SECRET: test-webhook-secret
+      APP_HOST: app.catalystops.test
+      APP_PROTOCOL: https
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y libpq-dev libvips
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3.1"
+          bundler-cache: true
+
+      - name: Load test schema
+        run: bin/rails db:schema:load
+
+      - name: Run RSpec
+        run: bundle exec rspec spec/models
+
+  rspec_requests:
+    name: RSpec Requests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: catalyst_ops_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d catalyst_ops_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      RAILS_ENV: test
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/catalyst_ops_test
+      REDIS_URL: redis://localhost:6379/0
+      SECRET_KEY_BASE: test-secret-key-base
+      MP_TEST_ACCESS_TOKEN: test-token
+      MP_PRODUCTION_ACCESS_TOKEN: test-token
+      MP_PUBLIC_KEY: test-public-key
+      MP_WEBHOOK_SECRET: test-webhook-secret
+      APP_HOST: app.catalystops.test
+      APP_PROTOCOL: https
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y libpq-dev libvips
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3.1"
+          bundler-cache: true
+
+      - name: Load test schema
+        run: bin/rails db:schema:load
+
+      - name: Run RSpec
+        run: bundle exec rspec spec/requests
+
+  rspec_other:
+    name: RSpec Other
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: catalyst_ops_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d catalyst_ops_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      RAILS_ENV: test
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/catalyst_ops_test
+      REDIS_URL: redis://localhost:6379/0
+      SECRET_KEY_BASE: test-secret-key-base
+      MP_TEST_ACCESS_TOKEN: test-token
+      MP_PRODUCTION_ACCESS_TOKEN: test-token
+      MP_PUBLIC_KEY: test-public-key
+      MP_WEBHOOK_SECRET: test-webhook-secret
+      APP_HOST: app.catalystops.test
+      APP_PROTOCOL: https
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y libpq-dev libvips
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3.1"
+          bundler-cache: true
+
+      - name: Load test schema
+        run: bin/rails db:schema:load
+
+      - name: Run RSpec
+        run: >
+          bundle exec rspec
+          spec/commands
+          spec/controllers
+          spec/jobs
+          spec/mailers
+          spec/services

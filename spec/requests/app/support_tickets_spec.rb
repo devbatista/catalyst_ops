@@ -19,7 +19,7 @@ RSpec.describe "App::SupportTickets", type: :request do
     end
     allow_any_instance_of(ApplicationController).to receive(:verified_request?).and_return(true)
 
-    host! "app.lvh.me"
+    host! scoped_host_for("app")
     create(:subscription, company: company, status: :active)
     sign_in user
 
@@ -189,5 +189,11 @@ RSpec.describe "App::SupportTickets", type: :request do
         expect(json["errors"]).to include("Status Não pode ser alterado em tickets fechado ou cancelado")
       end
     end
+  end
+
+  def scoped_host_for(subdomain)
+    tld_labels = ["example", "com"]
+    extra_domain_labels = Array.new(Rails.application.config.action_dispatch.tld_length.to_i - 1, "app")
+    ([subdomain] + extra_domain_labels + tld_labels).join(".")
   end
 end
