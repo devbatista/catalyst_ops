@@ -10,11 +10,23 @@ RSpec.describe CouponRedemption, type: :model do
   describe "validações" do
     subject(:redemption) { build(:coupon_redemption) }
 
-    it { should validate_uniqueness_of(:subscription_id) }
     it { should validate_presence_of(:original_amount) }
     it { should validate_presence_of(:discount_amount) }
     it { should validate_presence_of(:final_amount) }
     it { should validate_presence_of(:applied_at) }
+
+    it "não permite mais de um resgate para a mesma assinatura" do
+      existing = create(:coupon_redemption, applied_at: 13.months.ago)
+      redemption = build(
+        :coupon_redemption,
+        company: existing.company,
+        subscription: existing.subscription,
+        applied_at: Time.current
+      )
+
+      expect(redemption).not_to be_valid
+      expect(redemption.errors.details[:subscription_id]).to include(error: :taken, value: existing.subscription_id)
+    end
 
     it "não permite final maior que valor original" do
       redemption = build(:coupon_redemption, original_amount: 100, final_amount: 101)
