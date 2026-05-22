@@ -1,6 +1,12 @@
 require "rails_helper"
 
 RSpec.describe UserOnboardingProgress, type: :model do
+  let(:mail_delivery) { instance_double(ActionMailer::MessageDelivery, deliver_later: true) }
+
+  before do
+    allow(UserMailer).to receive(:welcome_email).and_return(mail_delivery)
+  end
+
   describe "associações" do
     it { should belong_to(:user) }
   end
@@ -9,8 +15,15 @@ RSpec.describe UserOnboardingProgress, type: :model do
     subject(:progress) { build(:user_onboarding_progress) }
 
     it { should validate_presence_of(:user_id) }
-    it { should validate_uniqueness_of(:user_id) }
     it { should validate_inclusion_of(:last_seen_step).in_array(UserOnboardingProgress::STEP_KEYS).allow_nil }
+
+    it "não permite mais de um progresso para o mesmo usuário" do
+      existing = create(:user_onboarding_progress)
+      progress = build(:user_onboarding_progress, user: existing.user)
+
+      expect(progress).not_to be_valid
+      expect(progress.errors.details[:user_id]).to include(error: :taken, value: existing.user_id)
+    end
   end
 
   describe "progresso" do
