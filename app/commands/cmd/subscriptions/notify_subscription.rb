@@ -13,7 +13,7 @@ module Cmd
 
         begin
           @subscription.transaction do
-            Subscriptions::ExpirationWarningMailer
+            ::Subscriptions::ExpirationWarningMailer
               .with(subscription: @subscription)
               .warning_email
               .deliver_later
