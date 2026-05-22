@@ -30,7 +30,8 @@ COMPANIES = Array.new(rand(3..10)) do
   gestor = User.create!(
     name: Faker::Name.name,
     email: Faker::Internet.unique.email,
-    password: "senha123",
+    password: "Password@123",
+    password_confirmation: "Password@123",
     role: :gestor,
     company: company,
     phone: Faker::PhoneNumber.cell_phone_in_e164,

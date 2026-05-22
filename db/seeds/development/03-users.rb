@@ -8,7 +8,8 @@ USERS = []
 USERS << User.create!(
   name: "Admin",
   email: "admin@catalystops.local",
-  password: "senha123",
+  password: "Password@123",
+  password_confirmation: "Password@123",
   role: :admin,
   phone: Faker::PhoneNumber.cell_phone_in_e164,
   active: true
@@ -28,7 +29,8 @@ COMPANIES.each do |company|
     USERS << User.create!(
       name: Faker::Name.name,
       email: Faker::Internet.unique.email,
-      password: "senha123",
+      password: "Password@123",
+      password_confirmation: "Password@123",
       role: :tecnico,
       company: company,
       phone: Faker::PhoneNumber.cell_phone_in_e164,
