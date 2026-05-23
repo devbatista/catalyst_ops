@@ -1,4 +1,9 @@
 constraints subdomain: "admin" do
+  if Rails.env.development?
+    get "/coverage", to: "admin/coverage#index", as: :admin_coverage
+    mount Rack::Files.new(Rails.root.join("coverage").to_s), at: "/coverage_report"
+  end
+
   get "/", to: "admin/dashboard#index", as: :admin_dashboard
 
   resources :companies, module: "admin", as: :admin_companies

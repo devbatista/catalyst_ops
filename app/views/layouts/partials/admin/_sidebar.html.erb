@@ -110,6 +110,15 @@
       <% end %>
     </li>
 
+    <% if Rails.env.development? %>
+      <li class="list-group-item <%= active_menu_class(admin_coverage_path) %>">
+        <%= link_to admin_coverage_path do %>
+          <div class="parent-icon"><i class='bx bx-test-tube'></i></div>
+          <div class="menu-title">Coverage</div>
+        <% end %>
+      </li>
+    <% end %>
+
     <!-- Configurações -->
     <li class="list-group-item <%= active_menu_class(admin_configurations_path) %>">
       <%= link_to admin_configurations_path do %>
