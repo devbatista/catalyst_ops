@@ -75,6 +75,71 @@ RSpec.describe Reports::ExportBuilder do
         expect(result[:output_path]).to end_with(".csv")
       end
     end
+
+    it "gera XLSX com abas de relatório e resumo" do
+      create(:order_service, company: company, client: client, status: :finalizada)
+      report = create(
+        :report,
+        company: company,
+        user: user,
+        report_type: :service_orders,
+        filters: { "export_format" => "xlsx" }
+      )
+
+      result = described_class.call(report)
+
+      aggregate_failures do
+        expect(result[:content_type]).to eq("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        expect(result[:output_path]).to end_with(".xlsx")
+        expect(xlsx_entry(result[:output_path], "xl/workbook.xml")).to include("Relatorio", "Resumo")
+        expect(xlsx_entry(result[:output_path], "xl/worksheets/sheet1.xml")).to include("Codigo", "Cliente Exportacao")
+      end
+    end
+
+    it "gera PDF usando filtros vazios e intervalo padrão" do
+      create(:order_service, company: company, client: client, status: :cancelada)
+      report = create(
+        :report,
+        title: "Relatorio OS",
+        company: company,
+        user: user,
+        report_type: :service_orders,
+        filters: { "export_format" => "pdf", "status" => "", "start_date" => "", "end_date" => "" }
+      )
+
+      result = described_class.call(report)
+
+      aggregate_failures do
+        expect(result[:content_type]).to eq("application/pdf")
+        expect(result[:output_path]).to end_with(".pdf")
+        expect(File.binread(result[:output_path], 4)).to eq("%PDF")
+      end
+    end
+
+    it "ignora datas inválidas e limita períodos maiores que seis meses" do
+      old_order = create(:order_service, company: company, client: client, created_at: 8.months.ago)
+      current_order = create(:order_service, company: company, client: client, created_at: 1.day.ago)
+      report = create(
+        :report,
+        company: company,
+        user: user,
+        report_type: :service_orders,
+        filters: {
+          "export_format" => "csv",
+          "start_date" => 1.year.ago.to_date.to_s,
+          "end_date" => "data-invalida"
+        }
+      )
+
+      result = described_class.call(report)
+      csv = CSV.read(result[:output_path])
+      exported_codes = csv.drop(1).take_while { |row| row.any? }.map(&:first)
+
+      aggregate_failures do
+        expect(exported_codes).to include(current_order.code.to_s)
+        expect(exported_codes).not_to include(old_order.code.to_s)
+      end
+    end
   end
 
   def company_with_active_subscription
@@ -82,5 +147,9 @@ RSpec.describe Reports::ExportBuilder do
     company = create(:company, plan: plan)
     create(:subscription, company: company, subscription_plan: plan, status: :active)
     company
+  end
+
+  def xlsx_entry(path, entry_name)
+    Zip::File.open(path) { |zip| zip.read(entry_name) }
   end
 end
