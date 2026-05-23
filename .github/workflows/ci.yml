@@ -196,4 +196,5 @@ jobs:
           spec/controllers
           spec/jobs
           spec/mailers
+          spec/queries
           spec/services
