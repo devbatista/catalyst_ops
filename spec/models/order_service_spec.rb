@@ -42,6 +42,34 @@ RSpec.describe OrderService, type: :model do
       expect(OrderService.by_status(:concluida)).to include(os_concluida)
       expect(OrderService.by_status(:cancelada)).to include(os_cancelada)
     end
+
+    it "retorna ordens por cliente, técnico, atribuição e orçamento" do
+      technician = os_andamento.users.first
+      without_budget = create_order_service(status: :agendada, created_without_budget: true)
+
+      aggregate_failures do
+        expect(OrderService.by_client(client.id)).to include(os_agendada, os_andamento)
+        expect(OrderService.by_technician(technician.id)).to contain_exactly(os_andamento)
+        expect(OrderService.assigned).to contain_exactly(os_andamento)
+        expect(OrderService.unassigned).to include(os_agendada, os_concluida, os_cancelada, without_budget)
+        expect(OrderService.created_without_budget).to contain_exactly(without_budget)
+      end
+    end
+
+    it "retorna ordens agendadas para hoje, atrasadas e finalizadas no mês" do
+      today = create_order_service(status: :agendada, scheduled_at: Time.current.change(hour: 10), expected_end_at: Time.current.change(hour: 12))
+      overdue = create_order_service(status: :agendada)
+      overdue.update_columns(scheduled_at: 2.days.ago, expected_end_at: 1.day.ago)
+      finished = create_order_service(status: :finalizada, updated_at: Time.current)
+      old_finished = create_order_service(status: :finalizada)
+      old_finished.update_column(:updated_at, 2.months.ago)
+
+      aggregate_failures do
+        expect(OrderService.scheduled_for_today).to include(today)
+        expect(OrderService.to_overdue).to include(overdue)
+        expect(OrderService.finished_this_month).to include(finished)
+      end
+    end
   end
 
   describe "métodos de negócio" do
@@ -100,6 +128,38 @@ RSpec.describe OrderService, type: :model do
       )
     end
 
+    it "retorna próximas transições para todos os status" do
+      expectations = {
+        pendente: ["cancelada"],
+        agendada: ["em_andamento", "cancelada"],
+        atrasada: ["em_andamento", "cancelada"],
+        em_andamento: ["concluida", "cancelada"],
+        concluida: ["finalizada"],
+        finalizada: [],
+        cancelada: []
+      }
+
+      expectations.each do |status, next_statuses|
+        expect(build(:order_service, status: status).next_possible_statuses).to eq(next_statuses)
+      end
+    end
+
+    it "retorna permissões de ação conforme status e conteúdo" do
+      technician = create(:user, :tecnico, company: company, active: true)
+      another_technician = create(:user, :tecnico, company: company, active: true)
+      scheduled = create_order_service(status: :agendada)
+      scheduled.users << technician
+      in_progress = create_order_service(status: :em_andamento, users: [another_technician])
+      create(:service_item, order_service: in_progress)
+
+      aggregate_failures do
+        expect(scheduled.reload.can_be_started?).to be true
+        expect(in_progress.reload.can_be_completed?).to be true
+        expect(build(:order_service, status: :concluida).can_be_cancelled?).to be false
+        expect(build(:order_service, status: :atrasada).overdue?).to be true
+      end
+    end
+
     it "calcula duração em horas" do
       order_service = build(:order_service, started_at: Time.zone.local(2026, 5, 20, 8), finished_at: Time.zone.local(2026, 5, 20, 10, 30))
 
@@ -139,6 +199,37 @@ RSpec.describe OrderService, type: :model do
       aggregate_failures do
         expect(order_service).not_to be_valid
         expect(order_service.errors[:base]).to include("Limite de ordens de serviço atingido para o plano atual da empresa.")
+      end
+    end
+
+    it "valida desconto percentual e exige motivo quando desconto é aplicado" do
+      order_service = build(:order_service, company: company, client: client, discount_type: "percent", discount_value: 101, discount_reason: "")
+      order_service.service_items.build(description: "Servico", quantity: 1, unit_price: 100)
+
+      aggregate_failures do
+        expect(order_service).not_to be_valid
+        expect(order_service.errors[:discount_value]).to include("não pode ser maior que 100%")
+        expect(order_service.errors[:discount_reason]).to include("deve ser informado quando houver desconto")
+      end
+    end
+
+    it "valida desconto fixo maior que subtotal" do
+      order_service = build(:order_service, company: company, client: client, discount_type: "fixed", discount_value: 150, discount_reason: "Cortesia")
+      order_service.service_items.build(description: "Servico", quantity: 1, unit_price: 100)
+
+      aggregate_failures do
+        expect(order_service).not_to be_valid
+        expect(order_service.errors[:discount_value]).to include("não pode ser maior que o subtotal da OS")
+      end
+    end
+
+    it "normaliza desconto vazio para nenhum desconto" do
+      order_service = create_order_service(discount_type: "", discount_value: 50, discount_reason: "Promoção")
+
+      aggregate_failures do
+        expect(order_service.discount_type).to eq("none")
+        expect(order_service.discount_value).to eq(0)
+        expect(order_service.discount_reason).to be_nil
       end
     end
   end
