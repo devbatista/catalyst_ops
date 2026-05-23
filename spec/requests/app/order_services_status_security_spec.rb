@@ -91,6 +91,48 @@ RSpec.describe "Segurança de status em App::OrderServices", type: :request do
     end
   end
 
+  it "lista ordens sem técnico e atrasadas da empresa" do
+    unassigned_order = create(:order_service, company: company, client: client, title: "OS Sem Técnico", status: :pendente)
+    overdue_order = create(:order_service, company: company, client: client, title: "OS Atrasada", status: :atrasada, scheduled_at: 3.days.ago, expected_end_at: 2.days.ago)
+    assigned_order = create(:order_service, company: company, client: client, title: "OS Com Técnico", status: :agendada)
+    create(:assignment, order_service: assigned_order, user: create(:user, :tecnico, company: company, active: true))
+
+    get "/order_services/unassigned"
+    expect(response.body).to include(unassigned_order.id)
+    expect(response.body).not_to include(assigned_order.id)
+
+    get "/order_services/overdue"
+    expect(response.body).to include(overdue_order.id)
+  end
+
+  it "envia PDF para o cliente quando OS está concluída" do
+    delivery = instance_double(ActionMailer::MessageDelivery, deliver_later: true)
+    order_service = create(:order_service, company: company, client: client, status: :concluida)
+    allow(OrderServiceMailer).to receive(:send_pdf_to_client).and_return(delivery)
+
+    post "/order_services/#{order_service.id}/send_pdf_to_client"
+
+    aggregate_failures do
+      expect(response).to redirect_to(app_order_service_url(order_service))
+      expect(flash[:notice]).to eq("PDF enviado para o cliente com sucesso.")
+      expect(OrderServiceMailer).to have_received(:send_pdf_to_client).with(order_service, user)
+      expect(delivery).to have_received(:deliver_later)
+    end
+  end
+
+  it "bloqueia envio de PDF quando cliente não tem e-mail" do
+    client_without_email = create(:client, company: company)
+    client_without_email.update_column(:email, "")
+    order_service = create(:order_service, company: company, client: client_without_email, status: :concluida)
+
+    post "/order_services/#{order_service.id}/send_pdf_to_client"
+
+    aggregate_failures do
+      expect(response).to redirect_to(app_order_service_url(order_service))
+      expect(flash[:alert]).to eq("O cliente não possui e-mail cadastrado.")
+    end
+  end
+
   def app_order_service_url(order_service)
     "http://#{app_host}/order_services/#{order_service.id}"
   end
