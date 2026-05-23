@@ -15,15 +15,16 @@ RSpec.describe "App::OnboardingProgressController", type: :request do
   it "exibe progresso atual em JSON" do
     get "/onboarding_progress", as: :json
 
-    payload = JSON.parse(response.body)
-    expect(response).to have_http_status(:ok)
+    expect(response).to have_http_status(:ok), response.body
+    payload = parsed_json_response
     expect(payload.dig("onboarding_progress", "steps_total")).to eq(UserOnboardingProgress::STEP_KEYS.size)
   end
 
   it "marca etapa concluída" do
     patch "/onboarding_progress", params: { operation: "complete_step", step_key: "created_budget" }, as: :json
 
-    payload = JSON.parse(response.body)
+    expect(response).to have_http_status(:ok), response.body
+    payload = parsed_json_response
     expect(payload.dig("onboarding_progress", "completed_steps")).to include("created_budget" => true)
     expect(user.user_onboarding_progress.reload).to be_completed_step("created_budget")
   end
@@ -32,7 +33,7 @@ RSpec.describe "App::OnboardingProgressController", type: :request do
     patch "/onboarding_progress", params: { operation: "invalida" }, as: :json
 
     expect(response).to have_http_status(:unprocessable_entity)
-    expect(JSON.parse(response.body)["success"]).to be false
+    expect(parsed_json_response["success"]).to be false
   end
 
   def active_company
@@ -44,5 +45,11 @@ RSpec.describe "App::OnboardingProgressController", type: :request do
 
   def scoped_host_for(subdomain)
     ([subdomain] + Array.new(Rails.application.config.action_dispatch.tld_length.to_i - 1, "app") + ["example", "com"]).join(".")
+  end
+
+  def parsed_json_response
+    expect(response.media_type).to eq("application/json"), response.body.first(1_000)
+
+    JSON.parse(response.body)
   end
 end
