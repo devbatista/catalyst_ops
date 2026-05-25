@@ -1,44 +1,59 @@
-# CatalystOps - README Tecnico
+# CatalystOps - README Técnico
 
-Este documento e voltado para desenvolvimento, manutencao e troubleshooting do
+Este documento é voltado para desenvolvimento, manutenção e troubleshooting do
 projeto. Ele complementa o `README.md` da raiz com foco em arquitetura
-aplicacional, boundaries de dominio, autorizacao, background jobs e
+aplicacional, boundaries de domínio, autorização, background jobs e
 particularidades do workspace.
 
-## Visao arquitetural
+## Documentação para agentes de IA
 
-O CatalystOps e uma aplicacao Ruby on Rails com modelo SaaS multi-tenant,
-orientada a empresas prestadoras de servicos tecnicos. O tenant primario e
-`Company`, e a maior parte da modelagem de negocio deriva desse isolamento.
+O repositório possui documentação neutra para agentes de IA:
 
-Pilares tecnicos do projeto:
+- [`AGENTS.md`](AGENTS.md): ponto de entrada com regras gerais.
+- [`docs/dev/ai/00_indice.md`](docs/dev/ai/00_indice.md): índice de contexto
+  por domínio.
+
+Antes de alterar fluxos sensíveis, leia o arquivo de domínio correspondente em
+`docs/dev/ai/`. Essa documentação complementa este README técnico com regras de
+negócio, riscos comuns e testes recomendados por área.
+
+## Visão arquitetural
+
+O CatalystOps é uma aplicação Ruby on Rails com modelo SaaS multi-tenant,
+orientada a empresas prestadoras de serviços técnicos. O tenant primário é
+`Company`, e a maior parte da modelagem de negócio deriva desse isolamento.
+
+Pilares técnicos do projeto:
 
 - Ruby on Rails como framework MVC
 - PostgreSQL como datastore transacional
 - Redis como backend de fila e cache
 - Sidekiq para processamento assíncrono
-- Devise para autenticacao
-- CanCanCan para autorizacao
+- Devise para autenticação
+- CanCanCan para autorização
 - Active Storage para anexos
-- Action Mailer para notificacoes transacionais
+- Action Mailer para notificações transacionais
+- Mercado Pago para assinaturas e pagamentos
+- Sentry para monitoramento de erros
+- Auditoria global em `audit_events`
 
-## Topologia logica
+## Topologia lógica
 
-O sistema e segmentado por subdominios, cada um com responsabilidade clara:
+O sistema é segmentado por subdomínios, cada um com responsabilidade clara:
 
-- `register`: onboarding, criacao de empresa e assinatura inicial
-- `login`: autenticacao e recuperacao de credenciais
-- `app`: area operacional da empresa
+- `register`: onboarding, criação de empresa e assinatura inicial
+- `login`: autenticação e recuperação de credenciais
+- `app`: área operacional da empresa
 - `admin`: backoffice da plataforma
 - `webhook`: entrada de callbacks externos
 
-Essa separacao ajuda a preservar coesao de contexto e reduz acoplamento entre
-fluxos de onboarding, operacao e administracao global.
+Essa separação ajuda a preservar coesão de contexto e reduz acoplamento entre
+fluxos de onboarding, operação e administração global.
 
 ## Modelo de tenancy
 
-O tenancy e implementado em nivel aplicacional, principalmente por escopo de
-`company_id`. Em termos praticos:
+O tenancy é implementado em nível aplicacional, principalmente por escopo de
+`company_id`. Em termos práticos:
 
 - `User` pertence a uma `Company`
 - `Client` pertence a uma `Company`
@@ -49,102 +64,102 @@ O tenancy e implementado em nivel aplicacional, principalmente por escopo de
 Regra operacional importante:
 
 - sempre que a consulta estiver em contexto de app, o filtro por empresa deve
-  ser explicito ou derivado do relacionamento do `current_user`
-- qualquer query "global" em controllers da area `app` deve ser tratada como
-  suspeita ate prova em contrario
+  ser explícito ou derivado do relacionamento do `current_user`
+- qualquer query "global" em controllers da área `app` deve ser tratada como
+  suspeita até prova em contrário
 
 ## Camadas e namespaces
 
-O projeto esta organizado em dois namespaces principais de interface:
+O projeto está organizado em dois namespaces principais de interface:
 
-- `App::...`: contexto de empresa usuaria
+- `App::...`: contexto de empresa usuária
 - `Admin::...`: contexto administrativo da plataforma
 
-Dentro de `app/controllers/app`, o comportamento e role-aware:
+Dentro de `app/controllers/app`, o comportamento é role-aware:
 
 - `gestor`
 - `tecnico`
 
-O roteamento e separado em arquivos por area, por exemplo:
+O roteamento é separado em arquivos por área, por exemplo:
 
-- [`config/routes/app.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/config/routes/app.rb)
-- [`config/routes/admin.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/config/routes/admin.rb)
+- [`config/routes/app.rb`](config/routes/app.rb)
+- [`config/routes/admin.rb`](config/routes/admin.rb)
 
-## Autenticacao e autorizacao
+## Autenticação e autorização
 
-### Autenticacao
+### Autenticação
 
-O projeto usa Devise. O `current_user` e o principal entrypoint de contexto.
+O projeto usa Devise. O `current_user` é o principal entrypoint de contexto.
 Praticamente todo fluxo protegido depende de:
 
-- usuario autenticado
-- role valida
+- usuário autenticado
+- role válida
 - `company_id` consistente
 
-### Autorizacao
+### Autorização
 
-As permissoes sao centralizadas em [`app/models/ability.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/app/models/ability.rb).
+As permissões são centralizadas em [`app/models/ability.rb`](app/models/ability.rb).
 
-Esse arquivo concentra a matriz RBAC/ABAC da aplicacao. Os principais vetores de
-decisao sao:
+Esse arquivo concentra a matriz RBAC/ABAC da aplicação. Os principais vetores de
+decisão são:
 
-- role do usuario (`admin`, `gestor`, `tecnico`)
+- role do usuário (`admin`, `gestor`, `tecnico`)
 - escopo por empresa
 - ownership da entidade
-- relacionamento indireto, por exemplo tecnico vendo apenas OS atribuidas
+- relacionamento indireto, por exemplo técnico vendo apenas OS atribuídas
 
-Padrao esperado:
+Padrão esperado:
 
-- regras globais por role ficam em metodos dedicados
+- regras globais por role ficam em métodos dedicados
 - controllers usam `authorize!` ou `load_and_authorize_resource`
-- views escondem acoes nao autorizadas, mas a regra real precisa estar no backend
+- views escondem ações não autorizadas, mas a regra real precisa estar no backend
 
-## Dominios funcionais principais
+## Domínios funcionais principais
 
 ### 1. Empresa e assinatura
 
-`Company` e o agregado raiz de tenancy. Ela centraliza:
+`Company` é o agregado raiz de tenancy. Ela centraliza:
 
-- usuarios
+- usuários
 - clientes
-- ordens de servico
+- ordens de serviço
 - tickets
 - assinatura corrente
 
 `Subscription` modela o estado comercial do cliente SaaS. Alguns comportamentos
 de produto dependem diretamente do plano corrente, como:
 
-- limite de tecnicos
-- limite de ordens de servico
-- nivel de suporte
+- limite de técnicos
+- limite de ordens de serviço
+- nível de suporte
 
-### 2. Usuarios e papeis
+### 2. Usuários e papéis
 
-`User` suporta papeis distintos no mesmo sistema:
+`User` suporta papéis distintos no mesmo sistema:
 
 - `gestor`: opera a empresa
-- `tecnico`: executa ordens de servico
+- `tecnico`: executa ordens de serviço
 - `admin`: opera a plataforma
 
-O sistema tambem usa semantica como `can_be_technician`, o que exige cuidado na
-leitura das regras de negocio e nos filtros de consulta.
+O sistema também usa semântica como `can_be_technician`, o que exige cuidado na
+leitura das regras de negócio e nos filtros de consulta.
 
 ### 3. Clientes
 
 `Client` representa o cliente final da empresa operadora. O relacionamento com
-`OrderService` e central para o fluxo operacional.
+`OrderService` é central para o fluxo operacional.
 
-### 4. Ordens de servico
+### 4. Ordens de serviço
 
-`OrderService` e um dos aggregates centrais do sistema. Ela concentra:
+`OrderService` é um dos aggregates centrais do sistema. Ela concentra:
 
 - cliente
 - empresa
-- tecnicos vinculados via `Assignment`
-- itens de servico
+- técnicos vinculados via `Assignment`
+- itens de serviço
 - anexos
-- transicoes de status
-- disparos de notificacao por email
+- transições de status
+- disparos de notificação por email
 
 Enum de status atual:
 
@@ -159,27 +174,27 @@ Enum de status atual:
 Esse lifecycle impacta:
 
 - dashboards
-- notificacoes
-- regras de edicao
-- visibilidade de acoes
-- calculos operacionais e financeiros
+- notificações
+- regras de edição
+- visibilidade de ações
+- cálculos operacionais e financeiros
 
-### 5. Atribuicao de tecnicos
+### 5. Atribuição de técnicos
 
-`Assignment` faz o binding entre `User` tecnico e `OrderService`.
+`Assignment` faz o binding entre `User` técnico e `OrderService`.
 
-Esse model encapsula validacoes importantes:
+Esse model encapsula validações importantes:
 
-- usuario atribuido deve ser tecnico
-- nao pode haver sobreposicao indevida de janela operacional
-- nao se deve atribuir tecnico em status nao permitidos
+- usuário atribuído deve ser técnico
+- não pode haver sobreposição indevida de janela operacional
+- não se deve atribuir técnico em status não permitidos
 
-Tambem e um ponto de fan-out de notificacao para tecnicos.
+Também é um ponto de fan-out de notificação para técnicos.
 
-### 6. Itens de servico
+### 6. Itens de serviço
 
-`ServiceItem` compoe o valor operacional de cada OS. Sempre que houver calculo
-de valor agregado, o baseline correto e:
+`ServiceItem` compõe o valor operacional de cada OS. Sempre que houver cálculo
+de valor agregado, o baseline correto é:
 
 `quantity * unit_price`
 
@@ -190,8 +205,8 @@ quantidade for maior que 1.
 
 `SupportTicket` e `SupportMessage` cobrem o fluxo de suporte conversacional.
 
-`KnowledgeBaseArticle` cobre artigos de ajuda e agora suporta segregacao por
-audiencia via campo `audience`, tipicamente:
+`KnowledgeBaseArticle` cobre artigos de ajuda e agora suporta segregação por
+audiência via campo `audience`, tipicamente:
 
 - `gestor`
 - `tecnico`
@@ -200,125 +215,145 @@ audiencia via campo `audience`, tipicamente:
 
 ### Dashboard de gestor
 
-Foco em indicadores de operacao da empresa:
+Foco em indicadores de operação da empresa:
 
 - clientes
-- tecnicos
+- técnicos
 - volume de OS
 - faturamento bruto operacional
 - ordens recentes
-- distribuicao por status
+- distribuição por status
 
-O "faturamento bruto" no dashboard de gestor e um indicador operacional,
-derivado da soma dos itens de servico, nao um fluxo de caixa contabil.
+O "faturamento bruto" no dashboard de gestor é um indicador operacional,
+derivado da soma dos itens de serviço, não um fluxo de caixa contábil.
 
-### Dashboard de tecnico
+### Dashboard de técnico
 
-Foco em execucao:
+Foco em execução:
 
 - agenda do dia
 - OS em andamento
 - OS atrasadas
-- concluidas no mes
-- proximas visitas
-- atribuicoes correntes
-- pendentes de finalizacao
+- concluídas no mês
+- próximas visitas
+- atribuições correntes
+- pendentes de finalização
 
-Esse dashboard usa um recorte de `OrderService` filtrado pelas OS atribuidas ao
+Esse dashboard usa um recorte de `OrderService` filtrado pelas OS atribuídas ao
 `current_user`.
 
 ### Dashboard de admin
 
-Foco em saude da plataforma:
+Foco em saúde da plataforma:
 
 - empresas ativas
 - assinaturas ativas
 - MRR estimado
 - tickets abertos
-- novas empresas no mes
-- usuarios no mes
-- OS finalizadas no mes
-- assinaturas em atencao
+- novas empresas no mês
+- usuários no mês
+- OS finalizadas no mês
+- assinaturas em atenção
 
-Boa pratica adotada recentemente:
+Boa prática adotada recentemente:
 
-- mover `where` e agregacoes repetidas para scopes/metodos nos models
+- mover `where` e agregações repetidas para scopes/métodos nos models
 - manter controller fino e sem query ad hoc demais
 
-## Regras especificas para tecnico
+## Regras específicas para técnico
 
-O papel `tecnico` possui um conjunto de restricoes operacionais relevantes:
+O papel `tecnico` possui um conjunto de restrições operacionais relevantes:
 
 - pode ver apenas OS associadas a ele
-- nao acessa tickets de suporte
+- não acessa tickets de suporte
 - acessa a base de conhecimento via submenu de suporte
 - tem dashboard dedicado
 - pode editar apenas subconjunto controlado da OS
 
-Na tela de edicao de OS:
+Na tela de edição de OS:
 
-- campos estruturais ficam visiveis, mas `disabled`
+- campos estruturais ficam visíveis, mas `disabled`
 - o backend aceita apenas os atributos autorizados
-- `attachments` e `observations` sao o foco principal de update
+- `attachments` e `observations` são o foco principal de update
 
 Em OS atrasada:
 
 - apenas `gestor` pode reagendar
-- tecnico nao deve conseguir burlar isso via URL direta
+- técnico não deve conseguir burlar isso via URL direta
 
-## Area financeira
+## Área financeira
 
-A area `Financeira` foi modelada como um modulo operacional para gestor,
-baseado no valor dos itens de servico por status da OS.
+A área `Financeira` foi modelada como um módulo operacional para gestor,
+baseado no valor dos itens de serviço por status da OS.
 
-Semantica atual:
+Semântica atual:
 
 - `Faturamento Realizado`: OS `finalizada`
 - `Faturamento Pendente`: OS `pendente`, `agendada`, `em_andamento`,
   `concluida`, `atrasada`
-- `cancelada` fica fora do calculo
+- `cancelada` fica fora do cálculo
 
-Isso nao e fluxo de caixa contabil. E uma leitura operacional de backlog e
+Isso não é fluxo de caixa contábil. É uma leitura operacional de backlog e
 receita consolidada sobre o agregado `OrderService`.
 
 ## Background jobs e assincronia
 
-O projeto usa Sidekiq para execucao assíncrona, principalmente em:
+O projeto usa Sidekiq para execução assíncrona, principalmente em:
 
 - envio de emails
-- eventos de notificacao
+- eventos de notificação
+- processamento de pagamentos de cadastro
+- relatórios/exportações
+- ciclo de vida e reconciliação de assinaturas
+- limpeza de auditoria
 
-### Variaveis de ambiente de reconciliacao
+Cron jobs carregados no startup do Sidekiq:
+
+| Job | Cron | Objetivo |
+| --- | --- | --- |
+| `MarkOverdueOrderServicesJob` | `* * * * *` | marca OS como atrasadas quando o horário agendado já passou |
+| `Subscriptions::CycleSubscriptionsJob` | `0 10 * * *` | cicla assinaturas aptas para renovação |
+| `Subscriptions::NotifyOverdueSubscriptionsJob` | `0 9 * * *` | notifica assinaturas vencidas há 5 dias |
+| `Subscriptions::ExpireOverdueSubscriptionsJob` | `0 11 * * *` | expira assinaturas vencidas há 10 dias ou mais |
+| `Subscriptions::FinalizeScheduledCancellationsJob` | `15 11 * * *` | finaliza cancelamentos agendados para o fim do período |
+| `Subscriptions::ReconcileSubscriptionsJob` | `0 12 * * *` | reconcilia status local de assinaturas com o Mercado Pago |
+| `Subscriptions::ReprocessPendingPaymentsJob` | `30 12 * * *` | reprocessa assinaturas `pending` de pix/boleto sem webhook processado |
+| `Audit::CleanupEventsJob` | `0 2 * * *` | remove `audit_events` antigos conforme política de retenção |
+
+Os agendamentos ficam em `config/initializers/sidekiq_schedules.rb`, usam fila
+`default` e timezone `America/Sao_Paulo`.
+
+### Variáveis de ambiente de reconciliação
 
 Os jobs de assinaturas usam janelas de tempo para reduzir custo de chamadas ao
-gateway e limitar o volume processado por execucao.
+gateway e limitar o volume processado por execução.
 
 - `SUBSCRIPTIONS_RECONCILIATION_WINDOW_DAYS`
   Controla a janela (em dias) do
   `Subscriptions::ReconcileSubscriptionsJob`.
-  Valor padrao: `30`.
+  Valor padrão: `30`.
 - `SUBSCRIPTIONS_PENDING_REPROCESS_WINDOW_DAYS`
   Controla a janela (em dias) do
   `Subscriptions::ReprocessPendingPaymentsJob`.
-  Valor padrao: `30`.
+  Valor padrão: `30`.
 
-Se as variaveis estiverem ausentes, vazias, `0` ou negativas, os jobs usam
+Se as variáveis estiverem ausentes, vazias, `0` ou negativas, os jobs usam
 fallback para `30` dias.
 
-### Variaveis de ambiente de retencao de auditoria
+### Variáveis de ambiente de retenção de auditoria
 
-O job `Audit::CleanupEventsJob` aplica a politica de retencao em `audit_events`
+O job `Audit::CleanupEventsJob` aplica a política de retenção em `audit_events`
 no modo hot-only, removendo registros antigos em lotes.
 
 - `AUDIT_LOG_RETENTION_DAYS`
-  Janela de retencao em dias para `audit_events`.
-  Valor padrao: `180`.
+  Janela de retenção em dias para `audit_events`.
+  Valor padrão: `180`.
 - `AUDIT_LOG_CLEANUP_BATCH_SIZE`
   Quantidade de registros por lote durante a limpeza.
-  Valor padrao: `1000`.
+  Valor padrão: `1000`.
 - `AUDIT_LOG_CLEANUP_DRY_RUN`
-  Quando `true`, nao remove dados; apenas mede quantos seriam removidos.
-  Valor padrao: `false`.
+  Quando `true`, não remove dados; apenas mede quantos seriam removidos.
+  Valor padrão: `false`.
 
 ## Auditoria global (base)
 
@@ -339,74 +374,56 @@ Para registrar eventos de forma padronizada, usar:
 
 - `Audit::EventLogger.call(...)`
 
-Catalogo inicial de acoes:
+Catálogo inicial de ações:
 
-- autenticacao: `auth.*`
-- usuarios/tecnicos: `user.*` e `technician.*`
+- autenticação: `auth.*`
+- usuários/técnicos: `user.*` e `technician.*`
 - clientes: `client.*`
-- ordens de servico: `order_service.*`
+- ordens de serviço: `order_service.*`
 - cupons: `coupon.*`
 - assinaturas/pagamentos: `subscription.*`
 - webhooks: `webhook.*`
 - sistema/jobs: `job.*` e `system.*`
 
-Padrao de nome:
+Padrão de nome:
 
-- `<dominio>.<evento>[.<subevento>]`
+- `<domínio>.<evento>[.<subevento>]`
 - exemplos: `order_service.status.changed`, `webhook.signature.invalid`
 
-As acoes validas ficam centralizadas em:
+As ações válidas ficam centralizadas em:
 
 - `Audit::ActionCatalog::ALL`
-- arquivo: [`app/services/audit/action_catalog.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/app/services/audit/action_catalog.rb)
+- arquivo: [`app/services/audit/action_catalog.rb`](app/services/audit/action_catalog.rb)
 
 Toda vez que aparecer `deliver_later`, o fluxo real passa por:
 
-1. serializacao do job
-2. persistencia/logica da fila no Redis
+1. serialização do job
+2. persistência/lógica da fila no Redis
 3. consumo pelo processo `sidekiq`
-4. reidratacao de argumentos, inclusive `GlobalID`
-5. execucao do mailer
+4. reidratação de argumentos, inclusive `GlobalID`
+5. execução do mailer
 
 Isso significa que erros em mailers podem aparecer tardiamente, fora da
 request original.
 
-## Action Mailer e notificacoes de OS
+## Action Mailer e notificações de OS
 
 `OrderService` possui callbacks que disparam emails transacionais em eventos de
-mudanca de estado.
+mudança de estado.
 
 Exemplos:
 
-- criacao
+- criação
 - agendamento
-- inicio de atendimento
-- conclusao
-- finalizacao
+- início de atendimento
+- conclusão
+- finalização
 - atraso
 
-### Inconsistencia conhecida em `notify_create`
-
-No estado atual do codigo:
-
-- `OrderServiceMailer#notify_create` define `@order_service` e `@client`
-- o destinatario e `@client.email`
-- o template texto usa `@client.name`
-- o template HTML ainda referencia `@gestor.name`
-
-Consequencia:
-
-- o job pode falhar com `undefined method 'name' for nil`
-- o erro aparece em log do Sidekiq como `ActionView::Template::Error`
-
-Quando o log mostra:
-
-- `Performing ActionMailer::MailDeliveryJob`
-- `Rendered order_service_mailer/notify_create.html.erb`
-
-isso significa que o worker retirou o job da fila e iniciou a renderizacao. So
-ha garantia real de sucesso quando o job conclui sem `WARN` ou `ERROR`
-subsequente.
+Quando o log mostra `Performing ActionMailer::MailDeliveryJob`, isso significa
+que o worker retirou o job da fila e iniciou a renderização. Só há garantia real
+de sucesso quando o job conclui sem `WARN` ou `ERROR` subsequente para o mesmo
+job.
 
 ## Seeds e bootstrap de dados
 
@@ -416,18 +433,18 @@ O bootstrap usa carga ordenada por ambiente:
 - `db/seeds/development`
 - `db/seeds/production`
 
-O seed de preparacao limpa a base antes de repopular. Como existem varias FKs,
-foi necessario usar `disable_referential_integrity` para evitar violacoes
+O seed de preparação limpa a base antes de repopular. Como existem várias FKs,
+foi necessário usar `disable_referential_integrity` para evitar violações
 durante `delete_all`.
 
 Pontos relevantes do dataset de desenvolvimento:
 
 - empresas
-- usuarios
+- usuários
 - clientes
-- ordens de servico
-- atribuicoes
-- itens de servico
+- ordens de serviço
+- atribuições
+- itens de serviço
 - artigos de base de conhecimento
 - tickets e mensagens de suporte
 
@@ -436,63 +453,63 @@ Pontos relevantes do dataset de desenvolvimento:
 Os artigos markdown em `docs/gestor` e `docs/tecnico` servem como fonte para a
 base de conhecimento exibida no app.
 
-Implicacoes tecnicas:
+Implicações técnicas:
 
-- a estrutura de pastas vira categoria semantica
+- a estrutura de pastas vira categoria semântica
 - o `seed` transforma markdown em HTML
 - o campo `audience` segmenta artigos por papel
 
-Isso cria um fluxo hibrido:
+Isso cria um fluxo híbrido:
 
-- markdown versionado em repositorio
-- conteudo indexado em banco
-- renderizacao filtrada por role no app
+- markdown versionado em repositório
+- conteúdo indexado em banco
+- renderização filtrada por role no app
 
-## Backup de banco (producao)
+## Backup de banco (produção)
 
-Backup automatico diario via script de host:
+Backup automático diário via script de host:
 
-- script: [`bin/backup_db`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/bin/backup_db)
+- script: [`bin/backup_db`](bin/backup_db)
 - formato: `pg_dump` custom (`.dump`)
-- retencao padrao: `7` dias (`BACKUP_RETENTION_DAYS`)
+- retenção padrão: `7` dias (`BACKUP_RETENTION_DAYS`)
 
-Exemplo de cron (todo dia as 02:15):
+Exemplo de cron (todo dia às 02:15):
 
 ```bash
 15 2 * * * cd /opt/catalyst_ops && BACKUP_RETENTION_DAYS=7 /opt/catalyst_ops/bin/backup_db >> /var/log/catalyst_ops_backup.log 2>&1
 ```
 
-Diretorio padrao dos arquivos:
+Diretório padrão dos arquivos:
 
 - `/opt/catalyst_ops/backups/postgres`
 
-## Restore de banco (producao/homologacao)
+## Restore de banco (produção/homologação)
 
 Script de restore:
 
-- [`bin/restore_db`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/bin/restore_db)
+- [`bin/restore_db`](bin/restore_db)
 
-Pre-condicoes:
+Pré-condições:
 
-- Fazer restore preferencialmente em homologacao para validacao.
-- Em producao, parar `web` e `sidekiq` antes do restore para evitar concorrencia.
-- Ter um arquivo `.dump` valido gerado pelo `bin/backup_db`.
+- Fazer restore preferencialmente em homologação para validação.
+- Em produção, parar `web` e `sidekiq` antes do restore para evitar concorrência.
+- Ter um arquivo `.dump` válido gerado pelo `bin/backup_db`.
 
-Restore basico:
+Restore básico:
 
 ```bash
 cd /opt/catalyst_ops
 CONFIRM_RESTORE=yes ./bin/restore_db /opt/catalyst_ops/backups/postgres/catalyst_ops_production_YYYYMMDD_HHMMSS.dump
 ```
 
-Restore para banco alvo especifico:
+Restore para banco alvo específico:
 
 ```bash
 cd /opt/catalyst_ops
 TARGET_DB=catalyst_ops_homolog CONFIRM_RESTORE=yes ./bin/restore_db /opt/catalyst_ops/backups/postgres/catalyst_ops_production_YYYYMMDD_HHMMSS.dump
 ```
 
-Sequencia recomendada em producao:
+Sequência recomendada em produção:
 
 ```bash
 cd /opt/catalyst_ops
@@ -501,13 +518,13 @@ CONFIRM_RESTORE=yes ./bin/restore_db /opt/catalyst_ops/backups/postgres/SEU_ARQU
 docker compose up -d web sidekiq
 ```
 
-Validacao pos-restore:
+Validação pós-restore:
 
 - Rodar `docker compose exec web bundle exec rails db:migrate:status`.
-- Acessar login/app/admin e validar fluxo basico de autenticacao.
+- Acessar login/app/admin e validar fluxo básico de autenticação.
 - Conferir `docker compose logs --tail=200 web sidekiq db`.
 
-## Convencoes recomendadas
+## Convenções recomendadas
 
 ### Querying
 
@@ -516,91 +533,91 @@ Validacao pos-restore:
 - preserve scoping por empresa
 - cuidado com `joins + distinct + order` no PostgreSQL
 
-### Autorizacao
+### Autorização
 
-- regra de permissao sempre no backend
+- regra de permissão sempre no backend
 - view apenas reflete o estado autorizado
-- paths sensiveis devem ser protegidos contra acesso direto
+- paths sensíveis devem ser protegidos contra acesso direto
 
-### Calculo de valores
+### Cálculo de valores
 
 - para total de itens, use `quantity * unit_price`
-- para leitura financeira, explicite se o valor e previsto ou realizado
-- nao chame de fluxo de caixa algo que nao modele entrada e saida real
+- para leitura financeira, explicite se o valor é previsto ou realizado
+- não chame de fluxo de caixa algo que não modele entrada e saída real
 
 ### Seeds
 
-- mantenha ordenacao lexical previsivel
+- mantenha ordenação lexical previsível
 - se um seed depender de outro, o nome do arquivo precisa refletir isso
 - ex.: `9-support_tickets.rb` antes de `9a-support_messages.rb`
 
-## CI/CD e governanca de merge
+## CI/CD e governança de merge
 
 ### Pipeline de deploy
 
 O deploy automatizado roda via GitHub Actions em
-[` .github/workflows/deploy.yml `](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/.github/workflows/deploy.yml),
-executando [`bin/deploy`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/bin/deploy) no servidor.
+[` .github/workflows/deploy.yml `](.github/workflows/deploy.yml),
+executando [`bin/deploy`](bin/deploy) no servidor.
 
 Detalhe operacional importante:
 
 - o workflow executa `bash /opt/catalyst_ops/bin/deploy` (sem `chmod`)
-- isso evita alterar permissao do arquivo no servidor e sujar `git status`
+- isso evita alterar permissão do arquivo no servidor e sujar `git status`
 
-Fluxo tecnico relevante:
+Fluxo técnico relevante:
 
 - `git fetch` + diff de arquivos alterados para calcular plano de deploy
-- rebuild de imagem quando houver mudancas sensiveis (ex.: `db/migrate/*`,
-  `app/*`, `config/*`, `lib/*`, dependencias e dockerfiles)
-- restart de `web`/`sidekiq` quando necessario
+- rebuild de imagem quando houver mudanças sensíveis (ex.: `db/migrate/*`,
+  `app/*`, `config/*`, `lib/*`, dependências e dockerfiles)
+- restart de `web`/`sidekiq` quando necessário
 - `db:migrate` executado via `docker compose run --rm web ...` para aplicar
-  pendencias
+  pendências
 
 Importante para troubleshooting:
 
-- producao nao usa bind mount de codigo no `web`; o codigo em runtime vem da
+- produção não usa bind mount de código no `web`; o código em runtime vem da
   imagem Docker
-- sem rebuild, migration nova pode existir no host git mas nao no container
-- se isso ocorrer, o `db:migrate` nao enxerga o arquivo da migration
+- sem rebuild, migration nova pode existir no host git mas não no container
+- se isso ocorrer, o `db:migrate` não enxerga o arquivo da migration
 
-### Politica de janela para PRs
+### Política de janela para PRs
 
-A politica de janela esta em
-[` .github/workflows/policy-window.yml `](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/.github/workflows/policy-window.yml).
+A política de janela está em
+[` .github/workflows/policy-window.yml `](.github/workflows/policy-window.yml).
 
 Regras implementadas:
 
-- mudancas sensiveis: somente `22:00-06:00` (America/Sao_Paulo)
-- mudancas simples: somente `09:00-18:00` (America/Sao_Paulo)
+- mudanças sensíveis: somente `22:00-06:00` (America/Sao_Paulo)
+- mudanças simples: somente `09:00-18:00` (America/Sao_Paulo)
 - PR com migration deve conter apenas `db/migrate/*` e opcionalmente
   `db/schema.rb`
 
-Observacao:
+Observação:
 
-- o workflow bloqueia merge via check; para aplicacao real, Branch Protection da
+- o workflow bloqueia merge via check; para aplicação real, Branch Protection da
   `main` deve exigir o status check `PR Window Policy / merge_window_policy`
-- como o check e avaliado no momento da execucao do job, para politica de hora
+- como o check é avaliado no momento da execução do job, para política de hora
   estrita no instante do merge recomenda-se habilitar `Require branches to be
   up to date before merging` na `main` ou usar merge queue (`merge_group`) para
-  revalidacao no fluxo final de merge
+  revalidação no fluxo final de merge
 
-## Pontos de atencao
+## Pontos de atenção
 
 ### Scope global enganoso
 
 Qualquer scope com `limit(1)` em model compartilhado deve ser revisado com
-cuidado. Em especial quando a intencao de negocio for "um registro por empresa"
-e nao "um registro global".
+cuidado. Em especial quando a intenção de negócio for "um registro por empresa"
+e não "um registro global".
 
 ### Integridade de assinatura
 
-Se a regra de negocio for "uma unica assinatura ativa por empresa", isso deve
-ser sustentado nao apenas pela aplicacao, mas idealmente por restricao de banco
-ou pelo menos por validacao consistente.
+Se a regra de negócio for "uma única assinatura ativa por empresa", isso deve
+ser sustentado não apenas pela aplicação, mas idealmente por restrição de banco
+ou pelo menos por validação consistente.
 
-### SQL ambiguo
+### SQL ambíguo
 
-Em relacoes com `includes`, `joins` e ordenacao por colunas comuns como
+Em relações com `includes`, `joins` e ordenação por colunas comuns como
 `updated_at`, qualifique explicitamente a tabela:
 
 - `order_services.updated_at`
@@ -609,33 +626,35 @@ Em relacoes com `includes`, `joins` e ordenacao por colunas comuns como
 
 ### Distinct com order no PostgreSQL
 
-`SELECT DISTINCT` combinado com `ORDER BY` em expressoes nao selecionadas pode
+`SELECT DISTINCT` combinado com `ORDER BY` em expressões não selecionadas pode
 quebrar. Se isso aparecer, revise:
 
 - necessidade real de `distinct`
-- expressao usada no `order`
+- expressão usada no `order`
 - possibilidade de qualificar e simplificar a query
 
-## Referencias rapidas
+## Referências rápidas
 
-- [`README.md`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/README.md)
-- [`app/models/ability.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/app/models/ability.rb)
-- [`app/models/order_service.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/app/models/order_service.rb)
-- [`app/models/company.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/app/models/company.rb)
-- [`app/models/subscription.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/app/models/subscription.rb)
-- [`app/controllers/app/dashboard_controller.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/app/controllers/app/dashboard_controller.rb)
-- [`app/controllers/admin/dashboard_controller.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/app/controllers/admin/dashboard_controller.rb)
-- [`app/controllers/app/support_controller.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/app/controllers/app/support_controller.rb)
-- [`app/mailers/order_service_mailer.rb`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/app/mailers/order_service_mailer.rb)
-- [`docs/gestor`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docs/gestor)
-- [`docs/tecnico`](/Users/devbatista/Programacao/devbatista/ruby/catalyst_ops/docs/tecnico)
+- [`README.md`](README.md)
+- [`AGENTS.md`](AGENTS.md)
+- [`docs/dev/ai/00_indice.md`](docs/dev/ai/00_indice.md)
+- [`app/models/ability.rb`](app/models/ability.rb)
+- [`app/models/order_service.rb`](app/models/order_service.rb)
+- [`app/models/company.rb`](app/models/company.rb)
+- [`app/models/subscription.rb`](app/models/subscription.rb)
+- [`app/controllers/app/dashboard_controller.rb`](app/controllers/app/dashboard_controller.rb)
+- [`app/controllers/admin/dashboard_controller.rb`](app/controllers/admin/dashboard_controller.rb)
+- [`app/controllers/app/support_controller.rb`](app/controllers/app/support_controller.rb)
+- [`app/mailers/order_service_mailer.rb`](app/mailers/order_service_mailer.rb)
+- [`docs/gestor`](docs/gestor)
+- [`docs/tecnico`](docs/tecnico)
 
-## Nota final para manutencao
+## Nota final para manutenção
 
-Se voce for mexer em fluxos sensiveis deste projeto, revise sempre estes eixos:
+Se você for mexer em fluxos sensíveis deste projeto, revise sempre estes eixos:
 
 - tenant isolation por `company_id`
-- matrix de permissao em `Ability`
+- matrix de permissão em `Ability`
 - lifecycle de `OrderService`
 - side effects assíncronos no Sidekiq
-- consistencia entre controller, model, view e mailer
+- consistência entre controller, model, view e mailer
