@@ -57,17 +57,19 @@ RSpec.describe OrderService, type: :model do
     end
 
     it "retorna ordens agendadas para hoje, atrasadas e finalizadas no mês" do
-      today = create_order_service(status: :agendada, scheduled_at: Time.current.change(hour: 10), expected_end_at: Time.current.change(hour: 12))
-      overdue = create_order_service(status: :agendada)
-      overdue.update_columns(scheduled_at: 2.days.ago, expected_end_at: 1.day.ago)
-      finished = create_order_service(status: :finalizada, updated_at: Time.current)
-      old_finished = create_order_service(status: :finalizada)
-      old_finished.update_column(:updated_at, 2.months.ago)
+      travel_to Time.zone.local(2026, 5, 15, 8, 0, 0) do
+        today = create_order_service(status: :agendada, scheduled_at: Time.current.change(hour: 10), expected_end_at: Time.current.change(hour: 12))
+        overdue = create_order_service(status: :agendada)
+        overdue.update_columns(scheduled_at: 2.days.ago, expected_end_at: 1.day.ago)
+        finished = create_order_service(status: :finalizada, updated_at: Time.current)
+        old_finished = create_order_service(status: :finalizada)
+        old_finished.update_column(:updated_at, 2.months.ago)
 
-      aggregate_failures do
-        expect(OrderService.scheduled_for_today).to include(today)
-        expect(OrderService.to_overdue).to include(overdue)
-        expect(OrderService.finished_this_month).to include(finished)
+        aggregate_failures do
+          expect(OrderService.scheduled_for_today).to include(today)
+          expect(OrderService.to_overdue).to include(overdue)
+          expect(OrderService.finished_this_month).to include(finished)
+        end
       end
     end
   end
