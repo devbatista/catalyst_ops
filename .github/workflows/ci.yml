@@ -194,6 +194,7 @@ jobs:
           bundle exec rspec
           spec/commands
           spec/controllers
+          spec/helpers
           spec/jobs
           spec/mailers
           spec/queries
