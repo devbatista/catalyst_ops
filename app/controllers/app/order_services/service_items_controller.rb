@@ -1,6 +1,6 @@
 class App::OrderServices::ServiceItemsController < ApplicationController
   before_action :set_order_service
-  before_action :set_service_item, only: [:show, :edit, :update, :destroy]
+  before_action :set_service_item, only: [:edit, :update, :destroy]
   
   def new
     @service_item = @order_service.service_items.build
@@ -12,7 +12,7 @@ class App::OrderServices::ServiceItemsController < ApplicationController
     authorize! :create, @service_item
     
     if @service_item.save
-      redirect_to @order_service, notice: 'Item de serviço adicionado com sucesso.'
+      redirect_to app_order_service_path(@order_service), notice: 'Item de serviço adicionado com sucesso.'
     else
       render :new, status: :unprocessable_entity
     end
@@ -26,7 +26,7 @@ class App::OrderServices::ServiceItemsController < ApplicationController
     authorize! :update, @service_item
     
     if @service_item.update(service_item_params)
-      redirect_to @order_service, notice: 'Item de serviço atualizado com sucesso.'
+      redirect_to app_order_service_path(@order_service), notice: 'Item de serviço atualizado com sucesso.'
     else
       render :edit, status: :unprocessable_entity
     end
@@ -35,13 +35,13 @@ class App::OrderServices::ServiceItemsController < ApplicationController
   def destroy
     authorize! :destroy, @service_item
     @service_item.destroy
-    redirect_to @order_service, notice: 'Item de serviço removido com sucesso.'
+    redirect_to app_order_service_path(@order_service), notice: 'Item de serviço removido com sucesso.'
   end
 
   private
 
   def set_order_service
-    @order_service = OrderService.find(params[:order_service_id])
+    @order_service = OrderService.find(params[:order_service_id] || params[:app_order_service_id])
   end
 
   def set_service_item

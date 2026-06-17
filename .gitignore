@@ -34,13 +34,12 @@
 
 /public/assets
 
+/coverage
+
 # Ignore master key for decrypting credentials and more.
 /config/master.key
 
-/project.md
-/TESTES_RSPEC_CHECKLIST.md
-/CHECKLIST_PENDENCIAS.md
-/SMOKE_TESTS_RELEASE.md
+/checklists
 
 /bin/rails_bkp
 

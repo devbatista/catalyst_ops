@@ -3,6 +3,7 @@ class App::DashboardController < ApplicationController
     authorize! :read, :dashboard
 
     initialize_default_dashboard_variables
+    set_onboarding_welcome_modal
 
     case current_user.role
     when "admin"
@@ -141,5 +142,33 @@ class App::DashboardController < ApplicationController
     @in_progress_count = 0
     @overdue_count = 0
     @budgets_total_value = 0
+  end
+
+  def set_onboarding_welcome_modal
+    @onboarding_progress = current_user.user_onboarding_progress
+    @show_onboarding_welcome_modal = onboarding_welcome_eligible?
+    @show_onboarding_checklist = !current_user.tecnico?
+    @onboarding_checklist_steps = onboarding_checklist_steps
+  end
+
+  def onboarding_welcome_eligible?
+    return true if @onboarding_progress.nil?
+    return false if @onboarding_progress.dismissed_at.present?
+    return false if @onboarding_progress.finished_at.present?
+    return false if @onboarding_progress.last_seen_step.present?
+    return false if @onboarding_progress.completed_steps_count.positive?
+
+    !@onboarding_progress.finished_all_steps?
+  end
+
+  def onboarding_checklist_steps
+    [
+      { key: "created_technician", label: "Cadastrar técnico", path: app_technicians_path },
+      { key: "created_customer", label: "Cadastrar cliente", path: app_clients_path },
+      { key: "created_budget", label: "Criar primeiro orçamento", path: app_budgets_path },
+      { key: "created_first_work_order", label: "Aprovar orçamento para gerar a primeira OS", path: app_budgets_path },
+      { key: "moved_work_order_status", label: "Atualizar status da ordem de serviço", path: app_order_services_path },
+      { key: "viewed_reports", label: "Visualizar relatórios", path: app_reports_path }
+    ]
   end
 end

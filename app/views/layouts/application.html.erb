@@ -25,6 +25,7 @@
   <link href="<%= asset_path('css/bootstrap.min.css') %>" rel="stylesheet">
   <link href="<%= asset_path('css/bootstrap-extended.css') %>" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <%= stylesheet_link_tag "https://cdn.jsdelivr.net/npm/intro.js/minified/introjs.min.css" %>
   <link href="<%= asset_path('css/app.css') %>" rel="stylesheet">
   <link href="<%= asset_path('css/icons.css') %>" rel="stylesheet">
   <!-- Theme Style CSS -->
@@ -46,6 +47,9 @@
   <div class="wrapper">
     <%= render 'layouts/partials/sidebar' %>
     <%= render 'layouts/partials/navbar' %>
+    <% if request.subdomain == "app" && current_user.present? %>
+      <%= render "app/dashboard/onboarding_tour" %>
+    <% end %>
 
     <%= yield %>
   </div>

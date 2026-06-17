@@ -4,14 +4,20 @@ require "cancan/matchers"
 RSpec.describe Ability, type: :model do
   subject(:ability) { Ability.new(user) }
 
-  let(:client) { create(:client) }
-  let(:order_service) { create(:order_service) }
+  let(:plan) { create(:plan) }
+  let(:company) { create(:company, plan: plan) }
+  let!(:subscription) { create(:subscription, company: company, subscription_plan: plan, status: :active) }
+  let(:other_company) { create(:company) }
+  let!(:other_subscription) { create(:subscription, company: other_company, status: :active) }
+
+  let(:client) { create(:client, company: company) }
+  let(:order_service) { create(:order_service, client: client) }
   let(:assignment) { create(:assignment) }
   let(:service_item) { create(:service_item, order_service: order_service) }
-  let(:gestor) { create(:user, role: "gestor") }
-  let(:tecnico) { create(:user, role: "tecnico") }
+  let(:gestor) { create(:user, role: "gestor", company: company) }
+  let(:tecnico) { create(:user, role: "tecnico", company: company) }
   let(:admin) { create(:user, role: "admin") }
-  let(:other_user) { create(:user, role: "tecnico") }
+  let(:other_user) { create(:user, role: "tecnico", company: other_company) }
 
   context "quando admin" do
     let(:user) { admin }
@@ -26,7 +32,7 @@ RSpec.describe Ability, type: :model do
     it { is_expected.to be_able_to(:manage, OrderService) }
     it { is_expected.to be_able_to(:manage, Assignment) }
     it { is_expected.to be_able_to(:manage, ServiceItem) }
-    it { is_expected.to be_able_to(:read, User.new(role: "tecnico")) }
+    it { is_expected.to be_able_to(:read, User.new(role: "tecnico", company_id: company.id)) }
     it { is_expected.to be_able_to(:read, :dashboard) }
 
     it "pode ler e atualizar o próprio perfil" do
@@ -41,7 +47,7 @@ RSpec.describe Ability, type: :model do
 
   context "quando técnico" do
     let(:user) { tecnico }
-    let(:order_service) { create(:order_service) }
+    let(:order_service) { create(:order_service, client: client) }
 
     before do
       # Associa o técnico à OS
@@ -53,7 +59,7 @@ RSpec.describe Ability, type: :model do
     end
 
     it "não pode ler OS não atribuída" do
-      os = create(:order_service)
+      os = create(:order_service, client: client)
       expect(ability).not_to be_able_to(:read, os)
     end
 
@@ -73,7 +79,7 @@ RSpec.describe Ability, type: :model do
     end
 
     it "não pode gerenciar itens de serviço de OSs não atribuídas" do
-      other_os = create(:order_service)
+      other_os = create(:order_service, client: client)
       other_item = create(:service_item, order_service: other_os)
       expect(ability).not_to be_able_to(:manage, other_item)
     end
@@ -82,12 +88,13 @@ RSpec.describe Ability, type: :model do
       assignment = create(:assignment,
                           user: tecnico,
                           order_service: create(:order_service,
+                                                client: client,
                                                 scheduled_at: 2.days.from_now))
       expect(ability).to be_able_to(:read, assignment)
     end
 
     it "não pode ler atribuições de outros" do
-      assignment = create(:assignment, user: other_user)
+      assignment = create(:assignment, user: other_user, order_service: order_service)
       expect(ability).not_to be_able_to(:read, assignment)
     end
 
@@ -106,7 +113,7 @@ RSpec.describe Ability, type: :model do
     end
 
     it "não pode ler clientes de OSs não atribuídas" do
-      other_client = create(:client)
+      other_client = create(:client, company: company)
       expect(ability).not_to be_able_to(:read, other_client)
     end
 

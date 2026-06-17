@@ -1,0 +1,88 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3 justify-content-between">
+      <h4 class="mb-0 text-uppercase">Comprovante de Devolução</h4>
+      <div class="d-flex gap-2">
+        <%= link_to "Voltar para OS", app_order_service_path(@order_service), class: "btn btn-light border" %>
+      </div>
+    </div>
+
+    <% flash.each do |type, message| %>
+      <% bootstrap_class = { notice: "alert-success", warning: "alert-warning", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
+      <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert">
+        <%= message %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    <% end %>
+
+    <div class="card">
+      <div class="card-body">
+        <div class="alert alert-light border mb-3">
+          <strong>Controle de envio:</strong>
+          <span class="ms-2">
+            Último emitido em:
+            <strong><%= @return_receipt_generated_at.present? ? l(@return_receipt_generated_at, format: :short) : "-" %></strong>
+          </span>
+          <span class="ms-3">
+            Último enviado em:
+            <strong><%= @return_receipt_sent_at.present? ? l(@return_receipt_sent_at, format: :short) : "-" %></strong>
+          </span>
+        </div>
+
+        <div class="mb-3">
+          <strong>OS:</strong> #<%= @order_service.code %> - <%= @order_service.title %><br>
+          <strong>Cliente:</strong> <%= @order_service.client&.name %>
+        </div>
+
+        <div class="border rounded-3 p-3 p-md-4 mb-3">
+          <h6 class="text-uppercase text-muted mb-3">Itens Devolvidos ao Cliente</h6>
+
+          <% if @order_service.received_items.any? %>
+            <div class="table-responsive">
+              <table class="table table-bordered table-sm mb-0">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Marca/Modelo</th>
+                    <th>Série</th>
+                    <th>Qtd</th>
+                    <th>Estado/Observação</th>
+                    <th>Acessórios</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @order_service.received_items.each do |item| %>
+                    <tr>
+                      <td><%= item.name %></td>
+                      <td><%= [item.brand, item.model].reject(&:blank?).join(" / ").presence || "-" %></td>
+                      <td><%= item.serial_number.presence || "-" %></td>
+                      <td><%= item.quantity.presence || "-" %></td>
+                      <td><%= [item.condition_notes, item.reported_issue].reject(&:blank?).join(" | ").presence || "-" %></td>
+                      <td><%= item.accessories.presence || "-" %></td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          <% else %>
+            <div class="alert alert-light border mb-0">
+              Nenhum item recebido foi cadastrado no comprovante de recebimento.
+              <%= link_to "Cadastrar agora", receipt_app_order_service_path(@order_service), class: "ms-1" %>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="d-flex gap-2">
+          <%= link_to "Gerar PDF de devolução de produto",
+                      generate_return_receipt_pdf_app_order_service_path(@order_service),
+                      class: "btn btn-outline-secondary",
+                      target: "_blank" %>
+          <%= button_to "Enviar devolução de produto",
+                        send_return_receipt_to_client_app_order_service_path(@order_service),
+                        method: :post,
+                        class: "btn btn-outline-primary" %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

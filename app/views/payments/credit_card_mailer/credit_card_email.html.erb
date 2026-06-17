@@ -1,0 +1,7 @@
+<p>Olá, <%= @company.name %>.</p>
+
+<p>Seu pagamento por cartão para o plano <%= @plan&.name %> está disponível.</p>
+
+<p>
+  <a href="<%= @payment_url %>">Concluir pagamento</a>
+</p>

@@ -39,7 +39,7 @@ module Cmd
       private
 
       def reconcile_by_payment
-        payment = MercadoPago::Subscriptions.fetch_payment(@subscription.external_payment_id)
+        payment = ::MercadoPago::Subscriptions.fetch_payment(@subscription.external_payment_id)
         return register_and_return_error("Pagamento #{@subscription.external_payment_id} nao encontrado no gateway") if payment.blank?
 
         @gateway_status = payment["status"].to_s
@@ -59,7 +59,7 @@ module Cmd
       end
 
       def reconcile_by_preapproval
-        preapproval = MercadoPago::Subscriptions.fetch_preapproval(@subscription.external_subscription_id)
+        preapproval = ::MercadoPago::Subscriptions.fetch_preapproval(@subscription.external_subscription_id)
         return register_and_return_error("Preapproval #{@subscription.external_subscription_id} nao encontrado no gateway") if preapproval.blank?
 
         @gateway_status = preapproval["status"].to_s
@@ -84,7 +84,7 @@ module Cmd
         case normalized
         when "approved", "authorized"
           activate_subscription(approved_at || Time.current)
-        when "cancelled", "canceled", "paused", "rejected"
+        when "cancelled", "canceled", "paused", "rejected", "refunded", "charged_back", "charge_back"
           @subscription.cancel! unless @subscription.cancelled?
         when "pending", "in_process"
           @subscription.update!(status: :pending) unless @subscription.pending? || @subscription.active?
@@ -152,7 +152,7 @@ module Cmd
         case gateway_status.to_s.downcase
         when "approved", "authorized"
           "active"
-        when "cancelled", "canceled", "paused", "rejected"
+        when "cancelled", "canceled", "paused", "rejected", "refunded", "charged_back", "charge_back"
           "cancelled"
         when "pending", "in_process"
           "pending"

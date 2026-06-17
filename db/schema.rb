@@ -10,11 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_04_03_111500) do
+ActiveRecord::Schema[7.1].define(version: 2026_05_16_103000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
-  enable_extension "vector"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name", null: false
@@ -163,7 +162,11 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_03_111500) do
     t.string "terms_accepted_ip"
     t.text "terms_accepted_user_agent"
     t.uuid "terms_accepted_by_user_id"
+    t.boolean "allow_order_service_without_budget", default: false, null: false
+    t.boolean "allow_simultaneous_order_services", default: false, null: false
     t.index ["active"], name: "index_companies_on_active"
+    t.index ["allow_order_service_without_budget"], name: "index_companies_on_allow_os_without_budget"
+    t.index ["allow_simultaneous_order_services"], name: "index_companies_on_allow_simultaneous_os"
     t.index ["city", "state"], name: "index_companies_on_city_and_state"
     t.index ["document"], name: "index_companies_on_document", unique: true
     t.index ["email"], name: "index_companies_on_email", unique: true
@@ -173,6 +176,26 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_03_111500) do
     t.index ["terms_accepted_by_user_id"], name: "index_companies_on_terms_accepted_by_user_id"
     t.index ["terms_version_accepted"], name: "index_companies_on_terms_version_accepted"
     t.index ["zip_code"], name: "index_companies_on_zip_code"
+  end
+
+  create_table "company_pdf_settings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.string "accent_color", default: "1F6FEB", null: false
+    t.string "header_subtitle"
+    t.string "document_note"
+    t.string "footer_text"
+    t.boolean "show_company_data", default: true, null: false
+    t.boolean "show_client_data", default: true, null: false
+    t.boolean "show_service_description", default: true, null: false
+    t.boolean "show_service_items", default: true, null: false
+    t.boolean "show_observations", default: true, null: false
+    t.boolean "show_discount_reason", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "document_type", default: "order_service", null: false
+    t.boolean "customization_enabled", default: false, null: false
+    t.string "header_text_color"
+    t.index ["company_id", "document_type"], name: "index_company_pdf_settings_on_company_id_and_document_type", unique: true
   end
 
   create_table "coupon_redemptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -215,8 +238,32 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_03_111500) do
     t.index ["valid_until"], name: "index_coupons_on_valid_until"
   end
 
-# Could not dump table "knowledge_base_articles" because of following StandardError
-#   Unknown type 'vector(1536)' for column 'embedding'
+  create_table "knowledge_base_articles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "title"
+    t.text "content"
+    t.string "category"
+    t.string "slug"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "audience", default: "gestor", null: false
+    t.index ["audience"], name: "index_knowledge_base_articles_on_audience"
+    t.index ["slug"], name: "index_knowledge_base_articles_on_slug", unique: true
+  end
+
+  create_table "order_service_received_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "order_service_id", null: false
+    t.string "name", null: false
+    t.string "brand"
+    t.string "model"
+    t.string "serial_number"
+    t.integer "quantity"
+    t.text "condition_notes"
+    t.text "reported_issue"
+    t.text "accessories"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_service_id"], name: "index_order_service_received_items_on_order_service_id"
+  end
 
   create_table "mobile_api_sessions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
@@ -254,10 +301,14 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_03_111500) do
     t.string "discount_type", default: "none", null: false
     t.decimal "discount_value", precision: 10, scale: 2, default: "0.0", null: false
     t.text "discount_reason"
+    t.boolean "created_without_budget", default: false, null: false
+    t.text "budget_waiver_reason"
+    t.string "budget_waiver_authorized_by"
     t.index ["client_id"], name: "index_order_services_on_client_id"
     t.index ["company_id", "code"], name: "index_order_services_on_company_id_and_code", unique: true
     t.index ["company_id", "status", "created_at"], name: "index_order_services_on_company_status_created_at"
     t.index ["company_id"], name: "index_order_services_on_company_id"
+    t.index ["created_without_budget"], name: "index_order_services_on_created_without_budget"
   end
 
   create_table "plans", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -276,6 +327,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_03_111500) do
     t.integer "max_technicians"
     t.integer "max_orders"
     t.string "support_level"
+    t.integer "max_budgets"
     t.index ["external_id"], name: "index_plans_on_external_id", unique: true
     t.index ["external_reference"], name: "index_plans_on_external_reference", unique: true
     t.index ["status"], name: "index_plans_on_status"
@@ -406,6 +458,18 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_03_111500) do
     t.index ["user_id"], name: "index_support_tickets_on_user_id"
   end
 
+  create_table "user_onboarding_progresses", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.jsonb "completed_steps", default: {}, null: false
+    t.string "last_seen_step"
+    t.datetime "dismissed_at"
+    t.datetime "finished_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["finished_at"], name: "index_user_onboarding_progresses_on_finished_at"
+    t.index ["user_id"], name: "index_user_onboarding_progresses_on_user_id", unique: true
+  end
+
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -459,10 +523,12 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_03_111500) do
   add_foreign_key "companies", "plans"
   add_foreign_key "companies", "users", column: "responsible_id"
   add_foreign_key "companies", "users", column: "terms_accepted_by_user_id"
+  add_foreign_key "company_pdf_settings", "companies"
   add_foreign_key "coupon_redemptions", "companies"
   add_foreign_key "coupon_redemptions", "coupons"
   add_foreign_key "coupon_redemptions", "subscriptions"
   add_foreign_key "mobile_api_sessions", "users"
+  add_foreign_key "order_service_received_items", "order_services"
   add_foreign_key "order_services", "clients"
   add_foreign_key "order_services", "companies"
   add_foreign_key "reports", "companies"
@@ -478,5 +544,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_03_111500) do
   add_foreign_key "support_tickets", "order_services"
   add_foreign_key "support_tickets", "users"
   add_foreign_key "support_tickets", "users", column: "assigned_to_id"
+  add_foreign_key "user_onboarding_progresses", "users"
   add_foreign_key "users", "companies"
 end

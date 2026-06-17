@@ -1,4 +1,4 @@
-<h2 style="margin-top:0;">Olá, <%= @technician.name %>!</h2>
+<h2 style="margin-top:0;">Olá, <%= @technician&.name || @user&.name || "Técnico(a)" %>!</h2>
 <p style="font-size:16px; line-height:1.6;">
   A Ordem de Serviço de código <strong><%= @order_service.code %></strong>, na qual você atuou, foi finalizada com sucesso pelo gestor.
 </p>

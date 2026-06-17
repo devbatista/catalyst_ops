@@ -1,8 +1,8 @@
 constraints subdomain: "app" do
   root to: "app/dashboard#index", as: :app_dashboard
-  get "order_services/new", to: "errors#show", defaults: { code: "404" }
 
   resource :terms_of_use, only: [:show, :update], controller: "app/terms_of_use", as: :app_terms_of_use
+  resource :onboarding_progress, only: [:show, :update], controller: "app/onboarding_progress", as: :app_onboarding_progress
 
   resources :clients, module: "app", as: :app_clients
   resources :budgets, only: [:index, :new, :create, :show, :edit, :update], module: "app", as: :app_budgets do
@@ -13,13 +13,21 @@ constraints subdomain: "app" do
       get :generate_pdf
     end
   end
-  resources :order_services, except: [:new, :create], module: "app", as: :app_order_services do
+  resources :order_services, module: "app", as: :app_order_services do
     get :unassigned, on: :collection
     get :overdue, on: :collection
     resources :service_items, module: "order_services", as: :app_service_items
     member do
       patch :update_status
       get :generate_pdf
+      post :send_pdf_to_client
+      get :generate_receipt_pdf
+      post :send_receipt_to_client
+      get :receipt
+      patch :update_receipt_data
+      get :return_receipt
+      get :generate_return_receipt_pdf
+      post :send_return_receipt_to_client
       delete :purge_attachment
       get :attachments
       get :schedule
@@ -30,6 +38,7 @@ constraints subdomain: "app" do
   resources :attachments, only: [:index, :show, :destroy], module: "app", as: :app_attachments
   resources :reports, only: [:index, :show], module: "app", as: :app_reports do
     collection do
+      post :export
       get :service_orders
       post :service_orders
     end
@@ -42,6 +51,9 @@ constraints subdomain: "app" do
     collection do
       patch :update_profile
       patch :update_company
+      patch :update_pdf_settings
+      delete :remove_pdf_logo
+      get :preview_pdf_settings
       patch :cancel_subscription
       patch :resume_subscription
       post :promote_manager

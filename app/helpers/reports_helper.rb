@@ -1,4 +1,32 @@
 module ReportsHelper
+  def report_status_badge_class(status)
+    {
+      "pendente" => "secondary",
+      "agendada" => "warning",
+      "em_andamento" => "info",
+      "concluida" => "success",
+      "finalizada" => "primary",
+      "cancelada" => "danger",
+      "atrasada" => "dark"
+    }[status.to_s] || "secondary"
+  end
+
+  def report_resolution_hours(order_service)
+    return "-" if order_service.started_at.blank? || order_service.finished_at.blank?
+
+    "#{((order_service.finished_at - order_service.started_at) / 1.hour).round(2)}h"
+  end
+
+  def report_sla_badge(order_service)
+    return content_tag(:span, "N/A", class: "badge bg-light text-dark border") if order_service.expected_end_at.blank? || order_service.finished_at.blank?
+
+    if order_service.finished_at <= order_service.expected_end_at
+      content_tag(:span, "Dentro do SLA", class: "badge bg-success")
+    else
+      content_tag(:span, "Fora do SLA", class: "badge bg-danger")
+    end
+  end
+
   def available_report_categories
     report_paths = {
       clients: '#',

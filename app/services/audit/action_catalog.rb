@@ -40,6 +40,10 @@ module Audit
       order_service.cancelled
       order_service.attachment.added
       order_service.attachment.removed
+      order_service.receipt.generated
+      order_service.receipt.sent
+      order_service.return_receipt.generated
+      order_service.return_receipt.sent
     ].freeze
 
     BUDGETS = %w[
@@ -51,12 +55,26 @@ module Audit
       budget.rejected
     ].freeze
 
+    REPORTS = %w[
+      report.export.requested
+      report.export.processing
+      report.export.completed
+      report.export.failed
+      report.downloaded
+    ].freeze
+
     COUPONS = %w[
       coupon.created
       coupon.updated
       coupon.deleted
       coupon.applied
       coupon.rejected
+    ].freeze
+
+    PLANS = %w[
+      plan.created
+      plan.updated
+      plan.deleted
     ].freeze
 
     SUBSCRIPTIONS = %w[
@@ -91,11 +109,16 @@ module Audit
       mobile.api.budgets.viewed
     ].freeze
 
+    TERMS = %w[
+      terms.accepted
+    ].freeze
+
     SYSTEM = %w[
       job.started
       job.completed
       job.failed
       job.retry_scheduled
+      system.monitoring.test_triggered
       system.deploy.executed
       system.migration.executed
     ].freeze
@@ -106,10 +129,13 @@ module Audit
       clients: CLIENTS,
       order_services: ORDER_SERVICES,
       budgets: BUDGETS,
+      reports: REPORTS,
       coupons: COUPONS,
+      plans: PLANS,
       subscriptions: SUBSCRIPTIONS,
       webhooks: WEBHOOKS,
       mobile_api: MOBILE_API,
+      terms: TERMS,
       system: SYSTEM
     }.freeze
 

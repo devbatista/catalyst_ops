@@ -70,6 +70,10 @@
                         <td class="text-end">
                           <%= link_to 'Ver', admin_knowledge_base_path(article), class: "btn btn-sm btn-primary me-1" %>
                           <%= link_to 'Editar', edit_admin_knowledge_base_path(article), class: "btn btn-sm btn-secondary me-1" %>
+                          <%= link_to 'Excluir',
+                                      admin_knowledge_base_path(article),
+                                      class: "btn btn-sm btn-danger js-delete-knowledge-base-article",
+                                      data: { confirm: "Tem certeza que deseja excluir este artigo?" } %>
                         </td>
                       </tr>
                     <% end %>
@@ -87,3 +91,5 @@
     </div>
   </div>
 </div>
+
+<%= javascript_import_module_tag "admin/knowledge_base_articles" %>

@@ -1,4 +1,8 @@
 module ConfigurationsHelper
+  def company_responsible?(user = current_user)
+    user.company&.responsible_id == user.id
+  end
+
   def current_company_plan(user = current_user)
     company = user.company
     subscription = company.subscriptions.find_by(status: :active)
@@ -7,7 +11,7 @@ module ConfigurationsHelper
 
   def can_promote_manager?(user = current_user)
     company = user.company
-    return false unless user.id == company.responsible_id
+    return false unless company_responsible?(user)
     plan = current_company_plan(user)
     plan&.name != "Basico"
   end

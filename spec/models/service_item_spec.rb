@@ -2,15 +2,25 @@ require "rails_helper"
 
 RSpec.describe ServiceItem, type: :model do
   describe "associações" do
-    it { should belong_to(:order_service) }
+    it { should belong_to(:order_service).optional }
+    it { should belong_to(:budget).optional }
   end
 
   describe "validações" do
-    it { should validate_presence_of(:description) }
-    it { should validate_presence_of(:quantity) }
-    it { should validate_presence_of(:unit_price) }
     it { should validate_numericality_of(:quantity).is_greater_than(0) }
     it { should validate_numericality_of(:unit_price).is_greater_than_or_equal_to(0) }
+
+    it "permite item totalmente em branco" do
+      item = build(:service_item, description: nil, quantity: nil, unit_price: nil)
+      expect(item).to be_valid
+    end
+
+    it "exige descrição, quantidade e preço quando o item está preenchido parcialmente" do
+      item = build(:service_item, description: "Serviço válido", quantity: nil, unit_price: nil)
+      expect(item).not_to be_valid
+      expect(item.errors[:quantity]).to be_present
+      expect(item.errors[:unit_price]).to be_present
+    end
 
     it "não permite quantidade zero ou negativa" do
       item = build(:service_item, quantity: 0)
@@ -47,9 +57,10 @@ RSpec.describe ServiceItem, type: :model do
   end
 
   describe "edge cases" do
-    it "aceita valores decimais grandes" do
+    it "não aceita quantidade decimal" do
       item = build(:service_item, quantity: 1.5, unit_price: 99.99)
-      expect(item.total_price).to eq(149.985)
+      expect(item).not_to be_valid
+      expect(item.errors[:quantity]).to be_present
     end
 
     it "arredonda corretamente o total se necessário" do

@@ -4,13 +4,15 @@
     <ul data-order-service-id="<%= order_service.id %>">
       <% order_service.attachments.each do |attachment| %>
         <% next unless attachment.persisted? %>
-        <li>
+        <li data-attachment-id="<%= attachment.id %>">
           <%= link_to attachment.filename, url_for(attachment), target: "_blank" %>
-          <%= link_to purge_attachment_app_order_service_path(order_service, attachment_id: attachment.id),
-            method: :delete,
-            data: { confirm: "Tem certeza que deseja remover este anexo?" },
-            class: "js-delete-attachment",
-            title: "Remover" do %>
+          <%= button_tag type: "button",
+            class: "js-mark-remove-attachment btn btn-link p-0 ms-2",
+            data: {
+              attachment_id: attachment.id,
+              confirm: "Tem certeza que deseja remover este anexo? A remocao sera aplicada ao salvar."
+            },
+            title: "Marcar para remocao" do %>
             <i class="bx bx-trash"></i>
           <% end %>
         </li>

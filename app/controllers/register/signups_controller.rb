@@ -130,11 +130,11 @@ class Register::SignupsController < ApplicationController
   def save_register(company, user)
     ActiveRecord::Base.transaction do
       company_res = Cmd::Companies::Create.new(company).call
-      raise ActiveRecord::Rollback, Array(company_res.errors).join(", ") unless company_res.success?
+      raise StandardError, Array(company_res.errors).join(", ") unless company_res.success?
 
       user.company = company
       user_res = Cmd::Users::Create.new(user).call
-      raise ActiveRecord::Rollback, Array(user_res.errors).join(", ") unless user_res.success?
+      raise StandardError, Array(user_res.errors).join(", ") unless user_res.success?
 
       company.update_attribute(:responsible_id, user.id)
       company.accept_current_terms!(
@@ -142,7 +142,20 @@ class Register::SignupsController < ApplicationController
         ip_address: request.remote_ip,
         user_agent: request.user_agent
       )
-      company.subscriptions.create!(subscription_params) || raise(ActiveRecord::Rollback, "Erro ao criar assinatura para a empresa.")
+      Audit::Log.call(
+        action: "terms.accepted",
+        actor: user,
+        company: company,
+        resource: company,
+        metadata: {
+          version: company.terms_version_accepted,
+          accepted_at: company.terms_accepted_at,
+          accepted_ip: company.terms_accepted_ip,
+          accepted_by_user_id: company.terms_accepted_by_user_id,
+          flow: "signup"
+        }
+      )
+      company.subscriptions.create!(subscription_params) || raise(StandardError, "Erro ao criar assinatura para a empresa.")
 
       return Result.new(true, nil)
     end

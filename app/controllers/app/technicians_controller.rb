@@ -33,6 +33,7 @@ class App::TechniciansController < ApplicationController
     @technician.company_id = current_user.company_id if current_user.gestor?
 
     if @technician.save
+      mark_onboarding_step("created_technician")
       redirect_to app_technician_path(@technician), notice: "Técnico criado com sucesso."
     else
       render :new, :unprocessable_entity

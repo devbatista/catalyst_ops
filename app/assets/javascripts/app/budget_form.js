@@ -1,89 +1,80 @@
-function parseBudgetNumber(rawValue) {
-  const raw = String(rawValue || "").trim();
-  if (!raw) return 0;
+(function () {
+  const UNIT_SELECTOR = 'input[name*="budget[service_items_attributes]"][name$="[unit_price]"]';
+  const QTY_SELECTOR = 'input[name*="budget[service_items_attributes]"][name$="[quantity]"]';
+  const ROW_SELECTOR = '#service-items-list .input-group, #service-items-list .service-item-row';
+  const TOTAL_SELECTOR = 'input[name="budget[total_value]"]';
 
-  let sanitized = raw.replace(/[^\d,.\-]/g, "");
-  if (!sanitized) return 0;
+  function parseQty(raw) {
+    const s = String(raw || '').trim().replace(/[^\d,.\-]/g, '');
+    if (!s) return 0;
 
-  const hasComma = sanitized.includes(",");
-  const hasDot = sanitized.includes(".");
+    const n = Number(s.replace(/\./g, '').replace(',', '.'));
+    return Number.isFinite(n) ? n : 0;
+  }
 
-  if (hasComma && hasDot) {
-    if (sanitized.lastIndexOf(",") > sanitized.lastIndexOf(".")) {
-      sanitized = sanitized.replace(/\./g, "").replace(",", ".");
-    } else {
-      sanitized = sanitized.replace(/,/g, "");
+  function parseMoneyMasked(raw) {
+    const digits = String(raw || '').replace(/\D/g, '');
+    return digits ? Number(digits) / 100 : 0;
+  }
+
+  function formatBRL(n) {
+    return Number(n || 0).toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  function calculateBudgetTotal() {
+    const totalInput = document.querySelector(TOTAL_SELECTOR);
+    if (!totalInput) return;
+
+    let total = 0;
+
+    document.querySelectorAll(ROW_SELECTOR).forEach((row) => {
+      if (row.style.display === 'none') return;
+
+      const destroyFlag = row.querySelector('.service-item-destroy-flag');
+      if (destroyFlag && destroyFlag.value === '1') return;
+
+      const quantityInput = row.querySelector(QTY_SELECTOR);
+      const unitPriceInput = row.querySelector(UNIT_SELECTOR);
+      if (!quantityInput || !unitPriceInput) return;
+
+      total += parseQty(quantityInput.value) * parseMoneyMasked(unitPriceInput.value);
+    });
+
+    totalInput.value = formatBRL(total);
+  }
+
+  function scheduleBudgetTotalCalculation() {
+    calculateBudgetTotal();
+    setTimeout(calculateBudgetTotal, 20);
+    setTimeout(calculateBudgetTotal, 80);
+  }
+
+  function handleFieldEvent(e) {
+    const target = e.target;
+    if (!(target instanceof HTMLInputElement)) return;
+    if (!target.matches(UNIT_SELECTOR) && !target.matches(QTY_SELECTOR)) return;
+
+    scheduleBudgetTotalCalculation();
+  }
+
+  document.addEventListener('input', handleFieldEvent, true);
+  document.addEventListener('keyup', handleFieldEvent, true);
+  document.addEventListener('change', handleFieldEvent, true);
+
+  document.addEventListener('click', function (e) {
+    if (e.target.matches('#add-service-item')) {
+      scheduleBudgetTotalCalculation();
+      return;
     }
-  } else if (hasComma) {
-    sanitized = sanitized.replace(/\./g, "").replace(",", ".");
-  } else {
-    sanitized = sanitized.replace(/,/g, "");
-  }
 
-  const parsed = Number(sanitized);
-  return Number.isFinite(parsed) ? parsed : 0;
-}
+    if (e.target.matches('.remove-item') || e.target.closest('.remove-item')) {
+      scheduleBudgetTotalCalculation();
+    }
+  }, true);
 
-function formatBudgetCurrency(value) {
-  return Number(value || 0).toLocaleString("pt-BR", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  });
-}
-
-function calculateBudgetTotal() {
-  const totalInput = document.querySelector('input[name="budget[total_value]"]');
-  if (!totalInput) return;
-
-  const rows = document.querySelectorAll("#service-items-list .input-group, #service-items-list .service-item-row");
-  let total = 0;
-
-  rows.forEach((row) => {
-    if (row.style.display === "none") return;
-
-    const destroyFlag = row.querySelector(".service-item-destroy-flag");
-    if (destroyFlag && destroyFlag.value === "1") return;
-
-    const quantityInput = row.querySelector('input[name*="[quantity]"]');
-    const unitPriceInput = row.querySelector('input[name*="[unit_price]"]');
-    if (!quantityInput || !unitPriceInput) return;
-
-    const quantity = parseBudgetNumber(quantityInput.value);
-    const unitPrice = parseBudgetNumber(unitPriceInput.value);
-    total += quantity * unitPrice;
-  });
-
-  totalInput.value = formatBudgetCurrency(total);
-}
-
-function isBudgetItemField(target) {
-  return target.matches('input[name*="budget[service_items_attributes]"][name$="[quantity]"], input[name*="budget[service_items_attributes]"][name$="[unit_price]"]');
-}
-
-document.addEventListener("input", function (e) {
-  const isBudgetItem = isBudgetItemField(e.target);
-  if (!isBudgetItem) return;
-
-  calculateBudgetTotal();
-});
-
-document.addEventListener("change", function (e) {
-  const isBudgetItem = isBudgetItemField(e.target);
-  if (!isBudgetItem) return;
-
-  calculateBudgetTotal();
-});
-
-document.addEventListener("click", function (e) {
-  if (e.target.matches("#add-service-item")) {
-    setTimeout(calculateBudgetTotal, 0);
-    return;
-  }
-
-  if (e.target.matches(".remove-item") || e.target.closest(".remove-item")) {
-    setTimeout(calculateBudgetTotal, 0);
-  }
-});
-
-document.addEventListener("DOMContentLoaded", calculateBudgetTotal);
-document.addEventListener("turbo:load", calculateBudgetTotal);
+  document.addEventListener('DOMContentLoaded', calculateBudgetTotal);
+  document.addEventListener('turbo:load', calculateBudgetTotal);
+})();

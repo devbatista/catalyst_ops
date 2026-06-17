@@ -4,6 +4,7 @@ class App::OrderServicesController < ApplicationController
   before_action :set_other_resources, only: [:edit, :update, :schedule]
   before_action :set_attachment_on_update, only: [:update]
   before_action :can_add_order_service, only: [:create]
+  before_action :ensure_direct_order_service_creation_enabled, only: [:new, :create]
   before_action :ensure_technician_only_updates_allowed_fields, only: [:update]
   before_action :restrict_status_update_for_technician, only: [:update_status]
   before_action :restrict_overdue_reschedule_for_technician, only: [:schedule, :perform_schedule]
@@ -58,14 +59,29 @@ class App::OrderServicesController < ApplicationController
   end
 
   def create
-    redirect_to new_app_budget_path(client_id: params.dig(:order_service, :client_id)),
-                alert: "A criação manual de OS foi desativada. Crie um orçamento."
+    @order_service.created_without_budget = true
+
+    if @order_service.update(order_service_params_with_auto_schedule_status)
+      redirect_to app_order_service_url(@order_service), notice: "Ordem de serviço criada com sucesso."
+    else
+      set_other_resources
+      flash.now[:alert] = @order_service.errors.full_messages.to_sentence
+      render :new, status: :unprocessable_entity
+    end
+  end
+
+  def new
+    @order_service.created_without_budget = true
+    set_other_resources
+    prefill_client_from_params
   end
 
   def edit; end
 
   def update
     if @order_service.update(order_service_params_with_auto_schedule_status)
+      set_simultaneous_conflicts_warning
+      purge_marked_attachments
       if @attachments.present?
         add_attachs
       else
@@ -88,6 +104,7 @@ class App::OrderServicesController < ApplicationController
   def perform_schedule
     begin
       if @order_service.update(schedule_params)
+        set_simultaneous_conflicts_warning
         redirect_to app_order_service_path(@order_service), notice: 'Ordem de Serviço agendada com sucesso.'
       else
         set_other_resources
@@ -113,6 +130,7 @@ class App::OrderServicesController < ApplicationController
       redirect_to schedule_app_order_service_path(@order_service)
     else
       if @order_service.update(status: target_status)
+        mark_onboarding_step("moved_work_order_status")
         redirect_to app_order_service_url(@order_service), notice: "Status atualizado com sucesso."
       else
         redirect_to app_order_service_url(@order_service), alert: @order_service.errors.full_messages.join(', ')
@@ -126,6 +144,177 @@ class App::OrderServicesController < ApplicationController
               filename: "ordem_servico_#{@order_service.id}.pdf",
               type: "application/pdf",
               disposition: "attachment"
+  end
+
+  def send_pdf_to_client
+    unless current_user.gestor?
+      return redirect_to app_order_service_url(@order_service), alert: "Somente gestores podem enviar o PDF da OS para o cliente."
+    end
+
+    unless @order_service.concluida? || @order_service.finalizada?
+      return redirect_to app_order_service_url(@order_service), alert: "O envio do PDF está disponível apenas para OS concluída ou finalizada."
+    end
+
+    if @order_service.client&.email.blank?
+      return redirect_to app_order_service_url(@order_service), alert: "O cliente não possui e-mail cadastrado."
+    end
+
+    OrderServiceMailer.send_pdf_to_client(@order_service, current_user).deliver_later
+    redirect_to app_order_service_url(@order_service), notice: "PDF enviado para o cliente com sucesso."
+  end
+
+  def generate_receipt_pdf
+    unless current_user.gestor?
+      return redirect_to app_order_service_url(@order_service), alert: "Somente gestores podem gerar comprovante de recebimento."
+    end
+
+    receipt_builder = Cmd::Pdf::CreateOrderServiceReceipt.new(
+      @order_service,
+      kind: :recebimento,
+      generated_by: current_user
+    )
+
+    Audit::Log.call(
+      action: "order_service.receipt.generated",
+      resource: @order_service,
+      metadata: {
+        order_service_id: @order_service.id,
+        code: @order_service.code,
+        generated_by_id: current_user.id
+      }
+    )
+
+    send_data receipt_builder.generate_pdf_data,
+              filename: receipt_builder.filename,
+              type: "application/pdf",
+              disposition: "attachment"
+  end
+
+  def send_receipt_to_client
+    unless current_user.gestor?
+      return redirect_to app_order_service_url(@order_service), alert: "Somente gestores podem enviar comprovante de recebimento."
+    end
+
+    if @order_service.client&.email.blank?
+      return redirect_to app_order_service_url(@order_service), alert: "O cliente não possui e-mail cadastrado."
+    end
+
+    OrderServiceMailer.send_receipt_to_client(@order_service, current_user).deliver_later
+    Audit::Log.call(
+      action: "order_service.receipt.sent",
+      resource: @order_service,
+      metadata: {
+        order_service_id: @order_service.id,
+        code: @order_service.code,
+        sent_by_id: current_user.id,
+        sent_to: @order_service.client.email
+      }
+    )
+    redirect_to app_order_service_url(@order_service), notice: "Comprovante de recebimento enviado ao cliente com sucesso."
+  end
+
+  def receipt
+    unless current_user.gestor?
+      return redirect_to app_order_service_url(@order_service), alert: "Somente gestores podem acessar o comprovante de recebimento."
+    end
+
+    @order_service.received_items.build if @order_service.received_items.empty?
+    @receipt_generated_at = latest_order_service_audit_at("order_service.receipt.generated")
+    @receipt_sent_at = latest_order_service_audit_at("order_service.receipt.sent")
+  end
+
+  def update_receipt_data
+    unless current_user.gestor?
+      return redirect_to app_order_service_url(@order_service), alert: "Somente gestores podem atualizar dados do comprovante de recebimento."
+    end
+
+    if @order_service.update(receipt_data_params)
+      redirect_to receipt_app_order_service_path(@order_service), notice: "Dados do comprovante de recebimento atualizados."
+    else
+      @order_service.received_items.build if @order_service.received_items.empty?
+      flash.now[:alert] = @order_service.errors.full_messages.to_sentence
+      render :receipt, status: :unprocessable_entity
+    end
+  end
+
+  def return_receipt
+    unless current_user.gestor?
+      return redirect_to app_order_service_url(@order_service), alert: "Somente gestores podem acessar o comprovante de devolução."
+    end
+
+    unless @order_service.concluida? || @order_service.finalizada? || @order_service.cancelada?
+      return redirect_to app_order_service_url(@order_service), alert: "A devolução está disponível apenas para OS concluída, finalizada ou cancelada."
+    end
+
+    @order_service.received_items.build if @order_service.received_items.empty?
+    @return_receipt_generated_at = latest_order_service_audit_at("order_service.return_receipt.generated")
+    @return_receipt_sent_at = latest_order_service_audit_at("order_service.return_receipt.sent")
+  end
+
+  def generate_return_receipt_pdf
+    unless current_user.gestor?
+      return redirect_to app_order_service_url(@order_service), alert: "Somente gestores podem gerar comprovante de devolução."
+    end
+
+    unless @order_service.concluida? || @order_service.finalizada? || @order_service.cancelada?
+      return redirect_to app_order_service_url(@order_service), alert: "A devolução está disponível apenas para OS concluída, finalizada ou cancelada."
+    end
+
+    if @order_service.received_items.empty?
+      return redirect_to app_order_service_url(@order_service), alert: "Cadastre ao menos um item recebido para gerar o comprovante de devolução."
+    end
+
+    receipt_builder = Cmd::Pdf::CreateOrderServiceReceipt.new(
+      @order_service,
+      kind: :devolucao,
+      generated_by: current_user
+    )
+
+    Audit::Log.call(
+      action: "order_service.return_receipt.generated",
+      resource: @order_service,
+      metadata: {
+        order_service_id: @order_service.id,
+        code: @order_service.code,
+        generated_by_id: current_user.id
+      }
+    )
+
+    send_data receipt_builder.generate_pdf_data,
+              filename: receipt_builder.filename,
+              type: "application/pdf",
+              disposition: "attachment"
+  end
+
+  def send_return_receipt_to_client
+    unless current_user.gestor?
+      return redirect_to app_order_service_url(@order_service), alert: "Somente gestores podem enviar comprovante de devolução."
+    end
+
+    unless @order_service.concluida? || @order_service.finalizada? || @order_service.cancelada?
+      return redirect_to app_order_service_url(@order_service), alert: "A devolução está disponível apenas para OS concluída, finalizada ou cancelada."
+    end
+
+    if @order_service.received_items.empty?
+      return redirect_to app_order_service_url(@order_service), alert: "Cadastre ao menos um item recebido para enviar o comprovante de devolução."
+    end
+
+    if @order_service.client&.email.blank?
+      return redirect_to app_order_service_url(@order_service), alert: "O cliente não possui e-mail cadastrado."
+    end
+
+    OrderServiceMailer.send_return_receipt_to_client(@order_service, current_user).deliver_later
+    Audit::Log.call(
+      action: "order_service.return_receipt.sent",
+      resource: @order_service,
+      metadata: {
+        order_service_id: @order_service.id,
+        code: @order_service.code,
+        sent_by_id: current_user.id,
+        sent_to: @order_service.client.email
+      }
+    )
+    redirect_to app_order_service_url(@order_service), notice: "Comprovante de devolução enviado ao cliente com sucesso."
   end
 
   def attachments
@@ -154,25 +343,29 @@ class App::OrderServicesController < ApplicationController
         :expected_end_at,
         :signed_by_client,
         :observations,
+        :budget_waiver_reason,
+        :budget_waiver_authorized_by,
         :discount_type,
         :discount_value,
         :discount_reason,
+        remove_attachment_ids: [],
         attachments: [],
         user_ids: [],
         service_items_attributes: [
           :id, :description, :quantity, :unit_price, :_destroy,
-        ],
+        ]
       )
     else
       params.require(:order_service).permit(
         :observations,
+        remove_attachment_ids: [],
         attachments: []
       )
     end
   end
 
   def order_service_params_with_auto_schedule_status
-    permitted_params = order_service_params
+    permitted_params = order_service_params.except(:remove_attachment_ids)
     return permitted_params unless should_set_status_as_scheduled?(permitted_params)
 
     permitted_params.merge(status: :agendada)
@@ -211,6 +404,22 @@ class App::OrderServicesController < ApplicationController
     @clients = current_user.clients.order(:name)
     @technicians = current_user.company.users.active.where("role = ? OR can_be_technician = ?", User.roles[:tecnico], true)
     @order_service&.service_items ||= []
+  end
+
+  def receipt_data_params
+    params.require(:order_service).permit(
+      received_items_attributes: [
+        :id, :name, :brand, :model, :serial_number, :quantity, :condition_notes, :reported_issue, :accessories, :_destroy
+      ]
+    )
+  end
+
+  def latest_order_service_audit_at(action)
+    AuditEvent
+      .where(action: action, resource_type: "OrderService", resource_id: @order_service.id.to_s)
+      .order(occurred_at: :desc)
+      .limit(1)
+      .pick(:occurred_at)
   end
 
   def prefill_client_from_params
@@ -258,6 +467,13 @@ class App::OrderServicesController < ApplicationController
     end
   end
 
+  def ensure_direct_order_service_creation_enabled
+    return if current_user.company.allow_order_service_without_budget?
+
+    redirect_to new_app_budget_path(client_id: params.dig(:order_service, :client_id)),
+                alert: "Sua empresa não permite criar OS sem orçamento. Crie um orçamento primeiro."
+  end
+
   def ensure_technician_only_updates_allowed_fields
     return unless current_user.tecnico?
 
@@ -269,12 +485,20 @@ class App::OrderServicesController < ApplicationController
 
     updated_datetimes = changed_attr_datetimes?
 
-    @order_service.assign_attributes(submitted.permit!)
+    assignable_submitted = submitted.to_unsafe_h.except("remove_attachment_ids")
+    @order_service.assign_attributes(assignable_submitted)
     changed = @order_service.changed - allowed_params - datetime_params
 
     if changed.any? || updated_datetimes
       redirect_to app_order_service_url, alert: "Você só tem permissão para alterar observações e anexos."
     end
+  end
+
+  def purge_marked_attachments
+    attachment_ids = Array(params.dig(:order_service, :remove_attachment_ids)).reject(&:blank?).uniq
+    return if attachment_ids.empty?
+
+    @order_service.attachments.where(id: attachment_ids).find_each(&:purge)
   end
 
   def changed_attr_datetimes?
@@ -287,6 +511,43 @@ class App::OrderServicesController < ApplicationController
     expected_updated = expected_raw.present? && @order_service.expected_end_at != Time.zone.parse(expected_raw)
 
     scheduled_updated || expected_updated
+  end
+
+  def set_simultaneous_conflicts_warning
+    conflicts = simultaneous_assignment_conflicts
+    return if conflicts.empty?
+
+    details = conflicts.map do |conflict|
+      "Técnico #{conflict[:technician_name]} também está na OS ##{conflict[:order_service_code]} "\
+      "(#{I18n.l(conflict[:scheduled_at], format: :short)} - #{I18n.l(conflict[:expected_end_at], format: :short)})"
+    end
+
+    flash[:warning] = "Atenção: conflito de agenda detectado. #{details.join(' | ')}"
+  end
+
+  def simultaneous_assignment_conflicts
+    return [] unless @order_service.company&.allow_simultaneous_order_services?
+    return [] if @order_service.scheduled_at.blank? || @order_service.expected_end_at.blank?
+
+    @order_service.users.includes(assignments: :order_service).flat_map do |technician|
+      technician.assignments
+                .joins(:order_service)
+                .where.not(order_services: { status: [:concluida, :cancelada] })
+                .where.not(order_service_id: @order_service.id)
+                .where(
+                  "(order_services.scheduled_at, order_services.expected_end_at) OVERLAPS (?, ?)",
+                  @order_service.scheduled_at - 1.hour,
+                  @order_service.expected_end_at + 1.hour
+                )
+                .map do |assignment|
+                  {
+                    technician_name: technician.name,
+                    order_service_code: assignment.order_service.code,
+                    scheduled_at: assignment.order_service.scheduled_at,
+                    expected_end_at: assignment.order_service.expected_end_at
+                  }
+                end
+    end.uniq
   end
 
   def restrict_status_update_for_technician

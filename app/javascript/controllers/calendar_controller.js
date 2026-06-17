@@ -12,6 +12,13 @@ export default class extends Controller {
     "#DC3545",
     "#0DCAF0"
   ]
+  static STATUS_EVENT_COLORS = {
+    finalizada: {
+      backgroundColor: "#0D6EFD",
+      borderColor: "#084298",
+      textColor: "#FFFFFF"
+    }
+  }
 
   connect() {
     if (typeof FullCalendar === "undefined") {
@@ -163,10 +170,11 @@ export default class extends Controller {
     if (selectedIds.length === 0) {
       return sourceEvents.map((event) => ({
         id: event.id,
-        title: event.default_title,
+        title: this.eventTitle(event, event.default_title),
         start: event.start,
         end: event.end,
-        url: event.url
+        url: event.url,
+        ...this.statusEventColors(event.status)
       }));
     }
 
@@ -181,17 +189,29 @@ export default class extends Controller {
 
           return {
             id: `${event.id}-${technician.id}`,
-            title: event.base_title,
+            title: this.eventTitle(event, event.base_title),
             start: event.start,
             end: event.end,
             url: event.url,
-            backgroundColor: color,
-            borderColor: color,
+            backgroundColor: this.statusEventColors(event.status).backgroundColor || color,
+            borderColor: this.statusEventColors(event.status).borderColor || color,
             textColor: "#FFFFFF"
           };
         });
     });
     return built;
+  }
+
+  eventTitle(event, fallbackTitle) {
+    if (event.status === "finalizada") {
+      return `[Finalizada] ${fallbackTitle}`;
+    }
+
+    return fallbackTitle;
+  }
+
+  statusEventColors(status) {
+    return this.constructor.STATUS_EVENT_COLORS[status] || {};
   }
 
   technicianColor(technicianId) {

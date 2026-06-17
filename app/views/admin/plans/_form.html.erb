@@ -38,17 +38,21 @@
   </div>
 
   <div class="row mb-3">
-    <div class="col-md-4">
+    <div class="col-md-3">
       <%= f.label :transaction_amount, "Valor (R$)" %>
       <%= f.number_field :transaction_amount, step: 0.01, class: "form-control" %>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
       <%= f.label :max_technicians, "Máx. técnicos" %>
       <%= f.number_field :max_technicians, class: "form-control" %>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
       <%= f.label :max_orders, "Máx. OS/mês" %>
       <%= f.number_field :max_orders, class: "form-control" %>
+    </div>
+    <div class="col-md-3">
+      <%= f.label :max_budgets, "Máx. orçamentos/mês" %>
+      <%= f.number_field :max_budgets, class: "form-control" %>
     </div>
   </div>
 

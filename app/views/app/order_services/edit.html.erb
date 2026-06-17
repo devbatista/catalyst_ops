@@ -2,11 +2,11 @@
   <div class="page-content">
     <!--breadcrumb-->
     <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
-      <h4 class="mb-0 text-uppercase">Editar Ordem de Serviço</h6>
+      <h4 class="mb-0 text-uppercase">Editar Ordem de Serviço</h4>
     </div>
 
     <% flash.each do |type, message| %>
-      <% bootstrap_class = { notice: "alert-success", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
+      <% bootstrap_class = { notice: "alert-success", warning: "alert-warning", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
       <div class="alert <%= bootstrap_class %> alert-dismissible fade show" role="alert">
         <%= message %>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>

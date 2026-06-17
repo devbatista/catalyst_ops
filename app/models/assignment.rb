@@ -7,6 +7,7 @@ class Assignment < ApplicationRecord
   validates :user_id, uniqueness: { scope: :order_service_id, message: "já está atribuído a esta OS" }
 
   validate :order_service_is_schedulable, on: :create
+  validate :order_service_must_allow_assignment, on: :create
   validate :user_must_be_tecnico
   validate :user_availability
 
@@ -96,6 +97,7 @@ class Assignment < ApplicationRecord
 
   def user_availability
     return if user.blank? || order_service.blank? || order_service.scheduled_at.blank?
+    return if allow_simultaneous_order_services?
 
     # Verificar se o técnico já tem outra OS no mesmo horário
     if conflicting_assignments.exists?
@@ -113,6 +115,14 @@ class Assignment < ApplicationRecord
         order_service.scheduled_at - 1.hour,
         order_service.expected_end_at + 1.hour
       )
+  end
+
+  def allow_simultaneous_order_services?
+    return true if order_service.company&.allow_simultaneous_order_services?
+    return true if user&.company&.allow_simultaneous_order_services?
+    return false if order_service.company_id.blank?
+
+    Company.where(id: order_service.company_id).pick(:allow_simultaneous_order_services) == true
   end
 
   def notify_technician

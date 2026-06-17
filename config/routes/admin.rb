@@ -1,4 +1,9 @@
 constraints subdomain: "admin" do
+  if Rails.env.development?
+    get "/coverage", to: "admin/coverage#index", as: :admin_coverage
+    mount Rack::Files.new(Rails.root.join("coverage").to_s), at: "/coverage_report"
+  end
+
   get "/", to: "admin/dashboard#index", as: :admin_dashboard
 
   resources :companies, module: "admin", as: :admin_companies
@@ -20,6 +25,11 @@ constraints subdomain: "admin" do
   resources :support_messages, only: [:create], module: "admin", as: :admin_support_messages
   resources :knowledge_base_articles, module: "admin", as: :admin_knowledge_base
   resources :logs, only: [:index, :show], module: "admin", as: :admin_logs
+  resources :metrics, only: [:index], module: "admin", as: :admin_metrics do
+    collection do
+      post :test_sentry
+    end
+  end
   resources :configurations, only: [:index, :edit, :update], module: "admin", as: :admin_configurations
   resources :contents, module: "admin", as: :admin_contents
   

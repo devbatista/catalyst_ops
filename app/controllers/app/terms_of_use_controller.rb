@@ -19,6 +19,19 @@ class App::TermsOfUseController < ApplicationController
       user_agent: request.user_agent
     )
 
+    Audit::Log.call(
+      action: "terms.accepted",
+      actor: current_user,
+      company: @company,
+      resource: @company,
+      metadata: {
+        version: @company.terms_version_accepted,
+        accepted_at: @company.terms_accepted_at,
+        accepted_ip: @company.terms_accepted_ip,
+        accepted_by_user_id: @company.terms_accepted_by_user_id
+      }
+    )
+
     redirect_to app_dashboard_path, notice: "Contrato de utilização aceito com sucesso."
   end
 end

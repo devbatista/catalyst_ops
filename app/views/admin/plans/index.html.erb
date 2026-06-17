@@ -74,6 +74,7 @@
                     <th>Valor</th>
                     <th>Máx. técnicos</th>
                     <th>Máx. OS/mês</th>
+                    <th>Máx. orçamentos/mês</th>
                     <th>Suporte</th>
                     <th>Ações</th>
                   </tr>
@@ -99,6 +100,7 @@
                       </td>
                       <td><%= plan.max_technicians.presence || "Ilimitado" %></td>
                       <td><%= plan.max_orders.presence || "Ilimitado" %></td>
+                      <td><%= plan.max_budgets.presence || "Ilimitado" %></td>
                       <td><%= plan.support_level.presence || "-" %></td>
                       <td>
                         <%= link_to 'Ver', admin_plan_path(plan), class: "btn btn-sm btn-primary" %>

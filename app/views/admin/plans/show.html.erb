@@ -52,15 +52,19 @@
             <!-- Limites e suporte -->
             <h5>Limites e suporte</h5>
             <div class="row mb-3">
-              <div class="col-md-4">
+              <div class="col-md-3">
                 <strong>Máx. técnicos:</strong>
                 <p><%= @plan.max_technicians.presence || "Ilimitado" %></p>
               </div>
-              <div class="col-md-4">
+              <div class="col-md-3">
                 <strong>Máx. OS por mês:</strong>
                 <p><%= @plan.max_orders.presence || "Ilimitado" %></p>
               </div>
-              <div class="col-md-4">
+              <div class="col-md-3">
+                <strong>Máx. orçamentos por mês:</strong>
+                <p><%= @plan.max_budgets.presence || "Ilimitado" %></p>
+              </div>
+              <div class="col-md-3">
                 <strong>Nível de suporte:</strong>
                 <p><%= @plan.support_level.presence || "-" %></p>
               </div>

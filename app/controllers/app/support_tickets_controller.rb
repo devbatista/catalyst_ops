@@ -11,7 +11,10 @@ class App::SupportTicketsController < ApplicationController
   end
 
   def show
-    @support_ticket = current_user.company.support_tickets.find(params[:id])
+    @support_ticket = current_user.company.support_tickets
+                                  .with_attached_attachments
+                                  .includes(support_messages: [attachments_attachments: :blob])
+                                  .find(params[:id])
     @support_messages = @support_ticket.support_messages.order(created_at: :asc)
   end
 
@@ -45,16 +48,15 @@ class App::SupportTicketsController < ApplicationController
     @support_ticket = current_user.company.support_tickets.find(params[:id])
     previous_status = @support_ticket.status
   
-    if @support_ticket.mark_as_closed!
-      SupportTicketNotifications.notify_status_changed(
-        ticket: @support_ticket,
-        actor: current_user,
-        previous_status: previous_status
-      )
-      render json: { success: true, status: @support_ticket.status, message: "Ticket fechado com sucesso." }
-    else
-      render json: { success: false, errors: @support_ticket.errors.full_messages }, status: :unprocessable_entity
-    end
+    @support_ticket.mark_as_closed!
+    SupportTicketNotifications.notify_status_changed(
+      ticket: @support_ticket,
+      actor: current_user,
+      previous_status: previous_status
+    )
+    render json: { success: true, status: @support_ticket.status, message: "Ticket fechado com sucesso." }
+  rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
+    render json: { success: false, errors: @support_ticket.errors.full_messages }, status: :unprocessable_entity
   end
 
   private

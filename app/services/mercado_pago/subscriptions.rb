@@ -86,12 +86,10 @@ module MercadoPago
         case mock_status.to_s.downcase.presence || "approved"
         when "approved"
           "approved"
-        when "cancelled", "canceled", "expired"
+        when "pending", "in_process"
+          "pending"
+        when "cancelled", "canceled", "expired", "failed", "failure", "rejected", "refunded", "charged_back", "charge_back"
           "cancelled"
-        when "rejected"
-          "rejected"
-        when "in_process"
-          "in_process"
         else
           "approved"
         end
@@ -140,9 +138,7 @@ module MercadoPago
         "accredited"
       when "cancelled"
         "by_collector"
-      when "rejected"
-        "cc_rejected_other_reason"
-      when "in_process"
+      when "pending", "in_process"
         "pending_contingency"
       else
         "pending_waiting_payment"

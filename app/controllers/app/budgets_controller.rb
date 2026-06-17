@@ -3,6 +3,7 @@ class App::BudgetsController < ApplicationController
   before_action :authorize_budget_access!
   before_action :set_budget, only: [:show, :edit, :update, :send_for_approval, :approve, :reject, :generate_pdf]
   before_action :authorize_budget_management!, only: [:new, :create, :edit, :update, :send_for_approval, :approve, :reject, :generate_pdf]
+  before_action :can_add_budget, only: [:new, :create]
   before_action :ensure_budget_editable!, only: [:edit, :update]
 
   def index
@@ -26,6 +27,7 @@ class App::BudgetsController < ApplicationController
     @budget = base_scope.new(budget_params)
 
     if @budget.save
+      mark_onboarding_step("created_budget")
       redirect_to app_budgets_path, notice: "Orçamento criado com sucesso."
     else
       @budget.service_items.build if @budget.service_items.empty?
@@ -72,6 +74,7 @@ class App::BudgetsController < ApplicationController
   def approve
     already_linked = @budget.order_service.present?
     @budget.approve_and_create_order_service!(approver_role: :gestor)
+    mark_onboarding_step("created_first_work_order")
     notice = already_linked ? "Orçamento já aprovado. OS vinculada mantida como pendente." : "Orçamento aprovado pelo gestor e OS criada como pendente."
     redirect_to app_budget_path(@budget), notice: notice
   rescue ActiveRecord::RecordInvalid => e
@@ -118,6 +121,13 @@ class App::BudgetsController < ApplicationController
     return if @budget.editable?
 
     redirect_to app_budgets_path, alert: "Este orçamento não pode mais ser alterado."
+  end
+
+  def can_add_budget
+    return if current_user.admin?
+    return if current_user.company.can_create_budget?
+
+    redirect_to app_budgets_path, alert: "Limite de orçamentos atingido para o seu plano atual."
   end
 
   def base_scope

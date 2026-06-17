@@ -1,6 +1,11 @@
 puts 'Limpando dados antigos...'
 
 ActiveRecord::Base.connection.disable_referential_integrity do
+  AuditEvent.delete_all
+  WebhookEvent.delete_all
+  SubscriptionReconciliationEvent.delete_all
+  Report.delete_all
+
   Company.update_all(responsible_id: nil)
 
   SupportMessage.delete_all

@@ -1,14 +1,21 @@
 require "rails_helper"
 
 RSpec.describe Assignment, type: :model do
+  let(:plan) { create(:plan) }
+  let(:company) { create(:company, plan: plan) }
+  let!(:subscription) { create(:subscription, company: company, subscription_plan: plan, status: :active) }
+  let(:client) { create(:client, company: company) }
+  let(:user) { create(:user, role: "tecnico", company: company) }
+  let(:order_service) { create_order_service }
+
   describe "validações" do
-    subject { create(:assignment) }
+    subject { create(:assignment, user: user, order_service: order_service) }
+
     it { should belong_to(:user) }
     it { should belong_to(:order_service) }
 
     it "não permite o mesmo usuário na mesma OS" do
-      user = create(:user, role: "tecnico")
-      os = create(:order_service)
+      os = create_order_service
       create(:assignment, user: user, order_service: os)
       assignment = build(:assignment, user: user, order_service: os)
       expect(assignment).not_to be_valid
@@ -17,8 +24,8 @@ RSpec.describe Assignment, type: :model do
 
     context "quando o usuário não é técnico" do
       it "não permite atribuição" do
-        user = create(:user, role: "gestor")
-        os = create(:order_service)
+        user = create(:user, role: "gestor", company: company)
+        os = create_order_service
         assignment = build(:assignment, user: user, order_service: os)
         expect(assignment).not_to be_valid
         expect(assignment.errors[:user]).to include("deve ser um técnico")
@@ -27,8 +34,7 @@ RSpec.describe Assignment, type: :model do
 
     context "quando a OS não permite mais atribuições" do
       it "não permite atribuição" do
-        user = create(:user, role: "tecnico")
-        os = create(:order_service)
+        os = create_order_service
         allow(os).to receive(:can_assign_technician?).and_return(false)
         assignment = build(:assignment, user: user, order_service: os)
         expect(assignment).not_to be_valid
@@ -38,32 +44,31 @@ RSpec.describe Assignment, type: :model do
 
     context "quando o técnico já tem outra OS agendada para o mesmo dia" do
       it "não permite atribuição" do
-        user = create(:user, role: "tecnico")
         date = 2.days.from_now
-        os1 = create(:order_service, scheduled_at: date)
-        os2 = create(:order_service, scheduled_at: date)
+        os1 = create_order_service(scheduled_at: date)
+        os2 = create_order_service(scheduled_at: date)
         create(:assignment, user: user, order_service: os1)
         assignment = build(:assignment, user: user, order_service: os2)
         expect(assignment).not_to be_valid
-        expect(assignment.errors[:user]).to include("já possui outra OS agendada para este dia")
+        expect(assignment.errors[:user]).to include("já possui outra OS agendada para este período")
       end
 
       it "permite atribuição se a OS anterior estiver concluída" do
-        user = create(:user, role: "tecnico")
         date = 2.days.from_now
-        os1 = create(:order_service, scheduled_at: date, status: :concluida)
-        os2 = create(:order_service, scheduled_at: date)
+        os1 = create_order_service(scheduled_at: date)
+        os2 = create_order_service(scheduled_at: date)
         create(:assignment, user: user, order_service: os1)
+        os1.update_column(:status, OrderService.statuses[:concluida])
         assignment = build(:assignment, user: user, order_service: os2)
         expect(assignment).to be_valid
       end
 
       it "permite atribuição se a OS anterior estiver cancelada" do
-        user = create(:user, role: "tecnico")
         date = 2.days.from_now
-        os1 = create(:order_service, scheduled_at: date, status: :cancelada)
-        os2 = create(:order_service, scheduled_at: date)
+        os1 = create_order_service(scheduled_at: date)
+        os2 = create_order_service(scheduled_at: date)
         create(:assignment, user: user, order_service: os1)
+        os1.update_column(:status, OrderService.statuses[:cancelada])
         assignment = build(:assignment, user: user, order_service: os2)
         expect(assignment).to be_valid
       end
@@ -71,16 +76,15 @@ RSpec.describe Assignment, type: :model do
   end
 
   describe "escopos" do
-    let(:user) { create(:user, role: "tecnico") }
-
     let!(:os_concluida) do
-      os = create(:order_service, status: :concluida)
+      os = create_order_service
       create(:assignment, user: user, order_service: os)
+      os.update_column(:status, OrderService.statuses[:concluida])
       os
     end
     let!(:a2) { Assignment.find_by(user: user, order_service: os_concluida) }
 
-    let!(:os_ativa) { create(:order_service, status: :agendada) }
+    let!(:os_ativa) { create_order_service(status: :agendada, scheduled_at: 3.days.from_now) }
     let!(:a1) { create(:assignment, user: user, order_service: os_ativa) }
 
     it "active retorna apenas assignments de OSs ativas" do
@@ -112,14 +116,14 @@ RSpec.describe Assignment, type: :model do
 
   describe "callbacks" do
     it "chama notify_technician após criar" do
-      assignment = build(:assignment)
+      assignment = build(:assignment, user: user, order_service: order_service)
       expect(assignment).to receive(:notify_technician)
       assignment.save(validate: false)
       # O método está comentado, então só testamos se é chamado
     end
 
     it "chama notify_technician_removal após destruir" do
-      assignment = create(:assignment)
+      assignment = create(:assignment, user: user, order_service: order_service)
       expect(assignment).to receive(:notify_technician_removal)
       assignment.destroy
       # O método está comentado, então só testamos se é chamado
@@ -128,7 +132,21 @@ RSpec.describe Assignment, type: :model do
 
   describe "factory" do
     it "possui uma factory válida" do
-      expect(build(:assignment)).to be_valid
+      expect(build(:assignment, user: user, order_service: order_service)).to be_valid
     end
+  end
+
+  def create_order_service(attributes = {})
+    scheduled_at = attributes.fetch(:scheduled_at, 1.day.from_now)
+
+    create(
+      :order_service,
+      {
+        company: company,
+        client: client,
+        scheduled_at: scheduled_at,
+        expected_end_at: scheduled_at + 2.hours
+      }.merge(attributes)
+    )
   end
 end

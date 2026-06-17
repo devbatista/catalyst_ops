@@ -43,6 +43,10 @@
         <div class="col-md-4 text-secondary"><strong>Limite de Ordens:</strong></div>
         <div class="col-md-8"><%= subscription.plan.max_orders || "Ilimitado" %></div>
       </div>
+      <div class="row mb-2">
+        <div class="col-md-4 text-secondary"><strong>Limite de Orçamentos:</strong></div>
+        <div class="col-md-8"><%= subscription.plan.max_budgets || "Ilimitado" %></div>
+      </div>
       <div class="row mb-0">
         <div class="col-md-4 text-secondary"><strong>Tipo de suporte:</strong></div>
         <div class="col-md-8"><%= subscription.plan.support_level %></div>

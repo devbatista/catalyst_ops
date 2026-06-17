@@ -20,6 +20,8 @@ gem "stimulus-rails"
 
 # JSON
 gem "jbuilder"
+gem "csv"
+gem "rubyzip", "~> 2.4"
 
 # Boot optimization
 gem "bootsnap", require: false
@@ -69,6 +71,7 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 
+  gem "simplecov", require: false
   gem 'shoulda-matchers', '~> 5.3'
 end
 
@@ -78,3 +81,8 @@ gem "sidekiq-cron", "~> 1.12"
 gem "dotenv-rails", "~> 3.0", groups: [:development, :test]
 
 gem "redcarpet"
+
+# Monitoramento de erros
+gem "sentry-ruby"
+gem "sentry-rails"
+gem "sentry-sidekiq"

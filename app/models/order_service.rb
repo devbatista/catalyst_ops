@@ -8,10 +8,12 @@ class OrderService < ApplicationRecord
   has_many :assignments, dependent: :destroy
   has_many :users, through: :assignments, after_remove: :audit_user_unassigned
   has_many :service_items, dependent: :destroy
+  has_many :received_items, class_name: "OrderServiceReceivedItem", dependent: :destroy, inverse_of: :order_service
   has_one :budget, dependent: :nullify
 
   accepts_nested_attributes_for :service_items, allow_destroy: true
   accepts_nested_attributes_for :assignments, allow_destroy: true
+  accepts_nested_attributes_for :received_items, allow_destroy: true, reject_if: :all_blank
 
   has_many_attached :attachments
 
@@ -67,6 +69,7 @@ class OrderService < ApplicationRecord
   scope :assigned, -> { joins(:assignments).distinct }
   scope :finished, -> { where(status: :finalizada) }
   scope :finished_this_month, -> { finished.where(updated_at: Time.current.all_month) }
+  scope :created_without_budget, -> { where(created_without_budget: true) }
 
   before_validation :set_company_from_client, on: :create
   before_validation :set_sequencial_code, on: :create
@@ -216,6 +219,9 @@ class OrderService < ApplicationRecord
       discount_type: discount_type,
       discount_value: discount_value.to_s,
       discount_amount: discount_amount.to_s,
+      created_without_budget: created_without_budget,
+      budget_waiver_reason: budget_waiver_reason,
+      budget_waiver_authorized_by: budget_waiver_authorized_by,
       total_value: total_value.to_s,
       client_id: client_id,
       company_id: company_id,
@@ -404,6 +410,8 @@ class OrderService < ApplicationRecord
       next if assignment.valid?
 
       assignment.errors.each do |error|
+        next if allow_simultaneous_order_services? && error.attribute == :user && error.message.include?("já possui outra OS agendada para este período")
+
         if error.attribute == :base && error.message.include?("data de agendamento")
           errors.add(:scheduled_at, "é obrigatório ao atribuir um técnico.")
         else
@@ -424,6 +432,10 @@ class OrderService < ApplicationRecord
 
   def requires_schedule_fields?
     agendada? || em_andamento? || concluida? || finalizada? || atrasada?
+  end
+
+  def allow_simultaneous_order_services?
+    company&.allow_simultaneous_order_services? == true
   end
 
   def plan_order_service_limit

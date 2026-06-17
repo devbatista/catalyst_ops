@@ -1,4 +1,4 @@
-import { formatPhone, onlyDigits } from "../utils/formatters";
+import { formatPhone, onlyDigits } from "utils/formatters";
 
 document.addEventListener("DOMContentLoaded", function () {
   // Telefone

@@ -6,6 +6,8 @@ BUDGETS = []
 
 CLIENTS.each do |client|
   rand(4..8).times do
+    break unless client.company.can_create_budget?
+
     budget = Budget.create!(
       title: Faker::Commerce.product_name,
       description: Faker::Lorem.sentence(word_count: 10),
@@ -26,14 +28,20 @@ CLIENTS.each do |client|
     # Recalcula total_value com base nos itens criados.
     budget.save!
 
-    # Mantém uma variedade de estados sem criar OS neste seed.
-    flow = [:rascunho, :enviado, :rejeitado].sample
+    # Mantém uma variedade de estados para alimentar os relatórios.
+    flow = [:rascunho, :enviado, :rejeitado, :aprovado].sample
     case flow
     when :enviado
       budget.send_for_approval!
     when :rejeitado
       budget.send_for_approval!
       budget.reject!(rejection_reason: "Cliente solicitou revisão de preço/prazo.")
+    when :aprovado
+      budget.send_for_approval!
+      budget.update!(
+        status: :aprovado,
+        approved_at: Faker::Time.backward(days: 120, period: :afternoon)
+      )
     end
 
     BUDGETS << budget
