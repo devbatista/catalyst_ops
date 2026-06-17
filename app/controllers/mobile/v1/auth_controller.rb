@@ -19,6 +19,7 @@ class Mobile::V1::AuthController < Mobile::V1::BaseController
     Audit::AuthLogger.login_succeeded(user: user)
 
     render json: {
+      accessToken: token,
       token: token,
       token_type: "Bearer",
       expires_at: expires_at.iso8601,
@@ -55,18 +56,5 @@ class Mobile::V1::AuthController < Mobile::V1::BaseController
   def login_error!(email:, user:, message:, status:)
     Audit::AuthLogger.login_failed(email: email, user: user)
     render json: { error: message }, status: status
-  end
-
-  def mobile_user_payload(user)
-    {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      company: {
-        id: user.company_id,
-        name: user.company&.name
-      }
-    }
   end
 end

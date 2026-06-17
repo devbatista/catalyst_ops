@@ -7,7 +7,13 @@ constraints subdomain: "mobile" do
     delete "auth/logout", to: "auth#logout"
     delete "auth/logout_all", to: "auth#logout_all"
 
-    resources :order_services, only: [:index, :show]
+    get "users/me", to: "users#me"
+
+    get "mobile/dashboard", to: "dashboard#show"
+    get "mobile/agenda", to: "agenda#index"
+    resources :service_orders, controller: "order_services", path: "mobile/service_orders", only: [:index, :show, :update]
+
+    resources :order_services, only: [:index, :show, :update]
     resources :budgets, only: [:index, :show]
   end
 end

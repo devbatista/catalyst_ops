@@ -250,6 +250,20 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_16_103000) do
     t.index ["slug"], name: "index_knowledge_base_articles_on_slug", unique: true
   end
 
+  create_table "mobile_api_sessions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.string "token_digest", null: false
+    t.datetime "expires_at", null: false
+    t.datetime "last_used_at"
+    t.datetime "revoked_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expires_at"], name: "index_mobile_api_sessions_on_expires_at"
+    t.index ["token_digest"], name: "index_mobile_api_sessions_on_token_digest", unique: true
+    t.index ["user_id", "revoked_at"], name: "index_mobile_api_sessions_on_user_id_and_revoked_at"
+    t.index ["user_id"], name: "index_mobile_api_sessions_on_user_id"
+  end
+
   create_table "order_service_received_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "order_service_id", null: false
     t.string "name", null: false
@@ -263,20 +277,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_16_103000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["order_service_id"], name: "index_order_service_received_items_on_order_service_id"
-  end
-
-  create_table "mobile_api_sessions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "user_id", null: false
-    t.string "token_digest", null: false
-    t.datetime "expires_at", null: false
-    t.datetime "last_used_at"
-    t.datetime "revoked_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["expires_at"], name: "index_mobile_api_sessions_on_expires_at"
-    t.index ["token_digest"], name: "index_mobile_api_sessions_on_token_digest", unique: true
-    t.index ["user_id", "revoked_at"], name: "index_mobile_api_sessions_on_user_id_and_revoked_at"
-    t.index ["user_id"], name: "index_mobile_api_sessions_on_user_id"
   end
 
   create_table "order_services", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
