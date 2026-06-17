@@ -47,10 +47,7 @@ class Mobile::V1::BaseController < ActionController::API
   end
 
   def mobile_order_services_scope
-    scope = mobile_company.order_services
-    return scope.by_technician(current_mobile_user.id) if current_mobile_user&.can_be_tecnico? && !current_mobile_user&.gestor? && !current_mobile_user&.admin?
-
-    scope
+    mobile_company.order_services.by_technician(current_mobile_user.id)
   end
 
   def mobile_user_payload(user)
