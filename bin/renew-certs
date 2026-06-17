@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+
+# Renova os certificados Let's Encrypt usados pelo nginx.
+#
+# Estrategia: so derruba o nginx (necessario porque o desafio HTTP-01 usa a
+# porta 80) quando o certificado esta dentro da janela de renovacao. Nos demais
+# dias o script sai sem tocar em nada, entao nao ha downtime.
+#
+# Uso (normalmente via cron):
+#   /opt/catalyst_ops/bin/renew-certs
+#
+# Variaveis opcionais:
+#   APP_DIR             diretorio do projeto (default: /opt/catalyst_ops)
+#   CERT_NAME           nome da linhagem do certbot (default: app.catalystops.com.br)
+#   RENEW_WINDOW_DAYS   renova se faltar menos que isso para vencer (default: 30)
+
+set -euo pipefail
+
+APP_DIR="${APP_DIR:-/opt/catalyst_ops}"
+CERT_NAME="${CERT_NAME:-app.catalystops.com.br}"
+RENEW_WINDOW_DAYS="${RENEW_WINDOW_DAYS:-30}"
+
+CERT_FILE="$APP_DIR/letsencrypt/live/$CERT_NAME/cert.pem"
+
+log() { echo "$(date -Is) [renew-certs] $*"; }
+
+cd "$APP_DIR"
+
+if [[ ! -f "$CERT_FILE" ]]; then
+  log "ERRO: certificado nao encontrado em $CERT_FILE"
+  exit 1
+fi
+
+# openssl -checkend retorna 0 se o cert AINDA esta valido apos N segundos,
+# ou seja, se passar no teste nao precisamos renovar.
+if openssl x509 -checkend "$((RENEW_WINDOW_DAYS * 24 * 3600))" -noout -in "$CERT_FILE"; then
+  log "Certificado valido por mais de ${RENEW_WINDOW_DAYS} dias. Nada a fazer."
+  exit 0
+fi
+
+log "Certificado dentro da janela de ${RENEW_WINDOW_DAYS} dias. Renovando..."
+
+# Garante que o nginx volta mesmo se a renovacao falhar.
+restore_nginx() {
+  log "Subindo o nginx novamente..."
+  docker compose up -d nginx
+}
+trap restore_nginx EXIT
+
+log "Parando o nginx para liberar a porta 80..."
+docker compose stop nginx
+
+log "Executando certbot renew..."
+docker run --rm -p 80:80 \
+  -v "$APP_DIR/letsencrypt:/etc/letsencrypt" \
+  certbot/certbot renew --quiet
+
+log "Renovacao concluida."
