@@ -20,6 +20,7 @@ Rails.application.routes.draw do
   draw :register
   draw :cliente
   draw :webhook
+  draw :mobile
 
   # Rotas padrão (sem subdomínio)
   # root to: "home#index"

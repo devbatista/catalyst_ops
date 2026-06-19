@@ -100,6 +100,19 @@ module Audit
       webhook.failed
     ].freeze
 
+    MOBILE_API = %w[
+      mobile.api.auth.me.viewed
+      mobile.api.auth.logout_all.succeeded
+      mobile.api.users.me.viewed
+      mobile.api.dashboard.viewed
+      mobile.api.agenda.viewed
+      mobile.api.order_services.listed
+      mobile.api.order_services.viewed
+      mobile.api.order_services.updated
+      mobile.api.budgets.listed
+      mobile.api.budgets.viewed
+    ].freeze
+
     TERMS = %w[
       terms.accepted
     ].freeze
@@ -125,6 +138,7 @@ module Audit
       plans: PLANS,
       subscriptions: SUBSCRIPTIONS,
       webhooks: WEBHOOKS,
+      mobile_api: MOBILE_API,
       terms: TERMS,
       system: SYSTEM
     }.freeze
