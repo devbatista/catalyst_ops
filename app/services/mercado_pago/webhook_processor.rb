@@ -144,7 +144,8 @@ module MercadoPago
         end_date: period_end.to_date,
         canceled_date: nil,
         expired_date: nil,
-        expiration_warning_sent_at: nil
+        expiration_warning_sent_at: nil,
+        expired_notification_sent_at: nil
       )
 
       Result.new(true, "Authorized payment #{authorized_payment_id} processado com sucesso")

@@ -15,7 +15,7 @@ RSpec.describe Subscriptions::ExpireOverdueSubscriptionsJob, type: :job do
       aggregate_failures do
         expect(command).to have_received(:call)
         expect(Rails.logger).to have_received(:info).with("[Subscriptions::ExpireOverdueSubscriptionsJob] Assinatura ID #{subscription.id} expirada com sucesso.")
-        expect(Rails.logger).to have_received(:info).with("[Subscriptions::ExpireOverdueSubscriptionsJob] 1 assinatura(s) processada(s) para expiracao.")
+        expect(Rails.logger).to have_received(:info).with("[Subscriptions::ExpireOverdueSubscriptionsJob] 1 assinatura(s) processada(s) para expiração.")
       end
     end
 
@@ -25,7 +25,7 @@ RSpec.describe Subscriptions::ExpireOverdueSubscriptionsJob, type: :job do
 
       described_class.new.perform
 
-      expect(Rails.logger).to have_received(:info).with("[Subscriptions::ExpireOverdueSubscriptionsJob] Nenhuma assinatura vencida ha 10 dias ou mais para expirar.")
+      expect(Rails.logger).to have_received(:info).with("[Subscriptions::ExpireOverdueSubscriptionsJob] Nenhuma assinatura vencida há 10 dias ou mais para expirar.")
     end
 
     it "registra erro quando o command retorna falha" do
