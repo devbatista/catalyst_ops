@@ -12,7 +12,7 @@ alterar código.
 - Quando uma tarefa cruzar domínios, leia todos os arquivos envolvidos.
 - Para fluxos de usuário, consulte também `docs/gestor/` e `docs/tecnico/`.
 
-## Dominios
+## Domínios
 
 - [Assinaturas e cobrança](assinaturas.md)
 - [Empresa e tenancy](empresas_e_tenancy.md)

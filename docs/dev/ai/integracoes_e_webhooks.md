@@ -11,7 +11,7 @@ Integrações externas conectam o CatalystOps a provedores de pagamento e outros
 serviços. O principal provedor atual é Mercado Pago, usado em assinaturas,
 planos, pagamentos e webhooks.
 
-## Areas Relacionadas
+## Áreas Relacionadas
 
 - `webhook`: entrada HTTP para callbacks externos.
 - `admin`: reconciliação e diagnóstico.

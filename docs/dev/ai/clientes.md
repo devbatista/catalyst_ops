@@ -10,11 +10,11 @@ de clientes ou relações com OS e orçamentos.
 `Client` representa o cliente final atendido pela empresa usuária. Ele é base
 para ordens de serviço, orçamentos, endereços e histórico operacional.
 
-## Areas Relacionadas
+## Áreas Relacionadas
 
 - `app/gestor`: cadastro, edição, busca e histórico.
 - OS e orçamentos: dependem do cliente.
-- Relatorios: podem filtrar ou agrupar por cliente.
+- Relatórios: podem filtrar ou agrupar por cliente.
 
 ## Pontos De Entrada Importantes
 

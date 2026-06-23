@@ -1,4 +1,4 @@
-# Financeiro E Relatorios
+# Financeiro E Relatórios
 
 ## Quando Ler Este Arquivo
 
@@ -11,7 +11,7 @@ O financeiro operacional deriva principalmente de OS e itens de serviço. Ele
 não deve ser confundido automaticamente com cobrança SaaS da plataforma, que
 pertence ao domínio de assinaturas.
 
-## Areas Relacionadas
+## Áreas Relacionadas
 
 - `app/gestor`: dashboard, financeiro e relatórios.
 - `admin`: métricas globais e acompanhamento da plataforma.

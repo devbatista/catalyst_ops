@@ -10,7 +10,7 @@ PDFs, dashboards operacionais, notificações de OS ou regras de edição.
 `OrderService` é um dos agregados centrais do sistema. Ele conecta empresa,
 cliente, técnicos, agenda, itens, anexos, status operacional e indicadores.
 
-## Areas Relacionadas
+## Áreas Relacionadas
 
 - `app/gestor`: cria, edita, agenda, cancela, finaliza e acompanha OS.
 - `app/tecnico`: visualiza e atualiza OS atribuídas.

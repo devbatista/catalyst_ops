@@ -11,7 +11,7 @@ O projeto usa Devise para autenticação e CanCanCan para autorização. `User` 
 entrypoint de contexto da aplicação protegida, e `Ability` concentra as regras
 reais de permissão.
 
-## Areas Relacionadas
+## Áreas Relacionadas
 
 - `login`: autenticação e recuperação de credenciais.
 - `register`: cadastro inicial.

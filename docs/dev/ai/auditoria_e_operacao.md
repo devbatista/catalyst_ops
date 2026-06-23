@@ -10,7 +10,7 @@ operacionais, jobs de limpeza, runbooks, diagnóstico ou telas de monitoramento.
 Auditoria e operação dão rastreabilidade a ações relevantes do sistema,
 principalmente em domínios sensíveis como assinatura, suporte, usuários e OS.
 
-## Areas Relacionadas
+## Áreas Relacionadas
 
 - `admin`: logs, métricas, coverage e diagnóstico.
 - Jobs: ciclo de vida, limpeza e reconciliação.
@@ -51,7 +51,7 @@ principalmente em domínios sensíveis como assinatura, suporte, usuários e OS.
 - Remover metadados importantes para troubleshooting.
 - Transformar query operacional em escrita.
 - Quebrar filtros de logs admin.
-- Registrar dado sensivel em log ou metadado.
+- Registrar dado sensível em log ou metadado.
 
 ## Testes Recomendados
 

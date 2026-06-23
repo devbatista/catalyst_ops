@@ -11,7 +11,7 @@ orçamentos em ordens de serviço.
 e cliente. Ele pode originar uma OS quando aprovado, e compartilha itens de
 serviço com cálculos financeiros.
 
-## Areas Relacionadas
+## Áreas Relacionadas
 
 - `app/gestor`: cria, edita, envia e acompanha orçamentos.
 - `cliente`: fluxo externo de aprovação ou rejeição.

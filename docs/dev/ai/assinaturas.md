@@ -12,7 +12,7 @@ ao Mercado Pago.
 depende da assinatura ativa, e mudanças nesse domínio podem afetar login,
 onboarding, limites de plano, faturamento, auditoria e jobs de reconciliação.
 
-## Areas Relacionadas
+## Áreas Relacionadas
 
 - `register`: criação de empresa e assinatura inicial.
 - `app/gestor`: consulta de assinatura e acesso operacional.

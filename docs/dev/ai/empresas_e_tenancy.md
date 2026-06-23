@@ -11,7 +11,7 @@ subdomínio.
 `Company` é o tenant principal do CatalystOps. A maior parte dos dados de
 negócio deve estar direta ou indiretamente ligada a `company_id`.
 
-## Areas Relacionadas
+## Áreas Relacionadas
 
 - `register`: cria empresa, usuário inicial e assinatura.
 - `app/gestor` e `app/tecnico`: operam sempre dentro de uma empresa.
@@ -50,7 +50,7 @@ vir de assinatura, onboarding, ativação de usuários e configurações da empr
 - Expor dados de outra empresa por `find(params[:id])` sem escopo.
 - Usar associações globais quando existe associação por `current_user.company`.
 - Misturar regras de admin com regras de app.
-- Criar relatarios sem filtrar por empresa.
+- Criar relatórios sem filtrar por empresa.
 
 ## Testes Recomendados
 

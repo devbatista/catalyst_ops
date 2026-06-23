@@ -11,7 +11,7 @@ O suporte combina tickets conversacionais por empresa com uma base de
 conhecimento segmentada por audiência. Gestores e técnicos podem consumir
 conteúdos diferentes.
 
-## Areas Relacionadas
+## Áreas Relacionadas
 
 - `app/gestor`: abre, acompanha e responde tickets; consulta artigos.
 - `app/tecnico`: consulta artigos e usa suporte conforme permissão.

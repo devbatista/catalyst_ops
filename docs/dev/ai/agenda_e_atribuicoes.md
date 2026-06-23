@@ -11,7 +11,7 @@ visão de calendário ou notificações de atendimento.
 das OS agendadas e das atribuições, respeitando empresa, role e janelas de
 atendimento.
 
-## Areas Relacionadas
+## Áreas Relacionadas
 
 - `app/gestor`: agenda geral, agenda por técnico e atribuição.
 - `app/tecnico`: agenda própria e OS atribuídas.
