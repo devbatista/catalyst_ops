@@ -209,7 +209,8 @@ RSpec.describe Subscription, type: :model do
           cancel_effective_on: Date.new(2026, 5, 20),
           cancel_reason: "Cliente pediu pausa",
           expired_date: Date.new(2026, 5, 2),
-          expiration_warning_sent_at: Time.zone.local(2026, 5, 2, 11, 0, 0)
+          expiration_warning_sent_at: Time.zone.local(2026, 5, 2, 11, 0, 0),
+          expired_notification_sent_at: Time.zone.local(2026, 5, 7, 11, 0, 0)
         )
         started_at = Time.zone.local(2026, 5, 17, 9, 0, 0)
         period_end = Date.new(2026, 6, 17)
@@ -232,6 +233,7 @@ RSpec.describe Subscription, type: :model do
           expect(subscription.cancel_reason).to be_nil
           expect(subscription.expired_date).to be_nil
           expect(subscription.expiration_warning_sent_at).to be_nil
+          expect(subscription.expired_notification_sent_at).to be_nil
         end
       end
     end

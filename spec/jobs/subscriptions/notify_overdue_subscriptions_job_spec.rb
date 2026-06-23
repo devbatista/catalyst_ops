@@ -12,7 +12,7 @@ RSpec.describe Subscriptions::NotifyOverdueSubscriptionsJob, type: :job do
       described_class.new.perform
 
       expect(command).to have_received(:call)
-      expect(Rails.logger).to have_received(:info).with("[Subscriptions::NotifyOverdueSubscriptionsJob] Notificacao de vencimento registrada para assinatura ID #{subscription.id}.")
+      expect(Rails.logger).to have_received(:info).with("[Subscriptions::NotifyOverdueSubscriptionsJob] Notificação de vencimento registrada para assinatura ID #{subscription.id}.")
     end
 
     it "registra erro sem interromper quando comando falha" do

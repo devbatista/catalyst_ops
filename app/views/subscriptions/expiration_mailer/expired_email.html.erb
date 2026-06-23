@@ -1,0 +1,16 @@
+<p>Olá, <%= @responsible_name %>.</p>
+
+<p>
+  A assinatura da empresa <strong><%= @company.name %></strong> foi expirada em
+  <strong><%= l(@expired_on, format: :short) %></strong>.
+</p>
+
+<p>
+  O acesso ao CatalystOps ficará indisponível até a regularização da assinatura.
+</p>
+
+<% if @plan.present? %>
+  <p>Plano expirado: <strong><%= @plan.name %></strong>.</p>
+<% end %>
+
+<p>Se precisar de ajuda para regularizar o acesso, responda este email ou entre em contato com nosso suporte.</p>

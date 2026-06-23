@@ -74,7 +74,8 @@ class Subscription < ApplicationRecord
             cancel_effective_on: nil,
             cancel_reason: nil,
             expired_date: nil,
-            expiration_warning_sent_at: nil)
+            expiration_warning_sent_at: nil,
+            expired_notification_sent_at: nil)
   end
 
   def cancel!

@@ -8,9 +8,9 @@ class Subscriptions::ExpireOverdueSubscriptionsJob
 
     if subscription_ids.any?
       expire_subscriptions(subscription_ids)
-      Rails.logger.info "[Subscriptions::ExpireOverdueSubscriptionsJob] #{subscription_ids.size} assinatura(s) processada(s) para expiracao."
+      Rails.logger.info "[Subscriptions::ExpireOverdueSubscriptionsJob] #{subscription_ids.size} assinatura(s) processada(s) para expiração."
     else
-      Rails.logger.info "[Subscriptions::ExpireOverdueSubscriptionsJob] Nenhuma assinatura vencida ha 10 dias ou mais para expirar."
+      Rails.logger.info "[Subscriptions::ExpireOverdueSubscriptionsJob] Nenhuma assinatura vencida há 10 dias ou mais para expirar."
     end
   end
 
