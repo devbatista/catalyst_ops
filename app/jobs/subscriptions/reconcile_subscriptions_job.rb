@@ -42,6 +42,7 @@ class Subscriptions::ReconcileSubscriptionsJob
 
   def subscriptions_to_reconcile
     base = Subscription
+      .paid_plan
       .where(gateway: "mercado_pago", status: %w[pending active])
       .where("subscriptions.updated_at >= ?", reconciliation_window_start)
 

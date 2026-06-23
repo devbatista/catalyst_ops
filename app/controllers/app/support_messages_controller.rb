@@ -1,5 +1,6 @@
 class App::SupportMessagesController < ApplicationController
   skip_authorization_check
+  before_action :ensure_ticket_support_available
 
   def create
     @support_ticket = current_user.company.support_tickets.find(
@@ -26,6 +27,13 @@ class App::SupportMessagesController < ApplicationController
   end
 
   private
+
+  def ensure_ticket_support_available
+    return unless current_user.company&.starter_plan?
+
+    redirect_to app_support_index_path(section: "knowledge_base"),
+                alert: "O plano Starter oferece suporte somente via base de conhecimento."
+  end
 
   def support_message_params
     params.require(:support_message).permit(

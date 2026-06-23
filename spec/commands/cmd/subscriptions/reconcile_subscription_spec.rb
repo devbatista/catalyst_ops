@@ -8,7 +8,7 @@ RSpec.describe Cmd::Subscriptions::ReconcileSubscription do
       aggregate_failures do
         expect(result).not_to be_success
         expect(result.subscription).to be_nil
-        expect(result.errors).to eq("Assinatura nao encontrada")
+        expect(result.errors).to eq("Assinatura não encontrada")
       end
     end
 
@@ -29,6 +29,20 @@ RSpec.describe Cmd::Subscriptions::ReconcileSubscription do
           gateway_identifier: "pay_unsupported"
         )
       end
+    end
+
+    it "ignora assinatura de plano gratuito sem consultar gateway" do
+      plan = create(:plan, :starter)
+      company = create(:company, plan: plan, payment_method: "pix")
+      subscription = create(:subscription, company: company, subscription_plan: plan, status: :active, external_payment_id: "pay_free")
+
+      allow(MercadoPago::Subscriptions).to receive(:fetch_payment)
+
+      result = described_class.new(subscription_id: subscription.id).call
+
+      expect(result).to be_success
+      expect(MercadoPago::Subscriptions).not_to have_received(:fetch_payment)
+      expect(SubscriptionReconciliationEvent.where(subscription: subscription)).to be_empty
     end
 
     it "registra erro para cartão sem identificador externo" do

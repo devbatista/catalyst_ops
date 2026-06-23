@@ -22,5 +22,17 @@ FactoryBot.define do
       external_reference { "ENTERPRISE_#{SecureRandom.hex(4)}" }
       transaction_amount { 399.0 }
     end
+
+    trait :starter do
+      name { "Starter" }
+      reason { "starter-gratuito" }
+      external_reference { "STARTER_#{SecureRandom.hex(4)}" }
+      transaction_amount { 0 }
+      free { true }
+      max_technicians { 1 }
+      max_orders { 3 }
+      max_budgets { 3 }
+      support_level { "Base de conhecimento" }
+    end
   end
 end

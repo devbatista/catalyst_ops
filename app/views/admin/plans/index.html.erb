@@ -93,10 +93,14 @@
                       </td>
                       <td><%= "#{plan.frequency} #{plan.frequency_type}" %></td>
                       <td>
-                        R$ <%= number_with_precision(plan.transaction_amount,
-                                                     precision: 2,
-                                                     separator: ',',
-                                                     delimiter: '.') %>
+                        <% if plan.free? %>
+                          Grátis
+                        <% else %>
+                          R$ <%= number_with_precision(plan.transaction_amount,
+                                                       precision: 2,
+                                                       separator: ',',
+                                                       delimiter: '.') %>
+                        <% end %>
                       </td>
                       <td><%= plan.max_technicians.presence || "Ilimitado" %></td>
                       <td><%= plan.max_orders.presence || "Ilimitado" %></td>

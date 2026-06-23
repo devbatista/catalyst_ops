@@ -8,7 +8,7 @@ class App::TechniciansController < ApplicationController
       when "admin"
         User.where(role: :tecnico).order(:name)
       when "gestor"
-        User.where(role: :tecnico, company_id: current_user.company_id).order(:name)
+        current_user.company.technicians.order(:name)
       else
         User.none
       end
@@ -68,6 +68,11 @@ class App::TechniciansController < ApplicationController
   end
 
   def can_add_technician
+    if current_user.company&.starter_plan?
+      redirect_to app_technicians_path, alert: "No plano Starter, o gestor já atua como técnico."
+      return
+    end
+
     unless current_user.company.can_add_technician?
       redirect_to app_technicians_path, alert: "Limite de técnicos atingido para o seu plano atual."
     end

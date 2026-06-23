@@ -19,6 +19,18 @@ RSpec.describe Subscriptions::ExpireOverdueSubscriptionsJob, type: :job do
       end
     end
 
+    it "ignora assinatura vencida de plano gratuito" do
+      plan = create(:plan, :starter)
+      subscription = create(:subscription, subscription_plan: plan, status: :active, end_date: Date.current - 11.days)
+
+      allow(Cmd::Subscriptions::ExpireOverdueSubscriptions).to receive(:new)
+      allow(Rails.logger).to receive(:info)
+
+      described_class.new.perform
+
+      expect(Cmd::Subscriptions::ExpireOverdueSubscriptions).not_to have_received(:new).with(subscription_id: subscription.id)
+    end
+
     it "registra log quando não há assinaturas expiradas" do
       allow(Subscription).to receive(:overdue_for_expiration).and_return(Subscription.none)
       allow(Rails.logger).to receive(:info)

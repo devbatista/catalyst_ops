@@ -18,13 +18,15 @@ class Register::SignupsController < ApplicationController
   def create
     @payment_methods = %w[pix credit_card boleto]
     @coupon_code = params.dig(:signup, :coupon_code).to_s.upcase.strip
+    plan = selected_plan
     @company = Company.new(company_params.merge(
-      plan_id: params.dig(:signup, :plan_id),
-      payment_method: params.dig(:signup, :payment_method)
+      plan_id: plan&.id,
+      payment_method: plan&.free? ? "pix" : params.dig(:signup, :payment_method)
     ))
     @company.require_terms_acceptance = true
     @company.terms_checkbox_accepted = terms_accepted?
     @user = User.new(user_params.merge(role: :gestor))
+    @user.can_be_technician = true if plan&.free?
     coupon_result = resolve_coupon_result
 
     unless coupon_result.success?
@@ -47,7 +49,10 @@ class Register::SignupsController < ApplicationController
                          alert: "Cadastro criado, mas houve falha ao iniciar o fluxo de pagamento: #{payment_result.errors}"
     end
 
-    if trial_coupon_without_mercado_pago?(coupon_result)
+    if @company.plan&.free?
+      @user.send_welcome_email!
+      return redirect_to success_path(company_id: @company.id, starter: "1")
+    elsif trial_coupon_without_mercado_pago?(coupon_result)
       @user.send_signup_confirmation_email!
       return redirect_to success_path(company_id: @company.id, confirmation_email: "1")
     end
@@ -67,6 +72,12 @@ class Register::SignupsController < ApplicationController
     if params[:confirmation_email] == "1"
       @success_message = "Foi enviado um link de confirmação de cadastro no email"
       @success_subtext = nil
+      return
+    end
+
+    if params[:starter] == "1"
+      @success_message = "Cadastro criado com sucesso."
+      @success_subtext = "Seu plano Starter gratuito já está ativo."
       return
     end
 
@@ -95,13 +106,19 @@ class Register::SignupsController < ApplicationController
   end
 
   def subscription_params
-    plan = Plan.find_by(id: params.dig(:signup, :plan_id))
+    plan = selected_plan
     {
       preapproval_plan_id: plan&.external_id,
       reason: plan&.reason,
       transaction_amount: plan&.transaction_amount,
       external_reference: @company&.id&.to_s,
-    }
+    }.tap do |attributes|
+      if plan&.free?
+        attributes[:status] = :active
+        attributes[:start_date] = Date.current
+        attributes[:end_date] = nil
+      end
+    end
   end
 
   def terms_accepted?
@@ -109,7 +126,7 @@ class Register::SignupsController < ApplicationController
   end
 
   def resolve_coupon_result
-    plan = Plan.find_by(id: params.dig(:signup, :plan_id))
+    plan = selected_plan
 
     Coupons::SignupBenefitResolver.new(
       plan: plan,
@@ -166,6 +183,8 @@ class Register::SignupsController < ApplicationController
   end
 
   def handle_payment_flow(company, payment_method, cc_token = nil, coupon_result = nil)
+    return Result.new(true, nil) if company.plan&.free?
+
     case payment_method
     when "boleto"
       handle_boleto_flow(company, coupon_result)
@@ -252,6 +271,10 @@ class Register::SignupsController < ApplicationController
 
   def should_send_welcome_email?(coupon_result)
     signup_without_coupon?(coupon_result) && !%w[pix boleto].include?(@company.payment_method)
+  end
+
+  def selected_plan
+    @selected_plan ||= Plan.find_by(id: params.dig(:signup, :plan_id))
   end
 
 end

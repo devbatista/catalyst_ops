@@ -33,7 +33,7 @@ RSpec.describe Plan, type: :model do
     it { is_expected.to validate_uniqueness_of(:external_id) }
     it { is_expected.to validate_uniqueness_of(:external_reference) }
     it { is_expected.to validate_numericality_of(:frequency).only_integer.is_greater_than(0) }
-    it { is_expected.to validate_numericality_of(:transaction_amount).is_greater_than(0) }
+    it { is_expected.to validate_numericality_of(:transaction_amount).is_greater_than_or_equal_to(0) }
     it { is_expected.to validate_inclusion_of(:status).in_array(%w[active inactive]) }
 
     it "é válido com os dados padrão da factory" do
@@ -64,13 +64,19 @@ RSpec.describe Plan, type: :model do
       end
     end
 
-    it "rejeita valor de transação igual a zero" do
+    it "rejeita valor de transação igual a zero para plano pago" do
       plan = build(:plan, transaction_amount: 0)
 
       aggregate_failures do
         expect(plan).not_to be_valid
-        expect(plan.errors[:transaction_amount]).to include("deve ser maior que 0")
+        expect(plan.errors[:transaction_amount]).to include("deve ser maior que 0 para planos pagos")
       end
+    end
+
+    it "permite valor de transação igual a zero para plano gratuito" do
+      plan = build(:plan, :starter)
+
+      expect(plan).to be_valid
     end
 
     it "permite limites operacionais opcionais do plano" do

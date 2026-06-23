@@ -69,6 +69,14 @@ RSpec.describe Company, type: :model do
       expect(company.can_add_technician?).to be(false)
     end
 
+    it "identifica empresa com plano Starter gratuito" do
+      plan = create(:plan, :starter)
+      company = create(:company, plan: plan)
+      create(:subscription, company: company, subscription_plan: plan, status: :active)
+
+      expect(company).to be_starter_plan
+    end
+
     it "valida se pode criar OS respeitando limite" do
       plan = create(:plan, max_orders: 1)
       company = create(:company, plan: plan)

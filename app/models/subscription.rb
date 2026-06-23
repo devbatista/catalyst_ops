@@ -23,18 +23,24 @@ class Subscription < ApplicationRecord
   scope :active, -> { where(status: :active).limit(1) }
   scope :active_records, -> { where(status: :active) }
   scope :in_attention, -> { where(status: [:pending, :expired, :cancelled]).order(updated_at: :desc, created_at: :desc) }
+  scope :paid_plan, -> {
+    left_outer_joins(:plan)
+      .where("plans.id IS NULL OR plans.free = ?", false)
+  }
   
   scope :overdue_for_notification, -> {
-    where(status: :active, expiration_warning_sent_at: nil)
+    paid_plan
+      .where(status: :active, expiration_warning_sent_at: nil)
       .where('end_date <= ?', Date.current - 5.days)
   }
-  scope :overdue_for_expiration, -> { where(status: :active).where('end_date <= ?', Date.current - 10.days) }
+  scope :overdue_for_expiration, -> { paid_plan.where(status: :active).where('end_date <= ?', Date.current - 10.days) }
   scope :scheduled_for_cancellation_due, -> {
     where(status: :active, cancel_at_period_end: true).where('cancel_effective_on <= ?', Date.current)
   }
   
   scope :ready_to_cycle, -> { 
-    joins(:company)
+    paid_plan
+      .joins(:company)
       .where(status: :active)
       .where(cancel_at_period_end: false)
       .where(end_date: Date.current + 7.days)
@@ -48,6 +54,10 @@ class Subscription < ApplicationRecord
   
   def allows_access?
     active?
+  end
+
+  def free_plan?
+    plan&.free? || false
   end
 
   def self.estimated_mrr

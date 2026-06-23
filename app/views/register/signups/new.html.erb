@@ -284,7 +284,13 @@
                                           </div>
                                         </div>
                                         <div class="text-end">
-                                          <div class="fw-bold">R$ <%= number_with_precision(plan.transaction_amount, precision: 2, separator: ',', delimiter: '.' ) %></div>
+                                          <div class="fw-bold">
+                                            <% if plan.free? %>
+                                              Grátis
+                                            <% else %>
+                                              R$ <%= number_with_precision(plan.transaction_amount, precision: 2, separator: ',', delimiter: '.' ) %>
+                                            <% end %>
+                                          </div>
                                         </div>
                                       </div>
                                     </label>

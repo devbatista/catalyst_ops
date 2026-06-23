@@ -159,15 +159,46 @@ RSpec.describe Subscription, type: :model do
           end_date: Date.new(2026, 5, 24),
           cancel_at_period_end: false
         )
+        free_plan = create(:plan, :starter)
+        free_subscription = create(
+          :subscription,
+          subscription_plan: free_plan,
+          status: :active,
+          end_date: Date.new(2026, 5, 24),
+          cancel_at_period_end: false
+        )
         scoped_ids = [
           ready_subscription.id,
           credit_card_subscription.id,
           scheduled_cancellation_subscription.id,
           wrong_date_subscription.id,
-          pending_subscription.id
+          pending_subscription.id,
+          free_subscription.id
         ]
 
         expect(described_class.where(id: scoped_ids).ready_to_cycle).to contain_exactly(ready_subscription)
+      end
+    end
+
+    describe ".overdue_for_notification" do
+      it "ignora assinaturas vencidas de planos gratuitos" do
+        paid_subscription = create(:subscription, status: :active, end_date: Date.current - 6.days, expiration_warning_sent_at: nil)
+        free_plan = create(:plan, :starter)
+        free_subscription = create(:subscription, subscription_plan: free_plan, status: :active, end_date: Date.current - 6.days, expiration_warning_sent_at: nil)
+
+        expect(described_class.where(id: [paid_subscription.id, free_subscription.id]).overdue_for_notification)
+          .to contain_exactly(paid_subscription)
+      end
+    end
+
+    describe ".overdue_for_expiration" do
+      it "ignora assinaturas vencidas de planos gratuitos" do
+        paid_subscription = create(:subscription, status: :active, end_date: Date.current - 11.days)
+        free_plan = create(:plan, :starter)
+        free_subscription = create(:subscription, subscription_plan: free_plan, status: :active, end_date: Date.current - 11.days)
+
+        expect(described_class.where(id: [paid_subscription.id, free_subscription.id]).overdue_for_expiration)
+          .to contain_exactly(paid_subscription)
       end
     end
   end

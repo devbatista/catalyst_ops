@@ -49,6 +49,7 @@ class Admin::PlansController < AdminController
       :frequency,
       :frequency_type,
       :transaction_amount,
+      :free,
       :init_point,
       :back_url,
       :max_technicians,

@@ -101,6 +101,15 @@ RSpec.describe "Controllers App de prioridade baixa", type: :request do
     end
   end
 
+  it "mostra gestor como técnico operacional no plano Starter" do
+    plan.update!(free: true, transaction_amount: 0, max_technicians: 1)
+    user.update!(can_be_technician: true)
+
+    get "/technicians"
+
+    expect(response.body).to include(user.name)
+  end
+
   def scoped_host_for(subdomain)
     tld_labels = ["example", "com"]
     extra_domain_labels = Array.new(Rails.application.config.action_dispatch.tld_length.to_i - 1, "app")
