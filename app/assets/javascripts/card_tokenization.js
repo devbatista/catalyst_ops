@@ -95,7 +95,9 @@
     function shouldTokenize() {
       const method = form.querySelector('input[name="signup[payment_method]"]:checked')?.value;
       const ccForm = document.getElementById('credit-card-form');
-      return method === 'credit_card' && ccForm && !ccForm.classList.contains('d-none');
+      const selectedPlan = form.querySelector('input[name="signup[plan_id]"]:checked');
+      const freePlanSelected = selectedPlan && selectedPlan.dataset.planFree === 'true';
+      return method === 'credit_card' && !freePlanSelected && ccForm && !ccForm.classList.contains('d-none');
     }
 
     let cardFormInstance = null;

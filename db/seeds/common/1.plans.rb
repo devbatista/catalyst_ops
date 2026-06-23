@@ -1,5 +1,20 @@
 puts "Criando os planos..."
 
+Plan.find_or_create_by!(external_reference: "STARTER") do |plan|
+  plan.name = "Starter"
+  plan.reason = "c-starter"
+  plan.status = "active"
+  plan.external_id = "starter-free"
+  plan.frequency = 1
+  plan.frequency_type = "months"
+  plan.transaction_amount = 0.0
+  plan.max_technicians = 1
+  plan.max_orders = 3
+  plan.max_budgets = 3
+  plan.support_level = "base de conhecimento"
+  plan.free = true
+end
+
 Plan.find_or_create_by!(external_reference: "BASICO") do |plan|
   plan.name = "Basico"
   plan.reason = "c-basico"
