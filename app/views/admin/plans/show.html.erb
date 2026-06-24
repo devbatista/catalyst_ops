@@ -38,11 +38,15 @@
               <div class="col-md-4">
                 <strong>Valor:</strong>
                 <p>
-                  R$
-                  <%= number_with_precision(@plan.transaction_amount,
-                                            precision: 2,
-                                            separator: ',',
-                                            delimiter: '.') %>
+                  <% if @plan.free? %>
+                    Grátis
+                  <% else %>
+                    R$
+                    <%= number_with_precision(@plan.transaction_amount,
+                                              precision: 2,
+                                              separator: ',',
+                                              delimiter: '.') %>
+                  <% end %>
                 </p>
               </div>
             </div>
@@ -67,6 +71,10 @@
               <div class="col-md-3">
                 <strong>Nível de suporte:</strong>
                 <p><%= @plan.support_level.presence || "-" %></p>
+              </div>
+              <div class="col-md-3">
+                <strong>Gratuito:</strong>
+                <p><%= @plan.free? ? "Sim" : "Não" %></p>
               </div>
             </div>
 

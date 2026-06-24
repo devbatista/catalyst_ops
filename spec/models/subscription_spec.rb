@@ -34,6 +34,17 @@ RSpec.describe Subscription, type: :model do
       expect { subscription.status = "desconhecido" }
         .to raise_error(ArgumentError, /'desconhecido' is not a valid status/)
     end
+
+    it "remove data de fim de assinaturas do plano Starter" do
+      starter_plan = create(:plan, :starter)
+      subscription = create(
+        :subscription,
+        subscription_plan: starter_plan,
+        end_date: Date.current + 15.days
+      )
+
+      expect(subscription.end_date).to be_nil
+    end
   end
 
   describe "scopes" do
@@ -159,15 +170,46 @@ RSpec.describe Subscription, type: :model do
           end_date: Date.new(2026, 5, 24),
           cancel_at_period_end: false
         )
+        free_plan = create(:plan, :starter)
+        free_subscription = create(
+          :subscription,
+          subscription_plan: free_plan,
+          status: :active,
+          end_date: Date.new(2026, 5, 24),
+          cancel_at_period_end: false
+        )
         scoped_ids = [
           ready_subscription.id,
           credit_card_subscription.id,
           scheduled_cancellation_subscription.id,
           wrong_date_subscription.id,
-          pending_subscription.id
+          pending_subscription.id,
+          free_subscription.id
         ]
 
         expect(described_class.where(id: scoped_ids).ready_to_cycle).to contain_exactly(ready_subscription)
+      end
+    end
+
+    describe ".overdue_for_notification" do
+      it "ignora assinaturas vencidas de planos gratuitos" do
+        paid_subscription = create(:subscription, status: :active, end_date: Date.current - 6.days, expiration_warning_sent_at: nil)
+        free_plan = create(:plan, :starter)
+        free_subscription = create(:subscription, subscription_plan: free_plan, status: :active, end_date: Date.current - 6.days, expiration_warning_sent_at: nil)
+
+        expect(described_class.where(id: [paid_subscription.id, free_subscription.id]).overdue_for_notification)
+          .to contain_exactly(paid_subscription)
+      end
+    end
+
+    describe ".overdue_for_expiration" do
+      it "ignora assinaturas vencidas de planos gratuitos" do
+        paid_subscription = create(:subscription, status: :active, end_date: Date.current - 11.days)
+        free_plan = create(:plan, :starter)
+        free_subscription = create(:subscription, subscription_plan: free_plan, status: :active, end_date: Date.current - 11.days)
+
+        expect(described_class.where(id: [paid_subscription.id, free_subscription.id]).overdue_for_expiration)
+          .to contain_exactly(paid_subscription)
       end
     end
   end
@@ -268,6 +310,16 @@ RSpec.describe Subscription, type: :model do
 
   describe "cancelamento agendado" do
     describe "#schedule_cancellation!" do
+      it "não agenda cancelamento para plano Starter" do
+        starter_plan = create(:plan, :starter)
+        subscription = create(:subscription, subscription_plan: starter_plan, status: :active)
+
+        expect { subscription.schedule_cancellation!(reason: "Não vou usar") }
+          .to raise_error(ActiveRecord::RecordInvalid, /O plano Starter não possui cancelamento de assinatura/)
+
+        expect(subscription.reload.cancel_at_period_end).to be(false)
+      end
+
       it "agenda cancelamento no fim do período mantendo a assinatura ativa" do
         subscription = create(:subscription, status: :active, end_date: Date.new(2026, 6, 10))
 

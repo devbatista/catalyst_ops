@@ -19,6 +19,18 @@ RSpec.describe "Register::SignupsController", type: :request do
     expect(response.body).to include(plan.name)
   end
 
+  it "exibe plano Starter gratuito como Grátis" do
+    starter = create(:plan, :starter, status: "active")
+
+    get "/"
+
+    aggregate_failures do
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(starter.name)
+      expect(response.body).to include("Grátis")
+    end
+  end
+
   it "cria empresa, usuário e assinatura para pagamento pix" do
     expect do
       post "/signups", params: signup_params(payment_method: "pix")
@@ -31,6 +43,37 @@ RSpec.describe "Register::SignupsController", type: :request do
     expect(company.payment_method).to eq("pix")
     expect(company).to be_accepted_current_terms
     expect(Audit::Log).to have_received(:call).with(hash_including(action: "terms.accepted", company: company))
+  end
+
+  it "cria empresa, gestor técnico e assinatura ativa para plano Starter gratuito sem iniciar pagamento" do
+    starter = create(:plan, :starter)
+    allow(CreateUser::PixPaymentJob).to receive(:perform_later)
+    allow(CreateUser::BoletoPaymentJob).to receive(:perform_later)
+    allow(Cmd::MercadoPago::CreateCreditCardPayment).to receive(:new)
+    allow_any_instance_of(User).to receive(:send_welcome_email!)
+
+    expect do
+      post "/signups", params: signup_params(plan_id: starter.id, payment_method: "credit_card")
+    end.to change(Company, :count).by(1)
+      .and change(User, :count).by(1)
+      .and change(Subscription, :count).by(1)
+
+    company = Company.order(:created_at).last
+    user = company.responsible
+    subscription = company.current_subscription
+
+    aggregate_failures do
+      expect(response).to redirect_to(success_path(company_id: company.id, starter: "1"))
+      expect(company.plan).to eq(starter)
+      expect(user).to be_gestor
+      expect(user).to be_can_be_technician
+      expect(subscription).to be_active
+      expect(subscription.end_date).to be_nil
+      expect(subscription.transaction_amount).to eq(0)
+      expect(CreateUser::PixPaymentJob).not_to have_received(:perform_later)
+      expect(CreateUser::BoletoPaymentJob).not_to have_received(:perform_later)
+      expect(Cmd::MercadoPago::CreateCreditCardPayment).not_to have_received(:new)
+    end
   end
 
   it "renderiza erro quando termos não são aceitos" do
@@ -56,10 +99,10 @@ RSpec.describe "Register::SignupsController", type: :request do
     expect(response.body).to include("Foi enviado")
   end
 
-  def signup_params(payment_method: "pix", accept_terms: "1", coupon_code: "")
+  def signup_params(payment_method: "pix", accept_terms: "1", coupon_code: "", plan_id: plan.id)
     {
       signup: {
-        plan_id: plan.id,
+        plan_id: plan_id,
         payment_method: payment_method,
         accept_terms: accept_terms,
         coupon_code: coupon_code,

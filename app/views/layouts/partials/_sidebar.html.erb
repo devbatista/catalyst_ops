@@ -83,52 +83,12 @@
       <% end %>
     </li>
 
-    <% if can?(:read, :support) || can?(:read, :knowledge_base) %>
-    <li id="onboarding-tour-support-menu" class="list-group-item <%= active_support_menu_class %>">
-      <%= link_to (can?(:read, :support) ? app_support_index_path(section: 'overview') : app_knowledge_base_index_path), class: "has-arrow" do %>
-        <div class="parent-icon"><i class="bx bx-support"></i></div>
-        <div class="menu-title">Suporte</div>
+    <% if can?(:read, :knowledge_base) %>
+    <li id="onboarding-tour-support-menu" class="list-group-item <%= active_menu_class(app_knowledge_base_index_path) %>">
+      <%= link_to app_knowledge_base_index_path do %>
+      <div class="parent-icon"><i class="bx bx-support"></i></div>
+      <div class="menu-title">Suporte</div>
       <% end %>
-      <ul>
-        <% if can?(:read, :support) %>
-        <li class="<%= active_menu_class(app_support_index_path(section: 'overview')) %>">
-          <%= link_to app_support_index_path(section: 'overview') do %>
-            <i class="bx bx-info-circle"></i> Visão Geral
-          <% end %>
-        </li>
-        <li class="<%= active_support_tickets_menu_class %>">
-          <%= link_to app_support_index_path(section: 'tickets') do %>
-            <i class="bx bx-list-ul"></i> Tickets
-          <% end %>
-        </li>
-        <% end %>
-        <% if can?(:read, :knowledge_base) %>
-        <li class="<%= active_menu_class(app_knowledge_base_index_path) %>">
-          <%= link_to app_knowledge_base_index_path do %>
-            <i class="bx bx-book-open"></i> Base de Conhecimento
-          <% end %>
-        </li>
-        <% end %>
-        <% if can?(:read, :support) %>
-        <li class="<%= active_menu_class(app_support_index_path(section: 'suggestions')) %>">
-          <%= link_to app_support_index_path(section: 'suggestions') do %>
-            <i class="bx bx-bulb"></i> Sugestões
-          <% end %>
-        </li>
-        <% if current_user.company&.plan&.name.in?(["Profissional", "Enterprise"]) %>
-          <li class="<%= active_menu_class(app_support_index_path(section: 'quick_contact')) %>">
-            <%= link_to app_support_index_path(section: 'quick_contact') do %>
-              <i class="bx bx-phone"></i> Contato Rápido
-            <% end %>
-          </li>
-        <% end %>
-        <% end %>
-        <li>
-          <%= link_to app_dashboard_path(onboarding_tour: 1, resume_onboarding: 1) do %>
-            <i class="bx bx-compass"></i> Ver tour novamente
-          <% end %>
-        </li>
-      </ul>
     </li>
     <% end %>
     

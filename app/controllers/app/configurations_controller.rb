@@ -118,6 +118,7 @@ class App::ConfigurationsController < ApplicationController
   end
 
   def cancel_subscription
+    return redirect_to app_configurations_path, alert: "O plano Starter não possui cancelamento de assinatura." if @subscription.free_plan?
     return redirect_to app_configurations_path, alert: "Assinatura não está ativa para cancelamento." unless @subscription.active?
     return redirect_to app_configurations_path, alert: "A assinatura já está agendada para cancelamento." if @subscription.cancel_at_period_end?
 

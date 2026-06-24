@@ -12,8 +12,10 @@ module Reconciliation
           s.updated_at
         FROM subscriptions s
         JOIN companies c ON c.id = s.company_id
+        LEFT JOIN plans p ON p.external_id = s.preapproval_plan_id
         WHERE s.gateway = 'mercado_pago'
           AND s.status = 'pending'
+          AND (p.id IS NULL OR p.free = FALSE)
           AND c.payment_method IN ('pix', 'boleto')
           AND s.external_payment_id IS NOT NULL
           AND s.external_payment_id <> ''

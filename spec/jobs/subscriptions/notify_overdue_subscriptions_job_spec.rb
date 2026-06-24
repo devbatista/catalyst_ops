@@ -15,6 +15,18 @@ RSpec.describe Subscriptions::NotifyOverdueSubscriptionsJob, type: :job do
       expect(Rails.logger).to have_received(:info).with("[Subscriptions::NotifyOverdueSubscriptionsJob] Notificação de vencimento registrada para assinatura ID #{subscription.id}.")
     end
 
+    it "ignora assinatura vencida de plano gratuito" do
+      plan = create(:plan, :starter)
+      subscription = create(:subscription, subscription_plan: plan, status: :active, end_date: Date.current - 6.days, expiration_warning_sent_at: nil)
+
+      allow(Cmd::Subscriptions::NotifySubscription).to receive(:new)
+      allow(Rails.logger).to receive(:info)
+
+      described_class.new.perform
+
+      expect(Cmd::Subscriptions::NotifySubscription).not_to have_received(:new).with(subscription_id: subscription.id)
+    end
+
     it "registra erro sem interromper quando comando falha" do
       subscription = create(:subscription, status: :active, end_date: Date.current - 6.days, expiration_warning_sent_at: nil)
       command = instance_double(Cmd::Subscriptions::NotifySubscription, call: double(success?: false, errors: "smtp fora"))

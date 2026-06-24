@@ -41,6 +41,7 @@ class SupportTicket < ApplicationRecord
   validates :subject, presence: true, length: { maximum: 200 }
   validates :description, presence: true
   validates :category, :impact, :status, :priority, presence: true
+  validate :starter_plan_cannot_create_ticket, on: :create
 
   scope :recent, -> { order(last_reply_at: :desc, created_at: :desc) }
   scope :by_company, ->(company_id) { where(company_id: company_id) }
@@ -114,5 +115,11 @@ class SupportTicket < ApplicationRecord
       errors.add(:status, "Não pode ser alterado em tickets fechado ou cancelado")
       throw(:abort)
     end
+  end
+
+  def starter_plan_cannot_create_ticket
+    return unless company&.starter_plan?
+
+    errors.add(:base, "O plano Starter oferece suporte somente via base de conhecimento.")
   end
 end

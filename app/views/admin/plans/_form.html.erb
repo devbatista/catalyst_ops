@@ -42,6 +42,12 @@
       <%= f.label :transaction_amount, "Valor (R$)" %>
       <%= f.number_field :transaction_amount, step: 0.01, class: "form-control" %>
     </div>
+    <div class="col-md-3 d-flex align-items-end">
+      <div class="form-check form-switch d-flex align-items-center gap-2 mb-1 ps-0">
+        <%= f.check_box :free, class: "form-check-input m-0", role: "switch", style: "width: 3rem; height: 1.5rem;" %>
+        <%= f.label :free, "Plano gratuito", class: "form-check-label mb-0" %>
+      </div>
+    </div>
     <div class="col-md-3">
       <%= f.label :max_technicians, "Máx. técnicos" %>
       <%= f.number_field :max_technicians, class: "form-control" %>
@@ -50,7 +56,7 @@
       <%= f.label :max_orders, "Máx. OS/mês" %>
       <%= f.number_field :max_orders, class: "form-control" %>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-3 mt-3 mt-md-0">
       <%= f.label :max_budgets, "Máx. orçamentos/mês" %>
       <%= f.number_field :max_budgets, class: "form-control" %>
     </div>

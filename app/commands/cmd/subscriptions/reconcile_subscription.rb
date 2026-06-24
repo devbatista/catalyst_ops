@@ -10,7 +10,8 @@ module Cmd
       end
 
       def call
-        return Result.new(false, nil, "Assinatura nao encontrada") if @subscription.blank?
+        return Result.new(false, nil, "Assinatura não encontrada") if @subscription.blank?
+        return Result.new(true, @subscription, nil) if @subscription.free_plan?
 
         @local_status_before = @subscription.status
         @gateway_status = nil

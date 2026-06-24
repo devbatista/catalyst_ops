@@ -1,5 +1,6 @@
 class App::SupportTicketsController < ApplicationController
   skip_authorization_check
+  before_action :ensure_ticket_support_available
 
   def index
     scope = current_user.company.support_tickets.recent
@@ -60,6 +61,13 @@ class App::SupportTicketsController < ApplicationController
   end
 
   private
+
+  def ensure_ticket_support_available
+    return unless current_user.company&.starter_plan?
+
+    redirect_to app_support_index_path(section: "knowledge_base"),
+                alert: "O plano Starter oferece suporte somente via base de conhecimento."
+  end
 
   def support_ticket_params
     params.require(:support_ticket).permit(

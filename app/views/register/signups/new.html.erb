@@ -274,7 +274,7 @@
                                 <% @plans.each do |plan| %>
                                   <div class="col-12 col-md-6 col-xl-4">
                                     <label class="pm-card w-100" for="plan_<%= plan.id %>">
-                                      <%= f.radio_button :plan_id, plan.id, id: "plan_#{plan.id}", class: "pm-input" %>
+                                      <%= f.radio_button :plan_id, plan.id, id: "plan_#{plan.id}", class: "pm-input", data: { plan_free: plan.free? } %>
                                       <div class="pm-content justify-content-between">
                                         <div class="d-flex align-items-center gap-2">
                                           <span class="pm-icon-wrap"><i class="bx bx-package pm-icon" aria-hidden="true"></i></span>
@@ -284,7 +284,13 @@
                                           </div>
                                         </div>
                                         <div class="text-end">
-                                          <div class="fw-bold">R$ <%= number_with_precision(plan.transaction_amount, precision: 2, separator: ',', delimiter: '.' ) %></div>
+                                          <div class="fw-bold">
+                                            <% if plan.free? %>
+                                              Grátis
+                                            <% else %>
+                                              R$ <%= number_with_precision(plan.transaction_amount, precision: 2, separator: ',', delimiter: '.' ) %>
+                                            <% end %>
+                                          </div>
                                         </div>
                                       </div>
                                     </label>
@@ -292,20 +298,22 @@
                                 <% end %>
                               </div>
                             
-                              <h6 class="mb-2">Formas de Pagamento</h6>
-                              <div class="payment-methods d-flex gap-3 flex-wrap">
-                                <% payment_methods.each do |pm| %>
-                                  <label class="pm-card" for="pm_<%= pm %>">
-                                    <%= f.radio_button :payment_method, pm, id: "pm_#{pm}", class: "pm-input" %>
-                                    <div class="pm-content">
-                                      <i class="bx <%= payment_method_icon(pm) %> pm-icon"></i>
-                                      <span class="pm-label"><%= payment_method_label(pm) %></span>
-                                    </div>
-                                  </label>
-                                <% end %>
+                              <div class="d-none" data-paid-plan-fields>
+                                <h6 class="mb-2">Formas de Pagamento</h6>
+                                <div class="payment-methods d-flex gap-3 flex-wrap">
+                                  <% payment_methods.each do |pm| %>
+                                    <label class="pm-card" for="pm_<%= pm %>">
+                                      <%= f.radio_button :payment_method, pm, id: "pm_#{pm}", class: "pm-input" %>
+                                      <div class="pm-content">
+                                        <i class="bx <%= payment_method_icon(pm) %> pm-icon"></i>
+                                        <span class="pm-label"><%= payment_method_label(pm) %></span>
+                                      </div>
+                                    </label>
+                                  <% end %>
+                                </div>
                               </div>
 
-                              <div class="card border mt-3">
+                              <div class="card border mt-3 d-none" data-paid-plan-fields>
                                 <div class="card-body">
                                   <h6 class="mb-2">Cupom</h6>
                                   <p class="text-muted mb-3">Se você recebeu um cupom promocional, informe o código abaixo antes de concluir o cadastro.</p>
@@ -376,6 +384,47 @@
   <%= javascript_include_tag "viacep", defer: true %>
   <%= javascript_include_tag "payment_method_toggle", defer: true %>
   <%= javascript_include_tag "card_tokenization", defer: true %>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var planInputs = document.querySelectorAll('input[name="signup[plan_id]"]');
+      var paidPlanFields = document.querySelectorAll("[data-paid-plan-fields]");
+      var paymentInputs = document.querySelectorAll('input[name="signup[payment_method]"]');
+      var couponInput = document.querySelector('input[name="signup[coupon_code]"]');
+      var creditCardForm = document.getElementById("credit-card-form");
+
+      function selectedPlan() {
+        return document.querySelector('input[name="signup[plan_id]"]:checked');
+      }
+
+      function paidPlanSelected() {
+        var plan = selectedPlan();
+        return plan && plan.dataset.planFree !== "true";
+      }
+
+      function syncPaidPlanFields() {
+        var shouldShow = paidPlanSelected();
+
+        paidPlanFields.forEach(function (field) {
+          field.classList.toggle("d-none", !shouldShow);
+        });
+
+        if (!shouldShow) {
+          paymentInputs.forEach(function (input) {
+            input.checked = false;
+          });
+
+          if (couponInput) couponInput.value = "";
+          if (creditCardForm) creditCardForm.classList.add("d-none");
+        }
+      }
+
+      planInputs.forEach(function (input) {
+        input.addEventListener("change", syncPaidPlanFields);
+      });
+
+      syncPaidPlanFields();
+    });
+  </script>
 
   <%= render 'layouts/partials/footer' %>
   <%= render 'layouts/partials/scripts' %>

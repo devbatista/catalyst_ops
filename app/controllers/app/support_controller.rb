@@ -3,6 +3,7 @@ class App::SupportController < ApplicationController
   
   def index
     @section = params[:section].presence || "overview"
+    return redirect_to_starter_knowledge_base if starter_restricted_section?
 
     case @section
     when "tickets"
@@ -38,6 +39,15 @@ class App::SupportController < ApplicationController
   end
 
   private
+
+  def starter_restricted_section?
+    current_user.company&.starter_plan? && %w[overview tickets suggestions quick_contact].include?(@section)
+  end
+
+  def redirect_to_starter_knowledge_base
+    redirect_to app_support_index_path(section: "knowledge_base"),
+                alert: "O plano Starter oferece suporte somente via base de conhecimento."
+  end
 
   def build_suggestion_form
     @suggestion_form = {

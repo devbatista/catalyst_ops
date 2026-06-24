@@ -132,6 +132,10 @@ class Company < ApplicationRecord
     adimplente?
   end
 
+  def starter_plan?
+    (current_plan || plan)&.free? || false
+  end
+
   def used_coupon_within_last_year?
     CouponRedemption.used_by_company_within_last_year?(self)
   end

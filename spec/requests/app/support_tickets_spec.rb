@@ -20,7 +20,7 @@ RSpec.describe "App::SupportTickets", type: :request do
     allow_any_instance_of(ApplicationController).to receive(:verified_request?).and_return(true)
 
     host! scoped_host_for("app")
-    create(:subscription, company: company, status: :active)
+    create(:subscription, company: company, subscription_plan: plan, status: :active)
     sign_in user
 
     allow(SupportTicketNotifications).to receive(:notify_created)
@@ -103,6 +103,15 @@ RSpec.describe "App::SupportTickets", type: :request do
         expect(response.body).to include("selected=\"selected\" value=\"normal\"")
       end
     end
+
+    it "bloqueia formulário de ticket para plano Starter" do
+      plan.update!(free: true, transaction_amount: 0, support_level: "Base de conhecimento")
+
+      get new_app_support_ticket_path
+
+      expect(response).to redirect_to(app_support_index_path(section: "knowledge_base"))
+      expect(flash[:alert]).to eq("O plano Starter oferece suporte somente via base de conhecimento.")
+    end
   end
 
   describe "POST /support_tickets" do
@@ -149,6 +158,24 @@ RSpec.describe "App::SupportTickets", type: :request do
         expect(response.body).to include("Novo ticket de suporte")
         expect(flash[:alert]).to be_present
       end
+    end
+
+    it "bloqueia criação de ticket para plano Starter" do
+      plan.update!(free: true, transaction_amount: 0, support_level: "Base de conhecimento")
+
+      expect do
+        post app_support_tickets_path, params: {
+          support_ticket: {
+            subject: "Preciso de ajuda",
+            description: "Mensagem",
+            category: "problema_tecnico",
+            impact: "alto",
+            priority: "alta"
+          }
+        }
+      end.not_to change(SupportTicket, :count)
+
+      expect(response).to redirect_to(app_support_index_path(section: "knowledge_base"))
     end
   end
 

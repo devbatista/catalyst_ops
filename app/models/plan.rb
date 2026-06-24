@@ -10,12 +10,25 @@ class Plan < ApplicationRecord
             presence: true
   validates :external_id, :external_reference, uniqueness: true
   validates :frequency, numericality: { only_integer: true, greater_than: 0 }
-  validates :transaction_amount, numericality: { greater_than: 0 }
+  validates :transaction_amount, numericality: { greater_than_or_equal_to: 0 }
+  validate :paid_plan_must_have_positive_amount
 
   STATUSES = %w[active inactive].freeze
   validates :status, inclusion: { in: STATUSES }
 
+  scope :paid, -> { where(free: false) }
+
+  def paid?
+    !free?
+  end
+
   private
+
+  def paid_plan_must_have_positive_amount
+    return if free? || transaction_amount.to_d.positive?
+
+    errors.add(:transaction_amount, "deve ser maior que 0 para planos pagos")
+  end
 
   def auditable_created_action
     "plan.created"
@@ -49,6 +62,7 @@ class Plan < ApplicationRecord
       max_orders: max_orders,
       max_budgets: max_budgets,
       support_level: support_level,
+      free: free,
       action_source: action
     }
 

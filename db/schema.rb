@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_06_23_120000) do
+ActiveRecord::Schema[7.1].define(version: 2026_06_23_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -328,8 +328,10 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_23_120000) do
     t.integer "max_orders"
     t.string "support_level"
     t.integer "max_budgets"
+    t.boolean "free", default: false, null: false
     t.index ["external_id"], name: "index_plans_on_external_id", unique: true
     t.index ["external_reference"], name: "index_plans_on_external_reference", unique: true
+    t.index ["free"], name: "index_plans_on_free"
     t.index ["status"], name: "index_plans_on_status"
   end
 
