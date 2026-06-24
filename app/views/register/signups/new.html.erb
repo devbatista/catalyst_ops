@@ -274,7 +274,12 @@
                                 <% @plans.each do |plan| %>
                                   <div class="col-12 col-md-6 col-xl-4">
                                     <label class="pm-card w-100" for="plan_<%= plan.id %>">
-                                      <%= f.radio_button :plan_id, plan.id, id: "plan_#{plan.id}", class: "pm-input", data: { plan_free: plan.free? } %>
+                                      <%= f.radio_button :plan_id,
+                                                         plan.id,
+                                                         id: "plan_#{plan.id}",
+                                                         class: "pm-input",
+                                                         checked: plan.id == @selected_plan_id,
+                                                         data: { plan_free: plan.free? } %>
                                       <div class="pm-content justify-content-between">
                                         <div class="d-flex align-items-center gap-2">
                                           <span class="pm-icon-wrap"><i class="bx bx-package pm-icon" aria-hidden="true"></i></span>

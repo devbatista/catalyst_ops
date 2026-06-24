@@ -31,6 +31,17 @@ RSpec.describe "Register::SignupsController", type: :request do
     end
   end
 
+  it "pré-seleciona o plano Starter quando informado pelo site" do
+    starter = create(:plan, :starter, status: "active")
+
+    get "/", params: { plan: "starter" }
+
+    aggregate_failures do
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to match(/id="plan_#{starter.id}"[^>]*checked="checked"/)
+    end
+  end
+
   it "cria empresa, usuário e assinatura para pagamento pix" do
     expect do
       post "/signups", params: signup_params(payment_method: "pix")
