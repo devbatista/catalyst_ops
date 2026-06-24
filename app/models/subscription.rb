@@ -50,6 +50,8 @@ class Subscription < ApplicationRecord
     )
   }
 
+  before_validation :clear_end_date_for_free_plan
+
   after_commit :sync_company_access, on: :update, if: -> { previous_changes.key?('status') }
   
   def allows_access?
@@ -181,6 +183,10 @@ class Subscription < ApplicationRecord
   end
   
   private
+
+  def clear_end_date_for_free_plan
+    self.end_date = nil if Plan.find_by(external_id: preapproval_plan_id)&.free?
+  end
 
   PLAN_UPGRADE_RANKS = {
     "Basico" => 1,

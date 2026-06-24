@@ -34,6 +34,17 @@ RSpec.describe Subscription, type: :model do
       expect { subscription.status = "desconhecido" }
         .to raise_error(ArgumentError, /'desconhecido' is not a valid status/)
     end
+
+    it "remove data de fim de assinaturas do plano Starter" do
+      starter_plan = create(:plan, :starter)
+      subscription = create(
+        :subscription,
+        subscription_plan: starter_plan,
+        end_date: Date.current + 15.days
+      )
+
+      expect(subscription.end_date).to be_nil
+    end
   end
 
   describe "scopes" do
