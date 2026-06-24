@@ -33,6 +33,7 @@ class Company < ApplicationRecord
   before_validation { self.email = email.to_s.downcase.strip if email.present? }
   before_validation :normalize_phone
   before_validation :normalize_zip_code
+  before_validation :normalize_website
   
   validates :payment_method, inclusion: { in: PAYMENT_METHODS }
   validates :name, presence: true, length: { minimum: 3 }
@@ -215,6 +216,13 @@ class Company < ApplicationRecord
 
   def normalize_phone
     self.phone = phone.to_s.gsub(/\D/, "") if phone.present?
+  end
+
+  def normalize_website
+    return if website.blank?
+
+    self.website = website.to_s.strip
+    self.website = "https://#{website}" unless website.match?(%r{\Ahttps?://}i)
   end
 
   def document_must_be_cpf_or_cnpj
