@@ -50,14 +50,14 @@ class Register::SignupsController < ApplicationController
     end
 
     if @company.plan&.free?
-      @user.send_welcome_email!
+      @user.send_starter_welcome_email!
       return redirect_to success_path(company_id: @company.id, starter: "1")
     elsif trial_coupon_without_mercado_pago?(coupon_result)
       @user.send_signup_confirmation_email!
       return redirect_to success_path(company_id: @company.id, confirmation_email: "1")
     end
 
-    @user.send_welcome_email! if should_send_welcome_email?(coupon_result)
+    @user.send_signup_welcome_email! if should_send_welcome_email?(coupon_result)
 
     redirect_to success_path(company_id: @company.id)
   end
@@ -90,6 +90,7 @@ class Register::SignupsController < ApplicationController
   def set_form_dependencies
     @payment_methods = %w[pix credit_card boleto]
     @plans = Plan.where(status: :active).order(:transaction_amount)
+    @selected_plan_id = selected_plan_for_form&.id
   end
 
   def company_params
@@ -275,6 +276,18 @@ class Register::SignupsController < ApplicationController
 
   def selected_plan
     @selected_plan ||= Plan.find_by(id: params.dig(:signup, :plan_id))
+  end
+
+  def selected_plan_for_form
+    plan_id = params.dig(:signup, :plan_id).presence || params[:plan_id].presence
+    return Plan.where(status: :active).find_by(id: plan_id) if plan_id.present?
+
+    plan_key = params[:plan].to_s.strip
+    return if plan_key.blank?
+
+    Plan.where(status: :active)
+        .where("LOWER(external_reference) = :key OR LOWER(name) = :key", key: plan_key.downcase)
+        .first
   end
 
 end

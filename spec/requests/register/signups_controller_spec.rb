@@ -17,6 +17,7 @@ RSpec.describe "Register::SignupsController", type: :request do
 
     expect(response).to have_http_status(:ok)
     expect(response.body).to include(plan.name)
+    expect(response.body).to include('type="text" name="signup[company][website]"')
   end
 
   it "exibe plano Starter gratuito como Grátis" do
@@ -28,6 +29,17 @@ RSpec.describe "Register::SignupsController", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include(starter.name)
       expect(response.body).to include("Grátis")
+    end
+  end
+
+  it "pré-seleciona o plano Starter quando informado pelo site" do
+    starter = create(:plan, :starter, status: "active")
+
+    get "/", params: { plan: "starter" }
+
+    aggregate_failures do
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to match(/id="plan_#{starter.id}"[^>]*checked="checked"/)
     end
   end
 
@@ -45,15 +57,32 @@ RSpec.describe "Register::SignupsController", type: :request do
     expect(Audit::Log).to have_received(:call).with(hash_including(action: "terms.accepted", company: company))
   end
 
+  it "envia email de acesso sem redefinir senha para cadastro pago com cartão" do
+    allow(Cmd::MercadoPago::CreateCreditCardPayment).to receive(:new)
+      .and_return(instance_double("Result", call: Register::SignupsController::Result.new(true, nil)))
+    expect_any_instance_of(User).to receive(:send_signup_welcome_email!)
+
+    post "/signups", params: signup_params(payment_method: "credit_card").deep_merge(
+      signup: { card_token: "card-token" }
+    )
+
+    company = Company.order(:created_at).last
+    expect(response).to redirect_to(success_path(company_id: company.id))
+  end
+
   it "cria empresa, gestor técnico e assinatura ativa para plano Starter gratuito sem iniciar pagamento" do
     starter = create(:plan, :starter)
     allow(CreateUser::PixPaymentJob).to receive(:perform_later)
     allow(CreateUser::BoletoPaymentJob).to receive(:perform_later)
     allow(Cmd::MercadoPago::CreateCreditCardPayment).to receive(:new)
-    allow_any_instance_of(User).to receive(:send_welcome_email!)
+    expect_any_instance_of(User).to receive(:send_starter_welcome_email!)
 
     expect do
-      post "/signups", params: signup_params(plan_id: starter.id, payment_method: "credit_card")
+      post "/signups", params: signup_params(
+        plan_id: starter.id,
+        payment_method: "credit_card",
+        website: "www.beneditoejuanpublicidadeepropagandame.com.br"
+      )
     end.to change(Company, :count).by(1)
       .and change(User, :count).by(1)
       .and change(Subscription, :count).by(1)
@@ -70,6 +99,7 @@ RSpec.describe "Register::SignupsController", type: :request do
       expect(subscription).to be_active
       expect(subscription.end_date).to be_nil
       expect(subscription.transaction_amount).to eq(0)
+      expect(company.website).to eq("https://www.beneditoejuanpublicidadeepropagandame.com.br")
       expect(CreateUser::PixPaymentJob).not_to have_received(:perform_later)
       expect(CreateUser::BoletoPaymentJob).not_to have_received(:perform_later)
       expect(Cmd::MercadoPago::CreateCreditCardPayment).not_to have_received(:new)
@@ -99,7 +129,7 @@ RSpec.describe "Register::SignupsController", type: :request do
     expect(response.body).to include("Foi enviado")
   end
 
-  def signup_params(payment_method: "pix", accept_terms: "1", coupon_code: "", plan_id: plan.id)
+  def signup_params(payment_method: "pix", accept_terms: "1", coupon_code: "", plan_id: plan.id, website: nil)
     {
       signup: {
         plan_id: plan_id,
@@ -116,7 +146,8 @@ RSpec.describe "Register::SignupsController", type: :request do
           number: "123",
           neighborhood: "Centro",
           city: "São Paulo",
-          state: "SP"
+          state: "SP",
+          website: website
         },
         user: {
           name: "Gestor Baixa",

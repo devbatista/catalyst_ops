@@ -27,6 +27,32 @@ RSpec.describe UserMailer, type: :mailer do
     end
   end
 
+  describe "#starter_welcome_email" do
+    it "envia link de acesso sem pedir redefinição de senha" do
+      email = described_class.starter_welcome_email(user)
+
+      aggregate_failures do
+        expect(email.to).to eq(["maria@example.com"])
+        expect(email.subject).to eq("Seu plano Starter no CatalystOps está ativo!")
+        expect(email.text_part.decoded).to include("Maria Usuária", "login.example.com")
+        expect(email.body.decoded).not_to include("reset_password_token", "Definir a nova senha")
+      end
+    end
+  end
+
+  describe "#signup_welcome_email" do
+    it "envia link de acesso sem pedir redefinição de senha" do
+      email = described_class.signup_welcome_email(user)
+
+      aggregate_failures do
+        expect(email.to).to eq(["maria@example.com"])
+        expect(email.subject).to eq("Sua conta no CatalystOps foi criada!")
+        expect(email.text_part.decoded).to include("Maria Usuária", "login.example.com")
+        expect(email.body.decoded).not_to include("reset_password_token", "Definir a nova senha")
+      end
+    end
+  end
+
   describe "#reset_password_email" do
     it "envia link de redefinição de senha" do
       email = described_class.reset_password_email(user, "reset-token")

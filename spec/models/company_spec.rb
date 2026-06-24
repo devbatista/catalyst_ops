@@ -8,6 +8,13 @@ RSpec.describe Company, type: :model do
   end
 
   describe "escopos e estado" do
+    it "normaliza website sem protocolo para https" do
+      company = build(:company, website: "www.exemplo.com.br")
+
+      expect(company).to be_valid
+      expect(company.website).to eq("https://www.exemplo.com.br")
+    end
+
     it "retorna empresas com mais ordens de serviço primeiro" do
       company_with_two = company_with_subscription
       company_with_one = company_with_subscription

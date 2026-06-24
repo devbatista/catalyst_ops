@@ -122,6 +122,22 @@ class User < ApplicationRecord
     update_column(:welcome_email_sent_at, Time.current) if mark_as_sent
   end
 
+  def send_starter_welcome_email!(mark_as_sent: true)
+    return false if welcome_email_sent_at.present?
+
+    UserMailer.starter_welcome_email(self).deliver_later
+    update_column(:welcome_email_sent_at, Time.current) if mark_as_sent
+    true
+  end
+
+  def send_signup_welcome_email!(mark_as_sent: true)
+    return false if welcome_email_sent_at.present?
+
+    UserMailer.signup_welcome_email(self).deliver_later
+    update_column(:welcome_email_sent_at, Time.current) if mark_as_sent
+    true
+  end
+
   def send_password_reset_email!
     token = set_reset_password_token
     UserMailer.reset_password_email(self, token).deliver_later
