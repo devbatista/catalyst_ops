@@ -17,6 +17,18 @@ RSpec.describe SupportTicket, type: :model do
     it { is_expected.to validate_presence_of(:impact) }
     it { is_expected.to validate_presence_of(:status) }
     it { is_expected.to validate_presence_of(:priority) }
+
+    it "não permite criar ticket para empresa no plano Starter" do
+      starter_plan = create(:plan, :starter)
+      company = create(:company, plan: starter_plan)
+      create(:subscription, company: company, subscription_plan: starter_plan)
+      user = create(:user, :gestor, company: company, active: true)
+
+      ticket = build(:support_ticket, company: company, user: user)
+
+      expect(ticket).not_to be_valid
+      expect(ticket.errors[:base]).to include("O plano Starter oferece suporte somente via base de conhecimento.")
+    end
   end
 
   describe "enums" do

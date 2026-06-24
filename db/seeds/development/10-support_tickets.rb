@@ -6,6 +6,8 @@ SUPPORT_TICKETS = []
 admin_user = USERS.find { |user| user.admin? }
 
 COMPANIES.each do |company|
+  next if company.starter_plan?
+
   gestor = company.users.find_by(role: :gestor)
   next unless gestor
 

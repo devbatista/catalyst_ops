@@ -6,7 +6,7 @@ puts 'Criando as empresas'
 PLANS = Plan.all.to_a
 PAYMENT_METHODS = %w[credit_card boleto pix]
 
-COMPANIES = Array.new(rand(3..10)) do
+COMPANIES = Array.new(rand(5..15)) do
   plan = PLANS.sample
   company = Company.create!(
     name: Faker::Company.name,
@@ -36,13 +36,13 @@ COMPANIES = Array.new(rand(3..10)) do
     company: company,
     phone: Faker::PhoneNumber.cell_phone_in_e164,
     active: true,
-    can_be_technician: [true, false].sample
+    can_be_technician: plan.free? ? true : [true, false].sample
   )
   company.update!(responsible_id: gestor.id)
 
   company.subscriptions.create!(
     preapproval_plan_id: plan.external_id,
-    status: :active, 
+    status: :active,
     start_date: Date.today,
     end_date: 1.month.from_now,
     transaction_amount: plan.transaction_amount
