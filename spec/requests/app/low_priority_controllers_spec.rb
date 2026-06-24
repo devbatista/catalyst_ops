@@ -110,6 +110,21 @@ RSpec.describe "Controllers App de prioridade baixa", type: :request do
     expect(response.body).to include(user.name)
   end
 
+  it "mostra Suporte como link direto para a base de conhecimento no menu" do
+    get "/knowledge_base"
+
+    aggregate_failures do
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("onboarding-tour-support-menu")
+      expect(response.body).to include(%(href="/knowledge_base"))
+      expect(response.body).not_to include("Visão Geral")
+      expect(response.body).not_to include("Tickets")
+      expect(response.body).not_to include("Sugestões")
+      expect(response.body).not_to include("Contato Rápido")
+      expect(response.body).not_to include("Ver tour novamente")
+    end
+  end
+
   it "não mostra cancelamento de assinatura nas configurações do plano Starter" do
     plan.update!(free: true, transaction_amount: 0, max_technicians: 1)
 

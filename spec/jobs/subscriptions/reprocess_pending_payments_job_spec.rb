@@ -55,6 +55,46 @@ RSpec.describe Subscriptions::ReprocessPendingPaymentsJob, type: :job do
       expect(Rails.logger).to have_received(:info).with("[Subscriptions::ReprocessPendingPaymentsJob] Nenhuma assinatura pending sem webhook para reprocessar (janela: 30 dias).")
     end
 
+    it "ignora assinaturas Starter ao consultar pendentes para reprocessamento" do
+      paid_plan = create(:plan)
+      starter_plan = create(:plan, :starter)
+      paid_company = create(:company, plan: paid_plan, payment_method: "pix")
+      starter_company = create(:company, plan: starter_plan, payment_method: "pix")
+      paid_subscription = create(
+        :subscription,
+        company: paid_company,
+        subscription_plan: paid_plan,
+        status: :pending,
+        gateway: "mercado_pago",
+        external_payment_id: "pay_paid_reprocess"
+      )
+      starter_subscription = create(
+        :subscription,
+        company: starter_company,
+        subscription_plan: starter_plan,
+        status: :pending,
+        gateway: "mercado_pago",
+        external_payment_id: "pay_starter_reprocess"
+      )
+      paid_command = instance_double(Cmd::Subscriptions::ReconcileSubscription, call: reconcile_result(true))
+
+      allow(Cmd::Subscriptions::ReconcileSubscription).to receive(:new).and_return(paid_command)
+      allow(Rails.logger).to receive(:info)
+
+      described_class.new.perform
+
+      aggregate_failures do
+        expect(Cmd::Subscriptions::ReconcileSubscription).to have_received(:new).once.with(
+          subscription_id: paid_subscription.id,
+          source_job: "Subscriptions::ReprocessPendingPaymentsJob",
+          window_days: 30
+        )
+        expect(Cmd::Subscriptions::ReconcileSubscription).not_to have_received(:new).with(
+          hash_including(subscription_id: starter_subscription.id)
+        )
+      end
+    end
+
     it "registra erro quando a query operacional falha" do
       query = instance_double(Cmd::Queries::RunOperationalQuery, call: query_result(false, [], "consulta indisponível"))
 

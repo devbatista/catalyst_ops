@@ -82,6 +82,39 @@ RSpec.describe "Controllers Admin de prioridade baixa", type: :request do
     expect(response.body).to include(event.gateway_identifier)
   end
 
+  it "permite criar plano gratuito no admin" do
+    expect do
+      post "/plans", params: {
+        plan: {
+          name: "Starter Admin",
+          reason: "starter-admin",
+          status: "active",
+          external_id: "starter-admin-free",
+          external_reference: "STARTER_ADMIN",
+          frequency: 1,
+          frequency_type: "months",
+          transaction_amount: 0,
+          free: "1",
+          max_technicians: 1,
+          max_orders: 3,
+          max_budgets: 3,
+          support_level: "Base de conhecimento"
+        }
+      }
+    end.to change(Plan, :count).by(1)
+
+    plan = Plan.find_by!(external_reference: "STARTER_ADMIN")
+
+    aggregate_failures do
+      expect(response).to redirect_to(admin_plan_path(plan))
+      expect(plan).to be_free
+      expect(plan.transaction_amount).to eq(0)
+      expect(plan.max_technicians).to eq(1)
+      expect(plan.max_orders).to eq(3)
+      expect(plan.max_budgets).to eq(3)
+    end
+  end
+
   it "mostra evento de reconciliação e restringe acesso não admin" do
     event = create(:subscription_reconciliation_event, gateway_identifier: "gateway-show")
 

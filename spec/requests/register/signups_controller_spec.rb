@@ -19,6 +19,18 @@ RSpec.describe "Register::SignupsController", type: :request do
     expect(response.body).to include(plan.name)
   end
 
+  it "exibe plano Starter gratuito como Grátis" do
+    starter = create(:plan, :starter, status: "active")
+
+    get "/"
+
+    aggregate_failures do
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(starter.name)
+      expect(response.body).to include("Grátis")
+    end
+  end
+
   it "cria empresa, usuário e assinatura para pagamento pix" do
     expect do
       post "/signups", params: signup_params(payment_method: "pix")
