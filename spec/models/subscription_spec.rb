@@ -310,6 +310,16 @@ RSpec.describe Subscription, type: :model do
 
   describe "cancelamento agendado" do
     describe "#schedule_cancellation!" do
+      it "não agenda cancelamento para plano Starter" do
+        starter_plan = create(:plan, :starter)
+        subscription = create(:subscription, subscription_plan: starter_plan, status: :active)
+
+        expect { subscription.schedule_cancellation!(reason: "Não vou usar") }
+          .to raise_error(ActiveRecord::RecordInvalid, /O plano Starter não possui cancelamento de assinatura/)
+
+        expect(subscription.reload.cancel_at_period_end).to be(false)
+      end
+
       it "agenda cancelamento no fim do período mantendo a assinatura ativa" do
         subscription = create(:subscription, status: :active, end_date: Date.new(2026, 6, 10))
 

@@ -127,6 +127,11 @@ class Subscription < ApplicationRecord
   end
 
   def schedule_cancellation!(reason: nil)
+    if free_plan?
+      errors.add(:base, "O plano Starter não possui cancelamento de assinatura.")
+      raise ActiveRecord::RecordInvalid, self
+    end
+
     unless active?
       errors.add(:base, "Apenas assinaturas ativas podem ser agendadas para cancelamento.")
       raise ActiveRecord::RecordInvalid, self

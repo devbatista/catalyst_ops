@@ -110,6 +110,19 @@ RSpec.describe "Controllers App de prioridade baixa", type: :request do
     expect(response.body).to include(user.name)
   end
 
+  it "não mostra cancelamento de assinatura nas configurações do plano Starter" do
+    plan.update!(free: true, transaction_amount: 0, max_technicians: 1)
+
+    get "/configurations"
+
+    aggregate_failures do
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("Assinatura")
+      expect(response.body).not_to include("Cancelamento")
+      expect(response.body).not_to include("Cancelar assinatura no fim do período")
+    end
+  end
+
   def scoped_host_for(subdomain)
     tld_labels = ["example", "com"]
     extra_domain_labels = Array.new(Rails.application.config.action_dispatch.tld_length.to_i - 1, "app")

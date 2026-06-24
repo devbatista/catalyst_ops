@@ -335,6 +335,21 @@ RSpec.describe App::ConfigurationsController, type: :controller do
     end
 
     describe "PATCH #cancel_subscription" do
+      it "não agenda cancelamento para plano Starter" do
+        starter_plan = create(:plan, :starter)
+        company.update!(plan: starter_plan)
+        subscription = create(:subscription, company: company, subscription_plan: starter_plan, status: :active)
+
+        patch :cancel_subscription, params: { cancel_reason: "Vou encerrar" }
+
+        aggregate_failures do
+          expect(response).to redirect_to(app_configurations_path)
+          expect(flash[:alert]).to eq("O plano Starter não possui cancelamento de assinatura.")
+          expect(subscription.reload.cancel_at_period_end).to be(false)
+          expect(Subscriptions::CancellationMailer).not_to have_received(:with)
+        end
+      end
+
       it "agenda o cancelamento da assinatura atual" do
         subscription = create(
           :subscription,
