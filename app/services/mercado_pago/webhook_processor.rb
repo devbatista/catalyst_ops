@@ -58,7 +58,7 @@ module MercadoPago
 
       case payment["status"].to_s
       when "approved"
-        subscription.activate!
+        subscription.activate_as_current!
         log_subscription_payment_event!(
           action: "subscription.payment.approved",
           subscription: subscription,
@@ -111,7 +111,7 @@ module MercadoPago
 
       case preapproval["status"]
       when "authorized"
-        subscription.activate!
+        subscription.activate_as_current!
       when "paused", "cancelled"
         subscription.cancel!
       when "pending"
@@ -136,17 +136,8 @@ module MercadoPago
       return Result.new(true, "Authorized payment #{authorized_payment_id} ignorado com status #{authorized_payment.dig('payment', 'status')}") unless authorized_payment.dig("payment", "status") == "approved"
 
       paid_at = parse_time(authorized_payment["debit_date"]) || Time.current
-      period_end = MercadoPago::Subscriptions.compute_period_end(paid_at)
 
-      subscription.update!(
-        status: :active,
-        start_date: paid_at.to_date,
-        end_date: period_end.to_date,
-        canceled_date: nil,
-        expired_date: nil,
-        expiration_warning_sent_at: nil,
-        expired_notification_sent_at: nil
-      )
+      subscription.activate_as_current!(started_at: paid_at)
 
       Result.new(true, "Authorized payment #{authorized_payment_id} processado com sucesso")
     end

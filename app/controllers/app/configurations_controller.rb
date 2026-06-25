@@ -2,6 +2,9 @@ class App::ConfigurationsController < ApplicationController
   skip_authorization_check
   before_action :set_subscription_for_management, only: [:cancel_subscription, :resume_subscription]
   before_action :authorize_subscription_management, only: [:cancel_subscription, :resume_subscription]
+  before_action :authorize_paid_subscription_start, only: [:start_paid_subscription]
+
+  Result = Struct.new(:success?, :errors)
 
   def index; end
 
@@ -117,6 +120,48 @@ class App::ConfigurationsController < ApplicationController
     end
   end
 
+  def start_paid_subscription
+    company = current_user.company
+    plan = paid_subscription_plan
+    payment_method = subscription_payment_method
+
+    if plan.blank?
+      redirect_to app_configurations_path(tab: "assinatura"), alert: "Selecione um plano pago ativo."
+      return
+    end
+
+    unless Company::PAYMENT_METHODS.include?(payment_method)
+      redirect_to app_configurations_path(tab: "assinatura"), alert: "Selecione uma forma de pagamento válida."
+      return
+    end
+
+    if company.current_active_subscription&.free_plan? != true
+      redirect_to app_configurations_path(tab: "assinatura"), alert: "A adesão pela tela de configurações está disponível apenas para o plano Starter."
+      return
+    end
+
+    if payment_method == "credit_card" && params.dig(:signup, :card_token).blank?
+      redirect_to app_configurations_path(tab: "assinatura"), alert: "Token do cartão não informado."
+      return
+    end
+
+    subscription = create_pending_paid_subscription!(company, plan, payment_method)
+    payment_result = start_paid_subscription_payment(company, plan, subscription, payment_method)
+
+    unless payment_result.success?
+      subscription.update_columns(status: Subscription.statuses[:cancelled], canceled_date: Time.current, updated_at: Time.current)
+      redirect_to app_configurations_path(tab: "assinatura"), alert: "Houve falha ao iniciar o pagamento: #{payment_result.errors}"
+      return
+    end
+
+    audit_paid_subscription_start(company, plan, subscription, payment_method)
+
+    redirect_to app_configurations_path(tab: "assinatura"),
+                notice: paid_subscription_notice(payment_method)
+  rescue ActiveRecord::RecordInvalid => e
+    redirect_to app_configurations_path(tab: "assinatura"), alert: e.record.errors.full_messages.to_sentence
+  end
+
   def cancel_subscription
     return redirect_to app_configurations_path, alert: "O plano Starter não possui cancelamento de assinatura." if @subscription.free_plan?
     return redirect_to app_configurations_path, alert: "Assinatura não está ativa para cancelamento." unless @subscription.active?
@@ -213,8 +258,96 @@ class App::ConfigurationsController < ApplicationController
     document_type == "budget" ? "orçamento" : "ordem de serviço"
   end
 
+  def paid_subscription_plan
+    Plan.paid.where(status: :active).find_by(id: params.dig(:signup, :plan_id))
+  end
+
+  def subscription_payment_method
+    params.dig(:signup, :payment_method).to_s
+  end
+
+  def create_pending_paid_subscription!(company, plan, payment_method)
+    ActiveRecord::Base.transaction do
+      company.subscriptions.pending.where.not(preapproval_plan_id: company.current_active_subscription&.preapproval_plan_id).update_all(
+        status: Subscription.statuses[:cancelled],
+        canceled_date: Time.current,
+        updated_at: Time.current
+      )
+
+      company.update!(payment_method: payment_method)
+
+      company.subscriptions.create!(
+        preapproval_plan_id: plan.external_id,
+        reason: plan.reason,
+        transaction_amount: plan.transaction_amount,
+        external_reference: company.id.to_s,
+        status: :pending,
+        raw_payload: {
+          "source" => "app_configurations",
+          "selected_payment_method" => payment_method
+        }
+      )
+    end
+  end
+
+  def start_paid_subscription_payment(company, plan, subscription, payment_method)
+    case payment_method
+    when "boleto"
+      CreateUser::BoletoPaymentJob.perform_later(company.id, plan_id: plan.id, subscription_id: subscription.id)
+      Result.new(true, nil)
+    when "pix"
+      CreateUser::PixPaymentJob.perform_later(company.id, plan_id: plan.id, subscription_id: subscription.id)
+      Result.new(true, nil)
+    when "credit_card"
+      Cmd::MercadoPago::CreateCreditCardPayment.new(
+        company,
+        params.dig(:signup, :card_token),
+        plan: plan,
+        subscription: subscription
+      ).call
+    else
+      Result.new(false, "Método de pagamento inválido.")
+    end
+  end
+
+  def paid_subscription_notice(payment_method)
+    case payment_method
+    when "credit_card"
+      "Adesão iniciada com sucesso. A assinatura será ativada após a aprovação do cartão."
+    when "pix"
+      "Adesão iniciada com sucesso. Enviaremos as instruções de pagamento por PIX para o e-mail da empresa."
+    when "boleto"
+      "Adesão iniciada com sucesso. Enviaremos o boleto para o e-mail da empresa."
+    end
+  end
+
+  def audit_paid_subscription_start(company, plan, subscription, payment_method)
+    Audit::Log.call(
+      action: "subscription.paid_signup.started",
+      actor: current_user,
+      company: company,
+      resource: subscription,
+      metadata: {
+        event: "paid_signup_started",
+        origin: "app_configurations_subscription",
+        selected_payment_method: payment_method,
+        previous_subscription_id: company.current_active_subscription&.id,
+        selected_plan: {
+          id: plan.id,
+          external_id: plan.external_id,
+          name: plan.name,
+          transaction_amount: plan.transaction_amount
+        },
+        pending_subscription: {
+          id: subscription.id,
+          status: subscription.status
+        }
+      }
+    )
+  end
+
   def set_subscription_for_management
-    @subscription = current_user.company&.current_subscription
+    @subscription = current_user.company&.current_active_subscription
     return if @subscription.present?
 
     redirect_to app_configurations_path, alert: "Nenhuma assinatura ativa encontrada."
@@ -224,5 +357,10 @@ class App::ConfigurationsController < ApplicationController
     return if performed?
 
     authorize! :manage, @subscription
+  end
+
+  def authorize_paid_subscription_start
+    subscription = current_user.company&.current_active_subscription || current_user.company&.subscriptions&.build
+    authorize! :manage, subscription
   end
 end

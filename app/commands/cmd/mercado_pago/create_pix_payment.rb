@@ -4,9 +4,10 @@ module Cmd
       Result = Struct.new(:success?, :mailer_params, :errors)
       attr_reader :company, :plan, :response
 
-      def initialize(company, amount_override: nil)
+      def initialize(company, amount_override: nil, plan: nil, subscription: nil)
         @company = company
-        @plan = company.plan
+        @plan = plan || company.plan
+        @subscription = subscription || company.current_subscription
         @amount_override = amount_override
       end
 
@@ -77,7 +78,7 @@ module Cmd
         payment_id = response['id'].to_s
         return if payment_id.blank?
 
-        company.current_subscription&.update!(external_payment_id: payment_id)
+        @subscription&.update!(external_payment_id: payment_id)
       end
     end
   end

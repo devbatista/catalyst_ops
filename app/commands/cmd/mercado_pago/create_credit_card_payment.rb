@@ -4,9 +4,10 @@ module Cmd
       Result = Struct.new(:success?, :subscription, :errors)
       attr_reader :company, :plan, :cc_token, :response
 
-      def initialize(company, cc_token)
+      def initialize(company, cc_token, plan: nil, subscription: nil)
         @company = company
-        @plan = company.plan
+        @plan = plan || company.plan
+        @subscription = subscription || company.current_subscription
         @cc_token = cc_token
       end
 
@@ -21,7 +22,7 @@ module Cmd
           ::MercadoPago::MockData.create_credit_card_payment(credit_card_params)
         end
 
-        subscription = company.current_subscription
+        subscription = @subscription
 
         subscription.update!(
           external_reference: company.id.to_s,
@@ -31,7 +32,7 @@ module Cmd
 
         case response["status"]
         when "authorized"
-          subscription.activate!
+          subscription.activate_as_current!
           Result.new(true, subscription, nil)
         when "pending"
           subscription.update!(status: :pending)

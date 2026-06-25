@@ -169,23 +169,27 @@ class Company < ApplicationRecord
   end
 
   def current_plan
-    subscriptions.current.first&.plan  
+    current_active_subscription&.plan || subscriptions.current.first&.plan || plan
+  end
+
+  def current_active_subscription
+    subscriptions.active_records.recent.first
   end
 
   def max_technicians
-    current_subscription.plan&.max_technicians
+    current_plan&.max_technicians
   end
   
   def max_orders
-    current_subscription.plan&.max_orders
+    current_plan&.max_orders
   end
 
   def max_budgets
-    current_subscription.plan&.max_budgets
+    current_plan&.max_budgets
   end
 
   def support_level
-    current_subscription.plan&.support_level
+    current_plan&.support_level
   end
 
   def can_add_technician?
@@ -238,6 +242,6 @@ class Company < ApplicationRecord
   end
 
   def adimplente?
-    current_subscription&.active? || false
+    current_active_subscription.present?
   end
 end

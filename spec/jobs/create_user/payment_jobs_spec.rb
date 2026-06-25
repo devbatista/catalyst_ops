@@ -8,30 +8,49 @@ RSpec.describe "Jobs de criação de pagamento", type: :job do
       command = instance_double(Cmd::MercadoPago::CreateBoletoPayment, call: result)
       mail = instance_double(ActionMailer::MessageDelivery, deliver_later: true)
 
-      allow(Cmd::MercadoPago::CreateBoletoPayment).to receive(:new).with(company, amount_override: 90).and_return(command)
       allow(Payments::BoletoMailer).to receive(:with).with(result.mailer_params).and_return(double(ticket_email: mail))
       allow(Coupons::Redeem).to receive(:call)
       allow(Coupon).to receive(:find).with("coupon-id").and_return(double("Coupon"))
-      allow(company).to receive(:current_subscription).and_return(double("Subscription"))
+      subscription = double("Subscription")
+      allow(company).to receive(:current_subscription).and_return(subscription)
+      allow(Cmd::MercadoPago::CreateBoletoPayment).to receive(:new).with(
+        company,
+        amount_override: 90,
+        plan: company.plan,
+        subscription: subscription
+      ).and_return(command)
       allow(Company).to receive(:find_by).with(id: company.id).and_return(company)
 
       described_class.new.perform(company.id, coupon_id: "coupon-id", original_amount: 100, final_amount: 90)
 
       aggregate_failures do
         expect(mail).to have_received(:deliver_later)
-        expect(Coupons::Redeem).to have_received(:call).with(hash_including(company: company, original_amount: 100, final_amount: 90))
+        expect(Cmd::MercadoPago::CreateBoletoPayment).to have_received(:new).with(
+          company,
+          amount_override: 90,
+          plan: company.plan,
+          subscription: subscription
+        )
+        expect(Coupons::Redeem).to have_received(:call).with(hash_including(company: company, subscription: subscription, original_amount: 100, final_amount: 90))
       end
     end
   end
 
   describe CreateUser::PixPaymentJob do
     it "cria pix e envia e-mail" do
-      company = create(:company)
+      plan = create(:plan)
+      company = create(:company, plan: plan)
+      subscription = create(:subscription, company: company, subscription_plan: plan)
       result = Cmd::MercadoPago::CreatePixPayment::Result.new(true, { company: company }, nil)
       command = instance_double(Cmd::MercadoPago::CreatePixPayment, call: result)
       mail = instance_double(ActionMailer::MessageDelivery, deliver_later: true)
 
-      allow(Cmd::MercadoPago::CreatePixPayment).to receive(:new).with(company, amount_override: nil).and_return(command)
+      allow(Cmd::MercadoPago::CreatePixPayment).to receive(:new).with(
+        company,
+        amount_override: nil,
+        plan: plan,
+        subscription: subscription
+      ).and_return(command)
       allow(Payments::PixMailer).to receive(:with).with(result.mailer_params).and_return(double(pix_email: mail))
 
       described_class.new.perform(company.id)

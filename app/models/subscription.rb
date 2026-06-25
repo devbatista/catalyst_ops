@@ -70,6 +70,19 @@ class Subscription < ApplicationRecord
     activate_for!
   end
 
+  def activate_as_current!(frequency: 1, frequency_type: "months", started_at: Time.current)
+    transaction do
+      activate_for!(frequency: frequency, frequency_type: frequency_type, started_at: started_at)
+
+      company.subscriptions
+             .where(status: :active)
+             .where.not(id: id)
+             .update_all(status: :cancelled, canceled_date: Time.current, updated_at: Time.current)
+
+      company.update!(plan: plan) if plan.present?
+    end
+  end
+
   def activate_for!(frequency: 1, frequency_type: "months", started_at: Time.current)
     period_end = MercadoPago::Subscriptions.compute_period_end(
       started_at,

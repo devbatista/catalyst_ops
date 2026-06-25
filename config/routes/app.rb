@@ -54,6 +54,7 @@ constraints subdomain: "app" do
       patch :update_pdf_settings
       delete :remove_pdf_logo
       get :preview_pdf_settings
+      post :start_paid_subscription
       patch :cancel_subscription
       patch :resume_subscription
       post :promote_manager
