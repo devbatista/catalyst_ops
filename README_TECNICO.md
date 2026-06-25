@@ -587,6 +587,8 @@ A política de janela está em
 
 Regras implementadas:
 
+- título do PR não pode começar com marcador de IA, como `[codex]`, `[IA]`,
+  `Claude:`, `Copilot -`, etc.
 - mudanças sensíveis: somente `22:00-06:00` (America/Sao_Paulo)
 - mudanças simples: somente `09:00-18:00` (America/Sao_Paulo)
 - PR com migration deve conter apenas `db/migrate/*` e opcionalmente

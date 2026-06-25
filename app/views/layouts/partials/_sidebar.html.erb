@@ -84,11 +84,46 @@
     </li>
 
     <% if can?(:read, :knowledge_base) %>
-    <li id="onboarding-tour-support-menu" class="list-group-item <%= active_menu_class(app_knowledge_base_index_path) %>">
-      <%= link_to app_knowledge_base_index_path do %>
-      <div class="parent-icon"><i class="bx bx-support"></i></div>
-      <div class="menu-title">Suporte</div>
-      <% end %>
+    <li id="onboarding-tour-support-menu" class="list-group-item <%= active_support_menu_class %>">
+      <a href="javascript:;" class="has-arrow">
+        <div class="parent-icon"><i class="bx bx-support"></i></div>
+        <div class="menu-title">Suporte</div>
+      </a>
+      <ul>
+        <% if current_user.company&.starter_plan? %>
+          <li>
+            <%= link_to app_knowledge_base_index_path do %>
+              <i class="bx bx-book-open"></i>Base de conhecimento
+            <% end %>
+          </li>
+        <% else %>
+          <li>
+            <%= link_to app_support_index_path do %>
+              <i class="bx bx-home-circle"></i>Visão geral
+            <% end %>
+          </li>
+          <li>
+            <%= link_to app_support_index_path(section: "tickets") do %>
+              <i class="bx bx-conversation"></i>Tickets
+            <% end %>
+          </li>
+          <li>
+            <%= link_to app_support_index_path(section: "knowledge_base") do %>
+              <i class="bx bx-book-open"></i>Base de conhecimento
+            <% end %>
+          </li>
+          <li>
+            <%= link_to app_support_index_path(section: "suggestions") do %>
+              <i class="bx bx-bulb"></i>Sugestões
+            <% end %>
+          </li>
+          <li>
+            <%= link_to app_support_index_path(section: "quick_contact") do %>
+              <i class="bx bx-envelope"></i>Contato rápido
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
     </li>
     <% end %>
     

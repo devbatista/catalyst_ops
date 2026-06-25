@@ -110,18 +110,45 @@ RSpec.describe "Controllers App de prioridade baixa", type: :request do
     expect(response.body).to include(user.name)
   end
 
-  it "mostra Suporte como link direto para a base de conhecimento no menu" do
+  it "mostra Suporte como dropdown restrito à base de conhecimento no menu do plano Starter" do
+    plan.update!(free: true, transaction_amount: 0, support_level: "Base de conhecimento")
+
     get "/knowledge_base"
 
     aggregate_failures do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("onboarding-tour-support-menu")
+      expect(response.body).to include("has-arrow")
       expect(response.body).to include(%(href="/knowledge_base"))
-      expect(response.body).not_to include("Visão Geral")
+      expect(response.body).to include("Base de conhecimento")
+      expect(response.body).not_to include("Visão geral")
       expect(response.body).not_to include("Tickets")
       expect(response.body).not_to include("Sugestões")
-      expect(response.body).not_to include("Contato Rápido")
+      expect(response.body).not_to include("Contato rápido")
       expect(response.body).not_to include("Ver tour novamente")
+    end
+  end
+
+  it "mostra Suporte como dropdown com subitens completos no menu do plano Profissional" do
+    plan.update!(name: "Profissional", free: false, transaction_amount: 199, support_level: "prioritário")
+
+    get "/support"
+
+    aggregate_failures do
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("onboarding-tour-support-menu")
+      expect(response.body).to include("has-arrow")
+      expect(response.body).to include(%(href="/support"))
+      expect(response.body).to include(%(href="/support?section=tickets"))
+      expect(response.body).to include(%(href="/support?section=knowledge_base"))
+      expect(response.body).to include(%(href="/support?section=suggestions"))
+      expect(response.body).to include(%(href="/support?section=quick_contact"))
+      expect(response.body).to include("Central de suporte")
+      expect(response.body).to include("Abrir novo ticket")
+      expect(response.body).to include("Visão geral")
+      expect(response.body).to include("Tickets")
+      expect(response.body).to include("Sugestões")
+      expect(response.body).to include("Contato rápido")
     end
   end
 
