@@ -664,4 +664,24 @@ RSpec.describe Subscription, type: :model do
       end
     end
   end
+
+  describe "#activate_as_current!" do
+    it "ativa a assinatura paga, cancela a Starter anterior e atualiza o plano da empresa" do
+      starter = create(:plan, :starter)
+      paid_plan = create(:plan, :profissional)
+      company = create(:company, plan: starter, active: true)
+      starter_subscription = create(:subscription, company: company, subscription_plan: starter, status: :active)
+      paid_subscription = create(:subscription, company: company, subscription_plan: paid_plan, status: :pending)
+
+      paid_subscription.activate_as_current!(started_at: Time.zone.local(2026, 6, 25, 10, 0, 0))
+
+      aggregate_failures do
+        expect(paid_subscription.reload).to be_active
+        expect(starter_subscription.reload).to be_cancelled
+        expect(company.reload.plan).to eq(paid_plan)
+        expect(company.current_active_subscription).to eq(paid_subscription)
+        expect(company).to be_active
+      end
+    end
+  end
 end

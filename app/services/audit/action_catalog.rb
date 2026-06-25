@@ -87,6 +87,7 @@ module Audit
       subscription.payment.pending
       subscription.payment.approved
       subscription.payment.failed
+      subscription.paid_signup.started
       subscription.reconciled
       subscription.reprocess.pending_payment
     ].freeze

@@ -65,6 +65,21 @@ RSpec.describe Company, type: :model do
       end
     end
 
+    it "mantém plano e acesso da assinatura ativa quando existe pagamento pendente" do
+      starter = create(:plan, :starter)
+      paid_plan = create(:plan, :profissional, max_technicians: 5)
+      company = create(:company, plan: starter)
+      active_subscription = create(:subscription, company: company, subscription_plan: starter, status: :active)
+      create(:subscription, company: company, subscription_plan: paid_plan, status: :pending)
+
+      aggregate_failures do
+        expect(company.current_active_subscription).to eq(active_subscription)
+        expect(company.current_plan).to eq(starter)
+        expect(company.max_technicians).to eq(1)
+        expect(company).to be_access_enabled
+      end
+    end
+
     it "valida se pode adicionar técnico respeitando limite" do
       plan = create(:plan, max_technicians: 1)
       company = create(:company, plan: plan)

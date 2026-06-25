@@ -396,11 +396,11 @@ RSpec.describe App::ConfigurationsController, type: :controller do
 
         patch :cancel_subscription
 
-        aggregate_failures do
-          expect(response).to redirect_to(app_configurations_path)
-          expect(flash[:alert]).to eq("Assinatura não está ativa para cancelamento.")
-          expect(Subscriptions::CancellationMailer).not_to have_received(:with)
-        end
+      aggregate_failures do
+        expect(response).to redirect_to(app_configurations_path)
+        expect(flash[:alert]).to eq("Nenhuma assinatura ativa encontrada.")
+        expect(Subscriptions::CancellationMailer).not_to have_received(:with)
+      end
       end
 
       it "redireciona quando não existe assinatura atual" do
@@ -488,6 +488,124 @@ RSpec.describe App::ConfigurationsController, type: :controller do
           expect(flash[:alert]).to eq("Falha ao reativar")
           expect(subscription.reload.cancel_at_period_end).to be(true)
         end
+      end
+    end
+  end
+
+  describe "adesão a plano pago" do
+    let(:starter_plan) { create(:plan, :starter) }
+    let(:paid_plan) { create(:plan, :profissional) }
+    let(:company) { create(:company, plan: starter_plan, active: true, payment_method: "boleto") }
+    let(:user) { create(:user, :gestor, company: company, active: true) }
+    let!(:starter_subscription) { create(:subscription, company: company, subscription_plan: starter_plan, status: :active) }
+
+    before do
+      allow(controller).to receive(:current_user).and_return(user)
+      allow(CreateUser::PixPaymentJob).to receive(:perform_later)
+      allow(CreateUser::BoletoPaymentJob).to receive(:perform_later)
+      allow(Audit::Log).to receive(:call)
+    end
+
+    it "cria assinatura paga pendente e agenda pagamento pix mantendo Starter ativo" do
+      post :start_paid_subscription, params: {
+        signup: {
+          plan_id: paid_plan.id,
+          payment_method: "pix"
+        }
+      }
+
+      pending_subscription = company.subscriptions.order(created_at: :desc).first
+
+      aggregate_failures do
+        expect(response).to redirect_to(app_configurations_path(tab: "assinatura"))
+        expect(flash[:notice]).to include("Adesão iniciada com sucesso")
+        expect(pending_subscription).to be_pending
+        expect(pending_subscription.plan).to eq(paid_plan)
+        expect(company.reload.payment_method).to eq("pix")
+        expect(starter_subscription.reload).to be_active
+        expect(company.current_active_subscription).to eq(starter_subscription)
+        expect(CreateUser::PixPaymentJob).to have_received(:perform_later).with(
+          company.id,
+          plan_id: paid_plan.id,
+          subscription_id: pending_subscription.id
+        )
+        expect(Audit::Log).to have_received(:call).with(
+          action: "subscription.paid_signup.started",
+          actor: user,
+          company: company,
+          resource: pending_subscription,
+          metadata: hash_including(
+            event: "paid_signup_started",
+            origin: "app_configurations_subscription",
+            selected_payment_method: "pix",
+            previous_subscription_id: starter_subscription.id,
+            selected_plan: hash_including(
+              id: paid_plan.id,
+              external_id: paid_plan.external_id,
+              name: paid_plan.name,
+              transaction_amount: paid_plan.transaction_amount
+            ),
+            pending_subscription: hash_including(
+              id: pending_subscription.id,
+              status: "pending"
+            )
+          )
+        )
+      end
+    end
+
+    it "cria assinatura paga pendente e agenda boleto" do
+      post :start_paid_subscription, params: {
+        signup: {
+          plan_id: paid_plan.id,
+          payment_method: "boleto"
+        }
+      }
+
+      pending_subscription = company.subscriptions.order(created_at: :desc).first
+
+      aggregate_failures do
+        expect(response).to redirect_to(app_configurations_path(tab: "assinatura"))
+        expect(company.reload.payment_method).to eq("boleto")
+        expect(CreateUser::BoletoPaymentJob).to have_received(:perform_later).with(
+          company.id,
+          plan_id: paid_plan.id,
+          subscription_id: pending_subscription.id
+        )
+      end
+    end
+
+    it "bloqueia cartão sem token" do
+      post :start_paid_subscription, params: {
+        signup: {
+          plan_id: paid_plan.id,
+          payment_method: "credit_card"
+        }
+      }
+
+      aggregate_failures do
+        expect(response).to redirect_to(app_configurations_path(tab: "assinatura"))
+        expect(flash[:alert]).to eq("Token do cartão não informado.")
+        expect(company.subscriptions.where(status: :pending)).to be_empty
+      end
+    end
+
+    it "bloqueia adesão quando empresa não está no Starter" do
+      paid_company_plan = create(:plan, name: "Basico", external_reference: "BASICO_ADESAO", transaction_amount: 99)
+      starter_subscription.update!(preapproval_plan_id: paid_company_plan.external_id, reason: paid_company_plan.reason, transaction_amount: paid_company_plan.transaction_amount)
+      company.update!(plan: paid_company_plan)
+
+      post :start_paid_subscription, params: {
+        signup: {
+          plan_id: paid_plan.id,
+          payment_method: "pix"
+        }
+      }
+
+      aggregate_failures do
+        expect(response).to redirect_to(app_configurations_path(tab: "assinatura"))
+        expect(flash[:alert]).to eq("A adesão pela tela de configurações está disponível apenas para o plano Starter.")
+        expect(CreateUser::PixPaymentJob).not_to have_received(:perform_later)
       end
     end
   end

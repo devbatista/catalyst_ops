@@ -1,3 +1,9 @@
+<% if ENV["MP_PUBLIC_KEY"].present? %>
+  <% content_for :head do %>
+    <meta name="mp-public-key" content="<%= ENV["MP_PUBLIC_KEY"] %>">
+  <% end %>
+<% end %>
+
 <div class="page-wrapper configurations-page">
   <div class="page-content">
     <% active_tab = @active_config_tab.presence || params[:tab].presence || "perfil" %>

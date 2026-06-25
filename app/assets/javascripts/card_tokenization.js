@@ -95,7 +95,9 @@
     function shouldTokenize() {
       const method = form.querySelector('input[name="signup[payment_method]"]:checked')?.value;
       const ccForm = document.getElementById('credit-card-form');
-      const selectedPlan = form.querySelector('input[name="signup[plan_id]"]:checked');
+      const selectedPlan =
+        form.querySelector('input[name="signup[plan_id]"]:checked') ||
+        form.querySelector('input[type="hidden"][name="signup[plan_id]"]');
       const freePlanSelected = selectedPlan && selectedPlan.dataset.planFree === 'true';
       return method === 'credit_card' && !freePlanSelected && ccForm && !ccForm.classList.contains('d-none');
     }
@@ -141,6 +143,8 @@
             form.submit();
           },
           onError: (errors) => {
+            if (!shouldTokenize()) return;
+
             console.error('cardForm error', errors);
             alert('Erro ao tokenizar o cartão. Verifique os dados e tente novamente.');
           }
