@@ -23,7 +23,7 @@
               <div class="text-end">
                 <% if @support_ticket.status %>
                   <span class="badge bg-primary">
-                    <%= @support_ticket.status.humanize %>
+                    <%= @support_ticket.status_label %>
                   </span>
                 <% end %>
                 <% if @support_ticket.aberto? || @support_ticket.em_andamento? || @support_ticket.aguardando_cliente? || @support_ticket.resolvido? %>
@@ -40,15 +40,15 @@
             <div class="row text-muted small mb-3">
               <div class="col-md-3 mb-2">
                 <div class="fw-semibold text-dark">Categoria</div>
-                <div><%= @support_ticket.category&.humanize || "-" %></div>
+                <div><%= @support_ticket.category.present? ? @support_ticket.category_label : "-" %></div>
               </div>
               <div class="col-md-3 mb-2">
                 <div class="fw-semibold text-dark">Impacto</div>
-                <div><%= @support_ticket.impact&.humanize || "-" %></div>
+                <div><%= @support_ticket.impact.present? ? @support_ticket.impact_label : "-" %></div>
               </div>
               <div class="col-md-3 mb-2">
                 <div class="fw-semibold text-dark">Prioridade</div>
-                <div><%= @support_ticket.priority&.humanize || "-" %></div>
+                <div><%= @support_ticket.priority.present? ? @support_ticket.priority_label : "-" %></div>
               </div>
               <div class="col-md-3 mb-2">
                 <div class="fw-semibold text-dark">OS relacionada</div>

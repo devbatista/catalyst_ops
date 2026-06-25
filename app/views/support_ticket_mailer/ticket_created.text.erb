@@ -4,12 +4,12 @@ Empresa: <%= @company.name %>
 Ticket: #<%= @ticket.id %>
 Assunto: <%= @ticket.subject %>
 Solicitante: <%= @requester.full_name.presence || @requester.name %>
-Categoria: <%= @ticket.category.humanize %>
-Impacto: <%= @ticket.impact.humanize %>
-Prioridade: <%= @ticket.priority.humanize %>
-Status: <%= @ticket.status.humanize %>
+Categoria: <%= @ticket.category_label %>
+Impacto: <%= @ticket.impact_label %>
+Prioridade: <%= @ticket.priority_label %>
+Status: <%= @ticket.status_label %>
 
-Descricao:
+Descrição:
 <%= @ticket.description %>
 
 Abrir ticket:

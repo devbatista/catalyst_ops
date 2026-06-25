@@ -23,21 +23,21 @@
                 <div class="col-md-4 mb-3">
                   <%= f.label :category, "Categoria", class: "form-label" %>
                   <%= f.select :category,
-                               SupportTicket.categories.keys.map { |c| [c.humanize, c] },
+                               SupportTicket.category_options,
                                { include_blank: "Selecione" },
                                class: "form-select" %>
                 </div>
                 <div class="col-md-4 mb-3">
                   <%= f.label :impact, "Impacto", class: "form-label" %>
                   <%= f.select :impact,
-                               SupportTicket.impacts.keys.map { |i| [i.humanize, i] },
+                               SupportTicket.impact_options,
                                { include_blank: "Selecione" },
                                class: "form-select" %>
                 </div>
                 <div class="col-md-4 mb-3">
                   <%= f.label :priority, "Prioridade", class: "form-label" %>
                   <%= f.select :priority,
-                               SupportTicket.priorities.keys.map { |p| [p.humanize, p] },
+                               SupportTicket.priority_options,
                                { include_blank: "Selecione" },
                                class: "form-select" %>
                 </div>
