@@ -1,0 +1,13 @@
+# frozen_string_literal: true
+
+require_relative "../lib/pull_request_title_policy"
+
+title = ARGV.first || ENV["PR_TITLE"].to_s
+reason = PullRequestTitlePolicy.invalid_reason(title)
+
+if reason
+  warn reason
+  exit 1
+end
+
+puts "Título do PR válido."
