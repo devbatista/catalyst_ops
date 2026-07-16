@@ -3,7 +3,7 @@ Nova mensagem no ticket #<%= @ticket.id %>
 Empresa: <%= @company.name %>
 Assunto: <%= @ticket.subject %>
 Autor da mensagem: <%= @actor.full_name.presence || @actor.name %>
-Status atual: <%= @ticket.status.humanize %>
+Status atual: <%= @ticket.status_label %>
 
 Mensagem:
 <%= @support_message.body %>

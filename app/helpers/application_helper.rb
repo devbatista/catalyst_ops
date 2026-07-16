@@ -66,7 +66,7 @@ module ApplicationHelper
       else "secondary"
       end
 
-    content_tag :span, ticket.status.humanize, class: "badge bg-#{status_class}"
+    content_tag :span, ticket.status_label, class: "badge bg-#{status_class}"
   end
 
   def ticket_impact_badge(ticket)
@@ -81,7 +81,7 @@ module ApplicationHelper
       end
 
     content_tag :span,
-                (ticket.impact&.humanize || "-"),
+                (ticket.impact.present? ? ticket.impact_label : "-"),
                 class: "badge bg-#{impact_class}"
   end
 

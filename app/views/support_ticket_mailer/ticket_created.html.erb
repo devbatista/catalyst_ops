@@ -9,10 +9,10 @@
   <strong>Ticket:</strong> #<%= @ticket.id %><br>
   <strong>Assunto:</strong> <%= @ticket.subject %><br>
   <strong>Solicitante:</strong> <%= @requester.full_name.presence || @requester.name %><br>
-  <strong>Categoria:</strong> <%= @ticket.category.humanize %><br>
-  <strong>Impacto:</strong> <%= @ticket.impact.humanize %><br>
-  <strong>Prioridade:</strong> <%= @ticket.priority.humanize %><br>
-  <strong>Status:</strong> <%= @ticket.status.humanize %>
+  <strong>Categoria:</strong> <%= @ticket.category_label %><br>
+  <strong>Impacto:</strong> <%= @ticket.impact_label %><br>
+  <strong>Prioridade:</strong> <%= @ticket.priority_label %><br>
+  <strong>Status:</strong> <%= @ticket.status_label %>
 </p>
 
 <p style="font-size:16px; line-height:1.6;">

@@ -20,14 +20,14 @@
                   <div class="col-md-3">
                     <label class="form-label">Status</label>
                     <%= select_tag :status,
-                                   options_for_select([["Todos", ""]] + SupportTicket.statuses.keys.map { |s| [s.humanize, s] }, params[:status]),
+                                   options_for_select([["Todos", ""]] + SupportTicket.status_options, params[:status]),
                                    class: "form-select" %>
                   </div>
 
                   <div class="col-md-3">
                     <label class="form-label">Categoria</label>
                     <%= select_tag :category,
-                                   options_for_select([["Todas", ""]] + SupportTicket.categories.keys.map { |c| [c.humanize, c] }, params[:category]),
+                                   options_for_select([["Todas", ""]] + SupportTicket.category_options, params[:category]),
                                    class: "form-select" %>
                   </div>
 
@@ -94,7 +94,7 @@
                         <td><%= ticket.company&.name %></td>
                         <td><%= ticket.user&.name %></td>
 
-                        <td><%= ticket.category.humanize %></td>
+                        <td><%= ticket.category_label %></td>
 
                         <td><%= ticket_status_badge(ticket) %></td>
 

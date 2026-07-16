@@ -5,7 +5,7 @@
   <strong>Empresa:</strong> <%= @company.name %><br>
   <strong>Assunto:</strong> <%= @ticket.subject %><br>
   <strong>Autor da mensagem:</strong> <%= @actor.full_name.presence || @actor.name %><br>
-  <strong>Status atual:</strong> <%= @ticket.status.humanize %>
+  <strong>Status atual:</strong> <%= @ticket.status_label %>
 </p>
 
 <p style="font-size:16px; line-height:1.6;">

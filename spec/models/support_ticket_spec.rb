@@ -72,6 +72,70 @@ RSpec.describe SupportTicket, type: :model do
     end
   end
 
+  describe "labels dos enums" do
+    it "retorna categorias com acentuação correta" do
+      expect(described_class.category_options).to eq(
+        [
+          ["Dúvida", "duvida"],
+          ["Problema técnico", "problema_tecnico"],
+          ["Financeiro", "financeiro"],
+          ["Sugestão", "sugestao"],
+          ["Outros", "outros"]
+        ]
+      )
+    end
+
+    it "retorna impactos com acentuação correta" do
+      expect(described_class.impact_options).to eq(
+        [
+          ["Baixo", "baixo"],
+          ["Médio", "medio"],
+          ["Alto", "alto"],
+          ["Bloqueante", "bloqueante"]
+        ]
+      )
+    end
+
+    it "retorna status com rótulos legíveis" do
+      expect(described_class.status_options).to eq(
+        [
+          ["Aberto", "aberto"],
+          ["Em andamento", "em_andamento"],
+          ["Aguardando cliente", "aguardando_cliente"],
+          ["Resolvido", "resolvido"],
+          ["Fechado", "fechado"],
+          ["Cancelado", "cancelado"]
+        ]
+      )
+    end
+
+    it "retorna prioridades com acentuação correta" do
+      expect(described_class.priority_options).to eq(
+        [
+          ["Baixa", "baixa"],
+          ["Normal", "normal"],
+          ["Alta", "alta"],
+          ["Crítica", "critica"]
+        ]
+      )
+    end
+
+    it "expõe os labels no ticket" do
+      ticket = build(
+        :support_ticket,
+        category: :problema_tecnico,
+        impact: :medio,
+        status: :aguardando_cliente,
+        priority: :critica
+      )
+
+      expect(ticket.category_label).to eq("Problema técnico")
+      expect(ticket.impact_label).to eq("Médio")
+      expect(ticket.status_label).to eq("Aguardando cliente")
+      expect(ticket.priority_label).to eq("Crítica")
+    end
+  end
+
   describe "scopes" do
     describe ".recent" do
       it "ordena por última resposta e depois por criação" do
