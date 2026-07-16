@@ -9,8 +9,8 @@
 CatalystOps é um SaaS de gestão de ordens de serviço para empresas
 prestadoras de serviços técnicos (assistências, manutenção, instalação,
 field service em geral). Centraliza orçamentos, ordens de serviço, agenda de
-técnicos, clientes, financeiro e suporte em um único lugar — com acesso web
-e app mobile para o técnico em campo.
+técnicos, clientes, financeiro e suporte em um único lugar, acessível pelo
+navegador em qualquer dispositivo.
 
 ## Público-Alvo
 
@@ -24,8 +24,8 @@ e app mobile para o técnico em campo.
 
 "Do orçamento ao pagamento em um só fluxo: você cria o orçamento, o cliente
 aprova online sem precisar de login, a OS é gerada automaticamente, o técnico
-recebe na agenda e no celular, e o financeiro mostra o que foi realizado e o
-que está pendente."
+recebe na agenda dele, e o financeiro mostra o que foi realizado e o que está
+pendente."
 
 ## Funcionalidades Por Módulo
 
@@ -48,11 +48,8 @@ que está pendente."
 - Calendário da operação (dia/semana) e agenda por técnico.
 - Detecção de conflito de horário e aviso de OS simultâneas.
 - Permissões por papel: gestor administra; técnico vê e executa só o que é
-  dele.
-
-### App mobile (API dedicada)
-- Login seguro no celular; o técnico vê dashboard, agenda e suas OS.
-- Atualiza status, adiciona observações e envia fotos direto do atendimento.
+  dele — dashboard, agenda e OS próprias, acessíveis também pelo navegador
+  do celular.
 
 ### Financeiro e relatórios
 - Visão de faturamento realizado × pendente por itens de OS.
@@ -113,7 +110,7 @@ são **mensais** (mês corrente). "Ilimitado" = sem restrição.
 - Agenda por técnico com detecção de conflito.
 - Permissões prontas: técnico não vê financeiro nem dados de outros
   atendimentos.
-- App mobile: técnico novo produz no primeiro dia.
+- Interface simples para o técnico: técnico novo produz no primeiro dia.
 
 ### Empresa que quer profissionalizar a imagem
 - Cliente final aprova orçamento em página profissional, sem login.
@@ -125,7 +122,7 @@ são **mensais** (mês corrente). "Ilimitado" = sem restrição.
 | Objeção | Resposta |
 |---|---|
 | "É caro." | Comece no Starter gratuito — 3 OS/mês sem pagar nada. O Básico custa R$ 99: uma OS recuperada por mês já paga o sistema. |
-| "Meu técnico não vai usar." | O app mobile mostra só o que ele precisa: agenda e OS dele. Atualizar status e mandar foto é mais fácil que responder WhatsApp. |
+| "Meu técnico não vai usar." | O técnico vê só o que precisa: agenda e OS dele, direto no navegador do celular. Atualizar status e anexar foto é mais fácil que responder WhatsApp. |
 | "Já uso planilha." | Planilha não avisa OS atrasada, não deixa o cliente aprovar orçamento online e não gera OS sozinha. |
 | "E se eu quiser sair?" | Sem fidelidade: o cancelamento vale até o fim do período pago e os relatórios exportam seus dados em CSV/XLSX. |
 | "Meus dados ficam seguros?" | Isolamento por empresa, auditoria de eventos críticos e conformidade LGPD (retenção e aceite de termos registrados). |
@@ -150,8 +147,16 @@ são **mensais** (mês corrente). "Ilimitado" = sem restrição.
 - Contato rápido (WhatsApp) só existe em Profissional e Enterprise.
 - Starter não abre ticket de suporte (só base de conhecimento).
 - Sem integração com outros gateways além do Mercado Pago.
-- Sem app publicado em loja — o mobile é via API/app próprio (confirmar
-  status de publicação antes de prometer).
+- **App mobile ainda não foi entregue** — a infraestrutura (API) existe, mas
+  o aplicativo será lançado depois. Não prometer app em loja nem citar prazo
+  sem alinhamento com produto. Enquanto isso, o acesso do técnico é pelo
+  navegador do celular.
+
+## Roadmap (usar com cautela na venda)
+
+- **App mobile do técnico**: em desenvolvimento, será entregue em fase
+  posterior. Pode ser mencionado como visão de futuro, nunca como
+  funcionalidade atual ou com data.
 
 ## Documentos Relacionados
 
