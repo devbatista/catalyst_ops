@@ -37,6 +37,7 @@ Este guia cobre as funcionalidades do perfil **gestor** no ambiente `app`.
 - [Como criar um orçamento](orcamentos/como_criar_orcamento.md)
 - [Como enviar orçamento para aprovação](orcamentos/como_enviar_orcamento_para_aprovacao.md)
 - [Como aprovar ou rejeitar orçamento (gestor)](orcamentos/como_aprovar_ou_rejeitar_orcamento.md)
+- [Como o cliente aprova o orçamento (portal do cliente)](orcamentos/como_cliente_aprova_orcamento.md)
 - [Como tratar orçamento rejeitado](orcamentos/como_tratar_orcamento_rejeitado.md)
 
 ## Clientes
@@ -60,6 +61,7 @@ Este guia cobre as funcionalidades do perfil **gestor** no ambiente `app`.
 
 ## Relatórios
 - [Como visualizar relatórios (OS e Orçamentos)](relatorios/como_ver_relatorios_os.md)
+- [Como exportar relatórios](relatorios/como_exportar_relatorios.md)
 
 ## Conta, Empresa e Assinatura
 - [Como atualizar seu perfil](conta/como_atualizar_perfil.md)
@@ -67,6 +69,8 @@ Este guia cobre as funcionalidades do perfil **gestor** no ambiente `app`.
 - [Como configurar regras de Ordens de Serviço](conta/como_configurar_regras_os.md)
 - [Como promover técnico para gestor](conta/como_promover_tecnico_a_gestor.md)
 - [Como consultar a assinatura](conta/como_gerenciar_assinatura.md)
+- [Como fazer upgrade de plano](conta/como_fazer_upgrade_de_plano.md)
+- [Como personalizar o PDF de OS e orçamentos](conta/como_personalizar_pdf.md)
 - [Como aceitar o contrato de utilização](conta/como_aceitar_termos.md)
 
 ## Suporte

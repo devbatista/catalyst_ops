@@ -5,7 +5,7 @@ Este guia cobre as funcionalidades do perfil **técnico** no ambiente `app`.
 ## Acesso
 - [Como fazer login](acesso/como_fazer_login.md)
 - [Como confirmar cadastro](acesso/como_confirmar_cadastro.md)
-- [Como redefinir senha](acesso/como_redefinir_senha.md)
+- [Esqueci minha senha (redefinir antes do login)](acesso/como_redefinir_senha.md)
 - [Como sair da conta (logout)](acesso/como_sair.md)
 
 ## Visão Geral
@@ -24,6 +24,7 @@ Este guia cobre as funcionalidades do perfil **técnico** no ambiente `app`.
 
 ## Conta
 - [Como atualizar meu perfil](conta/como_atualizar_perfil.md)
+- [Como trocar minha senha (já logado)](conta/como_redefinir_senha.md)
 - [Como aceitar o contrato de utilização](conta/como_aceitar_termos.md)
 
 ## Base de Conhecimento
