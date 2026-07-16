@@ -26,7 +26,7 @@ class SupportTicketMailer < ApplicationMailer
 
     mail(
       to: recipient_emails,
-      subject: "[Ticket ##{@ticket.id}] Status atualizado para #{@ticket.status.humanize}"
+      subject: "[Ticket ##{@ticket.id}] Status atualizado para #{@ticket.status_label}"
     )
   end
 

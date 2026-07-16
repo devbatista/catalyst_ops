@@ -85,17 +85,17 @@
             <div class="row mb-3">
               <div class="col-md-4">
                 <strong>Categoria:</strong>
-                <p class="mb-0"><%= @ticket.category&.humanize || "-" %></p>
+                <p class="mb-0"><%= @ticket.category.present? ? @ticket.category_label : "-" %></p>
               </div>
 
               <div class="col-md-4">
                 <strong>Impacto:</strong>
-                <p class="mb-0"><%= @ticket.impact&.humanize || "-" %></p>
+                <p class="mb-0"><%= @ticket.impact.present? ? @ticket.impact_label : "-" %></p>
               </div>
 
               <div class="col-md-4">
                 <strong>Prioridade:</strong>
-                <p class="mb-0"><%= @ticket.priority&.humanize || "-" %></p>
+                <p class="mb-0"><%= @ticket.priority.present? ? @ticket.priority_label : "-" %></p>
               </div>
             </div>
 
