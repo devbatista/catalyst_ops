@@ -36,3 +36,7 @@ serviços técnicos.
 - Financeiro e relatórios: `docs/dev/ai/financeiro_e_relatorios.md`
 - Integrações e webhooks: `docs/dev/ai/integracoes_e_webhooks.md`
 - Auditoria e operação: `docs/dev/ai/auditoria_e_operacao.md`
+- API mobile: `docs/dev/ai/api_mobile.md`
+- Admin e backoffice: `docs/dev/ai/admin_backoffice.md`
+- Onboarding de usuários: `docs/dev/ai/onboarding.md`
+- Portal público do cliente: `docs/dev/ai/portal_cliente.md`

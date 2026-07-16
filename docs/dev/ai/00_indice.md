@@ -25,3 +25,7 @@ alterar código.
 - [Financeiro e relatórios](financeiro_e_relatorios.md)
 - [Integrações e webhooks](integracoes_e_webhooks.md)
 - [Auditoria e operação](auditoria_e_operacao.md)
+- [API mobile](api_mobile.md)
+- [Admin e backoffice](admin_backoffice.md)
+- [Onboarding de usuários](onboarding.md)
+- [Portal público do cliente](portal_cliente.md)
