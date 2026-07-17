@@ -62,6 +62,8 @@ services:
     environment:
       <<: *rails_env
     command: bin/rails server -b 0.0.0.0 -p 3000
+    volumes:
+      - letters:/rails/tmp/letter_opener
     restart: unless-stopped
 
   sidekiq:
@@ -72,6 +74,8 @@ services:
       - redis
     environment:
       <<: *rails_env
+    volumes:
+      - letters:/rails/tmp/letter_opener
     restart: unless-stopped
 
   nginx:
@@ -88,3 +92,4 @@ services:
 
 volumes:
   pgdata:
+  letters:
