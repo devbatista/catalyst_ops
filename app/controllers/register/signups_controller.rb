@@ -50,6 +50,7 @@ class Register::SignupsController < ApplicationController
     end
 
     if @company.plan&.free?
+      @company.activate!
       @user.send_starter_welcome_email!
       return redirect_to success_path(company_id: @company.id, starter: "1")
     elsif trial_coupon_without_mercado_pago?(coupon_result)
