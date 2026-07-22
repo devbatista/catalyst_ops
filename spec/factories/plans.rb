@@ -3,8 +3,8 @@ FactoryBot.define do
     name { "Basico" }
     reason { "c-basico" }
     status { "active" }
-    sequence(:external_id) { |n| "plan_#{n}" }
-    sequence(:external_reference) { |n| "PLAN_#{n}" }
+    external_id { "plan_#{SecureRandom.hex(8)}" }
+    external_reference { "PLAN_#{SecureRandom.hex(8)}" }
     frequency { 1 }
     frequency_type { "months" }
     transaction_amount { 99.0 }

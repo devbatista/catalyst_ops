@@ -25,7 +25,26 @@ class ApplicationController < ActionController::Base
     unless current_user && current_user.active?
       reset_session
       redirect_to login_root_url(subdomain: "login"), allow_other_host: true
+      return
     end
+
+    if web_session_expired?
+      reset_session
+      redirect_to login_root_url(subdomain: "login"), allow_other_host: true,
+                  alert: "Sua sessão expirou por inatividade. Faça login novamente."
+      return
+    end
+
+    renew_web_session_activity!
+  end
+
+  def web_session_expired?
+    last_activity_at = session[:last_activity_at].to_i
+    last_activity_at.positive? && Time.current.to_i - last_activity_at > 12.hours
+  end
+
+  def renew_web_session_activity!
+    session[:last_activity_at] = Time.current.to_i
   end
 
   def with_current_context
