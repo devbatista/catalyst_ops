@@ -286,9 +286,11 @@ class Register::SignupsController < ApplicationController
     plan_key = params[:plan].to_s.strip
     return if plan_key.blank?
 
-    Plan.where(status: :active)
-        .where("LOWER(external_reference) = :key OR LOWER(name) = :key", key: plan_key.downcase)
-        .first
+    plans = Plan.where(status: :active)
+    normalized_key = plan_key.downcase
+
+    plans.where("LOWER(external_reference) = ?", normalized_key).first ||
+      plans.where("LOWER(name) = ?", normalized_key).first
   end
 
 end

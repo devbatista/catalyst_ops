@@ -33,7 +33,20 @@ RSpec.describe "Register::SignupsController", type: :request do
   end
 
   it "pré-seleciona o plano Starter quando informado pelo site" do
-    starter = create(:plan, :starter, status: "active")
+    starter = Plan.find_or_create_by!(external_reference: "STARTER") do |plan|
+      plan.name = "Starter"
+      plan.reason = "starter-gratuito"
+      plan.status = "active"
+      plan.external_id = "starter_test"
+      plan.frequency = 1
+      plan.frequency_type = "months"
+      plan.transaction_amount = 0
+      plan.free = true
+      plan.max_technicians = 1
+      plan.max_orders = 3
+      plan.max_budgets = 3
+      plan.support_level = "Base de conhecimento"
+    end
 
     get "/", params: { plan: "starter" }
 

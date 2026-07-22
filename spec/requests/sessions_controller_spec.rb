@@ -84,6 +84,35 @@ RSpec.describe "SessionsController", type: :request do
     end
   end
 
+  describe "timeout de sessão" do
+    it "encerra a sessão após 12 horas de inatividade e renova a janela a cada acesso" do
+      company = active_company
+      user = create(:user, :gestor, company: company, active: true, password: "Password@123")
+      base_time = Time.zone.local(2026, 1, 1, 9, 0, 0)
+
+      travel_to(base_time) do
+        post "/login", params: { email: user.email, password: "Password@123" }
+      end
+
+      host! scoped_host_for("app")
+
+      travel_to(base_time + 11.hours) do
+        get "/"
+        expect(response).to have_http_status(:ok)
+      end
+
+      travel_to(base_time + 22.hours) do
+        get "/"
+        expect(response).to have_http_status(:ok)
+      end
+
+      travel_to(base_time + 34.hours + 1.second) do
+        get "/"
+        expect(response).to redirect_to(login_root_url(subdomain: "login"))
+      end
+    end
+  end
+
   describe "GET /forgot_password" do
     it "renderiza a tela de recuperação de senha" do
       get "/forgot_password"

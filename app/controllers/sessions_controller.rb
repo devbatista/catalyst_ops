@@ -15,6 +15,7 @@ class SessionsController < Devise::SessionsController
     user = User.find_by(email: email)
     if user&.active? && user&.valid_password?(params[:password])
       sign_in(:user, user)
+      session[:last_activity_at] = Time.current.to_i
       Audit::AuthLogger.login_succeeded(user: user)
 
       if user.admin?
