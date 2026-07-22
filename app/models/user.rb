@@ -6,7 +6,7 @@ class User < ApplicationRecord
   PASSWORD_REQUIREMENTS_MESSAGE = "deve ter pelo menos 8 caracteres, incluindo letra maiúscula, letra minúscula, número e caractere especial"
 
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable
+         :recoverable, :rememberable, :timeoutable, :validatable
 
   enum role: {
     admin: 0,
