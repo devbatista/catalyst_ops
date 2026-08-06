@@ -62,4 +62,17 @@ RSpec.describe UserMailer, type: :mailer do
       expect(email.text_part.decoded).to include("reset_password_token=reset-token")
     end
   end
+
+  describe "#test_email" do
+    it "envia e-mail de teste com cópia para o admin solicitante" do
+      email = described_class.test_email(user, "admin@example.com")
+
+      aggregate_failures do
+        expect(email.to).to eq(["maria@example.com"])
+        expect(email.cc).to eq(["admin@example.com"])
+        expect(email.subject).to eq("E-mail de teste - CatalystOps")
+        expect(email.text_part.decoded).to include("Maria Usuária", "admin@example.com")
+      end
+    end
+  end
 end

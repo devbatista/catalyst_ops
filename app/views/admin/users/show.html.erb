@@ -72,9 +72,9 @@
             <% end %>
 
             <hr>
-            
+
             <h5>Empresa do usuário</h5>
-            
+
             <% if @user.company.present? %>
               <div class="row mb-3">
                 <div class="col-md-6">
@@ -94,7 +94,7 @@
                   </p>
                 </div>
               </div>
-            
+
               <div class="row mb-3">
                 <div class="col-md-6">
                   <strong>Email:</strong>
@@ -105,14 +105,14 @@
                   <p><%= @user.company.current_plan&.name || @user.company.plan&.name || "Sem plano" %></p>
                 </div>
               </div>
-            
+
               <div class="row mb-3">
                 <div class="col-md-12">
                   <strong>Endereço:</strong>
                   <p><%= @user.company.full_address %></p>
                 </div>
               </div>
-            
+
               <div class="row mb-3">
                 <div class="col-md-4">
                   <strong>Status de acesso:</strong>
@@ -130,6 +130,24 @@
             <% else %>
               <p class="text-muted">Este usuário não está vinculado a nenhuma empresa.</p>
             <% end %>
+
+            <hr>
+
+            <h5>Teste de e-mail</h5>
+            <div class="row mb-3">
+              <div class="col-md-8">
+                <p class="text-muted mb-0">
+                  Envia uma mensagem de teste para <%= @user.email %> com cópia para <%= current_user.email %>.
+                </p>
+              </div>
+              <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <%= button_to "Enviar e-mail de teste",
+                              send_test_email_admin_user_path(@user),
+                              method: :post,
+                              class: "btn btn-sm btn-outline-primary",
+                              form: { data: { confirm: "Enviar e-mail de teste para #{@user.email}?" } } %>
+              </div>
+            </div>
 
             <div class="mt-3">
               <%= link_to "Voltar", admin_users_path, class: "btn btn-secondary" %>
