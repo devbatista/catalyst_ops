@@ -201,7 +201,17 @@ Opcionalmente, você também pode acessar o Rails diretamente por:
 
 ## Como subir o projeto
 
-### 1. Build e subida dos containers
+### 1. Criar o override de desenvolvimento
+
+O `docker-compose.override.yml` está no `.gitignore`, então **um clone novo não vem
+com ele**. Sem esse arquivo o código fica congelado dentro da imagem e nenhuma
+alteração local reflete no container. Crie-o a partir do exemplo:
+
+```bash
+cp docker-compose.override.yml.example docker-compose.override.yml
+```
+
+### 2. Build e subida dos containers
 
 Na raiz do projeto:
 
@@ -217,19 +227,19 @@ Isso sobe:
 - `sidekiq`
 - `nginx`
 
-### 2. Criar banco e rodar migrations
+### 3. Criar banco e rodar migrations
 
 ```bash
 docker compose exec web bin/rails db:create db:migrate
 ```
 
-### 3. Popular dados iniciais
+### 4. Popular dados iniciais
 
 ```bash
 docker compose exec web bin/rails db:seed
 ```
 
-### 4. Validar o ambiente
+### 5. Validar o ambiente
 
 ```bash
 docker compose ps
@@ -239,20 +249,29 @@ docker compose logs -f sidekiq
 
 ## Montagem de código no desenvolvimento
 
-O arquivo [`docker-compose.override.yml`](docker-compose.override.yml) monta o diretório do projeto dentro dos containers `web` e `sidekiq`:
+O arquivo `docker-compose.override.yml` monta o diretório do projeto dentro dos
+containers `web` e `sidekiq`. Ele **não é versionado** (está no `.gitignore`) —
+o template versionado é
+[`docker-compose.override.yml.example`](docker-compose.override.yml.example):
 
 ```yaml
 services:
   web:
     volumes:
       - .:/rails
-      - ./storage:/rails/storage
+      - /rails/tmp
+      - letters:/rails/tmp/letter_opener
 
   sidekiq:
     volumes:
       - .:/rails
-      - ./storage:/rails/storage
+      - /rails/tmp
+      - letters:/rails/tmp/letter_opener
 ```
+
+O volume anônimo em `/rails/tmp` mantém o `tmp/` dentro do container: o cache do
+bootsnap é específico da plataforma e o cache gerado no host (macOS) quebra no
+Linux do container.
 
 Na prática, isso significa:
 

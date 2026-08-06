@@ -1,0 +1,25 @@
+# Exemplo de override para DESENVOLVIMENTO.
+#
+# Copie para docker-compose.override.yml (que está no .gitignore):
+#
+#   cp docker-compose.override.yml.example docker-compose.override.yml
+#
+# O Docker Compose carrega o docker-compose.override.yml automaticamente junto
+# com o docker-compose.yml. Sem ele, o código roda a partir do snapshot copiado
+# para dentro da imagem no build (Dockerfile: `COPY . .`), e nenhuma alteração
+# local aparece sem `docker compose build`.
+services:
+  web:
+    volumes:
+      - .:/rails
+      # Volume anônimo: mantém tmp/ dentro do container. O cache do bootsnap é
+      # específico da plataforma e o cache gerado no host (macOS) quebra no
+      # Linux do container.
+      - /rails/tmp
+      - letters:/rails/tmp/letter_opener
+
+  sidekiq:
+    volumes:
+      - .:/rails
+      - /rails/tmp
+      - letters:/rails/tmp/letter_opener
