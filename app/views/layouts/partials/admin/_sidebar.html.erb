@@ -110,6 +110,14 @@
       <% end %>
     </li>
 
+    <!-- Email -->
+    <li class="list-group-item <%= active_menu_class(admin_email_path) if defined?(admin_email_path) %>">
+      <%= link_to (defined?(admin_email_path) ? admin_email_path : "#") do %>
+        <div class="parent-icon"><i class='bx bx-envelope'></i></div>
+        <div class="menu-title">Email</div>
+      <% end %>
+    </li>
+
     <% if Rails.env.development? %>
       <li class="list-group-item <%= active_menu_class(admin_coverage_path) %>">
         <%= link_to admin_coverage_path do %>

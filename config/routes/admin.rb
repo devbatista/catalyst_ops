@@ -34,6 +34,7 @@ constraints subdomain: "admin" do
       post :test_sentry
     end
   end
+  resource :email, only: [:show, :create], module: "admin", as: :admin_email
   resources :configurations, only: [:index, :edit, :update], module: "admin", as: :admin_configurations
   resources :contents, module: "admin", as: :admin_contents
   

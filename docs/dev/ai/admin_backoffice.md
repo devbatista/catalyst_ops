@@ -36,6 +36,8 @@ Seções e finalidades:
   com anexos e notificação.
 - Base de conhecimento: CRUD de `KnowledgeBaseArticle` com filtros por
   categoria, audiência e busca.
+- Email: formulário operacional para envio de e-mail de teste para um
+  destinatário informado pelo admin.
 - Logs: listagem e detalhe de `AuditEvent` com filtros e exportação CSV.
 - Métricas: status do Sentry, indicadores de erro por auditoria, filas do
   Sidekiq e funil de onboarding/ativação.
@@ -70,6 +72,7 @@ Seções e finalidades:
 - `app/controllers/admin/tickets_controller.rb`
 - `app/controllers/admin/support_messages_controller.rb`
 - `app/controllers/admin/knowledge_base_articles_controller.rb`
+- `app/controllers/admin/emails_controller.rb`
 - `app/controllers/admin/logs_controller.rb`
 - `app/controllers/admin/metrics_controller.rb`
 - `app/controllers/admin/configurations_controller.rb`
@@ -118,6 +121,9 @@ Seções e finalidades:
   Sidekiq, Mercado Pago, webhook secret, SMTP). A única escrita é o perfil do
   próprio admin (`id` fixo `"profile"`, permitindo `name`, `phone` e senha);
   qualquer outro `id` retorna alerta de configuração não encontrada.
+- Email: `Admin::EmailsController` expõe `show` e `create`, valida o
+  destinatário com `URI::MailTo::EMAIL_REGEXP` e dispara
+  `AdminMailer.test_email(...).deliver_later`.
 - Coverage: rota e mount de `/coverage_report` só existem em development; o
   controller lê `coverage/.last_run.json` e `coverage/.resultset.json`.
 

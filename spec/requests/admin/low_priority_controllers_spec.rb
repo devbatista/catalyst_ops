@@ -35,6 +35,7 @@ RSpec.describe "Controllers Admin de prioridade baixa", type: :request do
       "/subscriptions",
       "/tickets",
       "/order_services",
+      "/email",
       "/knowledge_base_articles",
       "/subscription_reconciliation_events"
     ].each do |path|
