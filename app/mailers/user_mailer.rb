@@ -28,4 +28,15 @@ class UserMailer < ApplicationMailer
     @reset_password_url = new_password_url(subdomain: "login", reset_password_token: token)
     mail(to: @user.email, subject: "Redefinição de senha - CatalystOps")
   end
+
+  def test_email(user, copy_recipient)
+    @user = user
+    @copy_recipient = copy_recipient
+
+    mail(
+      to: @user.email,
+      cc: copy_recipient,
+      subject: "E-mail de teste - CatalystOps"
+    )
+  end
 end

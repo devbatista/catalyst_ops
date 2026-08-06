@@ -7,7 +7,11 @@ constraints subdomain: "admin" do
   get "/", to: "admin/dashboard#index", as: :admin_dashboard
 
   resources :companies, module: "admin", as: :admin_companies
-  resources :users, module: "admin", as: :admin_users
+  resources :users, module: "admin", as: :admin_users do
+    member do
+      post :send_test_email
+    end
+  end
   resources :subscriptions, module: "admin", as: :admin_subscriptions
   resources :subscription_reconciliation_events, only: [:index, :show], module: "admin", as: :admin_subscription_reconciliation_events
   resources :plans, module: "admin", as: :admin_plans
