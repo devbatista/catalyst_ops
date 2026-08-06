@@ -1,0 +1,41 @@
+<div class="page-wrapper">
+  <div class="page-content">
+    <div class="row">
+      <div class="col-12 col-xl-8">
+        <div class="mb-3">
+          <h4 class="mb-0 text-uppercase">Email</h4>
+        </div>
+
+        <% flash.each do |type, message| %>
+          <% bootstrap_class = { notice: "alert-success", alert: "alert-danger", error: "alert-danger" }[type.to_sym] || "alert-info" %>
+          <div class="alert <%= bootstrap_class %> alert-dismissible fade show shadow-sm" role="alert">
+            <%= message %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+          </div>
+        <% end %>
+
+        <div class="card">
+          <div class="card-body">
+            <h5 class="mb-3">Teste de envio</h5>
+
+            <%= form_with url: admin_email_path, scope: :email_test, method: :post, local: true do |f| %>
+              <div class="mb-3">
+                <%= f.label :email, "E-mail do destinatário", class: "form-label" %>
+                <%= f.email_field :email,
+                                  value: @email,
+                                  class: "form-control",
+                                  placeholder: "nome@empresa.com.br",
+                                  required: true,
+                                  autocomplete: "email" %>
+              </div>
+
+              <div class="d-flex gap-2">
+                <%= f.submit "Enviar e-mail de teste", class: "btn btn-primary" %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
