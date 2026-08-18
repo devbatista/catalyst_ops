@@ -70,6 +70,37 @@ RSpec.describe "Admin::MetricsController", type: :request do
 
       expect(response).to have_http_status(:ok)
     end
+
+    it "apresenta indicadores de armazenamento do servidor" do
+      Rails.cache.clear
+      status = instance_double(Process::Status, success?: true)
+      storage_path = Rails.root.join("tmp/storage").to_s
+
+      allow(Open3).to receive(:capture3).with("df", "-Pk", Rails.root.to_s).and_return(
+        ["Filesystem 1024-blocks Used Available Capacity Mounted on\n/dev/disk1 1000 700 300 70% /\n", "", status]
+      )
+      allow(Open3).to receive(:capture3).with("du", "-sk", storage_path).and_return(
+        ["42\t#{storage_path}\n", "", status]
+      )
+
+      get "/metrics", params: { period: "24h" }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("Armazenamento do servidor")
+      expect(response.body).to include("70% usado")
+      expect(response.body).to include("Pasta storage")
+    end
+
+    it "apresenta fallback quando armazenamento não pode ser consultado" do
+      Rails.cache.clear
+      allow(Open3).to receive(:capture3).and_raise(StandardError, "df indisponível")
+
+      get "/metrics", params: { period: "24h" }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("Armazenamento do servidor")
+      expect(response.body).to include("Não foi possível consultar o espaço em disco deste ambiente.")
+    end
   end
 
   describe "POST /metrics/test_sentry" do

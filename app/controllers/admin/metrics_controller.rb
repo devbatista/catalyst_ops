@@ -1,3 +1,5 @@
+require "open3"
+
 class Admin::MetricsController < AdminController
   PERIODS = {
     "24h" => 24.hours,
@@ -14,6 +16,7 @@ class Admin::MetricsController < AdminController
     @sentry_status = sentry_status
     @error_indicators = error_indicators
     @sidekiq_indicators = sidekiq_indicators
+    @storage_indicators = storage_indicators
     @onboarding_indicators = onboarding_indicators
     @quick_links = quick_links
   end
@@ -93,6 +96,34 @@ class Admin::MetricsController < AdminController
       queue_default: 0,
       retries: 0,
       dead: 0
+    }
+  end
+
+  def storage_indicators
+    root_path = Rails.root
+    active_storage_path = active_storage_disk_root || Rails.root.join("storage")
+    disk_usage = filesystem_usage_for(root_path)
+
+    {
+      available: disk_usage.present?,
+      root_path: root_path.to_s,
+      storage_path: active_storage_path.to_s,
+      total_bytes: disk_usage&.fetch(:total_bytes, nil),
+      used_bytes: disk_usage&.fetch(:used_bytes, nil),
+      available_bytes: disk_usage&.fetch(:available_bytes, nil),
+      used_percentage: disk_usage&.fetch(:used_percentage, nil),
+      storage_bytes: cached_directory_usage_for(active_storage_path)
+    }
+  rescue StandardError
+    {
+      available: false,
+      root_path: Rails.root.to_s,
+      storage_path: Rails.root.join("storage").to_s,
+      total_bytes: nil,
+      used_bytes: nil,
+      available_bytes: nil,
+      used_percentage: nil,
+      storage_bytes: nil
     }
   end
 
@@ -220,5 +251,46 @@ class Admin::MetricsController < AdminController
   def missing_required_sentry_vars
     required = ["SENTRY_DSN"]
     required.reject { |key| ENV[key].present? }
+  end
+
+  def active_storage_disk_root
+    service_name = Rails.application.config.active_storage.service.to_s
+    service_config = Rails.application.config.active_storage.service_configurations.fetch(service_name, {})
+
+    return unless service_config["service"] == "Disk" && service_config["root"].present?
+
+    Pathname.new(service_config["root"].to_s)
+  end
+
+  def filesystem_usage_for(path)
+    stdout, _stderr, status = Open3.capture3("df", "-Pk", path.to_s)
+    return unless status.success?
+
+    _filesystem, blocks, used, available, capacity, _mount = stdout.lines.last.to_s.split(/\s+/, 6)
+    return if blocks.blank? || used.blank? || available.blank?
+
+    {
+      total_bytes: blocks.to_i.kilobytes,
+      used_bytes: used.to_i.kilobytes,
+      available_bytes: available.to_i.kilobytes,
+      used_percentage: capacity.to_s.delete("%").to_i
+    }
+  end
+
+  def cached_directory_usage_for(path)
+    Rails.cache.fetch(["admin_metrics", "directory_usage", path.to_s], expires_in: 5.minutes) do
+      directory_usage_for(path)
+    end
+  rescue StandardError
+    nil
+  end
+
+  def directory_usage_for(path)
+    return 0 unless path.exist?
+
+    stdout, _stderr, status = Open3.capture3("du", "-sk", path.to_s)
+    return unless status.success?
+
+    stdout.to_s.split(/\s+/, 2).first.to_i.kilobytes
   end
 end

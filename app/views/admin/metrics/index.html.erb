@@ -166,6 +166,77 @@
       <div class="col-12 col-xl-6">
         <div class="card border-0 shadow-sm h-100">
           <div class="card-body">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+              <h6 class="mb-0">Armazenamento do servidor</h6>
+              <% if @storage_indicators[:available] %>
+                <% storage_badge_class =
+                     if @storage_indicators[:used_percentage] >= 90
+                       "bg-danger"
+                     elsif @storage_indicators[:used_percentage] >= 80
+                       "bg-warning text-dark"
+                     else
+                       "bg-success"
+                     end %>
+                <span class="badge <%= storage_badge_class %>">
+                  <%= @storage_indicators[:used_percentage] %>% usado
+                </span>
+              <% else %>
+                <span class="badge bg-secondary">indisponível</span>
+              <% end %>
+            </div>
+
+            <% if @storage_indicators[:available] %>
+              <div class="progress mb-3" style="height: 8px;">
+                <div class="progress-bar <%= storage_badge_class %>"
+                     role="progressbar"
+                     style="width: <%= @storage_indicators[:used_percentage] %>%;"
+                     aria-valuenow="<%= @storage_indicators[:used_percentage] %>"
+                     aria-valuemin="0"
+                     aria-valuemax="100"></div>
+              </div>
+
+              <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                  <tbody>
+                    <tr>
+                      <th>Disco total</th>
+                      <td><code><%= number_to_human_size(@storage_indicators[:total_bytes]) %></code></td>
+                    </tr>
+                    <tr>
+                      <th>Disco usado</th>
+                      <td><code><%= number_to_human_size(@storage_indicators[:used_bytes]) %></code></td>
+                    </tr>
+                    <tr>
+                      <th>Disco livre</th>
+                      <td><code><%= number_to_human_size(@storage_indicators[:available_bytes]) %></code></td>
+                    </tr>
+                    <tr>
+                      <th>Pasta storage</th>
+                      <td>
+                        <code>
+                          <%= @storage_indicators[:storage_bytes].nil? ? "indisponível" : number_to_human_size(@storage_indicators[:storage_bytes]) %>
+                        </code>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="small text-muted mt-3">
+                Caminho monitorado: <code><%= @storage_indicators[:storage_path] %></code>
+              </div>
+            <% else %>
+              <p class="small text-muted mb-0">
+                Não foi possível consultar o espaço em disco deste ambiente.
+              </p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-xl-6">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
             <h6 class="mb-3">Configuração de monitoramento</h6>
             <p class="text-muted small mb-2">Variáveis esperadas:</p>
             <ul class="small mb-3">
